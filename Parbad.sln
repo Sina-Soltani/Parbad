@@ -1,0 +1,50 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2035
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DB28BA4A-5CEF-4F6A-813B-4E22068C1350}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSE.txt = LICENSE.txt
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{571BD034-8370-432B-9B18-4C6FA697121C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parbad", "src\Parbad\Parbad.csproj", "{53D0B3CC-2FD4-4113-A368-60715FB8518E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parbad.Mvc", "src\Parbad.Mvc\Parbad.Mvc.csproj", "{19FBD363-C6F1-4DFC-A311-DA8485B6F8A4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{6BB6AFB4-7951-4435-8C10-95AF86B200F8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{82387DCB-D085-4537-B079-BE33F18BC4F8}"
+	ProjectSection(SolutionItems) = preProject
+		docs\Documentation.fa.md = docs\Documentation.fa.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{53D0B3CC-2FD4-4113-A368-60715FB8518E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53D0B3CC-2FD4-4113-A368-60715FB8518E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53D0B3CC-2FD4-4113-A368-60715FB8518E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53D0B3CC-2FD4-4113-A368-60715FB8518E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19FBD363-C6F1-4DFC-A311-DA8485B6F8A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19FBD363-C6F1-4DFC-A311-DA8485B6F8A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19FBD363-C6F1-4DFC-A311-DA8485B6F8A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19FBD363-C6F1-4DFC-A311-DA8485B6F8A4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{53D0B3CC-2FD4-4113-A368-60715FB8518E} = {571BD034-8370-432B-9B18-4C6FA697121C}
+		{19FBD363-C6F1-4DFC-A311-DA8485B6F8A4} = {571BD034-8370-432B-9B18-4C6FA697121C}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CBDDB699-C14A-4235-B0AE-32725230B4ED}
+	EndGlobalSection
+EndGlobal
