@@ -1,5 +1,7 @@
-
+﻿
 ### What is Parbad?
+
+[مشاهده مقاله به فارسی](https://www.dotnettips.info/post/2880/%d9%be%d8%b1%d8%a8%d8%a7%d8%af-%d8%b1%d8%a7%d9%87%d9%86%d9%85%d8%a7%db%8c-%d8%a7%d8%aa%d8%b5%d8%a7%d9%84-%d9%88-%d9%be%db%8c%d8%a7%d8%af%d9%87%e2%80%8c%d8%b3%d8%a7%d8%b2%db%8c-%d8%af%d8%b1%da%af%d8%a7%d9%87%e2%80%8c%d9%87%d8%a7%db%8c-%d8%a7%db%8c%d9%86%d8%aa%d8%b1%d9%86%d8%aa%db%8c-%d8%b4%d8%a8%da%a9%d9%87-%d8%b4%d8%aa%d8%a7%d8%a8)
 
 Parbad is an integrated online payment system. It helps developers and site owners to add Online Payment ability to their websites.
 It can communicate with the most popular banks in Iran like: Mellat, Parsian, Tejarat, Saman and Pasargad.
@@ -60,7 +62,7 @@ else
     Label1.Text = result.Message;
 }
 ```
-Here, result object is the result of the request that you sent to the gateway:
+Here, the result object is the result of the request that you sent to the gateway:
 * ReferenceId: A uniqe code for your payment's request. This code usualy comes from the banks
 * Status: Tells you about the result's status
 * Message: A formatted message about the result (you can show it to the client if you like)

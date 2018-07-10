@@ -1,0 +1,18 @@
+﻿@model Parbad.Sample.Mvc.Models.RefundViewModel
+
+<h1>Refund a transaction</h1>
+
+@Html.ValidationSummary()
+
+@using (Html.BeginForm("Refund", "Payment", FormMethod.Post))
+{
+    <div class="form-group">
+        @Html.LabelFor(model => model.OrderNumber, new { @class = "control-label" })
+        @Html.TextBoxFor(model => model.OrderNumber, new { @class = "form-control" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(model => model.Amount, new { @class = "control-label" })
+        @Html.TextBoxFor(model => model.Amount, new { @class = "form-control" })
+    </div>
+    <button class="btn btn-success">Refund</button>
+}

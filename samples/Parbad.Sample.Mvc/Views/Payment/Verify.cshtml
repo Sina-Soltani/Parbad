@@ -1,0 +1,26 @@
+﻿@model Parbad.Core.VerifyResult
+
+<h1>Verify result</h1>
+
+<table class="table">
+    <tr>
+        <td>Gateway</td>
+        <td>@Model.Gateway</td>
+    </tr>
+    <tr>
+        <td>Reference Id</td>
+        <td>@Model.ReferenceId</td>
+    </tr>
+    <tr>
+        <td>Transaction Id</td>
+        <td>@Model.TransactionId</td>
+    </tr>
+    <tr>
+        <td>Status</td>
+        <td>@Model.Status</td>
+    </tr>
+    <tr>
+        <td>Message</td>
+        <td class="text-lg">@Model.Message</td>
+    </tr>
+</table>
