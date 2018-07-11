@@ -40,7 +40,7 @@ namespace Parbad.Web
         {
             httpResponse.Cache.SetCacheability(HttpCacheability.NoCache);
 
-            httpResponse.AppendHeader("Online-Payment-System", "Powered By Parbad (http://www.parbad.ir)");
+            httpResponse.AppendHeader("Online-Payment-System", "Powered By Parbad (https://github.com/Sina-Soltani/Parbad)");
         }
 
         public static Uri AppendQueryString(this Uri uri, string key, string value)

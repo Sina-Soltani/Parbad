@@ -206,8 +206,7 @@ namespace Parbad
         /// Verifies request that comes from a gateway.
         /// </summary>
         /// <param name="httpContext">HttpContext object of current request.</param>
-        /// <param name="verifyInvoiceHandler"></param>
-        /// <returns></returns>
+        /// <param name="verifyInvoiceHandler">This handler would be called before verifying the invoice. You can check the invoice with your database and decide whether or not you should call the Cancel method.</param>
         public static VerifyResult Verify(HttpContext httpContext, Action<VerifyInvoice> verifyInvoiceHandler = null)
         {
             if (httpContext == null)
@@ -268,12 +267,15 @@ namespace Parbad
                         CreatedOn = DateTime.Now,
                         ReferenceId = paymentData.ReferenceId,
                         TransactionId = string.Empty,
-                        Status = VerifyResultStatus.CanceledByDevelopment.ToString()
+                        Status = VerifyResultStatus.CanceledProgrammatically.ToString()
                     });
 
                     paymentData.Status = PaymentDataStatus.Failed;
 
-                    return new VerifyResult(paymentData.Gateway, paymentData.ReferenceId, paymentData.TransactionId, VerifyResultStatus.CanceledByDevelopment, paymentVerify.CancellationReason);
+                    //  Update PaymentData in the Storage
+                    UpdatePaymentData(paymentData);
+
+                    return new VerifyResult(paymentData.Gateway, paymentData.ReferenceId, paymentData.TransactionId, VerifyResultStatus.CanceledProgrammatically, paymentVerify.CancellationReason);
                 }
             }
 
@@ -319,8 +321,7 @@ namespace Parbad
         /// Verifies request that comes from a gateway.
         /// </summary>
         /// <param name="httpContext">HttpContext object of current request.</param>
-        /// <param name="verifyInvoiceHandler"></param>
-        /// <returns></returns>
+        /// <param name="verifyInvoiceHandler">This handler would be called before verifying the invoice. You can check the invoice with your database and decide whether or not you should call the Cancel method.</param>
         public static async Task<VerifyResult> VerifyAsync(HttpContext httpContext, Action<VerifyInvoice> verifyInvoiceHandler = null)
         {
             if (httpContext == null)
@@ -381,12 +382,15 @@ namespace Parbad
                         CreatedOn = DateTime.Now,
                         ReferenceId = paymentData.ReferenceId,
                         TransactionId = string.Empty,
-                        Status = VerifyResultStatus.CanceledByDevelopment.ToString()
+                        Status = VerifyResultStatus.CanceledProgrammatically.ToString()
                     });
 
                     paymentData.Status = PaymentDataStatus.Failed;
 
-                    return new VerifyResult(paymentData.Gateway, paymentData.ReferenceId, paymentData.TransactionId, VerifyResultStatus.CanceledByDevelopment, paymentVerify.CancellationReason);
+                    //  Update PaymentData in the Storage
+                    await UpdatePaymentDataAsync(paymentData);
+
+                    return new VerifyResult(paymentData.Gateway, paymentData.ReferenceId, paymentData.TransactionId, VerifyResultStatus.CanceledProgrammatically, paymentVerify.CancellationReason);
                 }
             }
 

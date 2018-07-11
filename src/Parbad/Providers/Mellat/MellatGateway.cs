@@ -260,52 +260,6 @@ namespace Parbad.Providers.Mellat
             return new RefundResult(Gateway.Mellat, refundPaymentContext.Amount, status, translatedResult);
         }
 
-        //private MellatGatewayConfiguration MellatConfiguration => (MellatGatewayConfiguration)Configuration;
-
-        //public override string Name => Gateway.Mellat.ToString();
-
-        //protected override IPaymentRequestCommand ProvidePaymentRequestCommand()
-        //{
-        //    return new MellatPaymentRequestCommand(
-        //        MellatConfiguration.TerminalId,
-        //        MellatConfiguration.UserName,
-        //        MellatConfiguration.UserPassword,
-        //        GetWebServiceUrl(),
-        //        PaymentPageUrl);
-        //}
-
-        //protected override ICallbackCommand ProvideCallbackRequestCommand()
-        //{
-        //    return new MellatCallbackCommand();
-        //}
-
-        //protected override IVerifyCommand ProvideVerifyRequestCommand()
-        //{
-        //    return new MellatVerifyCommand(
-        //        MellatConfiguration.TerminalId,
-        //        MellatConfiguration.UserName,
-        //        MellatConfiguration.UserPassword,
-        //        GetWebServiceUrl());
-        //}
-
-        //protected override ISettleCommand ProvideSettleRequestCommand()
-        //{
-        //    return new MellatSettleCommand(
-        //        MellatConfiguration.TerminalId,
-        //        MellatConfiguration.UserName,
-        //        MellatConfiguration.UserPassword,
-        //        GetWebServiceUrl());
-        //}
-
-        //protected override IReverseCommand ProvideReverseRequestCommand()
-        //{
-        //    return new MellatReverseCommand(
-        //        MellatConfiguration.TerminalId,
-        //        MellatConfiguration.UserName,
-        //        MellatConfiguration.UserPassword,
-        //        GetWebServiceUrl());
-        //}
-
         private static string CreatePayRequestWebService(long terminalId, string userName, string userPassword, long orderId, long amount, string localDate, string localTime, string additionalData, string callBackUrl, long payerId)
         {
             return

@@ -13,8 +13,11 @@ namespace Parbad.Core
         /// Initializes new Invoice object.
         /// </summary>
         /// <param name="orderNumber">Order number. Must be unique for each requests.</param>
-        /// <param name="amount"></param>
-        /// <param name="callBackUrl"></param>
+        /// <param name="amount">Amount to pay (IR-Rial)</param>
+        /// <param name="callBackUrl">
+        /// A complete URL in your website to verify the Invoice. Clients will come back to this URL after they pay the money in the Gateway.
+        /// <para>A complete URL would be like: "http://www.mywebsite.com/payment/verify"</para>
+        /// </param>
         public Invoice(long orderNumber, long amount, string callBackUrl)
         {
             if (orderNumber <= 0)
@@ -49,8 +52,15 @@ namespace Parbad.Core
         /// </summary>
         public long OrderNumber { get; }
 
+        /// <summary>
+        /// Amount to pay (IR-Rial)
+        /// </summary>
         public long Amount { get; }
 
+        /// <summary>
+        /// A complete URL in your website to verify the Invoice. Clients will come back to this URL for verifying the Invoice, after they pay the money in the Gateway.
+        /// <para>A complete URL would be like: "http://www.mywebsite.com/payment/verify"</para>
+        /// </summary>
         public string CallbackUrl { get; internal set; }
     }
 }

@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Parbad")]
-[assembly: AssemblyDescription("Integrated online payment system for Shetab Network")]
+[assembly: AssemblyDescription("Parbad is a free and open-source integrated online payment system for the banks in Iran. Currently it contains Shetab network (Mellat, Parsian, Tejarat, Saman, Pasargad). Please see the website for more information.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("https://github.com/Sina-Soltani/Parbad/")]
 [assembly: AssemblyProduct("Parbad")]
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.1.3.0")]
-[assembly: AssemblyFileVersion("1.1.3.0")]
+[assembly: AssemblyVersion("1.1.4.0")]
+[assembly: AssemblyFileVersion("1.1.4.0")]

@@ -33,6 +33,6 @@
         /// <summary>
         /// Payment verification is canceled by calling VerifyInvoice.Cancel() method.
         /// </summary>
-        CanceledByDevelopment = 5
+        CanceledProgrammatically = 5
     }
 }
