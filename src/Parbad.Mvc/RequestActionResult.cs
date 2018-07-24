@@ -4,23 +4,38 @@ using Parbad.Core;
 
 namespace Parbad.Mvc
 {
+    /// <summary>
+    /// An ActionResult for redirecting the client to the gateway.
+    /// </summary>
     public class RequestActionResult : ActionResult
     {
         private readonly RequestResult _requestResult;
         private readonly Func<ActionResult> _onFailuresHandler;
 
-        public RequestActionResult(RequestResult payResult) : this(payResult, null)
+        /// <summary>
+        /// An ActionResult for redirecting the client to the gateway.
+        /// </summary>
+        /// <param name="requestResult">RequestResult object.</param>
+        public RequestActionResult(RequestResult requestResult) : this(requestResult, null)
         {
         }
 
-        public RequestActionResult(RequestResult payResult, Func<ActionResult> onFailuresHandler)
+        /// <summary>
+        /// An ActionResult for redirecting the client to the gateway.
+        /// </summary>
+        /// <param name="requestResult">RequestResult object.</param>
+        /// <param name="onFailuresHandler">
+        /// This handler would be called when RequestResult object failed.
+        /// <para>For example you can return View("Error")</para>
+        /// </param>
+        public RequestActionResult(RequestResult requestResult, Func<ActionResult> onFailuresHandler)
         {
-            if (payResult == null)
+            if (requestResult == null)
             {
-                throw new ArgumentNullException(nameof(payResult));
+                throw new ArgumentNullException(nameof(requestResult));
             }
 
-            _requestResult = payResult;
+            _requestResult = requestResult;
             _onFailuresHandler = onFailuresHandler;
         }
 
