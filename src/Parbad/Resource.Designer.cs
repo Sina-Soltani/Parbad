@@ -81,18 +81,18 @@ namespace Parbad {
         /// <summary>
         ///   Looks up a localized string similar to &lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt; &lt;title&gt;Parbad Gateway&lt;/title&gt; &lt;meta charset=&quot;utf-8&quot;&gt; &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt; &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt; &lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css&quot;/&gt; &lt;style type=&quot;text/css&quot;&gt; body{margin-top: 30px;}.panel-title{font-weight: bold;}&lt;/style&gt;&lt;/head&gt;&lt;body&gt; &lt;div class=&quot;container&quot;&gt; &lt;div class=&quot;row&quot;&gt; &lt;div class=&quot;col-md-6 col-md-offset-3&quot;&gt; &lt;div cla [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string PaymentPayHtml {
+        internal static string ParbadVirtualGatewayRequestHtml {
             get {
-                return ResourceManager.GetString("PaymentPayHtml", resourceCulture);
+                return ResourceManager.GetString("ParbadVirtualGatewayRequestHtml", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to &lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt; &lt;title&gt;Parbad Gateway&lt;/title&gt; &lt;meta charset=&quot;utf-8&quot;&gt; &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt; &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt; &lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css&quot;/&gt; &lt;style type=&quot;text/css&quot;&gt; body{margin-top: 30px;}.panel-title{font-weight: bold;}&lt;/style&gt;&lt;/head&gt;&lt;body&gt; &lt;div class=&quot;container&quot;&gt; &lt;div class=&quot;row&quot;&gt; &lt;div class=&quot;col-md-6 col-md-offset-3&quot;&gt; &lt;div cla [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string PaymentRequestHtml {
+        internal static string ParbadVirtualGatewayResultHtml {
             get {
-                return ResourceManager.GetString("PaymentRequestHtml", resourceCulture);
+                return ResourceManager.GetString("ParbadVirtualGatewayResultHtml", resourceCulture);
             }
         }
         

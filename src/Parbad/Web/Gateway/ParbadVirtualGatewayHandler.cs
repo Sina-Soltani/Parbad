@@ -8,6 +8,9 @@ using Parbad.Utilities;
 
 namespace Parbad.Web.Gateway
 {
+    /// <summary>
+    /// Parbad Virtual Gateway HttpHandler to test website's functionality with a virtual payment.
+    /// </summary>
     public sealed class ParbadVirtualGatewayHandler : IHttpHandler
     {
         private static ParbadVirtualGatewayConfiguration GatewayConfiguration => ParbadConfiguration.Gateways.GetParbadVirtualGatewayConfiguration();
@@ -36,9 +39,11 @@ namespace Parbad.Web.Gateway
                 case GatewayCommandType.Request:
                     HandleRequestCommand(httpContext, commandDetails);
                     break;
+
                 case GatewayCommandType.Pay:
                     HandlePayCommand(httpContext, commandDetails);
                     break;
+
                 default:
                     WriteToResponse(httpContext, "CommandType is not valid.");
                     break;
@@ -98,7 +103,7 @@ namespace Parbad.Web.Gateway
 
         private static string GenerateRequestCommandHtml(long orderNumber, Money amount, string redirectUrl, string parbadGatewayUrl, bool isPasswordRequired)
         {
-            return Resource.PaymentRequestHtml
+            return Resource.ParbadVirtualGatewayRequestHtml
                 .Replace("#OrderNumber#", orderNumber.ToString())
                 .Replace("#DisplayOrderNumber#", orderNumber.ToString("N0"))
                 .Replace("#Amount#", amount.ToString())
@@ -140,7 +145,7 @@ namespace Parbad.Web.Gateway
 
         private static string GeneratePayCommandHtml(long orderNumber, string referenceId, Money amount, string redirectUrl, bool isPayed)
         {
-            return Resource.PaymentPayHtml
+            return Resource.ParbadVirtualGatewayResultHtml
                 .Replace("#DisplayOrderNumber#", orderNumber.ToString("N0"))
                 .Replace("#DisplayAmount#", amount.ToString("N0"))
                 .Replace("#ReferenceId#", referenceId)
