@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("https://github.com/Sina-Soltani/Parbad/")]
 [assembly: AssemblyProduct("Parbad")]
-[assembly: AssemblyCopyright("Copyright © Parbad 2018 under license https://github.com/Sina-Soltani/Parbad/blob/master/LICENSE.txt")]
+[assembly: AssemblyCopyright("Copyright © Parbad 2018 under the license https://github.com/Sina-Soltani/Parbad/blob/master/LICENSE.txt")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.1.4.0")]
-[assembly: AssemblyFileVersion("1.1.4.0")]
+[assembly: AssemblyVersion("1.1.5.0")]
+[assembly: AssemblyFileVersion("1.1.5.0")]
