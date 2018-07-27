@@ -98,6 +98,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\Gateway.cs" />
     <Compile Include="Providers\GatewayFactory.cs" />
+    <Compile Include="Providers\IranKish\IranKishGateway.cs" />
+    <Compile Include="Providers\IranKish\IranKishGatewayConfiguration.cs" />
+    <Compile Include="Providers\IranKish\ResultTranslators\IranKishGatewayResultTranslator.cs" />
     <Compile Include="Providers\Mellat\MellatGateway.cs" />
     <Compile Include="Providers\Mellat\MellatGatewayConfiguration.cs" />
     <Compile Include="Providers\Mellat\ResultTranslators\MellatGatewayResultTranslator.cs" />

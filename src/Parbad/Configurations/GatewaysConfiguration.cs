@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Parbad.Providers;
+using Parbad.Providers.IranKish;
 using Parbad.Providers.Mellat;
 using Parbad.Providers.Parbad;
 using Parbad.Providers.Parsian;
@@ -10,6 +11,9 @@ using Parbad.Providers.Tejarat;
 
 namespace Parbad.Configurations
 {
+    /// <summary>
+    /// It holds all gateways configurations data.
+    /// </summary>
     public class GatewaysConfiguration
     {
         private readonly IDictionary<Gateway, object> _gatewayConfigurations;
@@ -95,6 +99,19 @@ namespace Parbad.Configurations
             }
 
             AddOrUpdate(Gateway.Tejarat, tejaratGatewayConfiguration);
+        }
+
+        /// <summary>
+        /// Configure IranKish gateway
+        /// </summary>
+        public void ConfigureIranKish(IranKishGatewayConfiguration iranKishGatewayConfiguration)
+        {
+            if (iranKishGatewayConfiguration == null)
+            {
+                throw new ArgumentNullException(nameof(iranKishGatewayConfiguration));
+            }
+
+            AddOrUpdate(Gateway.IranKish, iranKishGatewayConfiguration);
         }
 
         internal void AddOrUpdate(Gateway gateway, object gatewayConfiguration)

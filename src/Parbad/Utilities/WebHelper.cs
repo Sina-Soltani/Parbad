@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
@@ -10,69 +12,17 @@ namespace Parbad.Utilities
 {
     internal static class WebHelper
     {
-        public static string SendXmlWebRequest(string url, string data)
+        public static string SendXmlWebRequest(string url, string data, IDictionary<string, string> headers = null)
         {
-            if (url.IsNullOrWhiteSpace())
-            {
-                throw new ArgumentNullException(nameof(url));
-            }
-
-            var webRequest = WebRequest.CreateHttp(url);
-
-            webRequest.Method = "POST";
-            webRequest.ContentType = "text/xml;charset=UTF-8";
-
-            var buffer = Encoding.UTF8.GetBytes(data);
-
-            webRequest.ContentLength = buffer.Length;
-
-            //  Send request
-            using (var requestStream = webRequest.GetRequestStream())
-            {
-                requestStream.Write(buffer, 0, buffer.Length);
-            }
-
-            //  Get response
-            using (var webResponse = webRequest.GetResponse())
-            using (var dataStream = webResponse.GetResponseStream())
-            using (var readerStream = new StreamReader(dataStream))
-            {
-                return readerStream.ReadToEnd();
-            }
+            return SendWebRequest(url, data, "POST", "text/xml;charset=UTF-8", headers);
         }
 
-        public static async Task<string> SendXmlWebRequestAsync(string url, string data)
+        public static Task<string> SendXmlWebRequestAsync(string url, string data, IDictionary<string, string> headers = null)
         {
-            if (url.IsNullOrWhiteSpace())
-            {
-                throw new ArgumentNullException(nameof(url));
-            }
-
-            var webRequest = WebRequest.CreateHttp(url);
-
-            webRequest.Method = "POST";
-            webRequest.ContentType = "text/xml;charset=UTF-8";
-
-            var buffer = Encoding.UTF8.GetBytes(data);
-
-            webRequest.ContentLength = buffer.Length;
-
-            //  Send request
-            using (var requestStream = await webRequest.GetRequestStreamAsync())
-            {
-                await requestStream.WriteAsync(buffer, 0, buffer.Length);
-            }
-
-            //  Get response
-            using (var webResponse = await webRequest.GetResponseAsync())
-            using (var dataStream = webResponse.GetResponseStream())
-            using (var readerStream = new StreamReader(dataStream))
-            {
-                return await readerStream.ReadToEndAsync();
-            }
+            return SendWebRequestAsync(url, data, "POST", "text/xml;charset=UTF-8", headers);
         }
 
-        public static string SendWebRequest(string url, string data, string methodType, string contentType)
+        public static string SendWebRequest(string url, string data, string methodType, string contentType, IDictionary<string, string> headers = null)
         {
             if (url.IsNullOrWhiteSpace())
             {
@@ -88,6 +38,14 @@ namespace Parbad.Utilities
 
             webRequest.Method = methodType;
             webRequest.ContentType = contentType;
+
+            if (headers != null && headers.Any())
+            {
+                foreach (var header in headers)
+                {
+                    webRequest.Headers.Add(header.Key, header.Value);
+                }
+            }
 
             var buffer = Encoding.UTF8.GetBytes(data);
 
@@ -110,7 +68,7 @@ namespace Parbad.Utilities
             }
         }
 
-        public static async Task<string> SendWebRequestAsync(string url, string data, string methodType, string contentType)
+        public static async Task<string> SendWebRequestAsync(string url, string data, string methodType, string contentType, IDictionary<string, string> headers = null)
         {
             if (url.IsNullOrWhiteSpace())
             {
@@ -126,6 +84,14 @@ namespace Parbad.Utilities
 
             webRequest.Method = methodType;
             webRequest.ContentType = contentType;
+
+            if (headers != null && headers.Any())
+            {
+                foreach (var header in headers)
+                {
+                    webRequest.Headers.Add(header.Key, header.Value);
+                }
+            }
 
             var buffer = Encoding.UTF8.GetBytes(data);
 
