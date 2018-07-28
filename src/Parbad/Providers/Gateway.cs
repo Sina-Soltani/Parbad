@@ -10,6 +10,9 @@
         Parsian = 2,
         Tejarat = 3,
         Pasargad = 4,
+        /// <summary>
+        /// Warning: It's not tested yet.
+        /// </summary>
         IranKish = 5,
         ParbadVirtualGateway = 255
     }

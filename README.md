@@ -11,6 +11,18 @@ Unfortunately, these providers don't have a regular and clear instructions for d
 
 But with Parbad you can with only three or four lines of codes, communicate with these providers.
 
+
+| Gateway                  | Status     | Information |
+| ------------------------ |:----------:| ------------------------------------------ |
+| Mellat			       | Tested     | |
+| Saman				       | Tested     | |
+| Parsian				   | Tested     | |
+| Pasargad				   | Tested     | |
+| Tejarat			       | Not tested | It seems that the bank has not offered any Refund operations. |
+| Iran Kish				   | Not tested | Still needs to be tested with a real account. |
+| Parbad Virtual Gateway   | Tested     | |
+
+
 ### Getting Started
 
 * Usage

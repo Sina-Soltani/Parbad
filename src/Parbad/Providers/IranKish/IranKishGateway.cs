@@ -9,6 +9,9 @@ using Parbad.Utilities;
 
 namespace Parbad.Providers.IranKish
 {
+    /// <summary>
+    /// IranKish gateway. (Warning: It's not tested yet)
+    /// </summary>
     internal class IranKishGateway : GatewayBase
     {
         private const string PaymentPageUrl = "https://ikc.shaparak.ir/TPayment/Payment/index";
