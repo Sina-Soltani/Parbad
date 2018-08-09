@@ -263,3 +263,5 @@ http://www.mywebsite.com/ParbadLog.axd
 
 Parbad is Copyright &copy; 2017 [Sina Soltani](https://www.linkedin.com/in/sinasoltani/) and other contributors under the [Apache license](LICENSE.txt).
 Please let me know if you find any bugs or have any suggestions
+
+با توجه به دارا بودن پَرباد به لایسنس، در صورت استفاده و یا کپی از کدهای این پروژه و بازنشر آن، مراتب به گیت هاب و سایر منابع گزارش خواهد شد
