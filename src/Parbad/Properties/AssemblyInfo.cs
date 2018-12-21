@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("Parbad")]
-[assembly: AssemblyDescription("Parbad is a free and open-source integrated online payment system for the banks in Iran. Currently it contains Shetab network (Mellat, Parsian, Tejarat, Saman, Pasargad). Please see the website for more information.")]
+[assembly: AssemblyDescription("Parbad - Integrated and open-source online payment solution for Shetab-Network (Mellat, Saman, Parsian, Pasargad, Tejarat)")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("https://github.com/Sina-Soltani/Parbad/")]
 [assembly: AssemblyProduct("Parbad")]
@@ -14,5 +14,5 @@ using System.Runtime.InteropServices;
 
 [assembly: Guid("53d0b3cc-2fd4-4113-a368-60715fb8518e")]
 
-[assembly: AssemblyVersion("1.2.0.0")]
-[assembly: AssemblyFileVersion("1.2.0.0")]
+[assembly: AssemblyVersion("1.2.1.0")]
+[assembly: AssemblyFileVersion("1.2.1.0")]
