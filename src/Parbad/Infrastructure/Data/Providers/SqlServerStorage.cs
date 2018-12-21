@@ -118,7 +118,7 @@ namespace Parbad.Infrastructure.Data.Providers
 
         protected internal override PaymentData SelectByOrderNumber(long orderNumber)
         {
-            const string query = "SELECT * FROM [TbPayments] WHERE OrderNumber=@OrderNumber";
+            var query = $"SELECT * FROM [{PaymentsTableName}] WHERE OrderNumber=@OrderNumber";
 
             var sqlServerHelper = new SqlServerHelper(ConnectionString);
 
@@ -162,7 +162,7 @@ namespace Parbad.Infrastructure.Data.Providers
 
         protected internal override async Task<PaymentData> SelectByOrderNumberAsync(long orderNumber)
         {
-            const string query = "SELECT * FROM [TbPayments] WHERE OrderNumber=@OrderNumber";
+            var query = $"SELECT * FROM [{PaymentsTableName}] WHERE OrderNumber=@OrderNumber";
 
             var sqlServerHelper = new SqlServerHelper(ConnectionString);
 
