@@ -107,6 +107,7 @@
     <Compile Include="Providers\Mellat\ResultTranslators\MellatGatewayResultTranslator.cs" />
     <Compile Include="Providers\Melli\MelliGateway.cs" />
     <Compile Include="Providers\Melli\MelliGatewayConfiguration.cs" />
+    <Compile Include="Providers\Melli\MelliGatewayDataSigningException.cs" />
     <Compile Include="Providers\Melli\MelliHelper.cs" />
     <Compile Include="Providers\Melli\Models\MelliApiRequestResult.cs" />
     <Compile Include="Providers\Melli\Models\MelliApiVerifyResult.cs" />

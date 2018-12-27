@@ -8,28 +8,42 @@ namespace Parbad.Providers.Melli
     {
         public static string SignRequestData(string terminalId, string merchantKey, long orderId, long amount)
         {
-            var dataBytes = Encoding.UTF8.GetBytes($"{terminalId};{orderId};{amount}");
+            try
+            {
+                var dataBytes = Encoding.UTF8.GetBytes($"{terminalId};{orderId};{amount}");
 
-            var symmetric = SymmetricAlgorithm.Create("TripleDes");
-            symmetric.Mode = CipherMode.ECB;
-            symmetric.Padding = PaddingMode.PKCS7;
+                var symmetric = SymmetricAlgorithm.Create("TripleDes");
+                symmetric.Mode = CipherMode.ECB;
+                symmetric.Padding = PaddingMode.PKCS7;
 
-            var encryptor = symmetric.CreateEncryptor(Convert.FromBase64String(merchantKey), new byte[8]);
+                var encryptor = symmetric.CreateEncryptor(Convert.FromBase64String(merchantKey), new byte[8]);
 
-            return Convert.ToBase64String(encryptor.TransformFinalBlock(dataBytes, 0, dataBytes.Length));
+                return Convert.ToBase64String(encryptor.TransformFinalBlock(dataBytes, 0, dataBytes.Length));
+            }
+            catch (Exception exception)
+            {
+                throw new MelliGatewayDataSigningException(exception);
+            }
         }
 
         public static string SignVerifyData(string merchantKey, string token)
         {
-            var dataBytes = Encoding.UTF8.GetBytes(token);
+            try
+            {
+                var dataBytes = Encoding.UTF8.GetBytes(token);
 
-            var symmetric = SymmetricAlgorithm.Create("TripleDes");
-            symmetric.Mode = CipherMode.ECB;
-            symmetric.Padding = PaddingMode.PKCS7;
+                var symmetric = SymmetricAlgorithm.Create("TripleDes");
+                symmetric.Mode = CipherMode.ECB;
+                symmetric.Padding = PaddingMode.PKCS7;
 
-            var encryptor = symmetric.CreateEncryptor(Convert.FromBase64String(merchantKey), new byte[8]);
+                var encryptor = symmetric.CreateEncryptor(Convert.FromBase64String(merchantKey), new byte[8]);
 
-            return Convert.ToBase64String(encryptor.TransformFinalBlock(dataBytes, 0, dataBytes.Length));
+                return Convert.ToBase64String(encryptor.TransformFinalBlock(dataBytes, 0, dataBytes.Length));
+            }
+            catch (Exception exception)
+            {
+                throw new MelliGatewayDataSigningException(exception);
+            }
         }
     }
 }
