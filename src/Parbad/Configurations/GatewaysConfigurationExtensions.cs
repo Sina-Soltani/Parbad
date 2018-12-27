@@ -2,6 +2,7 @@
 using Parbad.Providers;
 using Parbad.Providers.IranKish;
 using Parbad.Providers.Mellat;
+using Parbad.Providers.Melli;
 using Parbad.Providers.Parbad;
 using Parbad.Providers.Parsian;
 using Parbad.Providers.Pasargad;
@@ -91,6 +92,13 @@ namespace Parbad.Configurations
             }
 
             return gatewayConfiguration.GetGatewayConfiguration<IranKishGatewayConfiguration>(Gateway.IranKish);
+        }
+
+        internal static MelliGatewayConfiguration GetMelliGatewayConfiguration(this GatewaysConfiguration gatewayConfiguration)
+        {
+            if (gatewayConfiguration == null) throw new ArgumentNullException(nameof(gatewayConfiguration));
+
+            return gatewayConfiguration.GetGatewayConfiguration<MelliGatewayConfiguration>(Gateway.Melli);
         }
 
         internal static TConfiguration GetGatewayConfiguration<TConfiguration>(this GatewaysConfiguration configuration, Gateway gateway) where TConfiguration : class

@@ -14,6 +14,7 @@
         /// Warning: It's not tested yet.
         /// </summary>
         IranKish = 5,
+        Melli = 6,
         ParbadVirtualGateway = 255
     }
 }

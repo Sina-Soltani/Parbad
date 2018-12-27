@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Parbad.Providers;
 using Parbad.Providers.IranKish;
 using Parbad.Providers.Mellat;
+using Parbad.Providers.Melli;
 using Parbad.Providers.Parbad;
 using Parbad.Providers.Parsian;
 using Parbad.Providers.Pasargad;
@@ -112,6 +113,16 @@ namespace Parbad.Configurations
             }
 
             AddOrUpdate(Gateway.IranKish, iranKishGatewayConfiguration);
+        }
+
+        /// <summary>
+        /// Configure Melli gateway
+        /// </summary>
+        public void ConfigureMelli(MelliGatewayConfiguration melliGatewayConfiguration)
+        {
+            if (melliGatewayConfiguration == null) throw new ArgumentNullException(nameof(melliGatewayConfiguration));
+
+            AddOrUpdate(Gateway.Melli, melliGatewayConfiguration);
         }
 
         internal void AddOrUpdate(Gateway gateway, object gatewayConfiguration)

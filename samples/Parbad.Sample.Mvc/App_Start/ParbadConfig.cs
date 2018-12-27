@@ -2,6 +2,7 @@
 using Parbad.Configurations;
 using Parbad.Infrastructure.Logging.Loggers.Xml;
 using Parbad.Providers.Mellat;
+using Parbad.Providers.Melli;
 using Parbad.Providers.Parbad;
 
 namespace Parbad.Sample.Mvc
@@ -13,6 +14,9 @@ namespace Parbad.Sample.Mvc
             //  Configure the Mellat gateway
             var mellatConfig = new MellatGatewayConfiguration(1111, "my user name", "my password");
             ParbadConfiguration.Gateways.ConfigureMellat(mellatConfig);
+
+            var melliConfig = new MelliGatewayConfiguration("My Terminal ID", "My Merchant ID", "My Merchant Key");
+            ParbadConfiguration.Gateways.ConfigureMelli(melliConfig);
 
             //  Configure the Parbad Virtual gateway
             ParbadConfiguration.Gateways.ConfigureParbadVirtualGateway(new ParbadVirtualGatewayConfiguration("Parbad.axd"));

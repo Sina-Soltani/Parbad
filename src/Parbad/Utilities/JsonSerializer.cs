@@ -7,14 +7,16 @@ namespace Parbad.Utilities
     {
         public static string Serialize(object obj)
         {
-            if (obj == null)
-            {
-                throw new ArgumentNullException(nameof(obj));
-            }
+            if (obj == null) throw new ArgumentNullException(nameof(obj));
 
-            var serializer = new JavaScriptSerializer();
+            return new JavaScriptSerializer().Serialize(obj);
+        }
 
-            return serializer.Serialize(obj);
+        public static T Deserialize<T>(string json)
+        {
+            if (json == null) throw new ArgumentNullException(nameof(json));
+
+            return new JavaScriptSerializer().Deserialize<T>(json);
         }
     }
 }

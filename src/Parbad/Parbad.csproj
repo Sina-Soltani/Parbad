@@ -21,6 +21,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\Parbad.xml</DocumentationFile>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -104,6 +105,23 @@
     <Compile Include="Providers\Mellat\MellatGateway.cs" />
     <Compile Include="Providers\Mellat\MellatGatewayConfiguration.cs" />
     <Compile Include="Providers\Mellat\ResultTranslators\MellatGatewayResultTranslator.cs" />
+    <Compile Include="Providers\Melli\MelliGateway.cs" />
+    <Compile Include="Providers\Melli\MelliGatewayConfiguration.cs" />
+    <Compile Include="Providers\Melli\MelliHelper.cs" />
+    <Compile Include="Providers\Melli\Models\MelliApiRequestResult.cs" />
+    <Compile Include="Providers\Melli\Models\MelliApiVerifyResult.cs" />
+    <Compile Include="Providers\Melli\ResultTranslator\MelliRequestResponseCodes.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MelliRequestResponseCodes.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Providers\Melli\ResultTranslator\MelliRequestResultTranslator.cs" />
+    <Compile Include="Providers\Melli\ResultTranslator\MelliVerifyResponseCodes.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MelliVerifyResponseCodes.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Providers\Melli\ResultTranslator\MelliVerifyResultTranslator.cs" />
     <Compile Include="Providers\Parbad\ParbadVirtualGateway.cs" />
     <Compile Include="Providers\Parbad\ParbadVirtualGatewayConfiguration.cs" />
     <Compile Include="Providers\Parbad\ResultTranslators\ParbadVirtualGatewayResultTranslator.cs" />
@@ -145,6 +163,14 @@
     <Compile Include="Web\ResponseCompressor.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Providers\Melli\ResultTranslator\MelliRequestResponseCodes.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>MelliRequestResponseCodes.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Providers\Melli\ResultTranslator\MelliVerifyResponseCodes.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>MelliVerifyResponseCodes.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resource.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resource.Designer.cs</LastGenOutput>

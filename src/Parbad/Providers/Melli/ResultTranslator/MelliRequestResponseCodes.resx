@@ -1,0 +1,264 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Code0" xml:space="preserve">
+    <value>تراکنش موفق</value>
+  </data>
+  <data name="Code1000" xml:space="preserve">
+    <value>ترتیب پارامترهای ارسالی اشتباه می باشد، لطفا مسئول فنی پذيرنده با بانک تماس حاصل فرمايند</value>
+  </data>
+  <data name="Code1001" xml:space="preserve">
+    <value>لطفا مسئول فنی پذيرنده با بانک تماس حاصل فرمايند،پارامترهای پرداخت اشتباه می باشد</value>
+  </data>
+  <data name="Code1002" xml:space="preserve">
+    <value>خطا در سیستم- تراکنش ناموفق</value>
+  </data>
+  <data name="Code1003" xml:space="preserve">
+    <value>IP پذيرنده اشتباه است.لطفا مسئول فنی پذيرنده با بانک تماس حاصل فرمايند</value>
+  </data>
+  <data name="Code1004" xml:space="preserve">
+    <value>لطفا مسئول فنی پذيرنده با بانک تماس حاصل فرمايند،شماره پذيرنده اشتباه است</value>
+  </data>
+  <data name="Code1005" xml:space="preserve">
+    <value>خطای دسترسی:لطفا بعدا تلاش فرمايید</value>
+  </data>
+  <data name="Code1006" xml:space="preserve">
+    <value>خطا در سیستم</value>
+  </data>
+  <data name="Code1011" xml:space="preserve">
+    <value>درخواست تکراری- شماره سفارش تکراری می باشد</value>
+  </data>
+  <data name="Code1012" xml:space="preserve">
+    <value>اطلاعات پذيرنده صحیح نیست،يکی از موارد تاريخ،زمان يا کلید تراکنش اشتباه است.لطفا مسئول فنی پذيرنده با بانک تماس حاصل فرمايند</value>
+  </data>
+  <data name="Code1015" xml:space="preserve">
+    <value>پاسخ خطای نامشخص از سمت مرکز</value>
+  </data>
+  <data name="Code1017" xml:space="preserve">
+    <value>مبلغ درخواستی شما جهت پرداخت از حد مجاز تعريف شده برای اين پذيرنده بیشتر است</value>
+  </data>
+  <data name="Code1018" xml:space="preserve">
+    <value>اشکال در تاريخ و زمان سیستم. لطفا تاريخ و زمان سرور خود را با بانک هماهنگ نمايید</value>
+  </data>
+  <data name="Code1019" xml:space="preserve">
+    <value>امکان پرداخت از طريق سیستم شتاب برای اين پذيرنده امکان پذير نیست</value>
+  </data>
+  <data name="Code1020" xml:space="preserve">
+    <value>پذيرنده غیرفعال شده است.لطفا جهت فعال سازی با بانک تماس بگیريد</value>
+  </data>
+  <data name="Code1023" xml:space="preserve">
+    <value>آدرس بازگشت پذيرنده نامعتبر است</value>
+  </data>
+  <data name="Code1024" xml:space="preserve">
+    <value>مهر زمانی پذيرنده نامعتبر است</value>
+  </data>
+  <data name="Code1025" xml:space="preserve">
+    <value>امضا تراکنش نامعتبر است</value>
+  </data>
+  <data name="Code1026" xml:space="preserve">
+    <value>شماره سفارش تراکنش نامعتبر است</value>
+  </data>
+  <data name="Code1027" xml:space="preserve">
+    <value>شماره پذيرنده نامعتبر است</value>
+  </data>
+  <data name="Code1028" xml:space="preserve">
+    <value>شماره ترمینال پذيرنده نامعتبر است</value>
+  </data>
+  <data name="Code1029" xml:space="preserve">
+    <value>آدرس IP پرداخت در محدوده آدرس های معتبر اعلام شده توسط پذيرنده
+نیست .لطفا مسئول فنی پذيرنده با بانک تماس حاصل فرمايند</value>
+  </data>
+  <data name="Code1030" xml:space="preserve">
+    <value>آدرس Domain پرداخت در محدوده آدرس های معتبر اعلام شده توسط
+پذيرنده نیست .لطفا مسئول فنی پذيرنده با بانک تماس حاصل فرمايند</value>
+  </data>
+  <data name="Code1031" xml:space="preserve">
+    <value>مهلت زمانی شما جهت پرداخت به پايان رسیده است.لطفا مجددا سعی
+بفرمايید</value>
+  </data>
+  <data name="Code1032" xml:space="preserve">
+    <value>پرداخت با اين کارت . برای پذيرنده مورد نظر شما امکان پذير نیست.لطفا از
+کارتهای مجاز که توسط پذيرنده معرفی شده است . استفاده نمايید</value>
+  </data>
+  <data name="Code1033" xml:space="preserve">
+    <value>به علت مشکل در سايت پذيرنده. پرداخت برای اين پذيرنده غیرفعال شده
+است.لطفا مسوول فنی سايت پذيرنده با بانک تماس حاصل فرمايند</value>
+  </data>
+  <data name="Code1036" xml:space="preserve">
+    <value>اطلاعات اضافی ارسال نشده يا دارای اشکال است</value>
+  </data>
+  <data name="Code1037" xml:space="preserve">
+    <value>شماره پذيرنده يا شماره ترمینال پذيرنده صحیح نمیباشد</value>
+  </data>
+  <data name="Code1053" xml:space="preserve">
+    <value>خطا: درخواست معتبر، از سمت پذيرنده صورت نگرفته است لطفا اطلاعات
+پذيرنده خود را چک کنید</value>
+  </data>
+  <data name="Code1055" xml:space="preserve">
+    <value>مقدار غیرمجاز در ورود اطلاعات</value>
+  </data>
+  <data name="Code1056" xml:space="preserve">
+    <value>سیستم موقتا قطع میباشد.لطفا بعدا تلاش فرمايید.</value>
+  </data>
+  <data name="Code1058" xml:space="preserve">
+    <value>سرويس پرداخت اينترنتی خارج از سرويس می باشد.لطفا بعدا سعی
+بفرمايید.</value>
+  </data>
+  <data name="Code1061" xml:space="preserve">
+    <value>اشکال در تولید کد يکتا. لطفا مرورگر خود را بسته و با اجرای مجدد مرورگر
+« عملیات پرداخت را انجام دهید )احتمال استفاده از دکمه Back »
+مرورگر(</value>
+  </data>
+  <data name="Code1064" xml:space="preserve">
+    <value>لطفا مجددا سعی بفرمايید</value>
+  </data>
+  <data name="Code1065" xml:space="preserve">
+    <value>ارتباط ناموفق .لطفا چند لحظه ديگر مجددا سعی کنید</value>
+  </data>
+  <data name="Code1066" xml:space="preserve">
+    <value>سیستم سرويس دهی پرداخت موقتا غیر فعال شده است</value>
+  </data>
+  <data name="Code1068" xml:space="preserve">
+    <value>با عرض پوزش به علت بروزرسانی . سیستم موقتا قطع میباشد.</value>
+  </data>
+  <data name="Code1072" xml:space="preserve">
+    <value>خطا در پردازش پارامترهای اختیاری پذيرنده</value>
+  </data>
+  <data name="Code1101" xml:space="preserve">
+    <value>مبلغ تراکنش نامعتبر است</value>
+  </data>
+  <data name="Code1103" xml:space="preserve">
+    <value>توکن ارسالی نامعتبر است</value>
+  </data>
+  <data name="Code1104" xml:space="preserve">
+    <value>اطلاعات تسهیم صحیح نیست</value>
+  </data>
+  <data name="Code23" xml:space="preserve">
+    <value>Inactive Merchant. پذيرنده کارت فعال نیست لطفا با بخش امور پذيرندگان، تماس حاصل فرمائید</value>
+  </data>
+  <data name="Code3" xml:space="preserve">
+    <value>Invalid Merchant. پذيرنده کارت فعال نیست لطفا با بخش امور پذيرندگان، تماس حاصل فرمائید</value>
+  </data>
+  <data name="Code58" xml:space="preserve">
+    <value>انجام تراکنش مربوطه توسط پايانه ی انجام دهنده مجاز نمی باشد.</value>
+  </data>
+  <data name="Code61" xml:space="preserve">
+    <value>مبلغ تراکنش از حد مجاز بالاتر است</value>
+  </data>
+</root>
