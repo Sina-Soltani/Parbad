@@ -8,10 +8,12 @@ namespace Parbad.Web
     {
         public static bool TryGetPaymentDataId(this HttpRequest httpRequest, out Guid id)
         {
-            if (httpRequest == null)
-            {
-                throw new ArgumentNullException(nameof(httpRequest));
-            }
+            return TryGetPaymentDataId(new HttpRequestWrapper(httpRequest), out id);
+        }
+
+        public static bool TryGetPaymentDataId(this HttpRequestBase httpRequest, out Guid id)
+        {
+            if (httpRequest == null) throw new ArgumentNullException(nameof(httpRequest));
 
             try
             {
@@ -27,10 +29,12 @@ namespace Parbad.Web
 
         public static bool IsAjaxRequest(this HttpRequest request)
         {
-            if (request == null)
-            {
-                throw new ArgumentNullException(nameof(request));
-            }
+            return IsAjaxRequest(new HttpRequestWrapper(request));
+        }
+
+        public static bool IsAjaxRequest(this HttpRequestBase request)
+        {
+            if (request == null) throw new ArgumentNullException(nameof(request));
 
             return request["X-Requested-With"] == "XMLHttpRequest" ||
                    request.Headers["X-Requested-With"] == "XMLHttpRequest";

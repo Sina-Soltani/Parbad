@@ -209,6 +209,16 @@ namespace Parbad
         /// <param name="verifyInvoiceHandler">This handler would be called before verifying the invoice. You can check the invoice with your database and decide whether or not you should call the Cancel method.</param>
         public static VerifyResult Verify(HttpContext httpContext, Action<VerifyInvoice> verifyInvoiceHandler = null)
         {
+            return Verify(new HttpContextWrapper(httpContext), verifyInvoiceHandler);
+        }
+
+        /// <summary>
+        /// Verifies request that comes from a gateway.
+        /// </summary>
+        /// <param name="httpContext">HttpContext object of current request.</param>
+        /// <param name="verifyInvoiceHandler">This handler would be called before verifying the invoice. You can check the invoice with your database and decide whether or not you should call the Cancel method.</param>
+        public static VerifyResult Verify(HttpContextBase httpContext, Action<VerifyInvoice> verifyInvoiceHandler = null)
+        {
             if (httpContext == null)
             {
                 throw new ArgumentNullException(nameof(httpContext));
@@ -322,7 +332,17 @@ namespace Parbad
         /// </summary>
         /// <param name="httpContext">HttpContext object of current request.</param>
         /// <param name="verifyInvoiceHandler">This handler would be called before verifying the invoice. You can check the invoice with your database and decide whether or not you should call the Cancel method.</param>
-        public static async Task<VerifyResult> VerifyAsync(HttpContext httpContext, Action<VerifyInvoice> verifyInvoiceHandler = null)
+        public static Task<VerifyResult> VerifyAsync(HttpContext httpContext, Action<VerifyInvoice> verifyInvoiceHandler = null)
+        {
+            return VerifyAsync(new HttpContextWrapper(httpContext), verifyInvoiceHandler);
+        }
+
+        /// <summary>
+        /// Verifies request that comes from a gateway.
+        /// </summary>
+        /// <param name="httpContext">HttpContext object of current request.</param>
+        /// <param name="verifyInvoiceHandler">This handler would be called before verifying the invoice. You can check the invoice with your database and decide whether or not you should call the Cancel method.</param>
+        public static async Task<VerifyResult> VerifyAsync(HttpContextBase httpContext, Action<VerifyInvoice> verifyInvoiceHandler = null)
         {
             if (httpContext == null)
             {

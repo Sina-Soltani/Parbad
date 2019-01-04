@@ -30,7 +30,7 @@ namespace Parbad.Sample.Mvc.Controllers
 
             if (result.Status == RequestResultStatus.Success)
             {
-                return new RequestActionResult(result);
+                return result.ToActionResult();
             }
 
             return View("PayRequestResult", result);
@@ -42,7 +42,7 @@ namespace Parbad.Sample.Mvc.Controllers
         // بنابراین بهتر است هیچگونه خصوصیتی برای این اکشن متد در نظر گرفته نشود
         public async Task<ActionResult> Verify()
         {
-            var result = await Payment.VerifyAsync(System.Web.HttpContext.Current, invoice =>
+            var result = await Payment.VerifyAsync(HttpContext, invoice =>
             {
                 // You can check your database, whether or not you have still products to sell
                 // در این مرحله هنوز درخواست تأیید و واریز وجه از وب سایت شما به بانک ارسال نشده است

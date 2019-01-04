@@ -30,10 +30,7 @@ namespace Parbad.Mvc
         /// </param>
         public RequestActionResult(RequestResult requestResult, Func<ActionResult> onFailuresHandler)
         {
-            if (requestResult == null)
-            {
-                throw new ArgumentNullException(nameof(requestResult));
-            }
+            if (requestResult == null) throw new ArgumentNullException(nameof(requestResult));
 
             _requestResult = requestResult;
             _onFailuresHandler = onFailuresHandler;
@@ -55,7 +52,7 @@ namespace Parbad.Mvc
                 return;
             }
 
-            _requestResult.Process(context.HttpContext.ApplicationInstance.Context);
+            _requestResult.Process(context.HttpContext);
         }
     }
 }

@@ -9,7 +9,7 @@ namespace Parbad.Core
     {
         private readonly IDictionary<string, object> _parameters;
 
-        public RequestParameters(HttpRequest httpRequest)
+        public RequestParameters(HttpRequestBase httpRequest)
         {
             if (httpRequest == null)
             {
