@@ -46,7 +46,7 @@ For MVC project:
 PM> Install-Package Parbad.Mvc5
 ```
 - - - -
-### Create invoice & redirect client to gateway
+### Create invoice & redirect the client to gateway
 
 First, you need to create an invoice and then send it to the specific gateway (Bank) that you want.
 ```csharp
@@ -79,17 +79,17 @@ Here, the result object is the result of the request that you sent to the gatewa
 * Status: Tells you about the result's status
 * Message: A formatted message about the result (you can show it to the client if you like)
 
-For MVC projects you can Install Parbad.Mvc5 and do like this:
+For MVC(4+, 5+) projects you can Install Parbad.Mvc5 and do like this:
 ```csharp
 if (result.Status == RequestResultStatus.Success)
 {
     // redirect client to Gateway's website
-    return new RequestActionResult(result);
+    return result.ToActionResult();
 }
 else
 {
 	// you can show the message if you want
-	var msg = result.Message;
+    var msg = result.Message;
 }
 ```
 - - - -
