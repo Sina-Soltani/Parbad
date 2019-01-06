@@ -30,7 +30,7 @@ namespace Parbad.Sample.Mvc.Controllers
 
             if (result.Status == RequestResultStatus.Success)
             {
-                return result.ToActionResult();
+                return result.RedirectToGateway();
             }
 
             return View("PayRequestResult", result);

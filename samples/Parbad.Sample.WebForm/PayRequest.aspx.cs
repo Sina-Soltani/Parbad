@@ -30,7 +30,7 @@ namespace Parbad.Sample.WebForm
             if (result.Status == RequestResultStatus.Success)
             {
                 //  This extension method, redirects the page to the gateway
-                result.Process(Context);
+                result.RedirectToGateway(Context);
                 return;
             }
 

@@ -96,6 +96,7 @@
     <Compile Include="Infrastructure\Logging\LogType.cs" />
     <Compile Include="Infrastructure\Translating\IGatewayResultTranslator.cs" />
     <Compile Include="Payment.cs" />
+    <Compile Include="PaymentVerifyingContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\Gateway.cs" />
     <Compile Include="Providers\GatewayFactory.cs" />
@@ -154,7 +155,7 @@
     <Compile Include="Utilities\SqlServerHelper.cs" />
     <Compile Include="Utilities\WebHelper.cs" />
     <Compile Include="Utilities\XmlHelper.cs" />
-    <Compile Include="VerifyInvoice.cs" />
+    <Compile Include="IPaymentVerifyingContext.cs" />
     <Compile Include="Web\Gateway\CommandDetails.cs" />
     <Compile Include="Web\Gateway\GatewayCommandType.cs" />
     <Compile Include="Web\Gateway\ParbadVirtualGatewayHandler.cs" />
