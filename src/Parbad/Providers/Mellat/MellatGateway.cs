@@ -47,22 +47,26 @@ namespace Parbad.Providers.Mellat
             var resCode = arrayResult[0];
             var refId = arrayResult.Length > 1 ? arrayResult[1] : string.Empty;
 
-            IGatewayResultTranslator gatewayResultTranslator = new MellatGatewayResultTranslator();
-
-            var translatedResult = gatewayResultTranslator.Translate(resCode);
+            string message;
 
             var isSucceed = resCode == OkResult;
 
             if (!isSucceed)
             {
+                IGatewayResultTranslator gatewayResultTranslator = new MellatGatewayResultTranslator();
+
+                message = gatewayResultTranslator.Translate(resCode);
+
                 var status = resCode == DuplicateOrderNumberResult ? RequestResultStatus.DuplicateOrderNumber : RequestResultStatus.Failed;
 
-                return new RequestResult(status, translatedResult, refId);
+                return new RequestResult(status, message, refId);
             }
+
+            message = "درخواست با موفقیت ارسال شد.";
 
             var postHtmlForm = CreatePayRequestHtmlForm(PaymentPageUrl, refId);
 
-            return new RequestResult(RequestResultStatus.Success, translatedResult, refId)
+            return new RequestResult(RequestResultStatus.Success, message, refId)
             {
                 BehaviorMode = GatewayRequestBehaviorMode.Post,
                 Content = postHtmlForm
@@ -92,22 +96,26 @@ namespace Parbad.Providers.Mellat
             var resCode = arrayResult[0];
             var refId = arrayResult.Length > 1 ? arrayResult[1] : string.Empty;
 
-            IGatewayResultTranslator gatewayResultTranslator = new MellatGatewayResultTranslator();
-
-            var translatedResult = gatewayResultTranslator.Translate(resCode);
+            string message;
 
             var isSucceed = resCode == OkResult;
 
             if (!isSucceed)
             {
+                IGatewayResultTranslator gatewayResultTranslator = new MellatGatewayResultTranslator();
+
+                message = gatewayResultTranslator.Translate(resCode);
+
                 var status = resCode == DuplicateOrderNumberResult ? RequestResultStatus.DuplicateOrderNumber : RequestResultStatus.Failed;
 
-                return new RequestResult(status, translatedResult, refId);
+                return new RequestResult(status, message, refId);
             }
+
+            message = "درخواست با موفقیت ارسال شد.";
 
             var postHtmlForm = CreatePayRequestHtmlForm(PaymentPageUrl, refId);
 
-            return new RequestResult(RequestResultStatus.Success, translatedResult, refId)
+            return new RequestResult(RequestResultStatus.Success, message, refId)
             {
                 BehaviorMode = GatewayRequestBehaviorMode.Post,
                 Content = postHtmlForm
