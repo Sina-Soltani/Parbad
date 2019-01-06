@@ -8,7 +8,7 @@ namespace Parbad
     public interface IPaymentVerifyingContext
     {
         /// <summary>
-        /// The gateway, which
+        /// The gateway, that sent the invoice.
         /// </summary>
         Gateway Gateway { get; }
 
