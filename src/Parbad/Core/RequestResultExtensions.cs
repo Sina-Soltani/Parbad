@@ -13,7 +13,7 @@ namespace Parbad.Core
         /// </summary>
         /// <param name="requestResult"></param>
         /// <param name="httpContext">The current HttpContext object.</param>
-        [Obsolete("This method is deprecated. Use RedirectToGateway method instead.")]
+        [Obsolete("This method is deprecated. Use the RedirectToGateway method instead.")]
         public static void Process(this RequestResult requestResult, HttpContext httpContext)
         {
             RedirectToGateway(requestResult, httpContext);
@@ -25,7 +25,7 @@ namespace Parbad.Core
         /// <param name="requestResult"></param>
         /// <param name="httpContext">The current HttpContext object.</param>
         /// <param name="onRequestFailedHandler"></param>
-        [Obsolete("This method is deprecated. Use RedirectToGateway method instead.")]
+        [Obsolete("This method is deprecated. Use the RedirectToGateway method instead.")]
         public static void Process(this RequestResult requestResult, HttpContext httpContext, Action onRequestFailedHandler)
         {
             RedirectToGateway(requestResult, httpContext, onRequestFailedHandler);
@@ -36,7 +36,7 @@ namespace Parbad.Core
         /// </summary>
         /// <param name="requestResult">RequestResult object</param>
         /// <param name="httpContext">HttpContext object</param>
-        [Obsolete("This method is deprecated. Use RedirectToGateway method instead.")]
+        [Obsolete("This method is deprecated. Use the RedirectToGateway method instead.")]
         public static void Process(this RequestResult requestResult, HttpContextBase httpContext)
         {
             RedirectToGateway(requestResult, httpContext);
@@ -48,7 +48,7 @@ namespace Parbad.Core
         /// <param name="requestResult">RequestResult object</param>
         /// <param name="httpContext">HttpContext object</param>
         /// <param name="onRequestFailedHandler">If RequestResult is not successful then this delegate will be invoke.</param>
-        [Obsolete("This method is deprecated. Use RedirectToGateway method instead.")]
+        [Obsolete("This method is deprecated. Use the RedirectToGateway method instead.")]
         public static void Process(this RequestResult requestResult, HttpContextBase httpContext, Action onRequestFailedHandler)
         {
             RedirectToGateway(requestResult, httpContext, onRequestFailedHandler);

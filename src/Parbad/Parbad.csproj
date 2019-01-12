@@ -105,6 +105,9 @@
     <Compile Include="Providers\IranKish\ResultTranslators\IranKishGatewayResultTranslator.cs" />
     <Compile Include="Providers\Mellat\MellatGateway.cs" />
     <Compile Include="Providers\Mellat\MellatGatewayConfiguration.cs" />
+    <Compile Include="Providers\Mellat\MellatHelper.cs" />
+    <Compile Include="Providers\Mellat\Models\MellatCallbackResult.cs" />
+    <Compile Include="Providers\Mellat\Models\MellatVerifyResult.cs" />
     <Compile Include="Providers\Mellat\ResultTranslators\MellatGatewayResultTranslator.cs" />
     <Compile Include="Providers\Melli\MelliGateway.cs" />
     <Compile Include="Providers\Melli\MelliGatewayConfiguration.cs" />

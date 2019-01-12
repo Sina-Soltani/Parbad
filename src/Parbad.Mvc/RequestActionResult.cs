@@ -36,6 +36,7 @@ namespace Parbad.Mvc
             _onFailuresHandler = onFailuresHandler;
         }
 
+        /// <inheritdoc />
         public override void ExecuteResult(ControllerContext context)
         {
             if (_requestResult.Status != RequestResultStatus.Success && _onFailuresHandler != null)

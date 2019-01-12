@@ -23,7 +23,7 @@ namespace Parbad
         string ReferenceId { get; }
 
         /// <summary>
-        /// Cancel the operation.
+        /// Cancel the operation. No Verifying request will be sent to the gateway. In this case, the money will transferred back to the client's bank account after about 15-60 minutes.
         /// </summary>
         /// <param name="reason">The reason for cancelling the operation.</param>
         void Cancel(string reason = null);

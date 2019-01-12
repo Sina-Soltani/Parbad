@@ -2,22 +2,12 @@
 using System.Threading.Tasks;
 using Parbad.Configurations;
 using Parbad.Core;
-using Parbad.Infrastructure.Translating;
-using Parbad.Providers.Mellat.ResultTranslators;
 using Parbad.Utilities;
 
 namespace Parbad.Providers.Mellat
 {
     internal class MellatGateway : GatewayBase
     {
-        private const string PaymentPageUrl = "https://bpm.shaparak.ir/pgwchannel/startpay.mellat";
-        private const string WebServiceUrl = "https://bpm.shaparak.ir/pgwchannel/services/pgw";
-        private const string TestWebServiceUrl = "https://bpm.shaparak.ir/pgwchannel/services/pgwtest";
-
-        private const string OkResult = "0";
-        private const string DuplicateOrderNumberResult = "41";
-        private const string AlreadyVerifiedResult = "43";
-
         public MellatGateway() : base(Gateway.Mellat.ToString())
         {
         }
@@ -26,420 +16,117 @@ namespace Parbad.Providers.Mellat
 
         public override RequestResult Request(Invoice invoice)
         {
-            var webServiceXml = CreatePayRequestWebService(
-                terminalId: Configuration.TerminalId,
-                userName: Configuration.UserName,
-                userPassword: Configuration.UserPassword,
-                orderId: invoice.OrderNumber,
-                amount: invoice.Amount,
-                localDate: DateTime.Now.ToString("yyyyMMdd"),
-                localTime: DateTime.Now.ToString("HHmmss"),
-                additionalData: string.Empty,
-                callBackUrl: invoice.CallbackUrl,
-                payerId: 0);
+            if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-            var xmlResult = WebHelper.SendXmlWebRequest(GetWebServiceUrl(), webServiceXml);
+            var data = MellatHelper.CreateRequestData(invoice, Configuration);
 
-            var result = XmlHelper.GetNodeValueFromXml(xmlResult, "return");
+            var response = WebHelper.SendXmlWebRequest(GetWebServiceUrl(), data);
 
-            var arrayResult = result.Split(',');
-
-            var resCode = arrayResult[0];
-            var refId = arrayResult.Length > 1 ? arrayResult[1] : string.Empty;
-
-            string message;
-
-            var isSucceed = resCode == OkResult;
-
-            if (!isSucceed)
-            {
-                IGatewayResultTranslator gatewayResultTranslator = new MellatGatewayResultTranslator();
-
-                message = gatewayResultTranslator.Translate(resCode);
-
-                var status = resCode == DuplicateOrderNumberResult ? RequestResultStatus.DuplicateOrderNumber : RequestResultStatus.Failed;
-
-                return new RequestResult(status, message, refId);
-            }
-
-            message = "درخواست با موفقیت ارسال شد.";
-
-            var postHtmlForm = CreatePayRequestHtmlForm(PaymentPageUrl, refId);
-
-            return new RequestResult(RequestResultStatus.Success, message, refId)
-            {
-                BehaviorMode = GatewayRequestBehaviorMode.Post,
-                Content = postHtmlForm
-            };
+            return MellatHelper.CreateRequestResult(response);
         }
 
         public override async Task<RequestResult> RequestAsync(Invoice invoice)
         {
-            var webServiceXml = CreatePayRequestWebService(
-                terminalId: Configuration.TerminalId,
-                userName: Configuration.UserName,
-                userPassword: Configuration.UserPassword,
-                orderId: invoice.OrderNumber,
-                amount: invoice.Amount,
-                localDate: DateTime.Now.ToString("yyyyMMdd"),
-                localTime: DateTime.Now.ToString("HHmmss"),
-                additionalData: string.Empty,
-                callBackUrl: invoice.CallbackUrl,
-                payerId: 0);
+            if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-            var xmlResult = await WebHelper.SendXmlWebRequestAsync(GetWebServiceUrl(), webServiceXml);
+            var data = MellatHelper.CreateRequestData(invoice, Configuration);
 
-            var result = XmlHelper.GetNodeValueFromXml(xmlResult, "return");
+            var response = await WebHelper.SendXmlWebRequestAsync(GetWebServiceUrl(), data);
 
-            var arrayResult = result.Split(',');
-
-            var resCode = arrayResult[0];
-            var refId = arrayResult.Length > 1 ? arrayResult[1] : string.Empty;
-
-            string message;
-
-            var isSucceed = resCode == OkResult;
-
-            if (!isSucceed)
-            {
-                IGatewayResultTranslator gatewayResultTranslator = new MellatGatewayResultTranslator();
-
-                message = gatewayResultTranslator.Translate(resCode);
-
-                var status = resCode == DuplicateOrderNumberResult ? RequestResultStatus.DuplicateOrderNumber : RequestResultStatus.Failed;
-
-                return new RequestResult(status, message, refId);
-            }
-
-            message = "درخواست با موفقیت ارسال شد.";
-
-            var postHtmlForm = CreatePayRequestHtmlForm(PaymentPageUrl, refId);
-
-            return new RequestResult(RequestResultStatus.Success, message, refId)
-            {
-                BehaviorMode = GatewayRequestBehaviorMode.Post,
-                Content = postHtmlForm
-            };
+            return MellatHelper.CreateRequestResult(response);
         }
 
         public override VerifyResult Verify(GatewayVerifyPaymentContext verifyPaymentContext)
         {
-            var resCode = verifyPaymentContext.RequestParameters.GetAs<string>("ResCode", caseSensitive: true);
+            if (verifyPaymentContext == null) throw new ArgumentNullException(nameof(verifyPaymentContext));
 
-            if (resCode.IsNullOrWhiteSpace())
+            var callbackResult = MellatHelper.CrateCallbackResult(verifyPaymentContext);
+
+            if (!callbackResult.IsSucceed)
             {
-                return new VerifyResult(Gateway.Mellat, string.Empty, string.Empty, VerifyResultStatus.NotValid, "Invalid data is received from the gateway");
-            }
-
-            //  Reference ID
-            string refId = verifyPaymentContext.RequestParameters.GetAs<string>("RefId", caseSensitive: true);
-
-            //  Transaction ID
-            var saleReferenceId = verifyPaymentContext.RequestParameters.GetAs<string>("SaleReferenceId", caseSensitive: true);
-
-            //  To translate gateway's result
-            IGatewayResultTranslator gatewayResultTranslator = new MellatGatewayResultTranslator();
-            string translatedResult;
-
-            if (resCode != OkResult)
-            {
-                translatedResult = gatewayResultTranslator.Translate(resCode);
-
-                return new VerifyResult(Gateway.Mellat, refId, saleReferenceId, VerifyResultStatus.Failed, translatedResult);
+                return callbackResult.Result;
             }
 
             //  Verify
 
-            var webServiceVerifyXml = CreateVerifyWebService(
-                terminalId: Configuration.TerminalId,
-                userName: Configuration.UserName,
-                userPassword: Configuration.UserPassword,
-                orderId: verifyPaymentContext.OrderNumber,
-                saleOrderId: verifyPaymentContext.OrderNumber,
-                saleReferenceId: Convert.ToInt64(saleReferenceId));
+            var data = MellatHelper.CreateVerifyData(verifyPaymentContext, Configuration, callbackResult);
 
-            var xmlResult = WebHelper.SendXmlWebRequest(GetWebServiceUrl(), webServiceVerifyXml);
+            var response = WebHelper.SendXmlWebRequest(GetWebServiceUrl(), data);
 
-            var result = XmlHelper.GetNodeValueFromXml(xmlResult, "return");
+            //  Check the verifying request.
+            var verifyResult = MellatHelper.CheckVerifyResult(response, callbackResult);
 
-            //  Check if verifing is failed.
-            VerifyResultStatus status;
-
-            if (result != OkResult)
+            if (!verifyResult.IsSucceed)
             {
-                translatedResult = gatewayResultTranslator.Translate(result);
-
-                status = result == AlreadyVerifiedResult
-                    ? VerifyResultStatus.AlreadyVerified
-                    : VerifyResultStatus.Failed;
-
-                return new VerifyResult(Gateway.Mellat, refId, saleReferenceId, status, translatedResult);
+                return verifyResult.Result;
             }
 
             //  Settle
-            var settleWebServiceXml = CreateSettleWebService(
-                terminalId: Configuration.TerminalId,
-                userName: Configuration.UserName,
-                userPassword: Configuration.UserPassword,
-                orderId: verifyPaymentContext.OrderNumber,
-                saleOrderId: verifyPaymentContext.OrderNumber,
-                saleReferenceId: Convert.ToInt64(saleReferenceId));
+            data = MellatHelper.CreateSettleData(Configuration, verifyPaymentContext, callbackResult);
 
-            xmlResult = WebHelper.SendXmlWebRequest(GetWebServiceUrl(), settleWebServiceXml);
+            response = WebHelper.SendXmlWebRequest(GetWebServiceUrl(), data);
 
-            result = XmlHelper.GetNodeValueFromXml(xmlResult, "return");
-
-            translatedResult = gatewayResultTranslator.Translate(result);
-
-            var isSuccess = result == OkResult;
-
-            status = isSuccess ? VerifyResultStatus.Success : VerifyResultStatus.Failed;
-
-            return new VerifyResult(Gateway.Mellat, refId, saleReferenceId, status, translatedResult);
+            return MellatHelper.CreateSettleResult(response, callbackResult);
         }
 
         public override async Task<VerifyResult> VerifyAsync(GatewayVerifyPaymentContext verifyPaymentContext)
         {
-            var resCode = verifyPaymentContext.RequestParameters.GetAs<string>("ResCode", caseSensitive: true);
+            if (verifyPaymentContext == null) throw new ArgumentNullException(nameof(verifyPaymentContext));
 
-            if (resCode.IsNullOrWhiteSpace())
+            var callbackResult = MellatHelper.CrateCallbackResult(verifyPaymentContext);
+
+            if (!callbackResult.IsSucceed)
             {
-                return new VerifyResult(Gateway.Mellat, string.Empty, string.Empty, VerifyResultStatus.NotValid, "Invalid data is received from the gateway");
-            }
-
-            //  Reference ID
-            string refId = verifyPaymentContext.RequestParameters.GetAs<string>("RefId", caseSensitive: true);
-
-            //  Transaction ID
-            var saleReferenceId = verifyPaymentContext.RequestParameters.GetAs<string>("SaleReferenceId", caseSensitive: true);
-
-            //  To translate gateway's result
-            IGatewayResultTranslator gatewayResultTranslator = new MellatGatewayResultTranslator();
-            string translatedResult;
-
-            if (resCode != OkResult)
-            {
-                translatedResult = gatewayResultTranslator.Translate(resCode);
-
-                return new VerifyResult(Gateway.Mellat, refId, saleReferenceId, VerifyResultStatus.Failed, translatedResult);
+                return callbackResult.Result;
             }
 
             //  Verify
 
-            var webServiceVerifyXml = CreateVerifyWebService(
-                terminalId: Configuration.TerminalId,
-                userName: Configuration.UserName,
-                userPassword: Configuration.UserPassword,
-                orderId: verifyPaymentContext.OrderNumber,
-                saleOrderId: verifyPaymentContext.OrderNumber,
-                saleReferenceId: Convert.ToInt64(saleReferenceId));
+            var data = MellatHelper.CreateVerifyData(verifyPaymentContext, Configuration, callbackResult);
 
-            var xmlResult = await WebHelper.SendXmlWebRequestAsync(GetWebServiceUrl(), webServiceVerifyXml);
+            var response = await WebHelper.SendXmlWebRequestAsync(GetWebServiceUrl(), data);
 
-            var result = XmlHelper.GetNodeValueFromXml(xmlResult, "return");
+            //  Check the verifying request.
+            var verifyResult = MellatHelper.CheckVerifyResult(response, callbackResult);
 
-            //  Check if verifing is failed.
-            VerifyResultStatus status;
-
-            if (result != OkResult)
+            if (!verifyResult.IsSucceed)
             {
-                translatedResult = gatewayResultTranslator.Translate(result);
-
-                status = result == AlreadyVerifiedResult
-                    ? VerifyResultStatus.AlreadyVerified
-                    : VerifyResultStatus.Failed;
-
-                return new VerifyResult(Gateway.Mellat, refId, saleReferenceId, status, translatedResult);
+                return verifyResult.Result;
             }
 
             //  Settle
-            var settleWebServiceXml = CreateSettleWebService(
-                terminalId: Configuration.TerminalId,
-                userName: Configuration.UserName,
-                userPassword: Configuration.UserPassword,
-                orderId: verifyPaymentContext.OrderNumber,
-                saleOrderId: verifyPaymentContext.OrderNumber,
-                saleReferenceId: Convert.ToInt64(saleReferenceId));
+            data = MellatHelper.CreateSettleData(Configuration, verifyPaymentContext, callbackResult);
 
-            xmlResult = await WebHelper.SendXmlWebRequestAsync(GetWebServiceUrl(), settleWebServiceXml);
+            response = await WebHelper.SendXmlWebRequestAsync(GetWebServiceUrl(), data);
 
-            result = XmlHelper.GetNodeValueFromXml(xmlResult, "return");
-
-            translatedResult = gatewayResultTranslator.Translate(result);
-
-            var isSuccess = result == OkResult;
-
-            status = isSuccess ? VerifyResultStatus.Success : VerifyResultStatus.Failed;
-
-            return new VerifyResult(Gateway.Mellat, refId, saleReferenceId, status, translatedResult);
+            return MellatHelper.CreateSettleResult(response, callbackResult);
         }
 
         public override RefundResult Refund(GatewayRefundPaymentContext refundPaymentContext)
         {
-            if (!long.TryParse(refundPaymentContext.TransactionId, out var longTransactionId))
-            {
-                throw new Exception($"Transaction ID format is not valid. Transaction ID must be Int64. Value: {refundPaymentContext.TransactionId}");
-            }
+            if (refundPaymentContext == null) throw new ArgumentNullException(nameof(refundPaymentContext));
 
-            var webServiceXml = CreateReverseWebService(
-                terminalId: Configuration.TerminalId,
-                userName: Configuration.UserName,
-                userPassword: Configuration.UserPassword,
-                orderId: refundPaymentContext.OrderNumber,
-                saleOrderId: refundPaymentContext.OrderNumber,
-                saleReferenceId: longTransactionId);
+            var data = MellatHelper.CreateRefundData(Configuration, refundPaymentContext);
 
-            var xmlResult = WebHelper.SendXmlWebRequest(GetWebServiceUrl(), webServiceXml);
+            var response = WebHelper.SendXmlWebRequest(GetWebServiceUrl(), data);
 
-            var result = XmlHelper.GetNodeValueFromXml(xmlResult, "return");
-
-            var isSuccess = result == OkResult;
-
-            var status = isSuccess ? RefundResultStatus.Success : RefundResultStatus.Failed;
-
-            IGatewayResultTranslator gatewayResultTranslator = new MellatGatewayResultTranslator();
-
-            var translatedResult = gatewayResultTranslator.Translate(result);
-
-            return new RefundResult(Gateway.Mellat, refundPaymentContext.Amount, status, translatedResult);
+            return MellatHelper.CreateRefundResult(response, refundPaymentContext);
         }
 
         public override async Task<RefundResult> RefundAsync(GatewayRefundPaymentContext refundPaymentContext)
         {
-            if (!long.TryParse(refundPaymentContext.TransactionId, out var longTransactionId))
-            {
-                throw new Exception($"Transaction ID format is not valid. Transaction ID must be Int64. Value: {refundPaymentContext.TransactionId}");
-            }
+            if (refundPaymentContext == null) throw new ArgumentNullException(nameof(refundPaymentContext));
 
-            var webServiceXml = CreateReverseWebService(
-                terminalId: Configuration.TerminalId,
-                userName: Configuration.UserName,
-                userPassword: Configuration.UserPassword,
-                orderId: refundPaymentContext.OrderNumber,
-                saleOrderId: refundPaymentContext.OrderNumber,
-                saleReferenceId: longTransactionId);
+            var data = MellatHelper.CreateRefundData(Configuration, refundPaymentContext);
 
-            var xmlResult = await WebHelper.SendXmlWebRequestAsync(GetWebServiceUrl(), webServiceXml);
+            var response = await WebHelper.SendXmlWebRequestAsync(GetWebServiceUrl(), data);
 
-            var result = XmlHelper.GetNodeValueFromXml(xmlResult, "return");
-
-            var isSuccess = result == OkResult;
-
-            var status = isSuccess ? RefundResultStatus.Success : RefundResultStatus.Failed;
-
-            IGatewayResultTranslator gatewayResultTranslator = new MellatGatewayResultTranslator();
-
-            var translatedResult = gatewayResultTranslator.Translate(result);
-
-            return new RefundResult(Gateway.Mellat, refundPaymentContext.Amount, status, translatedResult);
-        }
-
-        private static string CreatePayRequestWebService(long terminalId, string userName, string userPassword, long orderId, long amount, string localDate, string localTime, string additionalData, string callBackUrl, long payerId)
-        {
-            return
-                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:int=\"http://interfaces.core.sw.bps.com/\">" +
-                "<soapenv:Header/>" +
-                "<soapenv:Body>" +
-                "<int:bpPayRequest>" +
-                $"<terminalId>{terminalId}</terminalId>" +
-                "<!--Optional:-->" +
-                $"<userName>{userName}</userName>" +
-                "<!--Optional:-->" +
-                $"<userPassword>{userPassword}</userPassword>" +
-                $"<orderId>{orderId}</orderId>" +
-                $"<amount>{amount}</amount>" +
-                "<!--Optional:-->" +
-                $"<localDate>{localDate}</localDate>" +
-                "<!--Optional:-->" +
-                $"<localTime>{localTime}</localTime>" +
-                "<!--Optional:-->" +
-                $"<additionalData>{additionalData}</additionalData>" +
-                "<!--Optional:-->" +
-                $"<callBackUrl>{callBackUrl}</callBackUrl>" +
-                $"<payerId>{payerId}</payerId>" +
-                "'</int:bpPayRequest>" +
-                "</soapenv:Body>" +
-                "</soapenv:Envelope>";
-        }
-
-        private static string CreatePayRequestHtmlForm(string paymentPageUrl, string refId)
-        {
-            return
-                "<html>" +
-                "<body>" +
-                $"<form id=\"paymentForm\" action=\"{paymentPageUrl}\" method=\"post\" />" +
-                $"<input type=\"hidden\" name=\"RefId\" value=\"{refId}\" />" +
-                "</form>" +
-                "<script type=\"text/javascript\">" +
-                "document.getElementById('paymentForm').submit();" +
-                "</script>" +
-                "</body>" +
-                "</html>";
-        }
-
-        private static string CreateVerifyWebService(long terminalId, string userName, string userPassword, long orderId, long saleOrderId, long saleReferenceId)
-        {
-            return
-                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:int=\"http://interfaces.core.sw.bps.com/\">" +
-                "<soapenv:Header/>" +
-                "<soapenv:Body>" +
-                "<int:bpVerifyRequest>" +
-                $"<terminalId>{terminalId}</terminalId>" +
-                "<!--Optional:-->" +
-                $"<userName>{userName}</userName>" +
-                "<!--Optional:-->" +
-                $"<userPassword>{userPassword}</userPassword>" +
-                $"<orderId>{orderId}</orderId>" +
-                $"<saleOrderId>{saleOrderId}</saleOrderId>" +
-                $"<saleReferenceId>{saleReferenceId}</saleReferenceId>" +
-                "</int:bpVerifyRequest>" +
-                "</soapenv:Body>" +
-                "</soapenv:Envelope>";
-        }
-
-        private static string CreateSettleWebService(long terminalId, string userName, string userPassword, long orderId, long saleOrderId, long saleReferenceId)
-        {
-            return
-                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:int=\"http://interfaces.core.sw.bps.com/\">" +
-                "<soapenv:Header/>" +
-                "<soapenv:Body>" +
-                "<int:bpSettleRequest>" +
-                $"<terminalId>{terminalId}</terminalId>" +
-                "<!--Optional:-->" +
-                $"<userName>{userName}</userName>" +
-                "<!--Optional:-->" +
-                $"<userPassword>{userPassword}</userPassword>" +
-                $"<orderId>{orderId}</orderId>" +
-                $"<saleOrderId>{saleOrderId}</saleOrderId>" +
-                $"<saleReferenceId>{saleReferenceId}</saleReferenceId>" +
-                "</int:bpSettleRequest>" +
-                "</soapenv:Body>" +
-                "</soapenv:Envelope>";
-        }
-
-        private static string CreateReverseWebService(long terminalId, string userName, string userPassword, long orderId, long saleOrderId, long saleReferenceId)
-        {
-            return
-                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:int=\"http://interfaces.core.sw.bps.com/\">" +
-                "<soapenv:Header/>" +
-                "<soapenv:Body>" +
-                "<int:bpReversalRequest>" +
-                $"<terminalId>{terminalId}</terminalId>" +
-                "<!--Optional:-->" +
-                $"<userName>{userName}</userName>" +
-                "<!--Optional:-->" +
-                $"<userPassword>{userPassword}</userPassword>" +
-                $"<orderId>{orderId}</orderId>" +
-                $"<saleOrderId>{saleOrderId}</saleOrderId>" +
-                $"<saleReferenceId>{saleReferenceId}</saleReferenceId>" +
-                "</int:bpReversalRequest>" +
-                "</soapenv:Body>" +
-                "</soapenv:Envelope>";
+            return MellatHelper.CreateRefundResult(response, refundPaymentContext);
         }
 
         private string GetWebServiceUrl()
         {
-            return Configuration.IsTestModeEnabled ? TestWebServiceUrl : WebServiceUrl;
+            return Configuration.IsTestModeEnabled ? MellatHelper.TestWebServiceUrl : MellatHelper.WebServiceUrl;
         }
     }
 }
