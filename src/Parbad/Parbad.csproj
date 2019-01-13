@@ -130,8 +130,10 @@
     <Compile Include="Providers\Parbad\ParbadVirtualGateway.cs" />
     <Compile Include="Providers\Parbad\ParbadVirtualGatewayConfiguration.cs" />
     <Compile Include="Providers\Parbad\ResultTranslators\ParbadVirtualGatewayResultTranslator.cs" />
+    <Compile Include="Providers\Parsian\Models\ParsianCallbackResult.cs" />
     <Compile Include="Providers\Parsian\ParsianGateway.cs" />
     <Compile Include="Providers\Parsian\ParsianGatewayConfiguration.cs" />
+    <Compile Include="Providers\Parsian\ParsianHelper.cs" />
     <Compile Include="Providers\Parsian\ResultTranslators\ParsianStatusTranslator.cs" />
     <Compile Include="Providers\Pasargad\PasargadGateway.cs" />
     <Compile Include="Providers\Pasargad\PasargadGatewayConfiguration.cs" />
