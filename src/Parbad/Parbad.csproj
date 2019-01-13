@@ -140,10 +140,12 @@
     <Compile Include="Providers\Pasargad\PasargadGateway.cs" />
     <Compile Include="Providers\Pasargad\PasargadGatewayConfiguration.cs" />
     <Compile Include="Providers\Pasargad\PasargadHelper.cs" />
+    <Compile Include="Providers\Saman\Models\SamanCallbackResult.cs" />
     <Compile Include="Providers\Saman\ResultTranslators\SamanResultTranslator.cs" />
     <Compile Include="Providers\Saman\ResultTranslators\SamanStateTranslator.cs" />
     <Compile Include="Providers\Saman\SamanGateway.cs" />
     <Compile Include="Providers\Saman\SamanGatewayConfigurations.cs" />
+    <Compile Include="Providers\Saman\SamanHelper.cs" />
     <Compile Include="Providers\Tejarat\ResultTranslators\TejaratPayRequestResultTranslator.cs" />
     <Compile Include="Providers\Tejarat\ResultTranslators\TejaratVerifyResultTranslator.cs" />
     <Compile Include="Providers\Tejarat\TejaratGateway.cs" />
