@@ -100,8 +100,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\Gateway.cs" />
     <Compile Include="Providers\GatewayFactory.cs" />
+    <Compile Include="Providers\IranKish\IranKishCallbackResult.cs" />
     <Compile Include="Providers\IranKish\IranKishGateway.cs" />
     <Compile Include="Providers\IranKish\IranKishGatewayConfiguration.cs" />
+    <Compile Include="Providers\IranKish\IranKishHelper.cs" />
     <Compile Include="Providers\IranKish\ResultTranslators\IranKishGatewayResultTranslator.cs" />
     <Compile Include="Providers\Mellat\MellatGateway.cs" />
     <Compile Include="Providers\Mellat\MellatGatewayConfiguration.cs" />
@@ -187,5 +189,6 @@
       <LastGenOutput>Resource.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

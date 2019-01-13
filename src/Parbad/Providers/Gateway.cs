@@ -1,4 +1,6 @@
-﻿namespace Parbad.Providers
+﻿using System;
+
+namespace Parbad.Providers
 {
     /// <summary>
     /// Online payment providers.
@@ -8,6 +10,8 @@
         Saman = 0,
         Mellat = 1,
         Parsian = 2,
+
+        [Obsolete("Use IranKish gateway instead.", true)]
         Tejarat = 3,
         Pasargad = 4,
         /// <summary>

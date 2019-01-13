@@ -3,6 +3,7 @@ using Parbad.Utilities;
 
 namespace Parbad.Providers.Tejarat
 {
+    [Obsolete("Use Iran Kish gateway instead.")]
     public class TejaratGatewayConfiguration
     {
         public TejaratGatewayConfiguration(string merchant, string merchantPassword, string sha1Key)
