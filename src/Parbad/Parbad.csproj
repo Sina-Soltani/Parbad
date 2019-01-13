@@ -135,6 +135,8 @@
     <Compile Include="Providers\Parsian\ParsianGatewayConfiguration.cs" />
     <Compile Include="Providers\Parsian\ParsianHelper.cs" />
     <Compile Include="Providers\Parsian\ResultTranslators\ParsianStatusTranslator.cs" />
+    <Compile Include="Providers\Pasargad\Models\PasargadCallbackResult.cs" />
+    <Compile Include="Providers\Pasargad\Models\PasargadCheckCallbackResult.cs" />
     <Compile Include="Providers\Pasargad\PasargadGateway.cs" />
     <Compile Include="Providers\Pasargad\PasargadGatewayConfiguration.cs" />
     <Compile Include="Providers\Pasargad\PasargadHelper.cs" />
