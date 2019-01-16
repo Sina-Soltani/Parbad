@@ -13,7 +13,6 @@ namespace Parbad.Providers.Melli
         /// <param name="mainException">The main Exception object.</param>
         public MelliGatewayDataSigningException(Exception mainException) : base($"MelliBank signing data failed. {mainException.Message}", mainException)
         {
-
         }
     }
 }

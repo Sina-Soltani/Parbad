@@ -11,7 +11,7 @@ namespace Parbad.Providers
         Mellat = 1,
         Parsian = 2,
 
-        [Obsolete("Use IranKish gateway instead.", true)]
+        [Obsolete("Use IranKish gateway instead.")]
         Tejarat = 3,
         Pasargad = 4,
         /// <summary>

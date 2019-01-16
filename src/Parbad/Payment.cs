@@ -23,10 +23,7 @@ namespace Parbad
         /// <param name="invoice">Invoice object</param>
         public static RequestResult Request(Gateway gateway, Invoice invoice)
         {
-            if (invoice == null)
-            {
-                throw new ArgumentNullException(nameof(invoice));
-            }
+            if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
             ThrowExceptionIfGatewayIsNotConfigured(gateway);
 
@@ -116,10 +113,7 @@ namespace Parbad
         /// <param name="invoice">Invoice object</param>
         public static async Task<RequestResult> RequestAsync(Gateway gateway, Invoice invoice)
         {
-            if (invoice == null)
-            {
-                throw new ArgumentNullException(nameof(invoice));
-            }
+            if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
             ThrowExceptionIfGatewayIsNotConfigured(gateway);
 
@@ -217,14 +211,21 @@ namespace Parbad
         /// </summary>
         /// <param name="httpContext">HttpContext object of current request.</param>
         /// <param name="paymentVerifyingHandler">Describes the invoice which sent by the gateway. You can compare its data with your database and also cancel the payment operation if you need.</param>
+        public static Task<VerifyResult> VerifyAsync(HttpContext httpContext, Action<IPaymentVerifyingContext> paymentVerifyingHandler = null)
+        {
+            return VerifyAsync(new HttpContextWrapper(httpContext), paymentVerifyingHandler);
+        }
+
+        /// <summary>
+        /// Verifies request that comes from a gateway.
+        /// </summary>
+        /// <param name="httpContext">HttpContext object of current request.</param>
+        /// <param name="paymentVerifyingHandler">Describes the invoice which sent by the gateway. You can compare its data with your database and also cancel the payment operation if you need.</param>
         public static VerifyResult Verify(HttpContextBase httpContext, Action<IPaymentVerifyingContext> paymentVerifyingHandler = null)
         {
-            if (httpContext == null)
-            {
-                throw new ArgumentNullException(nameof(httpContext));
-            }
+            if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
 
-            //  1) Get PaymentData's ID from HttpRequest
+            //  1) Get Payment Data ID from HttpRequest
             if (!httpContext.Request.TryGetPaymentDataId(out var paymentId))
             {
                 return new VerifyResult(0, string.Empty, string.Empty, VerifyResultStatus.NotValid, "Payment's ID is not valid.");
@@ -332,24 +333,11 @@ namespace Parbad
         /// </summary>
         /// <param name="httpContext">HttpContext object of current request.</param>
         /// <param name="paymentVerifyingHandler">Describes the invoice which sent by the gateway. You can compare its data with your database and also cancel the payment operation if you need.</param>
-        public static Task<VerifyResult> VerifyAsync(HttpContext httpContext, Action<IPaymentVerifyingContext> paymentVerifyingHandler = null)
-        {
-            return VerifyAsync(new HttpContextWrapper(httpContext), paymentVerifyingHandler);
-        }
-
-        /// <summary>
-        /// Verifies request that comes from a gateway.
-        /// </summary>
-        /// <param name="httpContext">HttpContext object of current request.</param>
-        /// <param name="paymentVerifyingHandler">Describes the invoice which sent by the gateway. You can compare its data with your database and also cancel the payment operation if you need.</param>
         public static async Task<VerifyResult> VerifyAsync(HttpContextBase httpContext, Action<IPaymentVerifyingContext> paymentVerifyingHandler = null)
         {
-            if (httpContext == null)
-            {
-                throw new ArgumentNullException(nameof(httpContext));
-            }
+            if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
 
-            //  1) Get PaymentData's ID from HttpRequest
+            //  1) Get Payment Data ID from HttpRequest
             if (!httpContext.Request.TryGetPaymentDataId(out var paymentId))
             {
                 return new VerifyResult(0, string.Empty, string.Empty, VerifyResultStatus.NotValid, "Payment's ID is not valid.");
