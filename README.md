@@ -21,6 +21,7 @@ But with Parbad you can with only three or four lines of codes, communicate with
 | Tejarat			       | Not tested | It seems that the bank has not offered any Refund operations. |
 | Iran Kish				   | Not tested | Still needs to be tested with a real account. |
 | Parbad Virtual Gateway   | Tested     | |
+| Melli					   | Not tested | |
 
 
 ### Getting Started
@@ -67,7 +68,7 @@ var result = Payment.Request(Gateways.Mellat, invoice);
 if (result.Status == RequestResultStatus.Success)
 {
     // This extension method redirects client to Gateway's website.
-    result.Process(Context);
+    result.RedirectToGateway(Context);
 }
 else
 {

@@ -22,6 +22,24 @@ namespace Parbad.Utilities
             return SendWebRequestAsync(url, data, "POST", "text/xml;charset=UTF-8", headers);
         }
 
+        public static T SendAsJson<T>(string url, object data, string methodType)
+        {
+            var jsonData = JsonSerializer.Serialize(data);
+
+            var response = SendWebRequest(url, jsonData, methodType, "application/json");
+
+            return JsonSerializer.Deserialize<T>(response);
+        }
+
+        public static async Task<T> SendAsJsonAsync<T>(string url, object data, string methodType)
+        {
+            var jsonData = JsonSerializer.Serialize(data);
+
+            var response = await SendWebRequestAsync(url, jsonData, methodType, "application/json");
+
+            return JsonSerializer.Deserialize<T>(response);
+        }
+
         public static string SendWebRequest(string url, string data, string methodType, string contentType, IDictionary<string, string> headers = null)
         {
             if (url.IsNullOrWhiteSpace())
