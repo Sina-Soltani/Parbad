@@ -68,7 +68,7 @@ var result = Payment.Request(Gateways.Mellat, invoice);
 if (result.Status == RequestResultStatus.Success)
 {
     // This extension method redirects client to Gateway's website.
-    result.Process(Context);
+    result.RedirectToGateway(Context);
 }
 else
 {
