@@ -75,7 +75,7 @@ else
 }
 ```
 Here, the result object is the result of the request that you sent to the gateway:
-* ReferenceId: A uniqe code for your payment's request. This code usualy comes from the banks
+* ReferenceId: A uniqe code for your payment's request. This code usually comes from the banks
 * Status: Tells you about the result's status
 * Message: A formatted message about the result (you can show it to the client if you like)
 
