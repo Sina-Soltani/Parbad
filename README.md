@@ -18,7 +18,7 @@ But with Parbad you can with only three or four lines of codes, communicate with
 | Saman				       | Tested     | |
 | Parsian				   | Tested     | |
 | Pasargad				   | Tested     | |
-| Iran Kish				   | Not tested | Still needs to be tested with a real account. |
+| Iran Kish				   | Tested | |
 | Parbad Virtual Gateway   | Tested     | |
 | Melli					   | Tested | |
 
@@ -41,7 +41,7 @@ But with Parbad you can with only three or four lines of codes, communicate with
 PM> Install-Package Parbad
 ```
 
-For MVC project:
+For MVC (4+ , 5+) projects:
 ```
 PM> Install-Package Parbad.Mvc5
 ```
@@ -66,7 +66,7 @@ var result = Payment.Request(Gateways.Mellat, invoice);
 
 if (result.Status == RequestResultStatus.Success)
 {
-    // This extension method redirects client to Gateway's website.
+    // Redirect the client to Gateway's website.
     result.RedirectToGateway(Context);
 }
 else
@@ -83,7 +83,7 @@ For MVC(4+, 5+) projects you can Install Parbad.Mvc5 and do like this:
 ```csharp
 if (result.Status == RequestResultStatus.Success)
 {
-    // redirect client to Gateway's website
+    // redirect the client to Gateway's website
     return result.ToActionResult();
 }
 else
@@ -100,7 +100,7 @@ But, where should you do verifying! Remember VERIFY URL in step 1?
 So you should inside the Page_Load method of that URL do verifying. (if your project is an ASP.NET MVC project, then you should write the bellow codes in ActionMethod of that URL)
 
 ```c
-var result = Payment.Verify(System.Web.HttpContext.Current);
+var result = Payment.Verify(HttpContext);
 
 if(result.Status == VerifyResultStatus.Success)
 {
