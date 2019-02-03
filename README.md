@@ -100,7 +100,15 @@ But, where should you do verifying! Remember VERIFY URL in step 1?
 So you should inside the Page_Load method of that URL do verifying. (if your project is an ASP.NET MVC project, then you should write the bellow codes in ActionMethod of that URL)
 
 ```c
-var result = Payment.Verify(HttpContext);
+var result = await Payment.Verify(HttpContext, invoice =>
+{
+    // You can check your database, whether or not you have still products to sell
+
+    if (!Is_There_Still_Enough_Smartphone_In_Shop(invoice.OrderNumber, invoice.ReferenceId))
+    {
+        invoice.Cancel("We have no more smartphones to sell.");
+    }
+});
 
 if(result.Status == VerifyResultStatus.Success)
 {
