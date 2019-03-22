@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <LangVersion>latest</LangVersion>
-    <Version>1.0.0-beta1</Version>
+    <Version>1.0.0</Version>
     <Authors>Sina Soltani</Authors>
     <Description>Owin integration for Parbad project.
 
@@ -11,7 +11,7 @@ For more information see: https://www.nuget.org/packages/Parbad/</Description>
     <Copyright>Copyright © Sina Soltani 2016</Copyright>
     <PackageLicenseUrl>https://github.com/Sina-Soltani/Parbad/blob/master/LICENSE.txt</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/Sina-Soltani/Parbad</PackageProjectUrl>
-    <PackageIconUrl></PackageIconUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/Sina-Soltani/Parbad/master/images/Parbad.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/Sina-Soltani/Parbad</RepositoryUrl>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>

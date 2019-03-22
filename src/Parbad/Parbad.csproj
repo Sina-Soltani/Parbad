@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>latest</LangVersion>
-    <Version>2.0.0-beta1</Version>
+    <Version>2.0.0</Version>
     <Authors>Sina Soltani</Authors>
     <Description>Parbad is a free and open-source integrated online payment library which provides an easy solution to perform payment request, verify a payment and refund a paid payment.
 It supports the most popular banks in Iran such as Mellat, Melli, Parsian, Tejarat, Saman and Pasargad.
@@ -12,7 +12,7 @@ More information: https://github.com/Sina-Soltani/Parbad</Description>
     <Copyright>Copyright © Sina Soltani 2016</Copyright>
     <PackageLicenseUrl>https://github.com/Sina-Soltani/Parbad/blob/master/LICENSE.txt</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/Sina-Soltani/Parbad</PackageProjectUrl>
-    <PackageIconUrl></PackageIconUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/Sina-Soltani/Parbad/master/images/Parbad.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/Sina-Soltani/Parbad</RepositoryUrl>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
