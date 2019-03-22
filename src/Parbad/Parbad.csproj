@@ -8,7 +8,9 @@
     <Description>Parbad is a free and open-source integrated online payment library which provides an easy solution to perform payment request, verify a payment and refund a paid payment.
 It supports the most popular banks in Iran such as Mellat, Melli, Parsian, Tejarat, Saman and Pasargad.
 
-More information: https://github.com/Sina-Soltani/Parbad</Description>
+More information: https://github.com/Sina-Soltani/Parbad
+
+پَرباد یک کتابخانه رایگان و اوپن سورس است که امکان افزودن پرداخت آنلاین را به وب اپلیکیشن‌ها محیا میکند</Description>
     <Copyright>Copyright © Sina Soltani 2016</Copyright>
     <PackageLicenseUrl>https://github.com/Sina-Soltani/Parbad/blob/master/LICENSE.txt</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/Sina-Soltani/Parbad</PackageProjectUrl>
@@ -34,6 +36,10 @@ More information: https://github.com/Sina-Soltani/Parbad</Description>
     <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="2.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.2.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Http" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="2.2.0" />

@@ -33,5 +33,22 @@ namespace Parbad.Builder
 
             return builder;
         }
+
+        /// <summary>
+        /// Configures the context to connect to a Microsoft SQL Server database.
+        /// It also creates and migrates the database.
+        /// </summary>
+        /// <param name="builder">The builder being used to configure the context.</param>
+        /// <param name="connectionString">The connection string of the database to connect to.</param>
+        public static DbContextOptionsBuilder UseParbadSqlServer(this DbContextOptionsBuilder builder,
+            string connectionString)
+        {
+            if (builder == null) throw new ArgumentNullException(nameof(builder));
+            if (connectionString == null) throw new ArgumentNullException(nameof(connectionString));
+
+            builder.UseSqlServer(connectionString, optionsBuilder => optionsBuilder.MigrationsAssembly("Parbad"));
+
+            return builder;
+        }
     }
 }

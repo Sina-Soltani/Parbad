@@ -15,7 +15,7 @@ namespace Parbad.AspNetCore.VirtualGateway
 
         public Task Invoke(HttpContext httpContext, IParbadVirtualGatewayMiddlewareInvoker invoker)
         {
-            return invoker.Invoke(httpContext);
+            return invoker.InvokeAsync();
         }
     }
 }

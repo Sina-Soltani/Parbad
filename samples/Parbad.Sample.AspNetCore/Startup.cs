@@ -35,12 +35,11 @@ namespace Parbad.Sample.AspNetCore
 
                     gateways
                         .AddParbadVirtual()
-                        .WithOptions(options =>
-                        {
-                            options.GatewayPath = "/MyVirtualGateway";
-                        });
+                        .WithOptions(options => { options.GatewayPath = "/MyVirtualGateway"; });
                 })
                 .ConfigureHttpContext(builder => builder.UseDefaultAspNetCore())
+                // Uncomment the bellow code to use SQL Server instead of Memory.
+                //.ConfigureStorage(builder => builder.UseParbadSqlServer("Connection String"))
                 .ConfigureStorage(builder => builder.UseInMemoryDatabase("MyDatabase"));
         }
 
