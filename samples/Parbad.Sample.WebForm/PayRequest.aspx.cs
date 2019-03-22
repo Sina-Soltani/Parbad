@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Parbad.Core;
-using Parbad.Providers;
 
 namespace Parbad.Sample.WebForm
 {
@@ -21,24 +18,34 @@ namespace Parbad.Sample.WebForm
         {
             var verifyUrl = $"{Request.Url.Scheme}://{Request.Url.Authority}/Verify";
 
-            var invoice = new Invoice(long.Parse(TxtOrderNumber.Text), long.Parse(TxtAmount.Text), verifyUrl);
-
             var gateway = (Gateway)long.Parse(DropGateway.SelectedValue);
 
-            var result = Payment.Request(gateway, invoice);
-
-            if (result.Status == RequestResultStatus.Success)
+            var result = StaticOnlinePayment.Instance.Request(invoice =>
             {
-                //  This extension method, redirects the page to the gateway
-                result.RedirectToGateway(Context);
-                return;
+                invoice
+                    .UseAutoIncrementTrackingNumber(50)
+                    .SetAmount(long.Parse(TxtAmount.Text))
+                    .SetCallbackUrl(verifyUrl)
+                    .UseGateway(gateway);
+            });
+
+            if (result.IsSucceed)
+            {
+                result.GatewayTransporter.Transport();
             }
+            else
+            {
+                ResultPanel.Visible = true;
 
-            ResultPanel.Visible = true;
-
-            LblReferenceId.Text = result.ReferenceId;
-            LblStatus.Text = result.Status.ToString();
-            LblMessage.Text = result.Message;
+                // Note: This is just for development and testing.
+                // Don't show the actual result object to clients in production environment.
+                // Instead, show only the important information such as IsSucceed, Tracking Number and Transaction Code.
+                LblTrackingNumber.Text = result.TrackingNumber.ToString();
+                LblAmount.Text = result.Amount.ToString();
+                LblGateway.Text = result.GatewayName;
+                LblIsSucceed.Text = result.IsSucceed.ToString();
+                LblMessage.Text = result.Message;
+            }
         }
 
         public void FillDropDownList()

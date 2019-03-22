@@ -4,10 +4,6 @@
     <h1>Request</h1>
 
     <div class="form-group">
-        <asp:Label ID="Label1" runat="server" Text="Order Number" CssClass="control-label"></asp:Label>
-        <asp:TextBox ID="TxtOrderNumber" runat="server" CssClass="form-control"></asp:TextBox>
-    </div>
-    <div class="form-group">
         <asp:Label ID="Label2" runat="server" Text="Amount" CssClass="control-label"></asp:Label>
         <asp:TextBox ID="TxtAmount" runat="server" CssClass="form-control"></asp:TextBox>
     </div>
@@ -19,15 +15,23 @@
 
     <asp:Panel ID="ResultPanel" runat="server" Visible="False">
         <h1>Result</h1>
-
+        
         <table class="table">
             <tr>
-                <td>Reference ID</td>
-                <td><asp:Label ID="LblReferenceId" runat="server" Text=""></asp:Label></td>
+                <td>Tracking number</td>
+                <td><asp:Label ID="LblTrackingNumber" runat="server" Text=""></asp:Label></td>
             </tr>
             <tr>
-                <td>Status</td>
-                <td><asp:Label ID="LblStatus" runat="server" Text=""></asp:Label></td>
+                <td>Amount</td>
+                <td><asp:Label ID="LblAmount" runat="server" Text=""></asp:Label></td>
+            </tr>
+            <tr>
+                <td>Gateway</td>
+                <td><asp:Label ID="LblGateway" runat="server" Text=""></asp:Label></td>
+            </tr>
+            <tr>
+                <td>Is succeed</td>
+                <td><asp:Label ID="LblIsSucceed" runat="server" Text=""></asp:Label></td>
             </tr>
             <tr>
                 <td>Message</td>

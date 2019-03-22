@@ -1,0 +1,26 @@
+﻿@model Parbad.IPaymentRequestResult
+
+<h1>Request result</h1>
+
+<table class="table">
+    <tr>
+        <td>Tracking number</td>
+        <td>@Model.TrackingNumber</td>
+    </tr>
+    <tr>
+        <td>Amount</td>
+        <td>@Model.Amount</td>
+    </tr>
+    <tr>
+        <td>Gateway</td>
+        <td>@Model.GatewayName</td>
+    </tr>
+    <tr>
+        <td>Is succeed</td>
+        <td>@Model.IsSucceed</td>
+    </tr>
+    <tr>
+        <td>Message</td>
+        <td class="text-lg">@Model.Message</td>
+    </tr>
+</table>

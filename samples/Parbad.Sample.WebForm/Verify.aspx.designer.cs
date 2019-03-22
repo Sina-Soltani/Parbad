@@ -13,6 +13,24 @@ namespace Parbad.Sample.WebForm {
     public partial class Verify {
         
         /// <summary>
+        /// LblTrackingNumber control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label LblTrackingNumber;
+        
+        /// <summary>
+        /// LblAmount control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label LblAmount;
+        
+        /// <summary>
         /// LblGateway control.
         /// </summary>
         /// <remarks>
@@ -22,31 +40,22 @@ namespace Parbad.Sample.WebForm {
         protected global::System.Web.UI.WebControls.Label LblGateway;
         
         /// <summary>
-        /// LblReferenceId control.
+        /// LblTransactionCode control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label LblReferenceId;
+        protected global::System.Web.UI.WebControls.Label LblTransactionCode;
         
         /// <summary>
-        /// LblTransactionId control.
+        /// LblIsSucceed control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label LblTransactionId;
-        
-        /// <summary>
-        /// LblStatus control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label LblStatus;
+        protected global::System.Web.UI.WebControls.Label LblIsSucceed;
         
         /// <summary>
         /// LblMessage control.

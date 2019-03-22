@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Parbad.AspNetCore</name>
+    </assembly>
+    <members>
+        <member name="M:Parbad.AspNetCore.GatewayTransporterExtensions.TransportToGateway(Parbad.IGatewayTransporter)">
+            <summary>
+            Transports the client to the specified gateway.
+            </summary>
+        </member>
+        <member name="T:Parbad.AspNetCore.ActionResults.TransportToGatewayActionResult">
+            <summary>
+            An <see cref="T:Microsoft.AspNetCore.Mvc.IActionResult"/> for transporting the client to the specified gateway.
+            </summary>
+        </member>
+        <member name="M:Parbad.AspNetCore.ActionResults.TransportToGatewayActionResult.#ctor(Parbad.IGatewayTransporter)">
+            <summary>
+            Initializes an instance of <see cref="T:Parbad.AspNetCore.ActionResults.TransportToGatewayActionResult"/> for redirecting the client to the gateway.
+            </summary>
+        </member>
+        <member name="M:Parbad.AspNetCore.ActionResults.TransportToGatewayActionResult.ExecuteResultAsync(Microsoft.AspNetCore.Mvc.ActionContext)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Builder.AspNetCoreHttpContextBuilderExtensions.UseDefaultAspNetCore(Parbad.Http.IHttpContextBuilder)">
+            <summary>
+            Uses the default ASP.NET CORE <see cref="T:Microsoft.AspNetCore.Http.IHttpContextAccessor"/>. If it exists, no action is
+            taken. If it does not exist then the <see cref="T:Microsoft.AspNetCore.Http.HttpContextAccessor"/> is added.
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.Builder.ParbadVirtualGatewayMiddlewareExtensions.UseParbadVirtualGatewayIfDevelopment(Microsoft.AspNetCore.Builder.IApplicationBuilder)">
+            <summary>
+            Adds the Parbad Virtual Gateway middleware to the pipeline if the current
+            hosting environment name is <see cref="F:Microsoft.AspNetCore.Hosting.EnvironmentName.Development"/>.
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.Builder.ParbadVirtualGatewayMiddlewareExtensions.UseParbadVirtualGatewayWhen(Microsoft.AspNetCore.Builder.IApplicationBuilder,System.Func{Microsoft.AspNetCore.Http.HttpContext,System.Boolean})">
+            <summary>
+            Adds the Parbad Virtual Gateway middleware to the pipeline.
+            </summary>
+            <param name="builder"></param>
+            <param name="predicate"></param>
+        </member>
+        <member name="M:Parbad.Builder.ParbadVirtualGatewayMiddlewareExtensions.UseParbadVirtualGateway(Microsoft.AspNetCore.Builder.IApplicationBuilder)">
+            <summary>
+            Adds the Parbad Virtual Gateway middleware to the pipeline.
+            </summary>
+            <param name="builder"></param>
+        </member>
+    </members>
+</doc>

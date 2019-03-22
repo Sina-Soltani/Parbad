@@ -1,5 +1,4 @@
 ﻿using System;
-using Parbad.Core;
 
 namespace Parbad.Sample.WebForm
 {
@@ -12,11 +11,17 @@ namespace Parbad.Sample.WebForm
 
         protected void BtnRefund_Click(object sender, EventArgs e)
         {
-            var result = Payment.Refund(new RefundInvoice(long.Parse(TxtOrderNumber.Text), long.Parse(TxtAmount.Text)));
+            var trackingNumber = long.Parse(TxtTrackingNumber.Text);
 
-            LblGateway.Text = result.Gateway.ToString();
+            var result = StaticOnlinePayment.Instance.RefundCompletely(trackingNumber);
+
+            // Note: This is just for development and testing.
+            // Don't show the actual result object to clients in production environment.
+            // Instead, show only the important information such as IsSucceed, Tracking Number and Transaction Code.
+            LblTrackingNumber.Text = result.TrackingNumber.ToString();
             LblAmount.Text = result.Amount.ToString();
-            LblStatus.Text = result.Status.ToString();
+            LblGateway.Text = result.GatewayName;
+            LblIsSucceed.Text = result.IsSucceed.ToString();
             LblMessage.Text = result.Message;
         }
     }

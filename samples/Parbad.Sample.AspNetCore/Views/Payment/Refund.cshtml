@@ -1,0 +1,14 @@
+﻿@model RefundViewModel
+@{
+    ViewData["Title"] = "Refund a payment";
+}
+
+<form asp-controller="Payment" asp-action="Refund" method="post">
+    <div class="form-group">
+        <label asp-for="TrackingNumber"></label>
+        <input asp-for="TrackingNumber" class="form-control" placeholder="Tracking number">
+        <small class="form-text text-muted">Tracking number of payment that must be refunded.</small>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Refund</button>
+</form>

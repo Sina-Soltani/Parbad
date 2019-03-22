@@ -1,194 +1,58 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{53D0B3CC-2FD4-4113-A368-60715FB8518E}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Parbad</RootNamespace>
-    <AssemblyName>Parbad</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\Parbad.xml</DocumentationFile>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>latest</LangVersion>
+    <Version>2.0.0-beta1</Version>
+    <Authors>Sina Soltani</Authors>
+    <Description>Parbad is a free and open-source integrated online payment library which provides an easy solution to perform payment request, verify a payment and refund a paid payment.
+It supports the most popular banks in Iran such as Mellat, Melli, Parsian, Tejarat, Saman and Pasargad.
+
+More information: https://github.com/Sina-Soltani/Parbad</Description>
+    <Copyright>Copyright © Sina Soltani 2016</Copyright>
+    <PackageLicenseUrl>https://github.com/Sina-Soltani/Parbad/blob/master/LICENSE.txt</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/Sina-Soltani/Parbad</PackageProjectUrl>
+    <PackageIconUrl></PackageIconUrl>
+    <RepositoryUrl>https://github.com/Sina-Soltani/Parbad</RepositoryUrl>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageTags>Payment Gateway Bank Iran Shetab IranKish Mellat Melli Parsian Pasargad Saman پرداخت درگاه بانک ایران شتاب ایران-کیش ملت ملی پارسیان پاسارگاد سامان</PackageTags>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\Parbad.xml</DocumentationFile>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>D:\Programming\Git\ParbadOldOne\src\Parbad\Parbad.xml</DocumentationFile>
   </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>false</SignAssembly>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Runtime.Caching" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Web.Extensions" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
+    <Compile Remove="Http\Internal\**" />
+    <EmbeddedResource Remove="Http\Internal\**" />
+    <None Remove="Http\Internal\**" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="Configurations\GatewaysConfiguration.cs" />
-    <Compile Include="Configurations\GatewaysConfigurationExtensions.cs" />
-    <Compile Include="Configurations\LoggerSettings.cs" />
-    <Compile Include="Configurations\ParbadConfiguration.cs" />
-    <Compile Include="Core\Extensions.cs" />
-    <Compile Include="Core\GatewayBase.cs" />
-    <Compile Include="Core\GatewayRefundPaymentContext.cs" />
-    <Compile Include="Core\GatewayRequestBehaviorMode.cs" />
-    <Compile Include="Core\GatewayVerifyPaymentContext.cs" />
-    <Compile Include="Core\Invoice.cs" />
-    <Compile Include="Core\IRequestParameters.cs" />
-    <Compile Include="Core\Money.cs" />
-    <Compile Include="Core\RefundInvoice.cs" />
-    <Compile Include="Core\RefundResult.cs" />
-    <Compile Include="Core\RefundResultStatus.cs" />
-    <Compile Include="Core\RequestParameters.cs" />
-    <Compile Include="Core\RequestParametersExtensions.cs" />
-    <Compile Include="Core\RequestResult.cs" />
-    <Compile Include="Core\RequestResultExtensions.cs" />
-    <Compile Include="Core\RequestResultStatus.cs" />
-    <Compile Include="Core\VerifyResult.cs" />
-    <Compile Include="Core\VerifyResultStatus.cs" />
-    <Compile Include="Exceptions\AmountValidationException.cs" />
-    <Compile Include="Exceptions\CallbackUrlValidationException.cs" />
-    <Compile Include="Exceptions\GatewayConfigurationException.cs" />
-    <Compile Include="Exceptions\GatewayNotFoundException.cs" />
-    <Compile Include="Exceptions\StorageNotImplementedException.cs" />
-    <Compile Include="Infrastructure\Caching\CacheManagerExtensions.cs" />
-    <Compile Include="Infrastructure\Caching\CacheManagerFactory.cs" />
-    <Compile Include="Infrastructure\Caching\ICacheManager.cs" />
-    <Compile Include="Infrastructure\Caching\MemoryCacheManager.cs" />
-    <Compile Include="Infrastructure\Data\PaymentData.cs" />
-    <Compile Include="Infrastructure\Data\PaymentDataEncryptor.cs" />
-    <Compile Include="Infrastructure\Data\PaymentDataExtensions.cs" />
-    <Compile Include="Infrastructure\Data\PaymentDataStatus.cs" />
-    <Compile Include="Infrastructure\Data\Providers\SqlServerStorage.cs" />
-    <Compile Include="Infrastructure\Data\Providers\TemporaryMemoryStorage.cs" />
-    <Compile Include="Infrastructure\Data\Storage.cs" />
-    <Compile Include="Infrastructure\Logging\Log.cs" />
-    <Compile Include="Infrastructure\Logging\Logger.cs" />
-    <Compile Include="Infrastructure\Logging\Loggers\FileLogger.cs" />
-    <Compile Include="Infrastructure\Logging\Loggers\Xml\XmlFileLogger.cs" />
-    <Compile Include="Infrastructure\Logging\Loggers\Xml\XmlLog.cs" />
-    <Compile Include="Infrastructure\Logging\LogReadContext.cs" />
-    <Compile Include="Infrastructure\Logging\LogType.cs" />
-    <Compile Include="Infrastructure\Translating\IGatewayResultTranslator.cs" />
-    <Compile Include="Payment.cs" />
-    <Compile Include="PaymentVerifyingContext.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Providers\Gateway.cs" />
-    <Compile Include="Providers\GatewayFactory.cs" />
-    <Compile Include="Providers\IranKish\IranKishCallbackResult.cs" />
-    <Compile Include="Providers\IranKish\IranKishGateway.cs" />
-    <Compile Include="Providers\IranKish\IranKishGatewayConfiguration.cs" />
-    <Compile Include="Providers\IranKish\IranKishHelper.cs" />
-    <Compile Include="Providers\IranKish\ResultTranslators\IranKishGatewayResultTranslator.cs" />
-    <Compile Include="Providers\Mellat\MellatGateway.cs" />
-    <Compile Include="Providers\Mellat\MellatGatewayConfiguration.cs" />
-    <Compile Include="Providers\Mellat\MellatHelper.cs" />
-    <Compile Include="Providers\Mellat\Models\MellatCallbackResult.cs" />
-    <Compile Include="Providers\Mellat\Models\MellatVerifyResult.cs" />
-    <Compile Include="Providers\Mellat\ResultTranslators\MellatGatewayResultTranslator.cs" />
-    <Compile Include="Providers\Melli\MelliGateway.cs" />
-    <Compile Include="Providers\Melli\MelliGatewayConfiguration.cs" />
-    <Compile Include="Providers\Melli\MelliGatewayDataSigningException.cs" />
-    <Compile Include="Providers\Melli\MelliHelper.cs" />
-    <Compile Include="Providers\Melli\Models\MelliApiRequestResult.cs" />
-    <Compile Include="Providers\Melli\Models\MelliApiVerifyResult.cs" />
-    <Compile Include="Providers\Melli\Models\MelliCallbackResult.cs" />
-    <Compile Include="Providers\Melli\ResultTranslator\MelliRequestResponseCodes.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>MelliRequestResponseCodes.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Providers\Melli\ResultTranslator\MelliRequestResultTranslator.cs" />
-    <Compile Include="Providers\Melli\ResultTranslator\MelliVerifyResponseCodes.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>MelliVerifyResponseCodes.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Providers\Melli\ResultTranslator\MelliVerifyResultTranslator.cs" />
-    <Compile Include="Providers\Parbad\ParbadVirtualGateway.cs" />
-    <Compile Include="Providers\Parbad\ParbadVirtualGatewayConfiguration.cs" />
-    <Compile Include="Providers\Parbad\ResultTranslators\ParbadVirtualGatewayResultTranslator.cs" />
-    <Compile Include="Providers\Parsian\Models\ParsianCallbackResult.cs" />
-    <Compile Include="Providers\Parsian\ParsianGateway.cs" />
-    <Compile Include="Providers\Parsian\ParsianGatewayConfiguration.cs" />
-    <Compile Include="Providers\Parsian\ParsianHelper.cs" />
-    <Compile Include="Providers\Parsian\ResultTranslators\ParsianStatusTranslator.cs" />
-    <Compile Include="Providers\Pasargad\Models\PasargadCallbackResult.cs" />
-    <Compile Include="Providers\Pasargad\Models\PasargadCheckCallbackResult.cs" />
-    <Compile Include="Providers\Pasargad\PasargadGateway.cs" />
-    <Compile Include="Providers\Pasargad\PasargadGatewayConfiguration.cs" />
-    <Compile Include="Providers\Pasargad\PasargadHelper.cs" />
-    <Compile Include="Providers\Saman\Models\SamanCallbackResult.cs" />
-    <Compile Include="Providers\Saman\ResultTranslators\SamanResultTranslator.cs" />
-    <Compile Include="Providers\Saman\ResultTranslators\SamanStateTranslator.cs" />
-    <Compile Include="Providers\Saman\SamanGateway.cs" />
-    <Compile Include="Providers\Saman\SamanGatewayConfigurations.cs" />
-    <Compile Include="Providers\Saman\SamanHelper.cs" />
-    <Compile Include="Providers\Tejarat\ResultTranslators\TejaratPayRequestResultTranslator.cs" />
-    <Compile Include="Providers\Tejarat\ResultTranslators\TejaratVerifyResultTranslator.cs" />
-    <Compile Include="Providers\Tejarat\TejaratGateway.cs" />
-    <Compile Include="Providers\Tejarat\TejaratGatewayConfiguration.cs" />
-    <Compile Include="Resource.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resource.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Utilities\CommonTools.cs" />
-    <Compile Include="Utilities\Extensions.cs" />
-    <Compile Include="Utilities\GatewayFinder.cs" />
-    <Compile Include="Utilities\JsonSerializer.cs" />
-    <Compile Include="Utilities\PersianDateTime.cs" />
-    <Compile Include="Utilities\SqlServerHelper.cs" />
-    <Compile Include="Utilities\WebHelper.cs" />
-    <Compile Include="Utilities\XmlHelper.cs" />
-    <Compile Include="IPaymentVerifyingContext.cs" />
-    <Compile Include="Web\Gateway\CommandDetails.cs" />
-    <Compile Include="Web\Gateway\GatewayCommandType.cs" />
-    <Compile Include="Web\Gateway\ParbadVirtualGatewayHandler.cs" />
-    <Compile Include="Web\InternalExtensions.cs" />
-    <Compile Include="Web\LogViewer\PaginationRequestContext.cs" />
-    <Compile Include="Web\LogViewer\ParbadLogViewerHandler.cs" />
-    <Compile Include="Web\ResponseCompressor.cs" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.2.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="2.2.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="2.2.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.1" />
   </ItemGroup>
+
   <ItemGroup>
-    <EmbeddedResource Include="Providers\Melli\ResultTranslator\MelliRequestResponseCodes.resx">
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>MelliRequestResponseCodes.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Providers\Melli\ResultTranslator\MelliVerifyResponseCodes.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>MelliVerifyResponseCodes.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resource.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
 </Project>

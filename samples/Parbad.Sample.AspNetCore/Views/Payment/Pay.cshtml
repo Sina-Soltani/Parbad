@@ -1,0 +1,22 @@
+﻿@using Parbad
+@model PayViewModel
+@{
+    ViewData["Title"] = "Pay";
+}
+
+<form asp-controller="Payment" asp-action="Pay" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="form-group">
+        <label asp-for="Amount"></label>
+        <input asp-for="Amount" class="form-control" placeholder="Amount">
+        <span asp-validation-for="Amount" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="SelectedGateway"></label>
+        <select asp-for="SelectedGateway" asp-items="Html.GetEnumSelectList<Gateway>()" class="form-control">
+            <option>Select a gateway...</option>
+        </select>
+        <span asp-validation-for="SelectedGateway" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Pay</button>
+</form>

@@ -2,23 +2,27 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
     <h1>Verify result</h1>
-
+    
     <table class="table">
+        <tr>
+            <td>Tracking number</td>
+            <td><asp:Label ID="LblTrackingNumber" runat="server" Text=""></asp:Label></td>
+        </tr>
+        <tr>
+            <td>Amount</td>
+            <td><asp:Label ID="LblAmount" runat="server" Text=""></asp:Label></td>
+        </tr>
         <tr>
             <td>Gateway</td>
             <td><asp:Label ID="LblGateway" runat="server" Text=""></asp:Label></td>
         </tr>
         <tr>
-            <td>Reference Id</td>
-            <td><asp:Label ID="LblReferenceId" runat="server" Text=""></asp:Label></td>
+            <td>Transaction code</td>
+            <td><asp:Label ID="LblTransactionCode" runat="server" Text=""></asp:Label></td>
         </tr>
         <tr>
-            <td>Transaction Id</td>
-            <td><asp:Label ID="LblTransactionId" runat="server" Text=""></asp:Label></td>
-        </tr>
-        <tr>
-            <td>Status</td>
-            <td><asp:Label ID="LblStatus" runat="server" Text=""></asp:Label></td>
+            <td>Is succeed</td>
+            <td><asp:Label ID="LblIsSucceed" runat="server" Text=""></asp:Label></td>
         </tr>
         <tr>
             <td>Message</td>
