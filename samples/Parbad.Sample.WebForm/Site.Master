@@ -50,8 +50,8 @@
                 </div>
                 <div class="navbar-collapse collapse">
                     <ul class="nav navbar-nav">
-                        <li><a runat="server" href="~/PayRequest">Request</a></li>
-                        <li><a runat="server" href="~/Refund">Refund</a></li>
+                        <li><a runat="server" href="~/PayRequest">Make a payment</a></li>
+                        <li><a runat="server" href="~/Refund">Refund a payment</a></li>
                     </ul>
                 </div>
             </div>

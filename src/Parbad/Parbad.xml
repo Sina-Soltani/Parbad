@@ -1,0 +1,1708 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Parbad</name>
+    </assembly>
+    <members>
+        <member name="T:Parbad.Abstraction.IGateway">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Parbad.Abstraction.IGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
+            <summary>
+            Performs a payment request using the given <paramref name="invoice"/>.
+            </summary>
+            <param name="invoice">The invoice which must be pay.</param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="M:Parbad.Abstraction.IGateway.VerifyAsync(Parbad.Data.Domain.Payments.Payment,System.Threading.CancellationToken)">
+            <summary>
+            Verifies the requested payment to check whether or not the invoice has was paid in the gateway by the client.
+            </summary>
+            <param name="payment"></param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="M:Parbad.Abstraction.IGateway.RefundAsync(Parbad.Data.Domain.Payments.Payment,Parbad.Money,System.Threading.CancellationToken)">
+            <summary>
+            Performs a refund request for the given invoice.
+            </summary>
+            <param name="payment"></param>
+            <param name="amount"></param>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Parbad.Builder.IParbadBuilder">
+            <summary>
+            A builder for building the Parbad services.
+            </summary>
+        </member>
+        <member name="P:Parbad.Builder.IParbadBuilder.Services">
+            <summary>
+            Specifies the contract for a collection of service descriptors.
+            </summary>
+        </member>
+        <member name="M:Parbad.Builder.IParbadBuilder.Build">
+            <summary>
+            Builds a single instance of <see cref="T:Parbad.IOnlinePaymentAccessor"/> which provides an
+            instance of <see cref="T:Parbad.IOnlinePayment"/> from configured <see cref="T:System.IServiceProvider"/>.
+            <para>
+            You use this method if you don't use Microsoft.Extensions.DependencyInjection in your application.
+            Otherwise in applications such as ASP.NET CORE that uses Microsoft.Extensions.DependencyInjection, 
+            you don't need to use this method because that gets done for you.
+            </para>
+            <para>
+            You can also register the <see cref="P:Parbad.Builder.IParbadBuilder.Services"/> in any other
+            dependency injection tools such as Autofac and use Dependency Injection benefits in your application.
+            For example you can inject the <see cref="T:Parbad.IOnlinePayment"/> where ever you need.
+            </para>
+            </summary>
+        </member>
+        <member name="M:Parbad.Builder.StorageServiceBuilderExtensions.ConfigureStorage(Parbad.Builder.IParbadBuilder,System.Action{Microsoft.EntityFrameworkCore.DbContextOptionsBuilder})">
+            <summary>
+            Configures the storage required by Parbad to save and load the data.
+            Note: It uses Microsoft.EntityFrameworkCore as storage, which means you can save your data
+            in different database providers such as SQL Server, MySql, Sqlite, PostgreSQL, Oracle, InMemory, etc.
+            <para>For more information see: https://docs.microsoft.com/en-us/ef/core/providers/.</para>
+            </summary>
+            <param name="builder"></param>
+            <param name="storageBuilder"></param>
+        </member>
+        <member name="M:Parbad.Builder.GatewayBuilderExtensions.ConfigureGateways(Parbad.Builder.IParbadBuilder,System.Action{Parbad.GatewayBuilders.IGatewayBuilder})">
+            <summary>
+            Configures the gateways.
+            </summary>
+            <param name="builder"></param>
+            <param name="configure"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Parbad.Builder.GatewayConfigurationBuilderExtensions.WithOptionsProvider``3(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{``0},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds the given <see cref="T:Parbad.Options.IParbadOptionsProvider`1"/> to <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/>.
+            It will be used for configuring the specified option.
+            </summary>
+            <typeparam name="TGateway"></typeparam>
+            <typeparam name="TGatewayOptions">An option that should be configured to be used by the specified gateway.</typeparam>
+            <typeparam name="TOptionsProvider">An <see cref="T:Parbad.Options.IParbadOptionsProvider`1"/> that provides and
+            configures the <typeparamref name="TGatewayOptions"/></typeparam>
+            <param name="builder"></param>
+            <param name="serviceLifetime"></param>
+        </member>
+        <member name="M:Parbad.Builder.GatewayConfigurationBuilderExtensions.WithOptionsProvider``2(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{``0},System.Func{System.IServiceProvider,Parbad.Options.IParbadOptionsProvider{``1}},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds the given <see cref="T:Parbad.Options.IParbadOptionsProvider`1"/> to <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/>.
+            It will be used for configuring the specified option.
+            </summary>
+            <typeparam name="TGateway"></typeparam>
+            <typeparam name="TGatewayOptions">An option that should be configured to be used by the specified gateway.</typeparam>
+            <param name="builder"></param>
+            <param name="factory"></param>
+            <param name="serviceLifetime"></param>
+        </member>
+        <member name="M:Parbad.Builder.GatewayConfigurationBuilderExtensions.WithConfiguration``2(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{``0},Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Configures the specified gateway by using an <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/>.
+            </summary>
+            <param name="builder"></param>
+            <param name="configuration">The <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/> section.</param>
+        </member>
+        <member name="M:Parbad.Builder.GatewayHttpClientConfigurationBuilderExtensions.WithProxy``1(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{``0},System.Uri)">
+            <summary>
+            Configures the <see cref="T:System.Net.Http.HttpClient"/> of the specified gateway to use an <see cref="T:System.Net.IWebProxy"/>
+            for sending HTTP requests and receiving HTTP responses.
+            </summary>
+            <typeparam name="TGateway"></typeparam>
+            <param name="builder"></param>
+            <param name="proxyUrl">URL of proxy server.</param>
+        </member>
+        <member name="M:Parbad.Builder.GatewayHttpClientConfigurationBuilderExtensions.WithProxy``1(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{``0},System.Uri,System.String,System.String)">
+            <summary>
+            Configures the <see cref="T:System.Net.Http.HttpClient"/> of the specified gateway to use an <see cref="T:System.Net.IWebProxy"/>
+            for sending HTTP requests and receiving HTTP responses.
+            </summary>
+            <typeparam name="TGateway"></typeparam>
+            <param name="builder"></param>
+            <param name="proxyUrl">URL of proxy server.</param>
+            <param name="userName">Username of proxy server.</param>
+            <param name="password">Password of proxy server.</param>
+        </member>
+        <member name="M:Parbad.Builder.GatewayHttpClientConfigurationBuilderExtensions.WithProxy``1(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{``0},System.Net.IWebProxy)">
+            <summary>
+            Configures the <see cref="T:System.Net.Http.HttpClient"/> of the specified gateway to use an <see cref="T:System.Net.IWebProxy"/>
+            for sending HTTP requests and receiving HTTP responses.
+            </summary>
+            <typeparam name="TGateway"></typeparam>
+            <param name="builder"></param>
+            <param name="webProxy">The proxy that must be used.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Parbad.Builder.IranKishGatewayBuilderExtensions.AddIranKish(Parbad.GatewayBuilders.IGatewayBuilder)">
+            <summary>
+            Adds IranKish gateway to Parbad services.
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.Builder.IranKishGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.IranKish.IranKishGateway},System.Action{Parbad.GatewayProviders.IranKish.IranKishGatewayOptions})">
+            <summary>
+            Configures IranKish gateway options.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureOptions"></param>
+        </member>
+        <member name="M:Parbad.Builder.IranKishGatewayBuilderExtensions.WithOptionsProvider``1(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.IranKish.IranKishGateway},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds the given <typeparamref name="TOptionsProvider"/> to services.
+            It will be used for configuring the <see cref="T:Parbad.GatewayProviders.IranKish.IranKishGatewayOptions"/>.
+            </summary>
+            <typeparam name="TOptionsProvider"></typeparam>
+            <param name="builder"></param>
+            <param name="serviceLifetime">Lifetime of <typeparamref name="TOptionsProvider"/>.</param>
+        </member>
+        <member name="M:Parbad.Builder.IranKishGatewayBuilderExtensions.WithOptionsProvider(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.IranKish.IranKishGateway},System.Func{System.IServiceProvider,Parbad.Options.IParbadOptionsProvider{Parbad.GatewayProviders.IranKish.IranKishGatewayOptions}},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds the given <paramref name="factory"/> to services.
+            It will be used for configuring the <see cref="T:Parbad.GatewayProviders.IranKish.IranKishGatewayOptions"/>.
+            </summary>
+            <param name="builder"></param>
+            <param name="factory"></param>
+            <param name="serviceLifetime">Lifetime of <paramref name="factory"/>.</param>
+        </member>
+        <member name="M:Parbad.Builder.IranKishGatewayBuilderExtensions.WithConfiguration(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.IranKish.IranKishGateway},Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Configures IranKish gateway by using an <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/>.
+            </summary>
+            <param name="builder"></param>
+            <param name="configuration">The <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/> section.</param>
+        </member>
+        <member name="M:Parbad.Builder.MellatGatewayBuilderExtensions.AddMellat(Parbad.GatewayBuilders.IGatewayBuilder)">
+            <summary>
+            Adds Mellat gateway to Parbad services.
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.Builder.MellatGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Mellat.MellatGateway},System.Action{Parbad.GatewayProviders.Mellat.MellatGatewayOptions})">
+            <summary>
+            Configures Mellat gateway options.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureOptions"></param>
+        </member>
+        <member name="M:Parbad.Builder.MellatGatewayBuilderExtensions.WithOptionsProvider``1(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Mellat.MellatGateway},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds the given <typeparamref name="TOptionsProvider"/> to services.
+            It will be used for configuring the <see cref="T:Parbad.GatewayProviders.Mellat.MellatGatewayOptions"/>.
+            </summary>
+            <typeparam name="TOptionsProvider"></typeparam>
+            <param name="builder"></param>
+            <param name="serviceLifetime">Lifetime of <typeparamref name="TOptionsProvider"/>.</param>
+        </member>
+        <member name="M:Parbad.Builder.MellatGatewayBuilderExtensions.WithOptionsProvider(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Mellat.MellatGateway},System.Func{System.IServiceProvider,Parbad.Options.IParbadOptionsProvider{Parbad.GatewayProviders.Mellat.MellatGatewayOptions}},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds the given <paramref name="factory"/> to services.
+            It will be used for configuring the <see cref="T:Parbad.GatewayProviders.Mellat.MellatGatewayOptions"/>.
+            </summary>
+            <param name="builder"></param>
+            <param name="factory"></param>
+            <param name="serviceLifetime">Lifetime of <paramref name="factory"/>.</param>
+        </member>
+        <member name="M:Parbad.Builder.MellatGatewayBuilderExtensions.WithConfiguration(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Mellat.MellatGateway},Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Configures Mellat gateway by using an <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/>.
+            </summary>
+            <param name="builder"></param>
+            <param name="configuration">The <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/> section.</param>
+        </member>
+        <member name="M:Parbad.Builder.MelliGatewayBuilderExtensions.AddMelli(Parbad.GatewayBuilders.IGatewayBuilder)">
+            <summary>
+            Adds Melli gateway to Parbad services.
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.Builder.MelliGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Melli.MelliGateway},System.Action{Parbad.GatewayProviders.Melli.MelliGatewayOptions})">
+            <summary>
+            Configures Melli gateway options.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureOptions"></param>
+        </member>
+        <member name="M:Parbad.Builder.MelliGatewayBuilderExtensions.WithOptionsProvider``1(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Melli.MelliGateway},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds the given <typeparamref name="TOptionsProvider"/> to services.
+            It will be used for configuring the <see cref="T:Parbad.GatewayProviders.Melli.MelliGatewayOptions"/>.
+            </summary>
+            <typeparam name="TOptionsProvider"></typeparam>
+            <param name="builder"></param>
+            <param name="serviceLifetime">Lifetime of <typeparamref name="TOptionsProvider"/>.</param>
+        </member>
+        <member name="M:Parbad.Builder.MelliGatewayBuilderExtensions.WithOptionsProvider(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Melli.MelliGateway},System.Func{System.IServiceProvider,Parbad.Options.IParbadOptionsProvider{Parbad.GatewayProviders.Melli.MelliGatewayOptions}},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds the given <paramref name="factory"/> to services.
+            It will be used for configuring the <see cref="T:Parbad.GatewayProviders.Melli.MelliGatewayOptions"/>.
+            </summary>
+            <param name="builder"></param>
+            <param name="factory"></param>
+            <param name="serviceLifetime">Lifetime of <paramref name="factory"/>.</param>
+        </member>
+        <member name="M:Parbad.Builder.MelliGatewayBuilderExtensions.WithConfiguration(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Melli.MelliGateway},Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Configures Melli gateway by using an <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/>.
+            </summary>
+            <param name="builder"></param>
+            <param name="configuration">The <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/> section.</param>
+        </member>
+        <member name="M:Parbad.Builder.ParbadVirtualGatewayBuilderExtensions.AddParbadVirtual(Parbad.GatewayBuilders.IGatewayBuilder)">
+            <summary>
+            Adds ParbadVirtual gateway to Parbad services.
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.Builder.ParbadVirtualGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.ParbadVirtual.ParbadVirtualGateway},System.Action{Parbad.GatewayProviders.ParbadVirtual.ParbadVirtualGatewayOptions})">
+            <summary>
+            Configures Parbad Virtual gateway options.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureOptions"></param>
+        </member>
+        <member name="M:Parbad.Builder.ParbadVirtualGatewayBuilderExtensions.WithOptionsProvider``1(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.ParbadVirtual.ParbadVirtualGateway},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds the given <typeparamref name="TOptionsProvider"/> to services.
+            It will be used for configuring the <see cref="T:Parbad.GatewayProviders.ParbadVirtual.ParbadVirtualGatewayOptions"/>.
+            </summary>
+            <typeparam name="TOptionsProvider"></typeparam>
+            <param name="builder"></param>
+            <param name="serviceLifetime">Lifetime of <typeparamref name="TOptionsProvider"/>.</param>
+        </member>
+        <member name="M:Parbad.Builder.ParbadVirtualGatewayBuilderExtensions.WithOptionsProvider(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.ParbadVirtual.ParbadVirtualGateway},System.Func{System.IServiceProvider,Parbad.Options.IParbadOptionsProvider{Parbad.GatewayProviders.ParbadVirtual.ParbadVirtualGatewayOptions}},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds the given <paramref name="factory"/> to services.
+            It will be used for configuring the <see cref="T:Parbad.GatewayProviders.ParbadVirtual.ParbadVirtualGatewayOptions"/>.
+            </summary>
+            <param name="builder"></param>
+            <param name="factory"></param>
+            <param name="serviceLifetime">Lifetime of <paramref name="factory"/>.</param>
+        </member>
+        <member name="M:Parbad.Builder.ParbadVirtualGatewayBuilderExtensions.WithConfiguration(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.ParbadVirtual.ParbadVirtualGateway},Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Configures Parbad Virtual gateway by using an <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/>.
+            </summary>
+            <param name="builder"></param>
+            <param name="configuration">The <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/> section.</param>
+        </member>
+        <member name="M:Parbad.Builder.ParsianGatewayBuilderExtensions.AddParsian(Parbad.GatewayBuilders.IGatewayBuilder)">
+            <summary>
+            Adds Parsian gateway to Parbad services.
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.Builder.ParsianGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Parsian.ParsianGateway},System.Action{Parbad.GatewayProviders.Parsian.ParsianGatewayOptions})">
+            <summary>
+            Configures Parsian gateway options.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureOptions"></param>
+        </member>
+        <member name="M:Parbad.Builder.ParsianGatewayBuilderExtensions.WithOptionsProvider``1(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Parsian.ParsianGateway},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds the given <typeparamref name="TOptionsProvider"/> to services.
+            It will be used for configuring the <see cref="T:Parbad.GatewayProviders.Parsian.ParsianGatewayOptions"/>.
+            </summary>
+            <typeparam name="TOptionsProvider"></typeparam>
+            <param name="builder"></param>
+            <param name="serviceLifetime">Lifetime of <typeparamref name="TOptionsProvider"/>.</param>
+        </member>
+        <member name="M:Parbad.Builder.ParsianGatewayBuilderExtensions.WithOptionsProvider(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Parsian.ParsianGateway},System.Func{System.IServiceProvider,Parbad.Options.IParbadOptionsProvider{Parbad.GatewayProviders.Parsian.ParsianGatewayOptions}},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds the given <paramref name="factory"/> to services.
+            It will be used for configuring the <see cref="T:Parbad.GatewayProviders.Parsian.ParsianGatewayOptions"/>.
+            </summary>
+            <param name="builder"></param>
+            <param name="factory"></param>
+            <param name="serviceLifetime">Lifetime of <paramref name="factory"/>.</param>
+        </member>
+        <member name="M:Parbad.Builder.ParsianGatewayBuilderExtensions.WithConfiguration(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Parsian.ParsianGateway},Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Configures Parsian gateway by using an <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/>.
+            </summary>
+            <param name="builder"></param>
+            <param name="configuration">The <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/> section.</param>
+        </member>
+        <member name="M:Parbad.Builder.PasargadGatewayBuilderExtensions.AddPasargad(Parbad.GatewayBuilders.IGatewayBuilder)">
+            <summary>
+            Adds Pasargad gateway to Parbad services.
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.Builder.PasargadGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Pasargad.PasargadGateway},System.Action{Parbad.GatewayProviders.Pasargad.PasargadGatewayOptions})">
+            <summary>
+            Configures Pasargad gateway options.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureOptions"></param>
+        </member>
+        <member name="M:Parbad.Builder.PasargadGatewayBuilderExtensions.WithOptionsProvider``1(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Pasargad.PasargadGateway},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds the given <typeparamref name="TOptionsProvider"/> to services.
+            It will be used for configuring the <see cref="T:Parbad.GatewayProviders.Pasargad.PasargadGatewayOptions"/>.
+            </summary>
+            <typeparam name="TOptionsProvider"></typeparam>
+            <param name="builder"></param>
+            <param name="serviceLifetime">Lifetime of <typeparamref name="TOptionsProvider"/>.</param>
+        </member>
+        <member name="M:Parbad.Builder.PasargadGatewayBuilderExtensions.WithOptionsProvider(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Pasargad.PasargadGateway},System.Func{System.IServiceProvider,Parbad.Options.IParbadOptionsProvider{Parbad.GatewayProviders.Pasargad.PasargadGatewayOptions}},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds the given <paramref name="factory"/> to services.
+            It will be used for configuring the <see cref="T:Parbad.GatewayProviders.Pasargad.PasargadGatewayOptions"/>.
+            </summary>
+            <param name="builder"></param>
+            <param name="factory"></param>
+            <param name="serviceLifetime">Lifetime of <paramref name="factory"/>.</param>
+        </member>
+        <member name="M:Parbad.Builder.PasargadGatewayBuilderExtensions.WithConfiguration(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Pasargad.PasargadGateway},Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Configures Pasargad gateway by using an <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/>.
+            </summary>
+            <param name="builder"></param>
+            <param name="configuration">The <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/> section.</param>
+        </member>
+        <member name="M:Parbad.Builder.SamanGatewayBuilderExtensions.AddSaman(Parbad.GatewayBuilders.IGatewayBuilder)">
+            <summary>
+            Adds Saman gateway to Parbad services.
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.Builder.SamanGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Saman.SamanGateway},System.Action{Parbad.GatewayProviders.Saman.SamanGatewayOptions})">
+            <summary>
+            Configures Saman gateway options.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureOptions"></param>
+        </member>
+        <member name="M:Parbad.Builder.SamanGatewayBuilderExtensions.WithOptionsProvider``1(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Saman.SamanGateway},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds the given <typeparamref name="TOptionsProvider"/> to services.
+            It will be used for configuring the <see cref="T:Parbad.GatewayProviders.Saman.SamanGatewayOptions"/>.
+            </summary>
+            <typeparam name="TOptionsProvider"></typeparam>
+            <param name="builder"></param>
+            <param name="serviceLifetime">Lifetime of <typeparamref name="TOptionsProvider"/>.</param>
+        </member>
+        <member name="M:Parbad.Builder.SamanGatewayBuilderExtensions.WithOptionsProvider(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Saman.SamanGateway},System.Func{System.IServiceProvider,Parbad.Options.IParbadOptionsProvider{Parbad.GatewayProviders.Saman.SamanGatewayOptions}},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds the given <paramref name="factory"/> to services.
+            It will be used for configuring the <see cref="T:Parbad.GatewayProviders.Saman.SamanGatewayOptions"/>.
+            </summary>
+            <param name="builder"></param>
+            <param name="factory"></param>
+            <param name="serviceLifetime">Lifetime of <paramref name="factory"/>.</param>
+        </member>
+        <member name="M:Parbad.Builder.SamanGatewayBuilderExtensions.WithConfiguration(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Saman.SamanGateway},Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Configures Saman gateway by using an <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/>.
+            </summary>
+            <param name="builder"></param>
+            <param name="configuration">The <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/> section.</param>
+        </member>
+        <member name="M:Parbad.Builder.HttpContextBuilderExtensions.ConfigureHttpContext(Parbad.Builder.IParbadBuilder,System.Action{Parbad.Http.IHttpContextBuilder})">
+            <summary>
+            Configures the <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> required by Parbad.
+            </summary>
+            <param name="builder"></param>
+            <param name="httpContextBuilder">A builder for configuring the HttpContext.</param>
+        </member>
+        <member name="M:Parbad.Builder.OptionsExtensions.ConfigureOptions(Parbad.Builder.IParbadBuilder,System.Action{Parbad.Options.IParbadOptionsBuilder})">
+            <summary>
+            Configures the options required by Parbad to an <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/>.
+            </summary>
+            <param name="builder"></param>
+            <param name="optionsBuilder">A builder for configuring the options.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Parbad.Builder.PaymentTokenProviderExtensions.ConfigurePaymentToken(Parbad.Builder.IParbadBuilder,System.Action{Parbad.PaymentTokenProviders.IPaymentTokenBuilder})">
+            <summary>
+            Configures the <see cref="T:Parbad.PaymentTokenProviders.IPaymentTokenProvider"/> required by Parbad to create
+            a unique token which will be used to load the payment data when the client comes
+            back from the gateway.
+            </summary>
+            <param name="builder"></param>
+            <param name="tokenBuilder">A builder to configure the <see cref="T:Parbad.PaymentTokenProviders.IPaymentTokenProvider"/></param>
+        </member>
+        <member name="M:Parbad.Builder.QueryStringPaymentTokenProviderExtensions.UseGuidQueryStringPaymentTokenProvider(Parbad.PaymentTokenProviders.IPaymentTokenBuilder)">
+            <summary>
+            Uses the <see cref="T:Parbad.Internal.GuidQueryStringPaymentTokenProvider"/> as <see cref="T:Parbad.PaymentTokenProviders.IPaymentTokenProvider"/>.
+            It generates a unique <see cref="T:System.Guid"/> as a token for each payments and puts it inside the query string
+            of the URL. The generated token will be retrieved from the query string when the client
+            comes back from the gateway.
+            <para>Note: This is the default <see cref="T:Parbad.PaymentTokenProviders.IPaymentTokenProvider"/>, which means you don't need to call this.</para>
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.Builder.QueryStringPaymentTokenProviderExtensions.UseGuidQueryStringPaymentTokenProvider(Parbad.PaymentTokenProviders.IPaymentTokenBuilder,System.Action{Parbad.PaymentTokenProviders.QueryStringPaymentTokenOptions})">
+            <summary>
+            Uses the <see cref="T:Parbad.Internal.GuidQueryStringPaymentTokenProvider"/> as <see cref="T:Parbad.PaymentTokenProviders.IPaymentTokenProvider"/>.
+            It generates a unique <see cref="T:System.Guid"/> as a token for each payments and puts it inside the query string
+            of the URL. The generated token will be retrieved from the query string when the client
+            comes back from the gateway.
+            <para>Note: This is the default <see cref="T:Parbad.PaymentTokenProviders.IPaymentTokenProvider"/>, which means you don't need to call this.</para>
+            </summary>
+            <param name="builder"></param>
+            <param name="configureOptions">A delegate to configure the <see cref="T:Parbad.PaymentTokenProviders.QueryStringPaymentTokenOptions"/>.</param>
+        </member>
+        <member name="M:Parbad.Builder.QueryStringPaymentTokenProviderExtensions.UseGuidQueryStringPaymentTokenProvider(Parbad.PaymentTokenProviders.IPaymentTokenBuilder,Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Uses the <see cref="T:Parbad.Internal.GuidQueryStringPaymentTokenProvider"/> as <see cref="T:Parbad.PaymentTokenProviders.IPaymentTokenProvider"/>.
+            It generates a unique <see cref="T:System.Guid"/> as a token for each payments and puts it inside the query string
+            of the URL. The generated token will be retrieved from the query string when the client
+            comes back from the gateway.
+            <para>Note: This is the default <see cref="T:Parbad.PaymentTokenProviders.IPaymentTokenProvider"/>, which means you don't need to call this.</para>
+            </summary>
+            <param name="builder"></param>
+            <param name="configuration">The configuration section for <see cref="T:Parbad.PaymentTokenProviders.QueryStringPaymentTokenOptions"/>.
+            The default key is <see cref="F:Parbad.PaymentTokenProviders.QueryStringPaymentTokenOptions.ConfigurationKey"/></param>
+        </member>
+        <member name="M:Parbad.Builder.QueryStringPaymentTokenProviderExtensions.GetQueryStringPaymentTokenProviderConfiguration(Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Retrieves the <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/> section of <see cref="T:Parbad.PaymentTokenProviders.QueryStringPaymentTokenOptions"/> using <see cref="F:Parbad.PaymentTokenProviders.QueryStringPaymentTokenOptions.ConfigurationKey"/>.
+            </summary>
+            <param name="configuration"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Parbad.Builder.AutoTrackingNumberOptionsExtensions.GetAutoTrackingNumberOptionsConfiguration(Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Retrieves the <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/> section of <see cref="T:Parbad.TrackingNumberProviders.AutoTrackingNumberOptions"/> using <see cref="F:Parbad.TrackingNumberProviders.AutoTrackingNumberOptions.ConfigurationKey"/>.
+            </summary>
+        </member>
+        <member name="T:Parbad.CallbackUrl">
+            <summary>
+            A complete URL of your website. It will be used by the gateway for redirecting
+            the client again to your website.
+            <para>Note: A complete URL would be like: "http://www.mywebsite.com/foo/bar/"</para>
+            <exception cref="T:Parbad.Exceptions.CallbackUrlFormatException"></exception>
+            </summary>
+        </member>
+        <member name="M:Parbad.CallbackUrl.#ctor(System.String)">
+            <summary>
+            Initializes an instance of <see cref="T:Parbad.CallbackUrl"/> class.
+            </summary>
+            <param name="url">
+            A complete URL of your website. It will be used by the gateway for redirecting
+            the client again to your website.
+            <para>A complete URL would be like: "http://www.mywebsite.com/foo/bar/"</para>
+            </param>
+            <exception cref="T:Parbad.Exceptions.CallbackUrlFormatException"></exception>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="M:Parbad.CallbackUrl.AddQueryString(System.String,System.String)">
+            <summary>
+            Adds a query string to the current URL.
+            </summary>
+            <param name="name"></param>
+            <param name="value"></param>
+        </member>
+        <member name="T:Parbad.Gateway">
+            <summary>
+            Online payment providers.
+            </summary>
+        </member>
+        <member name="T:Parbad.GatewayBuilders.IGatewayBuilder">
+            <summary>
+            A builder for building a gateway.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayBuilders.IGatewayBuilder.Services">
+            <summary>
+            Specifies the contract for a collection of service descriptors.
+            </summary>
+        </member>
+        <member name="M:Parbad.GatewayBuilders.IGatewayBuilder.AddGateway``1(System.Uri,Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds the specified gateway to Parbad services.
+            </summary>
+            <typeparam name="TGateway">Type of gateway.</typeparam>
+            <param name="baseServiceUrl">Base service address of <typeparamref name="TGateway"/>.</param>
+            <param name="serviceLifetime">Lifetime of <typeparamref name="TGateway"/>.</param>
+        </member>
+        <member name="T:Parbad.GatewayBuilders.IGatewayConfigurationBuilder`1">
+            <summary>
+            A builder for configuring the specified gateway.
+            </summary>
+            <typeparam name="TGateway">Type of gateway.</typeparam>
+        </member>
+        <member name="P:Parbad.GatewayBuilders.IGatewayConfigurationBuilder`1.Services">
+            <summary>
+            Specifies the contract for a collection of service descriptors.
+            </summary>
+        </member>
+        <member name="M:Parbad.GatewayBuilders.IGatewayConfigurationBuilder`1.WithOptions``1(System.Action{``0})">
+            <summary>
+            Adds the configured options to Parbad services.
+            </summary>
+            <typeparam name="TOptions"></typeparam>
+            <param name="configureOptions"></param>
+        </member>
+        <member name="M:Parbad.GatewayBuilders.IGatewayConfigurationBuilder`1.WithHttpClient(System.Action{Microsoft.Extensions.DependencyInjection.IHttpClientBuilder})">
+            <summary>
+            Configures the <see cref="T:System.Net.Http.HttpClient"/> required by <typeparamref name="TGateway"/>
+            for sending HTTP requests and receiving HTTP responses.
+            </summary>
+            <param name="configureHttpClient">HttpClient configuration.</param>
+        </member>
+        <member name="P:Parbad.GatewayProviders.IranKish.IranKishCallbackResult.InvoiceNumber">
+            <summary>
+            Equals to TrackingNumber in Parbad system.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.IranKish.IranKishCallbackResult.ReferenceId">
+            <summary>
+            Equals to TransactionCode in Parbad system.
+            </summary>
+        </member>
+        <member name="T:Parbad.GatewayProviders.IranKish.IranKishGatewayOptions">
+            <summary>
+            IranKish gateway options
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Mellat.MellatGatewayOptions.UseTestTerminal">
+            <summary>
+            Requests will be sent to the test terminal gateway of Mellat.
+            </summary>
+        </member>
+        <member name="T:Parbad.GatewayProviders.Melli.MelliGatewayDataSigningException">
+            <summary>
+            The exception that is thrown when an error by signing is occurred.
+            </summary>
+        </member>
+        <member name="M:Parbad.GatewayProviders.Melli.MelliGatewayDataSigningException.#ctor(System.Exception)">
+            <summary>
+            Initializes a new instance of the Parbad.Providers.Melli.MelliGatewayDataSigningException class.
+            </summary>
+            <param name="mainException">The main Exception object.</param>
+        </member>
+        <member name="T:Parbad.GatewayProviders.Melli.MelliGatewayOptions">
+            <summary>
+            Melli Gateway options class.
+            </summary>
+        </member>
+        <member name="T:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code0">
+            <summary>
+              Looks up a localized string similar to تراکنش موفق.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1000">
+            <summary>
+              Looks up a localized string similar to ترتیب پارامترهای ارسالی اشتباه می باشد، لطفا مسئول فنی پذيرنده با بانک تماس حاصل فرمايند.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1001">
+            <summary>
+              Looks up a localized string similar to لطفا مسئول فنی پذيرنده با بانک تماس حاصل فرمايند،پارامترهای پرداخت اشتباه می باشد.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1002">
+            <summary>
+              Looks up a localized string similar to خطا در سیستم- تراکنش ناموفق.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1003">
+            <summary>
+              Looks up a localized string similar to IP پذيرنده اشتباه است.لطفا مسئول فنی پذيرنده با بانک تماس حاصل فرمايند.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1004">
+            <summary>
+              Looks up a localized string similar to لطفا مسئول فنی پذيرنده با بانک تماس حاصل فرمايند،شماره پذيرنده اشتباه است.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1005">
+            <summary>
+              Looks up a localized string similar to خطای دسترسی:لطفا بعدا تلاش فرمايید.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1006">
+            <summary>
+              Looks up a localized string similar to خطا در سیستم.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1011">
+            <summary>
+              Looks up a localized string similar to درخواست تکراری- شماره سفارش تکراری می باشد.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1012">
+            <summary>
+              Looks up a localized string similar to اطلاعات پذيرنده صحیح نیست،يکی از موارد تاريخ،زمان يا کلید تراکنش اشتباه است.لطفا مسئول فنی پذيرنده با بانک تماس حاصل فرمايند.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1015">
+            <summary>
+              Looks up a localized string similar to پاسخ خطای نامشخص از سمت مرکز.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1017">
+            <summary>
+              Looks up a localized string similar to مبلغ درخواستی شما جهت پرداخت از حد مجاز تعريف شده برای اين پذيرنده بیشتر است.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1018">
+            <summary>
+              Looks up a localized string similar to اشکال در تاريخ و زمان سیستم. لطفا تاريخ و زمان سرور خود را با بانک هماهنگ نمايید.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1019">
+            <summary>
+              Looks up a localized string similar to امکان پرداخت از طريق سیستم شتاب برای اين پذيرنده امکان پذير نیست.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1020">
+            <summary>
+              Looks up a localized string similar to پذيرنده غیرفعال شده است.لطفا جهت فعال سازی با بانک تماس بگیريد.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1023">
+            <summary>
+              Looks up a localized string similar to آدرس بازگشت پذيرنده نامعتبر است.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1024">
+            <summary>
+              Looks up a localized string similar to مهر زمانی پذيرنده نامعتبر است.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1025">
+            <summary>
+              Looks up a localized string similar to امضا تراکنش نامعتبر است.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1026">
+            <summary>
+              Looks up a localized string similar to شماره سفارش تراکنش نامعتبر است.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1027">
+            <summary>
+              Looks up a localized string similar to شماره پذيرنده نامعتبر است.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1028">
+            <summary>
+              Looks up a localized string similar to شماره ترمینال پذيرنده نامعتبر است.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1029">
+             <summary>
+               Looks up a localized string similar to آدرس IP پرداخت در محدوده آدرس های معتبر اعلام شده توسط پذيرنده
+            نیست .لطفا مسئول فنی پذيرنده با بانک تماس حاصل فرمايند.
+             </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1030">
+             <summary>
+               Looks up a localized string similar to آدرس Domain پرداخت در محدوده آدرس های معتبر اعلام شده توسط
+            پذيرنده نیست .لطفا مسئول فنی پذيرنده با بانک تماس حاصل فرمايند.
+             </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1031">
+             <summary>
+               Looks up a localized string similar to مهلت زمانی شما جهت پرداخت به پايان رسیده است.لطفا مجددا سعی
+            بفرمايید.
+             </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1032">
+             <summary>
+               Looks up a localized string similar to پرداخت با اين کارت . برای پذيرنده مورد نظر شما امکان پذير نیست.لطفا از
+            کارتهای مجاز که توسط پذيرنده معرفی شده است . استفاده نمايید.
+             </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1033">
+             <summary>
+               Looks up a localized string similar to به علت مشکل در سايت پذيرنده. پرداخت برای اين پذيرنده غیرفعال شده
+            است.لطفا مسوول فنی سايت پذيرنده با بانک تماس حاصل فرمايند.
+             </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1036">
+            <summary>
+              Looks up a localized string similar to اطلاعات اضافی ارسال نشده يا دارای اشکال است.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1037">
+            <summary>
+              Looks up a localized string similar to شماره پذيرنده يا شماره ترمینال پذيرنده صحیح نمیباشد.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1053">
+             <summary>
+               Looks up a localized string similar to خطا: درخواست معتبر، از سمت پذيرنده صورت نگرفته است لطفا اطلاعات
+            پذيرنده خود را چک کنید.
+             </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1055">
+            <summary>
+              Looks up a localized string similar to مقدار غیرمجاز در ورود اطلاعات.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1056">
+            <summary>
+              Looks up a localized string similar to سیستم موقتا قطع میباشد.لطفا بعدا تلاش فرمايید..
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1058">
+             <summary>
+               Looks up a localized string similar to سرويس پرداخت اينترنتی خارج از سرويس می باشد.لطفا بعدا سعی
+            بفرمايید..
+             </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1061">
+             <summary>
+               Looks up a localized string similar to اشکال در تولید کد يکتا. لطفا مرورگر خود را بسته و با اجرای مجدد مرورگر
+            « عملیات پرداخت را انجام دهید )احتمال استفاده از دکمه Back »
+            مرورگر(.
+             </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1064">
+            <summary>
+              Looks up a localized string similar to لطفا مجددا سعی بفرمايید.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1065">
+            <summary>
+              Looks up a localized string similar to ارتباط ناموفق .لطفا چند لحظه ديگر مجددا سعی کنید.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1066">
+            <summary>
+              Looks up a localized string similar to سیستم سرويس دهی پرداخت موقتا غیر فعال شده است.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1068">
+            <summary>
+              Looks up a localized string similar to با عرض پوزش به علت بروزرسانی . سیستم موقتا قطع میباشد..
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1072">
+            <summary>
+              Looks up a localized string similar to خطا در پردازش پارامترهای اختیاری پذيرنده.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1101">
+            <summary>
+              Looks up a localized string similar to مبلغ تراکنش نامعتبر است.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1103">
+            <summary>
+              Looks up a localized string similar to توکن ارسالی نامعتبر است.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code1104">
+            <summary>
+              Looks up a localized string similar to اطلاعات تسهیم صحیح نیست.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code23">
+            <summary>
+              Looks up a localized string similar to Inactive Merchant. پذيرنده کارت فعال نیست لطفا با بخش امور پذيرندگان، تماس حاصل فرمائید.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code3">
+            <summary>
+              Looks up a localized string similar to Invalid Merchant. پذيرنده کارت فعال نیست لطفا با بخش امور پذيرندگان، تماس حاصل فرمائید.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code58">
+            <summary>
+              Looks up a localized string similar to انجام تراکنش مربوطه توسط پايانه ی انجام دهنده مجاز نمی باشد..
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes.Code61">
+            <summary>
+              Looks up a localized string similar to مبلغ تراکنش از حد مجاز بالاتر است.
+            </summary>
+        </member>
+        <member name="T:Parbad.GatewayProviders.Melli.ResultTranslator.MelliVerifyResponseCodes">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliVerifyResponseCodes.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliVerifyResponseCodes.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliVerifyResponseCodes.Code0">
+            <summary>
+              Looks up a localized string similar to نتیجه تراکنش موفق است.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliVerifyResponseCodes.Code101">
+             <summary>
+               Looks up a localized string similar to مهلت ارسال تراکنش به پايان رسیده
+            است.
+             </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Melli.ResultTranslator.MelliVerifyResponseCodes.CodeMinus1">
+             <summary>
+               Looks up a localized string similar to پارامترهای ارسالی صحیح نیست و يا
+            تراکنش در سیستم وجود ندارد..
+             </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.ParbadVirtual.ParbadVirtualGatewayOptions.GatewayPath">
+            <summary>
+            Path of Virtual Gateway. It would be like: /MyParbadGateway
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Parsian.Models.ParsianCallbackResult.RRN">
+            <summary>
+            Equals to TransactionCode in Parbad system.
+            </summary>
+        </member>
+        <member name="P:Parbad.GatewayProviders.Pasargad.Models.PasargadCallbackResult.InvoiceNumber">
+            <summary>
+            Equals to ReferenceID in Parbad system.
+            </summary>
+        </member>
+        <member name="T:Parbad.IGatewayTransporter">
+            <summary>
+            Defines a mechanism for transporting the client to a gateway.
+            </summary>
+        </member>
+        <member name="M:Parbad.IGatewayTransporter.TransportAsync(System.Threading.CancellationToken)">
+            <summary>
+            Transports the client to the specified gateway.
+            </summary>
+        </member>
+        <member name="T:Parbad.Internal.DefaultInvoiceBuilder">
+            <inheritdoc />
+        </member>
+        <member name="T:Parbad.Internal.DefaultOnlinePayment">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Internal.DefaultOnlinePayment.#ctor(System.IServiceProvider,Parbad.Data.Context.ParbadDataContext,Parbad.PaymentTokenProviders.IPaymentTokenProvider,Parbad.Abstraction.IGatewayProvider,Microsoft.Extensions.Options.IOptions{Parbad.Options.MessagesOptions},Microsoft.Extensions.Logging.ILogger{Parbad.IOnlinePayment})">
+            <summary>
+            Initializes an instance of <see cref="T:Parbad.Internal.DefaultOnlinePayment"/>.
+            </summary>
+            <param name="services"></param>
+            <param name="database"></param>
+            <param name="tokenProvider"></param>
+            <param name="gatewayProvider"></param>
+            <param name="messagesOptions"></param>
+            <param name="logger"></param>
+        </member>
+        <member name="P:Parbad.Internal.DefaultOnlinePayment.Services">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Internal.DefaultOnlinePayment.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Internal.DefaultOnlinePayment.VerifyAsync(System.Action{Parbad.IPaymentVerifyingContext},System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Internal.DefaultOnlinePayment.RefundAsync(Parbad.RefundInvoice,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:Parbad.Internal.GatewayBuilder">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Internal.GatewayBuilder.#ctor(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Initializes an instance of <see cref="T:Parbad.Internal.GatewayBuilder"/>.
+            </summary>
+            <param name="services"></param>
+        </member>
+        <member name="P:Parbad.Internal.GatewayBuilder.Services">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Internal.GatewayBuilder.AddGateway``1(System.Uri,Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <inheritdoc />
+        </member>
+        <member name="T:Parbad.Internal.GatewayConfigurationBuilder`1">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Internal.GatewayConfigurationBuilder`1.#ctor(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Initializes an instance of <see cref="T:Parbad.Internal.GatewayConfigurationBuilder`1"/>.
+            </summary>
+            <param name="services"></param>
+        </member>
+        <member name="P:Parbad.Internal.GatewayConfigurationBuilder`1.Services">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Internal.GatewayConfigurationBuilder`1.WithOptions``1(System.Action{``0})">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Internal.GatewayConfigurationBuilder`1.WithHttpClient(System.Action{Microsoft.Extensions.DependencyInjection.IHttpClientBuilder})">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Internal.GatewayHelper.IsGateway(System.Type,System.Boolean)">
+            <summary>
+            
+            </summary>
+            <param name="type"></param>
+            <param name="throwException"></param>
+            <exception cref="T:Parbad.Exceptions.InvalidGatewayTypeException"></exception>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="M:Parbad.Internal.GatewayHelper.FindGatewayTypeByName(System.String,System.Boolean)">
+            <summary>
+            </summary>
+            <param name="gatewayName"></param>
+            <param name="throwException"></param>
+            <exception cref="T:Parbad.Exceptions.GatewayNotFoundException"></exception>
+        </member>
+        <member name="T:Parbad.Internal.GatewayProvider">
+            <exception cref="T:Parbad.Exceptions.GatewayNotFoundException"></exception>
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Internal.GatewayProvider.Provide(System.Type)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Internal.GatewayProviderExtensions.Provide(Parbad.Abstraction.IGatewayProvider,System.String)">
+            <summary>
+            </summary>
+            <param name="gatewayProvider"></param>
+            <param name="gatewayName"></param>
+            <exception cref="T:Parbad.Exceptions.GatewayNotFoundException"></exception>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="T:Parbad.Internal.OnlinePaymentAccessor">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Internal.OnlinePaymentAccessor.#ctor(System.IServiceProvider)">
+            <summary>
+            Initializes an instance of <see cref="T:Parbad.Internal.OnlinePaymentAccessor"/>.
+            </summary>
+            <param name="services"></param>
+        </member>
+        <member name="P:Parbad.Internal.OnlinePaymentAccessor.Services">
+            <inheritdoc />
+        </member>
+        <member name="P:Parbad.Internal.OnlinePaymentAccessor.OnlinePayment">
+            <inheritdoc />
+        </member>
+        <member name="T:Parbad.Internal.ParbadOptionsBuilder">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Internal.ParbadOptionsBuilder.#ctor(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Initializes an instance of <see cref="T:Parbad.Internal.ParbadOptionsBuilder"/>.
+            </summary>
+            <param name="services"></param>
+        </member>
+        <member name="P:Parbad.Internal.ParbadOptionsBuilder.Services">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Internal.ParbadOptionsBuilder.AddOptionsUsingProvider``2(Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Internal.ParbadOptionsBuilder.AddOptionsUsingProvider``1(System.Func{System.IServiceProvider,Parbad.Options.IParbadOptionsProvider{``0}},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <inheritdoc />
+        </member>
+        <member name="T:Parbad.Internal.PaymentTokenBuilder">
+            <inheritdoc />
+        </member>
+        <member name="T:Parbad.Internal.UserInputTrackingNumberProvider">
+            <summary>
+            Gets the tracking number direct from the user.
+            </summary>
+            <exception cref="T:Parbad.Exceptions.InvalidTrackingNumberException"></exception>
+        </member>
+        <member name="M:Parbad.Internal.UserInputTrackingNumberProvider.#ctor(System.Int64)">
+            <summary>
+            Initializes an instance of <see cref="T:Parbad.Internal.UserInputTrackingNumberProvider"/> with the
+            given <paramref name="trackingNumber"/>.
+            </summary>
+            <param name="trackingNumber"></param>
+            <exception cref="T:Parbad.Exceptions.InvalidTrackingNumberException"></exception>
+        </member>
+        <member name="T:Parbad.InvoiceBuilder.IInvoiceBuilder">
+            <summary>
+            A builder which helps to build an invoice.
+            </summary>
+        </member>
+        <member name="M:Parbad.InvoiceBuilder.IInvoiceBuilder.SetTrackingNumberProvider(Parbad.TrackingNumberProviders.ITrackingNumberProvider)">
+            <summary>
+            Sets an <see cref="T:Parbad.TrackingNumberProviders.ITrackingNumberProvider"/> which generates a new tracking numbers for each payment requests.
+            </summary>
+            <param name="provider">An implementation of <see cref="T:Parbad.TrackingNumberProviders.ITrackingNumberProvider"/>.</param>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="M:Parbad.InvoiceBuilder.IInvoiceBuilder.SetAmount(Parbad.Money)">
+            <summary>
+            Sets the amount of the invoice.
+            </summary>
+            <param name="amount">The amount of invoice.</param>
+        </member>
+        <member name="M:Parbad.InvoiceBuilder.IInvoiceBuilder.SetCallbackUrl(Parbad.CallbackUrl)">
+            <summary>
+            Sets the callback URL. It will be used by the gateway for redirecting the client
+            again to your website.
+            </summary>
+            <param name="url">
+            A complete URL of your website. It will be used by the gateway for redirecting the
+            client again to your website.
+            <para>Note: A complete URL would be like: "http://www.mywebsite.com/foo/bar/"</para>
+            </param>
+        </member>
+        <member name="M:Parbad.InvoiceBuilder.IInvoiceBuilder.SetGatewayType(System.Type)">
+            <summary>
+            Sets the type of the gateway which the invoice must be paid in.
+            </summary>
+            <param name="gatewayType">Type of the gateway</param>
+            <exception cref="T:Parbad.Exceptions.InvalidGatewayTypeException"></exception>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="M:Parbad.InvoiceBuilder.IInvoiceBuilder.AddAdditionalData(System.String,System.Object)">
+            <summary>
+            Adds additional data to the invoice.
+            </summary>
+            <param name="key">Key of the data</param>
+            <param name="value">Value of the data</param>
+        </member>
+        <member name="M:Parbad.InvoiceBuilder.IInvoiceBuilder.BuildAsync(System.Threading.CancellationToken)">
+            <summary>
+            Builds an invoice with the given data.
+            </summary>
+        </member>
+        <member name="M:Parbad.InvoiceBuilderExtensions.SetAmount(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Decimal)">
+            <summary>
+            Sets amount of the invoice.
+            </summary>
+            <param name="builder"></param>
+            <param name="amount">The amount of invoice.</param>
+        </member>
+        <member name="M:Parbad.InvoiceBuilderExtensions.SetCallbackUrl(Parbad.InvoiceBuilder.IInvoiceBuilder,System.String)">
+            <summary>
+            Sets the callback URL. It will be used by the gateway for redirecting the
+            client again to your website.
+            <para>Note: A complete URL would be like: "http://www.mywebsite.com/foo/bar/"</para>
+            </summary>
+            <param name="builder"></param>
+            <param name="callbackUrl">
+            A complete URL of your website. It will be used by the gateway for redirecting the
+            client again to your website.
+            <para>Note: A complete URL would be like: "http://www.mywebsite.com/foo/bar/"</para>
+            </param>
+            <returns></returns>
+        </member>
+        <member name="M:Parbad.InvoiceBuilderExtensions.SetGatewayType``1(Parbad.InvoiceBuilder.IInvoiceBuilder)">
+            <summary>
+            Sets the type of the gateway which the invoice must be paid in.
+            </summary>
+            <typeparam name="TGateway">Type of the gateway.</typeparam>
+            <param name="builder"></param>
+            <exception cref="T:Parbad.Exceptions.InvalidGatewayTypeException"></exception>
+        </member>
+        <member name="M:Parbad.InvoiceBuilderExtensions.UseGateway(Parbad.InvoiceBuilder.IInvoiceBuilder,Parbad.Gateway)">
+            <summary>
+            Sets the gateway from the pre-defined <see cref="T:Parbad.Gateway"/> enum.
+            </summary>
+            <param name="builder"></param>
+            <param name="gateway"></param>
+            <exception cref="T:System.ComponentModel.InvalidEnumArgumentException"></exception>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="M:Parbad.InvoiceBuilderExtensions.UseGateway(Parbad.InvoiceBuilder.IInvoiceBuilder,System.String)">
+            <summary>
+            Sets the gateway using the given name. The given name must match the values of
+            <see cref="T:Parbad.Gateway"/> enum.
+            </summary>
+            <param name="builder"></param>
+            <param name="gatewayName"></param>
+            <exception cref="T:Parbad.Exceptions.GatewayNotFoundException"></exception>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="M:Parbad.InvoiceBuilderExtensions.AddAdditionalData(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Collections.Generic.IDictionary{System.String,System.Object})">
+            <summary>
+            Appends the given dictionary to the additional data of the invoice.
+            </summary>
+            <param name="builder"></param>
+            <param name="additionalData"></param>
+        </member>
+        <member name="T:Parbad.IOnlinePayment">
+            <summary>
+            Provides solution to perform payment request, verify the requested payment and
+            refund a payment.
+            </summary>
+        </member>
+        <member name="P:Parbad.IOnlinePayment.Services">
+            <summary>
+            Defines a mechanism for retrieving a service object; that is, an object that
+            provides custom support to other objects.
+            </summary>
+        </member>
+        <member name="M:Parbad.IOnlinePayment.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
+            <summary>
+            Performs a payment request using the given <paramref name="invoice"/>.
+            </summary>
+            <param name="invoice">The invoice that must be paid.</param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="M:Parbad.IOnlinePayment.VerifyAsync(System.Action{Parbad.IPaymentVerifyingContext},System.Threading.CancellationToken)">
+            <summary>
+            Verifies the requested payment to check whether or not the invoice has was paid in the gateway by the client.
+            </summary>
+            <param name="context">Describes the information of requested payment.</param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="M:Parbad.IOnlinePayment.RefundAsync(Parbad.RefundInvoice,System.Threading.CancellationToken)">
+            <summary>
+            Performs a refund request for the given invoice.
+            </summary>
+            <param name="invoice">The invoice that must be refunded.</param>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Parbad.IOnlinePaymentAccessor">
+            <summary>
+            Provides an instance of <see cref="T:Parbad.IOnlinePayment"/> from configured <see cref="T:System.IServiceProvider"/>.
+            </summary>
+        </member>
+        <member name="P:Parbad.IOnlinePaymentAccessor.Services">
+            <summary>
+            Defines a mechanism for retrieving a service object; that is, an object that
+            provides custom support to other objects.
+            </summary>
+        </member>
+        <member name="P:Parbad.IOnlinePaymentAccessor.OnlinePayment">
+            <summary>
+            Gets an instance of <see cref="T:Parbad.IOnlinePayment"/>.
+            </summary>
+            <exception cref="T:Parbad.Exceptions.ParbadServiceNotInitializedException"></exception>
+        </member>
+        <member name="T:Parbad.IPaymentRefundResult">
+            <summary>
+            Describes the result of the Refund operation.
+            </summary>
+        </member>
+        <member name="T:Parbad.IPaymentRequestResult">
+            <summary>
+            Describes the result of the Request operation.
+            </summary>
+        </member>
+        <member name="P:Parbad.IPaymentRequestResult.GatewayTransporter">
+            <summary>
+            Redirects the client to the gateway website.
+            </summary>
+        </member>
+        <member name="T:Parbad.IPaymentResult">
+            <summary>
+            Describes the result of a payment operation.
+            </summary>
+        </member>
+        <member name="P:Parbad.IPaymentResult.TrackingNumber">
+            <summary>
+            A unique number which will be used for tracking a specific payment.
+            </summary>
+        </member>
+        <member name="P:Parbad.IPaymentResult.Amount">
+            <summary>
+            The amount of the payment.
+            </summary>
+        </member>
+        <member name="P:Parbad.IPaymentResult.IsSucceed">
+            <summary>
+            Determines weather the payment was successful or not.
+            </summary>
+        </member>
+        <member name="P:Parbad.IPaymentResult.GatewayName">
+            <summary>
+            Name of the gateway which the client has paid the payment in.
+            </summary>
+        </member>
+        <member name="P:Parbad.IPaymentResult.Message">
+            <summary>
+            A short message about the operation.
+            </summary>
+        </member>
+        <member name="P:Parbad.IPaymentResult.AdditionalData">
+            <summary>
+            Includes some additional data.
+            </summary>
+        </member>
+        <member name="T:Parbad.IPaymentVerifyingContext">
+            <summary>
+            Describes the invoice which sent by the gateway. You can compare its data with your
+            database and also cancel the payment operation if you need.
+            </summary>
+        </member>
+        <member name="P:Parbad.IPaymentVerifyingContext.TrackingNumber">
+            <summary>
+            Gets the TrackingNumber of requested payment.
+            </summary>
+        </member>
+        <member name="P:Parbad.IPaymentVerifyingContext.GatewayName">
+            <summary>
+            Gets the gateway's name of requested payment.
+            </summary>
+        </member>
+        <member name="M:Parbad.IPaymentVerifyingContext.CancelPayment(System.String)">
+            <summary>
+            Cancel the Verify operation. No Verifying request will be sent to the gateway.
+            In this case, the money will transferred back to the client's bank account after
+            about 15-60 minutes.
+            </summary>
+            <param name="reason">The reason for cancelling the operation. It will be saved in
+            Message field in database.</param>
+        </member>
+        <member name="T:Parbad.IPaymentVerifyResult">
+            <summary>
+            Describes the result of the Verify operation.
+            </summary>
+        </member>
+        <member name="P:Parbad.IPaymentVerifyResult.TransactionCode">
+            <summary>
+            Gets the transaction code from the gateway.
+            </summary>
+        </member>
+        <member name="T:Parbad.Money">
+            <summary>
+            Defines money unit.
+            <para>Note: The money unit of Iran money is RIAL. It means the amount of the invoice will be sent
+            to gateways automatically as <see cref="T:System.Int64"/> by Parbad.</para>
+            </summary>
+        </member>
+        <member name="M:Parbad.Money.#ctor(System.Decimal)">
+            <summary>
+            Initializes an instance of <see cref="T:Parbad.Money"/> class with the given amount.
+            </summary>
+            <param name="amount">The amount of money.</param>
+            <exception cref="T:System.ArgumentOutOfRangeException"></exception>
+        </member>
+        <member name="T:Parbad.Net.GatewayHttpClientExtensions">
+            <summary>
+            Manages the <see cref="T:System.Net.Http.HttpClient"/> for a specific gateway.
+            </summary>
+        </member>
+        <member name="M:Parbad.OnlinePaymentExtensions.Request(Parbad.IOnlinePayment,Parbad.Gateway,System.Int64,System.Decimal,System.String)">
+            <summary>
+            Performs a new payment request with the given data.
+            </summary>
+            <param name="onlinePayment"></param>
+            <param name="gateway">The gateway which the client must pay the invoice in.</param>
+            <param name="trackingNumber">
+            A tracking number for this request. It will be sent to the gateway.
+            <para>Note: It must be unique for each requests.</para>
+            </param>
+            <param name="amount">The amount of the payment request.</param>
+            <param name="callbackUrl">
+            A complete URL of your website. It will be used by the gateway for redirecting the client again to your website.
+            <para>A complete URL would be like: "http://www.mywebsite.com/foo/bar/"</para>
+            </param>
+        </member>
+        <member name="M:Parbad.OnlinePaymentExtensions.Request(Parbad.IOnlinePayment,System.Action{Parbad.InvoiceBuilder.IInvoiceBuilder})">
+            <summary>
+            Performs a new payment request with the given data.
+            </summary>
+            <param name="onlinePayment"></param>
+            <param name="configureInvoice">A builder which helps to build an invoice.</param>
+        </member>
+        <member name="M:Parbad.OnlinePaymentExtensions.Request(Parbad.IOnlinePayment,Parbad.Abstraction.Invoice)">
+            <summary>
+            Performs a new payment request with the given invoice.
+            </summary>
+            <param name="onlinePayment"></param>
+            <param name="invoice">The invoice that must be paid.</param>
+        </member>
+        <member name="M:Parbad.OnlinePaymentExtensions.RequestAsync(Parbad.IOnlinePayment,Parbad.Gateway,System.Int64,System.Decimal,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Performs a new payment request with the given data.
+            </summary>
+            <param name="onlinePayment"></param>
+            <param name="gateway">The gateway which the client must pay the invoice in.</param>
+            <param name="trackingNumber">
+            A tracking number for this request. It will be sent to the gateway.
+            <para>Note: It must be unique for each requests.</para>
+            </param>
+            <param name="amount">The amount of the payment request.</param>
+            <param name="callbackUrl">
+            A complete URL of your website. It will be used by the gateway for redirecting the client again to your website.
+            <para>A complete URL would be like: "http://www.mywebsite.com/foo/bar/"</para>
+            </param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="M:Parbad.OnlinePaymentExtensions.RequestAsync(Parbad.IOnlinePayment,System.Action{Parbad.InvoiceBuilder.IInvoiceBuilder},System.Threading.CancellationToken)">
+            <summary>
+            Performs a new payment request by using an invoice builder.
+            </summary>
+            <param name="onlinePayment"></param>
+            <param name="configureInvoice">A builder which helps to build an invoice.</param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="M:Parbad.OnlinePaymentExtensions.Verify(Parbad.IOnlinePayment,System.Action{Parbad.IPaymentVerifyingContext})">
+            <summary>
+            Verifies the requested payment to check whether or not the invoice has was paid in the gateway by the client.
+            </summary>
+            <param name="onlinePayment"></param>
+            <param name="paymentVerifyingContext">Describes the information of requested payment.</param>
+        </member>
+        <member name="M:Parbad.OnlinePaymentExtensions.Refund(Parbad.IOnlinePayment,Parbad.RefundInvoice)">
+            <summary>
+            Performs a refund request for the given invoice.
+            </summary>
+            <param name="onlinePayment"></param>
+            <param name="invoice">The invoice that must be refunded.</param>
+        </member>
+        <member name="M:Parbad.OnlinePaymentExtensions.RefundCompletely(Parbad.IOnlinePayment,System.Int64)">
+            <summary>
+            Refunds completely a specific payment with the given tracking number.
+            </summary>
+            <param name="onlinePayment"></param>
+            <param name="trackingNumber">The tracking number of the payment that must be refunded.</param>
+        </member>
+        <member name="M:Parbad.OnlinePaymentExtensions.RefundCompletely(Parbad.IOnlinePayment,Parbad.IPaymentVerifyResult)">
+            <summary>
+            Refunds completely the paid payment.
+            </summary>
+            <param name="onlinePayment"></param>
+            <param name="verifyResult"></param>
+        </member>
+        <member name="M:Parbad.OnlinePaymentExtensions.RefundSpecificAmount(Parbad.IOnlinePayment,System.Int64,System.Decimal)">
+            <summary>
+            Refunds a specific amount of a  with the given tracking number.
+            <para>Note: Only Saman Gateway supports this operation.</para>
+            </summary>
+            <param name="onlinePayment"></param>
+            <param name="trackingNumber">The tracking number of the payment which must be refunded.</param>
+            <param name="amount">Amount of refund.</param>
+        </member>
+        <member name="M:Parbad.OnlinePaymentExtensions.RefundCompletelyAsync(Parbad.IOnlinePayment,System.Int64,System.Threading.CancellationToken)">
+            <summary>
+            Refunds completely a specific payment with the given tracking number.
+            </summary>
+            <param name="onlinePayment"></param>
+            <param name="trackingNumber">The tracking number of the payment that must be refunded.</param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="M:Parbad.OnlinePaymentExtensions.RefundSpecificAmountAsync(Parbad.IOnlinePayment,System.Int64,System.Decimal,System.Threading.CancellationToken)">
+            <summary>
+            Refunds a specific amount of a payment with the given tracking number.
+            <para>Note: Only Saman Gateway supports this operation.</para>
+            </summary>
+            <param name="onlinePayment"></param>
+            <param name="trackingNumber">The tracking number of the payment that must be refunded.</param>
+            <param name="amount">Amount of refund.</param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="M:Parbad.OnlinePaymentExtensions.RefundCompletelyAsync(Parbad.IOnlinePayment,Parbad.IPaymentVerifyResult,System.Threading.CancellationToken)">
+            <summary>
+            Refunds completely the paid payment.
+            </summary>
+            <param name="onlinePayment"></param>
+            <param name="verifyResult"></param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="T:Parbad.Options.IParbadOptionsBuilder">
+            <summary>
+            A builder for building Parbad options.
+            </summary>
+        </member>
+        <member name="P:Parbad.Options.IParbadOptionsBuilder.Services">
+            <summary>
+            Specifies the contract for a collection of service descriptors.
+            </summary>
+        </member>
+        <member name="M:Parbad.Options.IParbadOptionsBuilder.AddOptionsUsingProvider``2(Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds the given <see cref="T:Parbad.Options.IParbadOptionsProvider`1"/> to <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/>.
+            It will be used for configuring the specified option.
+            </summary>
+            <typeparam name="TOptions"></typeparam>
+            <typeparam name="TOptionsProvider"></typeparam>
+            <param name="optionsProviderServiceLifetime"></param>
+        </member>
+        <member name="M:Parbad.Options.IParbadOptionsBuilder.AddOptionsUsingProvider``1(System.Func{System.IServiceProvider,Parbad.Options.IParbadOptionsProvider{``0}},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds the given <see cref="T:Parbad.Options.IParbadOptionsProvider`1"/> to <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/>.
+            It will be used for configuring the specified option.
+            </summary>
+            <typeparam name="TOptions"></typeparam>
+            <param name="optionsProviderFactory"></param>
+            <param name="optionsProviderServiceLifetime"></param>
+        </member>
+        <member name="T:Parbad.Options.IParbadOptionsProvider`1">
+            <summary>
+            Defines a mechanism for providing and configuring an option.
+            </summary>
+            <typeparam name="TOptions"></typeparam>
+        </member>
+        <member name="M:Parbad.Options.IParbadOptionsProvider`1.Provide(`0)">
+            <summary>
+            Configures the given <paramref name="options"/>.
+            </summary>
+            <param name="options"></param>
+        </member>
+        <member name="T:Parbad.ParbadBuilder">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.ParbadBuilder.#ctor(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Initializes an instance of <see cref="T:Parbad.ParbadBuilder"/> class with the given <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/>.
+            </summary>
+            <param name="services"></param>
+        </member>
+        <member name="P:Parbad.ParbadBuilder.Services">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.ParbadBuilder.Build">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.ParbadBuilder.CreateDefaultBuilder(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Initializes a new instance of the <see cref="T:Parbad.Builder.IParbadBuilder"/> class with pre-configured services.
+            </summary>
+        </member>
+        <member name="M:Parbad.PaymentRequestResultExtensions.Transport(Parbad.IGatewayTransporter)">
+            <summary>
+            Transports the client to the specified gateway.
+            </summary>
+        </member>
+        <member name="T:Parbad.PaymentTokenProviders.IPaymentTokenBuilder">
+            <summary>
+            A builder for building the <see cref="T:Parbad.PaymentTokenProviders.IPaymentTokenProvider"/> services.
+            </summary>
+        </member>
+        <member name="M:Parbad.PaymentTokenProviders.IPaymentTokenBuilder.AddPaymentTokenProvider``1(Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds a provider to the <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> with the given
+            <paramref name="serviceLifetime"/>.
+            </summary>
+            <typeparam name="TProvider">Type of provider</typeparam>
+            <param name="serviceLifetime">Specifies the lifetime of the <see cref="T:Parbad.PaymentTokenProviders.IPaymentTokenProvider"/>
+            in an Microsoft.Extensions.DependencyInjection.IServiceCollection.</param>
+        </member>
+        <member name="M:Parbad.PaymentTokenProviders.IPaymentTokenBuilder.AddPaymentTokenProvider(System.Func{System.IServiceProvider,Parbad.PaymentTokenProviders.IPaymentTokenProvider},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds a provider to the <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> using the given
+            <paramref name="implementationFactory"/> and <paramref name="serviceLifetime"/>.
+            </summary>
+            <param name="implementationFactory">A factory to create new instances of the
+            <see cref="T:Parbad.PaymentTokenProviders.IPaymentTokenProvider"/> implementation.</param>
+            <param name="serviceLifetime">Specifies the lifetime of the <see cref="T:Parbad.PaymentTokenProviders.IPaymentTokenProvider"/>
+            in an Microsoft.Extensions.DependencyInjection.IServiceCollection.</param>
+        </member>
+        <member name="T:Parbad.PaymentTokenProviders.IPaymentTokenProvider">
+            <summary>
+            A provider which generates a token for each new payment requests.
+            The generated token will be saved in database and retrieved when the client
+            comes back from the gateway.
+            </summary>
+        </member>
+        <member name="M:Parbad.PaymentTokenProviders.IPaymentTokenProvider.ProvideTokenAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
+            <summary>
+            Generates a unique token for the given invoice.
+            </summary>
+            <param name="invoice">The invoice which must be paid by the client.</param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="M:Parbad.PaymentTokenProviders.IPaymentTokenProvider.RetrieveTokenAsync(System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the token.
+            </summary>
+        </member>
+        <member name="F:Parbad.PaymentTokenProviders.QueryStringPaymentTokenOptions.ConfigurationKey">
+            <summary>
+            The specific key for <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/>
+            </summary>
+        </member>
+        <member name="P:Parbad.PaymentTokenProviders.QueryStringPaymentTokenOptions.QueryName">
+            <summary>
+            The default value is <see cref="F:Parbad.PaymentTokenProviders.QueryStringPaymentTokenOptions.DefaultQueryName"/>.
+            </summary>
+        </member>
+        <member name="T:Parbad.Properties.Resources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:Parbad.Properties.Resources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:Parbad.Properties.Resources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:Parbad.Properties.Resources.AmountCannotBeNegative">
+            <summary>
+              Looks up a localized string similar to Amount cannot be negative..
+            </summary>
+        </member>
+        <member name="P:Parbad.Properties.Resources.CannotGetParbadServiceException">
+            <summary>
+              Looks up a localized string similar to Cannot get Parbad service from injector. Make sure that Parbad is initialized by using the ParbadBuilder class..
+            </summary>
+        </member>
+        <member name="P:Parbad.Properties.Resources.NoRecordsSavedInDatabase">
+            <summary>
+              Looks up a localized string similar to No records saved in database..
+            </summary>
+        </member>
+        <member name="P:Parbad.Properties.Resources.OptionValueRequired">
+            <summary>
+              Looks up a localized string similar to Gateway configuration failed. {0} is required..
+            </summary>
+        </member>
+        <member name="P:Parbad.Properties.Resources.PaymentCanceledProgrammatically">
+            <summary>
+              Looks up a localized string similar to Verifing failed. Payment is canceled programmatically..
+            </summary>
+        </member>
+        <member name="P:Parbad.Properties.Resources.RefundNotSupports">
+            <summary>
+              Looks up a localized string similar to The Refund operation is not supported by this gateway..
+            </summary>
+        </member>
+        <member name="P:Parbad.Properties.Resources.VirtualGatewayRequestHtml">
+             <summary>
+               Looks up a localized string similar to &lt;!DOCTYPE html&gt;
+            &lt;html&gt;
+            &lt;head&gt;
+                &lt;title&gt;Parbad Gateway&lt;/title&gt;
+                &lt;meta charset=&quot;utf-8&quot;&gt;
+                &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
+                &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
+                &lt;link rel=&quot;stylesheet&quot; href=&quot;https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css&quot; integrity=&quot;sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T&quot; crossorigin=&quot;anonymous&quot;&gt;
+                &lt;style type=&quot;text/css&quot;&gt;
+                    body {
+                        margin-to [rest of string was truncated]&quot;;.
+             </summary>
+        </member>
+        <member name="P:Parbad.Properties.Resources.VirtualGatewayResultHtml">
+             <summary>
+               Looks up a localized string similar to &lt;!DOCTYPE html&gt;
+            &lt;html&gt;
+            &lt;head&gt;
+                &lt;title&gt;Parbad Virtual Gateway&lt;/title&gt;
+                &lt;meta charset=&quot;utf-8&quot;&gt;
+                &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
+                &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
+                &lt;link rel=&quot;stylesheet&quot; href=&quot;https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css&quot; integrity=&quot;sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T&quot; crossorigin=&quot;anonymous&quot;&gt;
+                &lt;style type=&quot;text/css&quot;&gt;
+                    body {
+                        m [rest of string was truncated]&quot;;.
+             </summary>
+        </member>
+        <member name="M:Parbad.RefundInvoice.#ctor(System.Int64,System.Decimal)">
+            <summary>
+            Initializes a new instance of <see cref="T:Parbad.RefundInvoice"/>.
+            </summary>
+            <param name="trackingNumber"></param>
+            <param name="amount"></param>
+            <exception cref="T:System.ArgumentOutOfRangeException"></exception>
+        </member>
+        <member name="T:Parbad.StaticOnlinePayment">
+            <summary>
+            Provides a static version of <see cref="T:Parbad.IOnlinePayment"/>.
+            <para> You use this method when using no dependency injections such as
+            Microsoft.Extensions.DependencyInjection in your application,
+            otherwise you don't need to use this and can inject the <see cref="T:Parbad.IOnlinePayment"/>
+            interface wherever you need.
+            </para>
+            </summary>
+        </member>
+        <member name="P:Parbad.StaticOnlinePayment.Instance">
+            <summary>
+            Gets a new instance of <see cref="T:Parbad.IOnlinePayment"/> from the <see cref="T:System.IServiceProvider"/>.
+            </summary>
+            <exception cref="T:System.InvalidOperationException"></exception>
+        </member>
+        <member name="M:Parbad.StaticOnlinePayment.Initialize(Parbad.IOnlinePaymentAccessor)">
+            <summary>
+            Initializes the <see cref="T:Parbad.StaticOnlinePayment"/> class for static usage.
+            </summary>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="F:Parbad.TrackingNumberProviders.AutoTrackingNumberOptions.ConfigurationKey">
+            <summary>
+            The specific key for <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/>
+            </summary>
+        </member>
+        <member name="T:Parbad.TrackingNumberProviders.ITrackingNumberProvider">
+            <summary>
+            Defines a mechanism for generating a tracking number for each payment requests.
+            </summary>
+        </member>
+        <member name="M:Parbad.TrackingNumberProviders.ITrackingNumberProvider.ProvideAsync(System.Threading.CancellationToken)">
+            <summary>
+            Provides a new tracking number.
+            </summary>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="M:Parbad.TrackingNumberProviderExtensions.SetTrackingNumber(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Int64)">
+            <summary>
+            Sets the tracking number of invoice.
+            </summary>
+            <param name="builder"></param>
+            <param name="trackingNumber">
+            The tracking number of invoice.
+            <para>Note: It must be unique for each payment requests.</para>
+            </param>
+            <exception cref="T:System.ArgumentNullException"></exception>
+            <exception cref="T:System.ArgumentOutOfRangeException"></exception>
+        </member>
+        <member name="M:Parbad.TrackingNumberProviderExtensions.SetTrackingNumberProvider``1(Parbad.InvoiceBuilder.IInvoiceBuilder)">
+            <summary>
+            Sets a provider which generates unique tracking numbers for each payment requests.
+            </summary>
+            <typeparam name="TProvider">Type of provider.</typeparam>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.TrackingNumberProviderExtensions.SetTrackingNumberProvider(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Func{System.IServiceProvider,Parbad.TrackingNumberProviders.ITrackingNumberProvider})">
+            <summary>
+            Sets a provider which generates unique tracking numbers for each payment requests.
+            </summary>
+            <param name="builder"></param>
+            <param name="factory"></param>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="M:Parbad.TrackingNumberProviderExtensions.UseAutoIncrementTrackingNumber(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Int64)">
+            <summary>
+            Generates automatically a new tracking number which is greater than the latest number.
+            <para>Note: You can also set a starting number by configuring the AutoTrackingNumberOptions.</para>
+            </summary>
+        </member>
+        <member name="M:Parbad.TrackingNumberProviderExtensions.UseAutoIncrementTrackingNumber(Parbad.InvoiceBuilder.IInvoiceBuilder)">
+            <summary>
+            Generates automatically a new tracking number which is greater than the latest number.
+            <para>Note: You can also set a starting number by configuring the AutoTrackingNumberOptions.</para>
+            </summary>
+        </member>
+        <member name="M:Parbad.TrackingNumberProviderExtensions.UseAutoRandomTrackingNumber(Parbad.InvoiceBuilder.IInvoiceBuilder)">
+            <summary>
+            Generates a new tracking number randomly in <see cref="T:System.Int64"/> range.
+            </summary>
+        </member>
+        <member name="M:Parbad.TrackingNumberProviderExtensions.UseAutoRandomTrackingNumber(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Int64)">
+            <summary>
+            Generates a new tracking number randomly in <see cref="T:System.Int64"/> range.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.ParbadBuilderExtensions.AddParbad(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Adds Parbad pre-configured services to the specified <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/>.
+            </summary>
+        </member>
+    </members>
+</doc>

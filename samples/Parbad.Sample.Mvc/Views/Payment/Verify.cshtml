@@ -1,23 +1,27 @@
-﻿@model Parbad.Core.VerifyResult
+﻿@model Parbad.IPaymentVerifyResult
 
 <h1>Verify result</h1>
 
 <table class="table">
     <tr>
+        <td>Tracking number</td>
+        <td>@Model.TrackingNumber</td>
+    </tr>
+    <tr>
+        <td>Amount</td>
+        <td>@Model.Amount</td>
+    </tr>
+    <tr>
         <td>Gateway</td>
-        <td>@Model.Gateway</td>
+        <td>@Model.GatewayName</td>
     </tr>
     <tr>
-        <td>Reference Id</td>
-        <td>@Model.ReferenceId</td>
+        <td>Transaction code</td>
+        <td>@Model.TransactionCode</td>
     </tr>
     <tr>
-        <td>Transaction Id</td>
-        <td>@Model.TransactionId</td>
-    </tr>
-    <tr>
-        <td>Status</td>
-        <td>@Model.Status</td>
+        <td>Is succeed</td>
+        <td>@Model.IsSucceed</td>
     </tr>
     <tr>
         <td>Message</td>

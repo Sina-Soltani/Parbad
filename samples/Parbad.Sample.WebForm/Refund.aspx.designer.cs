@@ -13,40 +13,13 @@ namespace Parbad.Sample.WebForm {
     public partial class Refund {
         
         /// <summary>
-        /// Label1 control.
+        /// TxtTrackingNumber control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label Label1;
-        
-        /// <summary>
-        /// TxtOrderNumber control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox TxtOrderNumber;
-        
-        /// <summary>
-        /// Label2 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label Label2;
-        
-        /// <summary>
-        /// TxtAmount control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox TxtAmount;
+        protected global::System.Web.UI.WebControls.TextBox TxtTrackingNumber;
         
         /// <summary>
         /// BtnRefund control.
@@ -67,13 +40,13 @@ namespace Parbad.Sample.WebForm {
         protected global::System.Web.UI.WebControls.Panel ResultPanel;
         
         /// <summary>
-        /// LblGateway control.
+        /// LblTrackingNumber control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label LblGateway;
+        protected global::System.Web.UI.WebControls.Label LblTrackingNumber;
         
         /// <summary>
         /// LblAmount control.
@@ -85,13 +58,22 @@ namespace Parbad.Sample.WebForm {
         protected global::System.Web.UI.WebControls.Label LblAmount;
         
         /// <summary>
-        /// LblStatus control.
+        /// LblGateway control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label LblStatus;
+        protected global::System.Web.UI.WebControls.Label LblGateway;
+        
+        /// <summary>
+        /// LblIsSucceed control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label LblIsSucceed;
         
         /// <summary>
         /// LblMessage control.

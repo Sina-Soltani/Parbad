@@ -8,14 +8,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
 		LICENSE.txt = LICENSE.txt
+		images\Parbad.png = images\Parbad.png
 		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{571BD034-8370-432B-9B18-4C6FA697121C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parbad", "src\Parbad\Parbad.csproj", "{53D0B3CC-2FD4-4113-A368-60715FB8518E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parbad", "src\Parbad\Parbad.csproj", "{53D0B3CC-2FD4-4113-A368-60715FB8518E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parbad.Mvc", "src\Parbad.Mvc\Parbad.Mvc.csproj", "{19FBD363-C6F1-4DFC-A311-DA8485B6F8A4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parbad.Mvc", "src\Parbad.Mvc\Parbad.Mvc.csproj", "{19FBD363-C6F1-4DFC-A311-DA8485B6F8A4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{6BB6AFB4-7951-4435-8C10-95AF86B200F8}"
 EndProject
@@ -29,6 +30,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parbad.Sample.Mvc", "samples\Parbad.Sample.Mvc\Parbad.Sample.Mvc.csproj", "{3A52916C-717C-46AA-B8C1-2D193B1C065B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parbad.Sample.WebForm", "samples\Parbad.Sample.WebForm\Parbad.Sample.WebForm.csproj", "{C959900B-EAC6-46EE-97EA-09BD0B4428B1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parbad.Owin", "src\Parbad.Owin\Parbad.Owin.csproj", "{A1815D72-31A8-45BF-95B5-2A1F1008E0F8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parbad.AspNetCore", "src\Parbad.AspNetCore\Parbad.AspNetCore.csproj", "{8C3DE484-FEBF-4CCC-A903-769C883C4E7E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parbad.Sample.AspNetCore", "samples\Parbad.Sample.AspNetCore\Parbad.Sample.AspNetCore.csproj", "{E0A5E310-0796-4F84-A19A-714173B70529}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -52,6 +59,18 @@ Global
 		{C959900B-EAC6-46EE-97EA-09BD0B4428B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C959900B-EAC6-46EE-97EA-09BD0B4428B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C959900B-EAC6-46EE-97EA-09BD0B4428B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1815D72-31A8-45BF-95B5-2A1F1008E0F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1815D72-31A8-45BF-95B5-2A1F1008E0F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1815D72-31A8-45BF-95B5-2A1F1008E0F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1815D72-31A8-45BF-95B5-2A1F1008E0F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C3DE484-FEBF-4CCC-A903-769C883C4E7E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C3DE484-FEBF-4CCC-A903-769C883C4E7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C3DE484-FEBF-4CCC-A903-769C883C4E7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C3DE484-FEBF-4CCC-A903-769C883C4E7E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E0A5E310-0796-4F84-A19A-714173B70529}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0A5E310-0796-4F84-A19A-714173B70529}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0A5E310-0796-4F84-A19A-714173B70529}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0A5E310-0796-4F84-A19A-714173B70529}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -61,6 +80,9 @@ Global
 		{19FBD363-C6F1-4DFC-A311-DA8485B6F8A4} = {571BD034-8370-432B-9B18-4C6FA697121C}
 		{3A52916C-717C-46AA-B8C1-2D193B1C065B} = {4BA4953D-151E-4805-9B33-FD6AC7E0A481}
 		{C959900B-EAC6-46EE-97EA-09BD0B4428B1} = {4BA4953D-151E-4805-9B33-FD6AC7E0A481}
+		{A1815D72-31A8-45BF-95B5-2A1F1008E0F8} = {571BD034-8370-432B-9B18-4C6FA697121C}
+		{8C3DE484-FEBF-4CCC-A903-769C883C4E7E} = {571BD034-8370-432B-9B18-4C6FA697121C}
+		{E0A5E310-0796-4F84-A19A-714173B70529} = {4BA4953D-151E-4805-9B33-FD6AC7E0A481}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CBDDB699-C14A-4235-B0AE-32725230B4ED}

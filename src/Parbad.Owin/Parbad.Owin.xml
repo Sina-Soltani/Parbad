@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Parbad.Owin</name>
+    </assembly>
+    <members>
+        <member name="M:Parbad.Builder.ParbadVirtualGatewayOwinExtensions.UseParbadVirtualGateway(Owin.IAppBuilder,System.IServiceProvider)">
+            <summary>
+            Adds the Parbad Virtual Gateway middleware to the pipeline.
+            </summary>
+            <param name="app"></param>
+            <param name="serviceProvider"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>
