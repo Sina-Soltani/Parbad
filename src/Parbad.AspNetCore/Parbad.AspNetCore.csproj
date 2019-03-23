@@ -22,6 +22,10 @@ For more information see: https://www.nuget.org/packages/Parbad/</Description>
     <DocumentationFile>D:\Programming\Git\ParbadOldOne\src\Parbad.AspNetCore\Parbad.AspNetCore.xml</DocumentationFile>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>D:\Programming\Git\ParbadOldOne\src\Parbad.AspNetCore\Parbad.AspNetCore.xml</DocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
   </ItemGroup>
