@@ -1,10 +1,8 @@
 ﻿
-# Parbad
-
-![Parbad](https://github.com/Sina-Soltani/Parbad/blob/master/images/Parbad-Readme.png "Parbad")
+![Parbad](https://github.com/Sina-Soltani/Parbad/blob/master/images/Parbad.png "Parbad")
 
 [![NuGet version (Parbad)](https://img.shields.io/nuget/v/Parbad.svg)](https://www.nuget.org/packages/Parbad/)
-
+https://api.travis-ci.com/Sina-Soltani/Parbad.svg?branch=master
 
 Parbad is an integrated online payment library which helps developers and site owners to add the online payment ability to their websites.
 It provides a solution to perform payment request, verify the requested payment and refund a payment. 
