@@ -2,7 +2,6 @@
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
 using System;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,7 +9,7 @@ using Microsoft.Extensions.Options;
 using Parbad.AspNetCore.VirtualGateway;
 using Parbad.GatewayProviders.ParbadVirtual;
 
-namespace Parbad.Builder
+namespace Microsoft.AspNetCore.Builder
 {
     public static class ParbadVirtualGatewayMiddlewareExtensions
     {
