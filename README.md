@@ -1,6 +1,6 @@
 ﻿
 ![Parbad](https://github.com/Sina-Soltani/Parbad/blob/master/images/Parbad.png "Parbad")
-
+- - - -
 
 [![NuGet version (Parbad)](https://img.shields.io/nuget/v/Parbad.svg)](https://www.nuget.org/packages/Parbad/)
 [![Build passing](https://api.travis-ci.com/Sina-Soltani/Parbad.svg?branch=master)](https://api.travis-ci.com/Sina-Soltani/Parbad.svg?branch=master)
