@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Parbad.AspNetCore;
 using Parbad.Sample.AspNetCore.Models;
@@ -87,12 +85,6 @@ namespace Parbad.Sample.AspNetCore.Controllers
             // Don't show the actual result object to clients in production environment.
             // Instead, show only the important information such as IsSucceed, Tracking Number and Transaction Code.
             return View("RefundResult", result);
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
         private static bool Is_There_Still_Enough_SmartPhone_In_Shop(long trackingNumber)

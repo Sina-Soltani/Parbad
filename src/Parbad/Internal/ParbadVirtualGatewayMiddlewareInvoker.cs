@@ -74,7 +74,7 @@ namespace Parbad.Internal
                 .Replace("#TransactionCode#", boolIsPaid ? Guid.NewGuid().ToString("N") : string.Empty)
                 .Replace("#RedirectUrl#", commandDetails.RedirectUrl)
                 .Replace("#IsPaid#", isPaid.ToString().ToLower())
-                .Replace("#ThisYear#", DateTime.Now.Year.ToString())
+                .Replace("#YearNow#", DateTime.Now.Year.ToString())
                 .Replace("#CssStatusName#", boolIsPaid ? "success" : "danger")
                 .Replace("#StatusText#", boolIsPaid ? "Succeed" : "Failed");
 
