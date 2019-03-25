@@ -1,6 +1,5 @@
 ﻿using System.Web.Optimization;
 using System.Web.Routing;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Owin;
 using Owin;
 using Parbad.Builder;
@@ -20,7 +19,7 @@ namespace Parbad.Sample.WebForm
             // Parbad configuration
             var parbad = ParbadConfig.Configure();
 
-            // Use Virtual Gateway
+            // Use Virtual Gateway(if you need)
             app.UseParbadVirtualGateway(parbad.Services);
         }
     }

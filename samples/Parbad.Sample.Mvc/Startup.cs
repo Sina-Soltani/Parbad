@@ -16,6 +16,8 @@ using Parbad.Sample.Mvc.Services;
 
 namespace Parbad.Sample.Mvc
 {
+    // This file is an example of How to integrate Parbad with a Dependency Injection library such as Autofac.
+
     public class Startup
     {
         public void ConfigureServices(ContainerBuilder containerBuilder)
@@ -55,9 +57,9 @@ namespace Parbad.Sample.Mvc
             app.UseAutofacMiddleware(container);
             app.UseAutofacMvc();
 
+            // Add the Parbad Virtual Gateway (if you need)
             // Get IServiceProvider required by Parbad Virtual Gateway from Autofac.
             var serviceProvider = container.Resolve<IServiceProvider>();
-
             app.UseParbadVirtualGateway(serviceProvider);
         }
     }

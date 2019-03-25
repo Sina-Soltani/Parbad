@@ -28,7 +28,7 @@ namespace Parbad.Sample.WebForm
                     //.ConfigureStorage(builder => builder.UseParbadSqlServer("Connection String"))
                     .ConfigureStorage(builder => builder.UseInMemoryDatabase("MyDatabase"))
                     .ConfigureHttpContext(builder => builder.UseOwinFromCurrentHttpContext())
-                    .Build();
+                    .Build(); // don't forget to use the build method. Otherwise you cannot use the StaticOnlinePayment class.
         }
     }
 }
