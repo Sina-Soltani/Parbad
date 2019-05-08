@@ -17,7 +17,8 @@ namespace Parbad.Data.Migrations
                 columns: table => new
                 {
                     PaymentID = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn)
+                        .Annotation("Sqlite:Autoincrement", true),
                     TrackingNumber = table.Column<long>(nullable: false),
                     Token = table.Column<string>(nullable: false),
                     CreatedOn = table.Column<DateTime>(nullable: false),
@@ -39,7 +40,8 @@ namespace Parbad.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<long>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn)
+                        .Annotation("Sqlite:Autoincrement", true),
                     CreatedOn = table.Column<DateTime>(nullable: false),
                     UpdatedOn = table.Column<DateTime>(nullable: true),
                     Amount = table.Column<decimal>(nullable: false),

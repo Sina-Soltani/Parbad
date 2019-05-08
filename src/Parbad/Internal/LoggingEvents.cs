@@ -11,7 +11,6 @@ namespace Parbad.Internal
 
         public const int RefundPayment = 102;
 
-        public const int DatabaseCreating = 200;
-        public const int DatabaseCreated = 201;
+        public const int DatabaseCreation = 200;
     }
 }

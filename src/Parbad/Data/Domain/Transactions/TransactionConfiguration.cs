@@ -6,24 +6,50 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Parbad.Data.Domain.Transactions
 {
+    /// <summary>
+    /// Transaction entity configuration.
+    /// </summary>
     public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
     {
+        /// <inheritdoc />
         public void Configure(EntityTypeBuilder<Transaction> builder)
         {
-            builder.ToTable("TbTransaction", "parbad");
+            builder.ToTable("transaction", "Parbad");
 
-            builder.Property(entity => entity.Id).ValueGeneratedOnAdd();
             builder
                 .HasKey(entity => entity.Id)
-                .HasName("TransactionID");
+                .HasName("transaction_id");
+            builder.Property(entity => entity.Id)
+                .HasColumnName("transaction_id")
+                .ValueGeneratedOnAdd();
 
-            builder.Property(entity => entity.Amount).IsRequired();
+            builder.Property(entity => entity.Amount)
+                .HasColumnName(nameof(Transaction.Amount).ToLower())
+                .IsRequired(required: true);
 
-            builder.Property(entity => entity.Type).IsRequired();
+            builder.Property(entity => entity.Type)
+                .HasColumnName(nameof(Transaction.Type).ToLower())
+                .IsRequired(required: true);
 
-            builder.Property(entity => entity.IsSucceed).IsRequired();
+            builder.Property(entity => entity.IsSucceed)
+                .HasColumnName("is_succeed")
+                .IsRequired(required: true);
 
-            builder.Property(entity => entity.CreatedOn).IsRequired();
+            builder.Property(entity => entity.Message)
+                .HasColumnName(nameof(Transaction.Message).ToLower())
+                .IsRequired(required: false);
+
+            builder.Property(entity => entity.AdditionalData)
+                .HasColumnName("additional_data")
+                .IsRequired(required: false);
+
+            builder.Property(entity => entity.CreatedOn)
+                .HasColumnName("created_on")
+                .IsRequired(required: true);
+
+            builder.Property(entity => entity.UpdatedOn)
+                .HasColumnName("updated_on")
+                .IsRequired(required: false);
         }
     }
 }

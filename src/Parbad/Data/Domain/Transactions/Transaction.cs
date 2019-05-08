@@ -18,8 +18,6 @@ namespace Parbad.Data.Domain.Transactions
         public string AdditionalData { get; set; }
 
         public long PaymentId { get; set; }
-        public long PaymentTrackingNumber { get; set; }
-        public string PaymentToken { get; set; }
         public Payment Payment { get; set; }
     }
 }

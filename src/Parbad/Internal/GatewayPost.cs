@@ -15,6 +15,7 @@ namespace Parbad.Internal
         private readonly string _url;
         private readonly IDictionary<string, string> _formData;
 
+        /// <inheritdoc />
         public GatewayPost(IHttpContextAccessor httpContextAccessor, string url, IDictionary<string, string> formData)
         {
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
@@ -22,6 +23,7 @@ namespace Parbad.Internal
             _formData = formData ?? throw new ArgumentNullException(nameof(formData));
         }
 
+        /// <inheritdoc />
         public Task TransportAsync(CancellationToken cancellationToken = default)
         {
             HttpResponseUtilities.AddNecessaryContents(_httpContextAccessor.HttpContext, "text/html");

@@ -30,11 +30,7 @@ namespace Parbad.Internal
 
             var newNumber = minimumValue;
 
-            if (trackingNumbers.Count == 0)
-            {
-                newNumber = minimumValue;
-            }
-            else
+            if (trackingNumbers.Count > 0)
             {
                 while (!cancellationToken.IsCancellationRequested)
                 {

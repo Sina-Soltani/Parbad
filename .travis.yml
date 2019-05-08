@@ -1,7 +1,8 @@
+dist: bionic
 language: csharp
 solution: Parbad.sln
 mono: none
-dotnet: 2.1.502
+dotnet: 2.2.105
 script:
  - dotnet restore
 ...

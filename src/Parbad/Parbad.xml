@@ -58,20 +58,98 @@
             </para>
             </summary>
         </member>
-        <member name="M:Parbad.Builder.StorageServiceBuilderExtensions.ConfigureStorage(Parbad.Builder.IParbadBuilder,System.Action{Microsoft.EntityFrameworkCore.DbContextOptionsBuilder})">
+        <member name="M:Parbad.Builder.DatabaseInitializerExtensions.UseInitializer(Parbad.Data.Initializers.IDatabaseInitializerBuilder,System.Func{Parbad.Data.Context.ParbadDataContext,System.Threading.Tasks.Task})">
+            <summary>
+            Adds the specified Initializer to Parbad services.
+            Initializers will be called in order that you specified.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureInitializer"></param>
+        </member>
+        <member name="M:Parbad.Builder.DatabaseInitializerExtensions.CreateDatabase(Parbad.Data.Initializers.IDatabaseInitializerBuilder)">
+            <summary>
+            Creates the Parbad database If it does not exist.
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.Builder.DatabaseInitializerExtensions.CreateAndMigrateDatabase(Parbad.Data.Initializers.IDatabaseInitializerBuilder)">
+            <summary>
+            Creates the Parbad database If it does not exist.
+            Will migrate the database too.
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.Builder.DatabaseInitializerExtensions.DeleteAndCreateDatabase(Parbad.Data.Initializers.IDatabaseInitializerBuilder)">
+            <summary>
+            Deletes and creates the Parbad database.
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.Builder.DatabaseServiceBuilderExtensions.ConfigureDatabase(Parbad.Builder.IParbadBuilder,System.Action{Microsoft.EntityFrameworkCore.DbContextOptionsBuilder})">
+            <summary>
+            Configures the database required by Parbad to save and load payments and transactions data.
+            <para>
+            Note: It uses Microsoft.EntityFrameworkCore as storage, which means you can save your data
+            in different database providers such as SQL Server, MySql, Sqlite, PostgreSQL, Oracle, InMemory, etc.
+            For more information see: https://docs.microsoft.com/en-us/ef/core/providers/.
+            </para>
+            </summary>
+            <param name="builder"></param>
+            <param name="configureDatabaseBuilder">Configure what database must be used and how it must be created.</param>
+        </member>
+        <member name="M:Parbad.Builder.DatabaseServiceBuilderExtensions.ConfigureDatabaseInitializers(Parbad.Builder.IParbadBuilder,System.Action{Parbad.Data.Initializers.IDatabaseInitializerBuilder})">
+            <summary>
+            Configures Parbad database initializers.
+            Initializers are useful for creating, deleting, migrating and seeding the Parbad database.
+            <para>Note: Use ConfigureDatabase method before using this method.</para>
+            <para>
+            Note: Use one of predefined database creators depends on the database
+            provider (In-Memory, SQL Server, MySQL, Sqlite, etc.) that you chose.
+            </para>
+            <para>
+            Providers examples:
+            </para>
+            <para>For In-Memory, use the CreateDatabase method.</para>
+            <para>For SQL Server, use the CreateAndMigrateDatabase method.</para>
+            <para>
+            For Sqlite, use DeleteAndCreateDatabase.
+            Because Sqlite has some limitations with migrations.
+            In this case, one way to fix this is to first delete the old Parbad database and then create it again.
+            </para>
+            <para>
+            If you prefer to initialize the Parbad database yourself, then use the UseInitializer method
+            and define how the database must be initialized.
+            </para>
+            <para>Note: Initializers will be called in order that you specified.</para>
+            </summary>
+            <param name="builder"></param>
+            <param name="configureInitializers"></param>
+        </member>
+        <member name="M:Parbad.Builder.DatabaseServiceBuilderExtensions.UseParbadMigrations``2(Microsoft.EntityFrameworkCore.Infrastructure.RelationalDbContextOptionsBuilder{``0,``1})">
+            <summary>
+            Uses the MigrationsAssembly method internally and passes the Parbad assembly name
+            as parameter for configuring the migrations.
+            </summary>
+            <typeparam name="TBuilder"></typeparam>
+            <typeparam name="TExtension"></typeparam>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.Builder.DatabaseServiceBuilderExtensions.ConfigureStorage(Parbad.Builder.IParbadBuilder,System.Action{Microsoft.EntityFrameworkCore.DbContextOptionsBuilder})">
             <summary>
             Configures the storage required by Parbad to save and load the data.
             Note: It uses Microsoft.EntityFrameworkCore as storage, which means you can save your data
             in different database providers such as SQL Server, MySql, Sqlite, PostgreSQL, Oracle, InMemory, etc.
             <para>For more information see: https://docs.microsoft.com/en-us/ef/core/providers/.</para>
+            <para>Note: This method is deprecated. Use ConfigureDatabase instead.</para>
             </summary>
             <param name="builder"></param>
             <param name="storageBuilder"></param>
         </member>
-        <member name="M:Parbad.Builder.StorageServiceBuilderExtensions.UseParbadSqlServer(Microsoft.EntityFrameworkCore.DbContextOptionsBuilder,System.String)">
+        <member name="M:Parbad.Builder.DatabaseServiceBuilderExtensions.UseParbadSqlServer(Microsoft.EntityFrameworkCore.DbContextOptionsBuilder,System.String)">
             <summary>
             Configures the context to connect to a Microsoft SQL Server database.
             It also creates and migrates the database.
+            <para>Note: This method is deprecated. Use ConfigureDatabase and ConfigureDatabaseInitializers instead.</para>
             </summary>
             <param name="builder">The builder being used to configure the context.</param>
             <param name="connectionString">The connection string of the database to connect to.</param>
@@ -506,6 +584,61 @@
             <param name="name"></param>
             <param name="value"></param>
         </member>
+        <member name="T:Parbad.Data.Domain.Payments.PaymentConfiguration">
+            <summary>
+            Payment entity configuration.
+            </summary>
+        </member>
+        <member name="M:Parbad.Data.Domain.Payments.PaymentConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{Parbad.Data.Domain.Payments.Payment})">
+            <inheritdoc />
+        </member>
+        <member name="T:Parbad.Data.Domain.Transactions.TransactionConfiguration">
+            <summary>
+            Transaction entity configuration.
+            </summary>
+        </member>
+        <member name="M:Parbad.Data.Domain.Transactions.TransactionConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{Parbad.Data.Domain.Transactions.Transaction})">
+            <inheritdoc />
+        </member>
+        <member name="T:Parbad.Data.Initializers.IDatabaseInitializer">
+            <summary>
+            An initializer to initialize the database required by Parbad.
+            </summary>
+        </member>
+        <member name="M:Parbad.Data.Initializers.IDatabaseInitializer.InitializeAsync(Parbad.Data.Context.ParbadDataContext,System.Threading.CancellationToken)">
+            <summary>
+            Initializes the database.
+            </summary>
+            <param name="context">Parbad database.</param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="T:Parbad.Data.Initializers.IDatabaseInitializerBuilder">
+            <summary>
+            A builder for building Parbad database initializers.
+            </summary>
+        </member>
+        <member name="P:Parbad.Data.Initializers.IDatabaseInitializerBuilder.Services">
+            <summary>
+            Provides solution to perform payment request, verify the requested payment and
+            refund a payment.
+            </summary>
+        </member>
+        <member name="M:Parbad.Data.Initializers.IDatabaseInitializerBuilder.AddInitializer``1(Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds the specified <typeparamref name="TInitializer"/> to Parbad services.
+            Initializers will be called in order that you specified.
+            </summary>
+            <typeparam name="TInitializer"></typeparam>
+            <param name="initializerLifetime">The lifetime of the specified <typeparamref name="TInitializer"/>.</param>
+        </member>
+        <member name="M:Parbad.Data.Initializers.IDatabaseInitializerBuilder.AddInitializer(System.Func{System.IServiceProvider,Parbad.Data.Initializers.IDatabaseInitializer},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds the specified Initializer to Parbad services.
+            Initializers will be called in order that you specified.
+            </summary>
+            <param name="implementationFactory"></param>
+            <param name="initializerLifetime">The lifetime of the specified Initializer.</param>
+        </member>
         <member name="T:Parbad.Gateway">
             <summary>
             Online payment providers.
@@ -888,6 +1021,11 @@
             Equals to ReferenceID in Parbad system.
             </summary>
         </member>
+        <member name="M:Parbad.GatewayTransporterExtensions.Transport(Parbad.IGatewayTransporter)">
+            <summary>
+            Transports the client to the specified gateway.
+            </summary>
+        </member>
         <member name="T:Parbad.IGatewayTransporter">
             <summary>
             Defines a mechanism for transporting the client to a gateway.
@@ -897,6 +1035,24 @@
             <summary>
             Transports the client to the specified gateway.
             </summary>
+        </member>
+        <member name="T:Parbad.Internal.DatabaseInitializerBuilder">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Internal.DatabaseInitializerBuilder.#ctor(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Initializes an instance of <see cref="T:Parbad.Internal.DatabaseInitializerBuilder"/> class.
+            </summary>
+            <param name="services"></param>
+        </member>
+        <member name="P:Parbad.Internal.DatabaseInitializerBuilder.Services">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Internal.DatabaseInitializerBuilder.AddInitializer``1(Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Internal.DatabaseInitializerBuilder.AddInitializer(System.Func{System.IServiceProvider,Parbad.Data.Initializers.IDatabaseInitializer},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <inheritdoc />
         </member>
         <member name="T:Parbad.Internal.DefaultInvoiceBuilder">
             <inheritdoc />
@@ -975,6 +1131,12 @@
             <param name="gatewayName"></param>
             <param name="throwException"></param>
             <exception cref="T:Parbad.Exceptions.GatewayNotFoundException"></exception>
+        </member>
+        <member name="M:Parbad.Internal.GatewayPost.#ctor(Microsoft.AspNetCore.Http.IHttpContextAccessor,System.String,System.Collections.Generic.IDictionary{System.String,System.String})">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Internal.GatewayPost.TransportAsync(System.Threading.CancellationToken)">
+            <inheritdoc />
         </member>
         <member name="T:Parbad.Internal.GatewayProvider">
             <exception cref="T:Parbad.Exceptions.GatewayNotFoundException"></exception>
@@ -1476,11 +1638,6 @@
         <member name="M:Parbad.ParbadBuilder.CreateDefaultBuilder(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
             <summary>
             Initializes a new instance of the <see cref="T:Parbad.Builder.IParbadBuilder"/> class with pre-configured services.
-            </summary>
-        </member>
-        <member name="M:Parbad.PaymentRequestResultExtensions.Transport(Parbad.IGatewayTransporter)">
-            <summary>
-            Transports the client to the specified gateway.
             </summary>
         </member>
         <member name="T:Parbad.PaymentTokenProviders.IPaymentTokenBuilder">

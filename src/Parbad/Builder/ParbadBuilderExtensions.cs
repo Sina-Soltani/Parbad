@@ -5,7 +5,6 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Parbad;
 using Parbad.Abstraction;
 using Parbad.Builder;
-using Parbad.Data.Context;
 using Parbad.Internal;
 using Parbad.InvoiceBuilder;
 
@@ -22,8 +21,6 @@ namespace Microsoft.Extensions.DependencyInjection
 
             builder.Services.TryAddTransient<IOnlinePayment, DefaultOnlinePayment>();
             builder.Services.TryAddSingleton<IOnlinePaymentAccessor, OnlinePaymentAccessor>();
-
-            builder.Services.TryAddTransient<IParbadDatabaseCreator, ParbadDatabaseCreator>();
 
             builder.Services.TryAddTransient<IInvoiceBuilder, DefaultInvoiceBuilder>();
 

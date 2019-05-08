@@ -2,10 +2,11 @@
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
 using System;
+using Parbad.Internal;
 
 namespace Parbad
 {
-    public static class PaymentRequestResultExtensions
+    public static class GatewayTransporterExtensions
     {
         /// <summary>
         /// Transports the client to the specified gateway.
@@ -15,7 +16,7 @@ namespace Parbad
             if (transporter == null) throw new ArgumentNullException(nameof(transporter));
 
             transporter.TransportAsync()
-                .ConfigureAwait(false)
+                .ConfigureAwaitFalse()
                 .GetAwaiter()
                 .GetResult();
         }

@@ -81,11 +81,12 @@ namespace Parbad.Internal
                 };
             }
 
-            //  Check the payment token
+            // Create a payment token
             var paymentToken = await _tokenProvider
                 .ProvideTokenAsync(invoice, cancellationToken)
                 .ConfigureAwaitFalse();
 
+            //  Check the created payment token
             if (await _database.Payments
                 .AnyAsync(model => model.Token == paymentToken, cancellationToken)
                 .ConfigureAwaitFalse())
@@ -193,7 +194,6 @@ namespace Parbad.Internal
             }
 
             var payment = await _database.Payments
-                .Include(model => model.Transactions)
                 .SingleOrDefaultAsync(model => model.Token == paymentToken, cancellationToken)
                 .ConfigureAwaitFalse();
 

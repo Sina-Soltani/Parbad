@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Parbad.Data.Context;
 
 namespace Parbad.Data.Migrations
 {
     [DbContext(typeof(ParbadDataContext))]
-    partial class ParbadDataContextModelSnapshot : ModelSnapshot
+    [Migration("20190501215542_Improve_Naming_Convention")]
+    partial class Improve_Naming_Convention
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,8 +26,7 @@ namespace Parbad.Data.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("payment_id")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn)
-                        .HasAnnotation("Sqlite:Autoincrement", true);
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<decimal>("Amount")
                         .HasColumnName("amount");
@@ -66,7 +67,7 @@ namespace Parbad.Data.Migrations
                     b.HasIndex("TrackingNumber")
                         .IsUnique();
 
-                    b.ToTable("payment", "Parbad");
+                    b.ToTable("payment","Parbad");
                 });
 
             modelBuilder.Entity("Parbad.Data.Domain.Transactions.Transaction", b =>
@@ -74,8 +75,7 @@ namespace Parbad.Data.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("transaction_id")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn)
-                        .HasAnnotation("Sqlite:Autoincrement", true);
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("AdditionalData")
                         .HasColumnName("additional_data");
@@ -105,7 +105,7 @@ namespace Parbad.Data.Migrations
 
                     b.HasIndex("PaymentId");
 
-                    b.ToTable("transaction", "Parbad");
+                    b.ToTable("transaction","Parbad");
                 });
 
             modelBuilder.Entity("Parbad.Data.Domain.Transactions.Transaction", b =>
