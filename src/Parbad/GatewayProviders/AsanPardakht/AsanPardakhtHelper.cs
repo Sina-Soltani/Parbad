@@ -53,7 +53,7 @@ namespace Parbad.GatewayProviders.AsanPardakht
             IHttpContextAccessor httpContextAccessor,
             MessagesOptions messagesOptions)
         {
-            var result = XmlHelper.GetNodeValueFromXml(response, "RequestOperationResult");
+            var result = XmlHelper.GetNodeValueFromXml(response, "RequestOperationResult", "http://tempuri.org/");
 
             var splitedResult = result.Split(',');
 
@@ -188,7 +188,7 @@ namespace Parbad.GatewayProviders.AsanPardakht
             AsanPardakhtCallbackResult callbackResult,
             MessagesOptions messagesOptions)
         {
-            var result = XmlHelper.GetNodeValueFromXml(response, "RequestVerificationResult");
+            var result = XmlHelper.GetNodeValueFromXml(response, "RequestVerificationResult", "http://tempuri.org/");
 
             var isSucceed = result == "500";
 
@@ -233,7 +233,7 @@ namespace Parbad.GatewayProviders.AsanPardakht
             AsanPardakhtCallbackResult callbackResult,
             MessagesOptions messagesOptions)
         {
-            var result = XmlHelper.GetNodeValueFromXml(response, "RequestReconciliationResult");
+            var result = XmlHelper.GetNodeValueFromXml(response, "RequestReconciliationResult", "http://tempuri.org/");
 
             var isSucceed = result == "600";
             string message;
