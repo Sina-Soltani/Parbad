@@ -65,6 +65,11 @@ namespace Parbad.GatewayProviders.IranKish
                 _httpContextAccessor.HttpContext.Request,
                 _messageOptions.Value);
 
+            if (!callbackResult.IsSucceed)
+            {
+                return callbackResult.Result;
+            }
+
             var data = IranKishHelper.CreateVerifyData(callbackResult, _options.Value);
 
             _httpClient.DefaultRequestHeaders.Add(IranKishHelper.HttpVerifyHeader.Key, IranKishHelper.HttpVerifyHeader.Value);
