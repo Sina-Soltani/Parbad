@@ -14,6 +14,7 @@ namespace Parbad
         Pasargad = 4,
         IranKish = 5,
         Melli = 6,
+        AsanPardakht = 7,
         ParbadVirtualGateway = 255
     }
 }

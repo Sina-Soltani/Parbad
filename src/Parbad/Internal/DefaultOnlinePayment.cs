@@ -194,6 +194,7 @@ namespace Parbad.Internal
             }
 
             var payment = await _database.Payments
+                .Include(model => model.Transactions)
                 .SingleOrDefaultAsync(model => model.Token == paymentToken, cancellationToken)
                 .ConfigureAwaitFalse();
 

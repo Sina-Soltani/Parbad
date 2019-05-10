@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Parbad.Builder;
@@ -39,7 +40,7 @@ namespace Parbad.Sample.AspNetCore
                 .ConfigureDatabase(builder =>
                 {
                     // In-Memory (For testing and development only)
-                    //builder.UseInMemoryDatabase("MyDatabase");
+                    builder.UseInMemoryDatabase("MyDatabase");
 
                     // SQL Server
                     //builder.UseSqlServer("Connection String", options => options.UseParbadMigrations());

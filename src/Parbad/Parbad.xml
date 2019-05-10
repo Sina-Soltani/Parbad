@@ -222,6 +222,44 @@
             <param name="webProxy">The proxy that must be used.</param>
             <returns></returns>
         </member>
+        <member name="M:Parbad.Builder.AsanPardakhtGatewayBuilderExtensions.AddAsanPardakht(Parbad.GatewayBuilders.IGatewayBuilder)">
+            <summary>
+            Adds AsanPardakht gateway to Parbad services.
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.Builder.AsanPardakhtGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGateway},System.Action{Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGatewayOptions})">
+            <summary>
+            Configures AsanPardakht gateway options.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureOptions"></param>
+        </member>
+        <member name="M:Parbad.Builder.AsanPardakhtGatewayBuilderExtensions.WithOptionsProvider``1(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGateway},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds the given <typeparamref name="TOptionsProvider"/> to services.
+            It will be used for configuring the <see cref="T:Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGatewayOptions"/>.
+            </summary>
+            <typeparam name="TOptionsProvider"></typeparam>
+            <param name="builder"></param>
+            <param name="serviceLifetime">Lifetime of <typeparamref name="TOptionsProvider"/>.</param>
+        </member>
+        <member name="M:Parbad.Builder.AsanPardakhtGatewayBuilderExtensions.WithOptionsProvider(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGateway},System.Func{System.IServiceProvider,Parbad.Options.IParbadOptionsProvider{Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGatewayOptions}},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds the given <paramref name="factory"/> to services.
+            It will be used for configuring the <see cref="T:Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGatewayOptions"/>.
+            </summary>
+            <param name="builder"></param>
+            <param name="factory"></param>
+            <param name="serviceLifetime">Lifetime of <paramref name="factory"/>.</param>
+        </member>
+        <member name="M:Parbad.Builder.AsanPardakhtGatewayBuilderExtensions.WithConfiguration(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGateway},Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Configures AsanPardakht gateway by using an <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/>.
+            </summary>
+            <param name="builder"></param>
+            <param name="configuration">The <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/> section.</param>
+        </member>
         <member name="M:Parbad.Builder.IranKishGatewayBuilderExtensions.AddIranKish(Parbad.GatewayBuilders.IGatewayBuilder)">
             <summary>
             Adds IranKish gateway to Parbad services.
@@ -686,6 +724,15 @@
             for sending HTTP requests and receiving HTTP responses.
             </summary>
             <param name="configureHttpClient">HttpClient configuration.</param>
+        </member>
+        <member name="M:Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGateway.VerifyAsync(Parbad.Data.Domain.Payments.Payment,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGateway.RefundAsync(Parbad.Data.Domain.Payments.Payment,Parbad.Money,System.Threading.CancellationToken)">
+            <inheritdoc />
         </member>
         <member name="P:Parbad.GatewayProviders.IranKish.IranKishCallbackResult.InvoiceNumber">
             <summary>
