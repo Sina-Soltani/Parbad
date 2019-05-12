@@ -22,11 +22,7 @@ More information: https://github.com/Sina-Soltani/Parbad
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>D:\Programming\Git\ParbadOldOne\src\Parbad\Parbad.xml</DocumentationFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>D:\Programming\Git\ParbadOldOne\src\Parbad\Parbad.xml</DocumentationFile>
+    <DocumentationFile>Parbad.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
