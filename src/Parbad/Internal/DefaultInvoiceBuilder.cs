@@ -15,20 +15,47 @@ namespace Parbad.Internal
     public class DefaultInvoiceBuilder : IInvoiceBuilder
     {
         private ITrackingNumberProvider _trackingNumberProvider;
-        private Money _amount;
-        private CallbackUrl _url;
-        private readonly IDictionary<string, object> _additionalData;
         private Type _gatewayType;
 
+        /// <summary>
+        /// Initializes an instance of <see cref="DefaultInvoiceBuilder"/> class.
+        /// </summary>
+        /// <param name="services"></param>
         public DefaultInvoiceBuilder(IServiceProvider services)
         {
             Services = services;
 
-            _additionalData = new Dictionary<string, object>();
+            AdditionalData = new Dictionary<string, object>();
         }
 
+        /// <inheritdoc />
+        public long TrackingNumber { get; set; }
+
+        /// <inheritdoc />
+        public Money Amount { get; set; }
+
+        /// <inheritdoc />
+        public CallbackUrl CallbackUrl { get; set; }
+
+        /// <inheritdoc />
+        public Type GatewayType
+        {
+            get => _gatewayType;
+            set
+            {
+                GatewayHelper.IsGateway(value, throwException: true);
+
+                _gatewayType = value;
+            }
+        }
+
+        /// <inheritdoc />
+        public IDictionary<string, object> AdditionalData { get; set; }
+
+        /// <inheritdoc />
         public IServiceProvider Services { get; }
 
+        /// <inheritdoc />
         public virtual IInvoiceBuilder SetTrackingNumberProvider(ITrackingNumberProvider provider)
         {
             _trackingNumberProvider = provider;
@@ -36,51 +63,52 @@ namespace Parbad.Internal
             return this;
         }
 
+        /// <inheritdoc />
         public virtual IInvoiceBuilder SetAmount(Money amount)
         {
-            _amount = amount;
+            Amount = amount;
 
             return this;
         }
 
+        /// <inheritdoc />
         public virtual IInvoiceBuilder SetCallbackUrl(CallbackUrl callbackUrl)
         {
-            _url = callbackUrl;
+            CallbackUrl = callbackUrl;
 
             return this;
         }
 
+        /// <inheritdoc />
         public virtual IInvoiceBuilder AddAdditionalData(string key, object value)
         {
-            _additionalData.Add(key, value);
+            AdditionalData.Add(key, value);
 
             return this;
         }
 
+        /// <inheritdoc />
         public virtual IInvoiceBuilder SetGatewayType(Type gatewayType)
         {
-            GatewayHelper.IsGateway(gatewayType, throwException: true);
-
-            _gatewayType = gatewayType;
+            GatewayType = gatewayType;
 
             return this;
         }
 
+        /// <inheritdoc />
         public virtual async Task<Invoice> BuildAsync(CancellationToken cancellationToken = default)
         {
-            if (_trackingNumberProvider == null)
+            if (_trackingNumberProvider != null)
             {
-                throw new Exception("No TrackingNumberProvider is set. A TrackingNumberProvider is needed for generating a tracking number.");
+                TrackingNumber = await _trackingNumberProvider.ProvideAsync(cancellationToken).ConfigureAwaitFalse();
             }
 
-            var trackingNumber = await _trackingNumberProvider.ProvideAsync(cancellationToken).ConfigureAwaitFalse();
-
             return new Invoice(
-                trackingNumber,
-                _amount,
-                _url,
+                TrackingNumber,
+                Amount,
+                CallbackUrl,
                 _gatewayType,
-                _additionalData
+                AdditionalData
             );
         }
     }

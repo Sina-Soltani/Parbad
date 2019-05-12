@@ -12,7 +12,6 @@ namespace Parbad.GatewayProviders.Mellat
         [Required(ErrorMessage = "User Name is required.", AllowEmptyStrings = false)]
         public string UserName { get; set; }
 
-        //[Required(ErrorMessageResourceName = "OptionValueRequired", ErrorMessageResourceType = typeof(Resources), AllowEmptyStrings = false)]
         [Required(ErrorMessage = "User Password is required.", AllowEmptyStrings = false)]
         public string UserPassword { get; set; }
 

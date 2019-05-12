@@ -11,8 +11,8 @@ namespace Parbad
     /// A complete URL of your website. It will be used by the gateway for redirecting
     /// the client again to your website.
     /// <para>Note: A complete URL would be like: "http://www.mywebsite.com/foo/bar/"</para>
-    /// <exception cref="CallbackUrlFormatException"></exception>
     /// </summary>
+    /// <exception cref="CallbackUrlFormatException"></exception>
     public class CallbackUrl : IComparable<CallbackUrl>
     {
         private string _url;

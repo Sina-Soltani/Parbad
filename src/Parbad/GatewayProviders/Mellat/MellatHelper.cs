@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Parbad.Abstraction;
 using Parbad.Data.Domain.Payments;
@@ -21,6 +22,8 @@ namespace Parbad.GatewayProviders.Mellat
         private const string AlreadyVerifiedResult = "43";
         private const string SettleSuccess = "45";
 
+        internal const string CumulativeAccountsKey = "MellatCumulativeAccounts";
+
         public const string PaymentPageUrl = "https://bpm.shaparak.ir/pgwchannel/startpay.mellat";
         public const string BaseServiceUrl = "https://bpm.shaparak.ir/";
         public const string WebServiceUrl = "/pgwchannel/services/pgw";
@@ -28,30 +31,12 @@ namespace Parbad.GatewayProviders.Mellat
 
         public static string CreateRequestData(Invoice invoice, MellatGatewayOptions options)
         {
-            return
-                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:int=\"http://interfaces.core.sw.bps.com/\">" +
-                "<soapenv:Header/>" +
-                "<soapenv:Body>" +
-                "<int:bpPayRequest>" +
-                $"<terminalId>{options.TerminalId}</terminalId>" +
-                "<!--Optional:-->" +
-                $"<userName>{options.UserName}</userName>" +
-                "<!--Optional:-->" +
-                $"<userPassword>{options.UserPassword}</userPassword>" +
-                $"<orderId>{invoice.TrackingNumber}</orderId>" +
-                $"<amount>{(long)invoice.Amount}</amount>" +
-                "<!--Optional:-->" +
-                $"<localDate>{DateTime.Now:yyyyMMdd}</localDate>" +
-                "<!--Optional:-->" +
-                $"<localTime>{DateTime.Now:HHmmss}</localTime>" +
-                "<!--Optional:-->" +
-                "<additionalData></additionalData>" +
-                "<!--Optional:-->" +
-                $"<callBackUrl>{invoice.CallbackUrl}</callBackUrl>" +
-                "<payerId>0</payerId>" +
-                "'</int:bpPayRequest>" +
-                "</soapenv:Body>" +
-                "</soapenv:Envelope>";
+            if (invoice.AdditionalData == null || !invoice.AdditionalData.ContainsKey(CumulativeAccountsKey))
+            {
+                return CreateSimpleRequestData(invoice, options);
+            }
+
+            return CreateCumulativeRequestData(invoice, options);
         }
 
         public static PaymentRequestResult CreateRequestResult(string webServiceResponse, IHttpContextAccessor httpContextAccessor, MessagesOptions messagesOptions)
@@ -238,6 +223,74 @@ namespace Parbad.GatewayProviders.Mellat
                 IsSucceed = isSuccess,
                 Message = message
             };
+        }
+
+        private static string CreateSimpleRequestData(Invoice invoice, MellatGatewayOptions options)
+        {
+            return
+                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:int=\"http://interfaces.core.sw.bps.com/\">" +
+                "<soapenv:Header/>" +
+                "<soapenv:Body>" +
+                "<int:bpPayRequest>" +
+                $"<terminalId>{options.TerminalId}</terminalId>" +
+                "<!--Optional:-->" +
+                $"<userName>{options.UserName}</userName>" +
+                "<!--Optional:-->" +
+                $"<userPassword>{options.UserPassword}</userPassword>" +
+                $"<orderId>{invoice.TrackingNumber}</orderId>" +
+                $"<amount>{(long)invoice.Amount}</amount>" +
+                "<!--Optional:-->" +
+                $"<localDate>{DateTime.Now:yyyyMMdd}</localDate>" +
+                "<!--Optional:-->" +
+                $"<localTime>{DateTime.Now:HHmmss}</localTime>" +
+                "<!--Optional:-->" +
+                "<additionalData></additionalData>" +
+                "<!--Optional:-->" +
+                $"<callBackUrl>{invoice.CallbackUrl}</callBackUrl>" +
+                "<payerId>0</payerId>" +
+                "'</int:bpPayRequest>" +
+                "</soapenv:Body>" +
+                "</soapenv:Envelope>";
+        }
+
+        private static string CreateCumulativeRequestData(Invoice invoice, MellatGatewayOptions options)
+        {
+            var accounts = (IList<MellatCumulativeDynamicAccount>)invoice.AdditionalData[CumulativeAccountsKey];
+
+            var totalAmount = accounts.Sum(account => account.Amount);
+
+            if (totalAmount != invoice.Amount)
+            {
+                throw new Exception("The total amount of Mellat Cumulative accounts is not equals to the amount of the invoice." +
+                                    $"Invoice amount: {invoice.Amount}." +
+                                    $"Accounts total amount: {totalAmount}");
+            }
+
+            var additionalData = accounts.Aggregate("", (current, account) => current + $"{account};");
+
+            return
+                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:int=\"http://interfaces.core.sw.bps.com/\">" +
+                "<soapenv:Header/>" +
+                "<soapenv:Body>" +
+                "<int:bpCumulativeDynamicPayRequest>" +
+                $"<terminalId>{options.TerminalId}</terminalId>" +
+                "<!--Optional:-->" +
+                $"<userName>{options.UserName}</userName>" +
+                "<!--Optional:-->" +
+                $"<userPassword>{options.UserPassword}</userPassword>" +
+                $"<orderId>{invoice.TrackingNumber}</orderId>" +
+                $"<amount>{(long)invoice.Amount}</amount>" +
+                "<!--Optional:-->" +
+                $"<localDate>{DateTime.Now:yyyyMMdd}</localDate>" +
+                "<!--Optional:-->" +
+                $"<localTime>{DateTime.Now:HHmmss}</localTime>" +
+                "<!--Optional:-->" +
+                $"<additionalData>{additionalData}</additionalData>" +
+                "<!--Optional:-->" +
+                $"<callBackUrl>{invoice.CallbackUrl}</callBackUrl>" +
+                "</int:bpCumulativeDynamicPayRequest>" +
+                "</soapenv:Body>" +
+                "</soapenv:Envelope>";
         }
     }
 }

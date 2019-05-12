@@ -9,15 +9,23 @@ namespace Parbad
 {
     /// <summary>
     /// Defines money unit.
-    /// <para>Note: The money unit of Iran money is RIAL. It means the amount of the invoice will be sent
-    /// to gateways automatically as <see cref="Int64"/> by Parbad.</para>
+    /// <para>
+    /// Note: The official unit of currency in Iran is the Iranian rial (IR).
+    /// It means the amount of the invoice will be sent to Iranian gateways automatically
+    /// as <see cref="Int64"/> by Parbad.
+    /// </para>
     /// </summary>
     public class Money : IComparable<Money>
     {
         private readonly decimal _amount;
 
         /// <summary>
-        /// Initializes an instance of <see cref="Money"/> class with the given amount.
+        /// Defines money unit.
+        /// <para>
+        /// Note: The official unit of currency in Iran is the Iranian rial (IR).
+        /// It means the amount of the invoice will be sent to Iranian gateways automatically
+        /// as <see cref="Int64"/> by Parbad.
+        /// </para>
         /// </summary>
         /// <param name="amount">The amount of money.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
