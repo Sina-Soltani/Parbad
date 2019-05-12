@@ -5,7 +5,7 @@ branches:
 image: Visual Studio 2019 Preview
 configuration: Release
 before_build:
-- cmd: dotnet restore
+- cmd: nuget restore
 build:
   project: src\Parbad\Parbad.csproj
   publish_nuget: true
