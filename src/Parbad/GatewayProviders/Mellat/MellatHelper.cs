@@ -257,6 +257,11 @@ namespace Parbad.GatewayProviders.Mellat
         {
             var accounts = (IList<MellatCumulativeDynamicAccount>)invoice.AdditionalData[CumulativeAccountsKey];
 
+            if (accounts.Count > 10)
+            {
+                throw new Exception("Cannot use more than 10 accounts for each Cumulative payment request.");
+            }
+
             var totalAmount = accounts.Sum(account => account.Amount);
 
             if (totalAmount != invoice.Amount)
