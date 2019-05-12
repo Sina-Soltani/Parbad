@@ -24,7 +24,7 @@ namespace Parbad.Sample.Mvc
                     .ConfigureDatabase(builder =>
                     {
                         // In-Memory (For testing and development only)
-                        //builder.UseInMemoryDatabase("MyDatabase");
+                        builder.UseInMemoryDatabase("MyDatabase");
 
                         // SQL Server
                         //builder.UseSqlServer("Connection String", options => options.UseParbadMigrations());
