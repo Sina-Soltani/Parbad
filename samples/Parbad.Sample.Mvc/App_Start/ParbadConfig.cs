@@ -21,6 +21,7 @@ namespace Parbad.Sample.Mvc
                             .AddParbadVirtual()
                             .WithOptions(options => options.GatewayPath = "/virtual");
                     })
+                    .ConfigureHttpContext(builder => builder.UseOwinFromCurrentHttpContext())
                     .ConfigureDatabase(builder =>
                     {
                         // In-Memory (For testing and development only)
