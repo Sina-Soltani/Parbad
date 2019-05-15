@@ -3,11 +3,12 @@ platform: Any CPU
 image: Visual Studio 2019 Preview
 configuration: Release
 before_build:
-- appveyor-retry dotnet restore -v Minimal
+  - appveyor-retry dotnet restore -v Minimal
 build_script:
-- dotnet build "src\Parbad" -c %CONFIGURATION% --no-dependencies
+  - dotnet build "src\Parbad" -c %CONFIGURATION% --no-dependencies
 after_build:
-- dotnet pack "src\Parbad" -c %CONFIGURATION% --no-build -o Parbad
+  - dotnet pack "src\Parbad" -c %CONFIGURATION% --no-build -o Parbad
+  - ps: Get-ChildItem .\*.nupkg | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
 artifacts:
   - path: src\Parbad\Release\*.nupkg
     name: Parbad
