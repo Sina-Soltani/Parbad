@@ -9,5 +9,5 @@ build_script:
 after_build:
   - dotnet pack "src\Parbad" -c %CONFIGURATION% --no-build -o artifacts
 artifacts:
-  - path: **\*.nupkg
+- path: '**\*.nupkg'
 deploy: off
