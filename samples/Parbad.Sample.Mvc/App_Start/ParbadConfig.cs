@@ -36,7 +36,7 @@ namespace Parbad.Sample.Mvc
                         // Sqlite
                         //builder.UseSqlite("Connection String");
                     })
-                    .ConfigureDatabaseInitializers(builder =>
+                    .ConfigureDatabaseInitializer(builder =>
                     {
                         // For In-Memory
                         builder.CreateDatabase();

@@ -6,8 +6,14 @@ before_build:
   - appveyor-retry dotnet restore -v Minimal
 build_script:
   - dotnet build "src\Parbad" -c %CONFIGURATION% --no-dependencies
+  - dotnet build "src\Parbad.Owin" -c %CONFIGURATION% --no-dependencies
+  - dotnet build "src\Parbad.Mvc" -c %CONFIGURATION% --no-dependencies
+  - dotnet build "src\Parbad.AspNetCore" -c %CONFIGURATION% --no-dependencies
 after_build:
   - dotnet pack "src\Parbad" -c %CONFIGURATION% --no-build -o artifacts
+  - dotnet pack "src\Parbad.Owin" -c %CONFIGURATION% --no-build -o artifacts
+  - dotnet pack "src\Parbad.Mvc" -c %CONFIGURATION% --no-build -o artifacts
+  - dotnet pack "src\Parbad.AspNetCore" -c %CONFIGURATION% --no-build -o artifacts
 artifacts:
-- path: '**\*.nupkg'
+- path: 'artifacts\*.nupkg'
 deploy: off

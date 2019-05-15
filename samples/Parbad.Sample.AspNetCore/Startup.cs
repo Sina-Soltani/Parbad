@@ -51,7 +51,7 @@ namespace Parbad.Sample.AspNetCore
                     // Sqlite
                     //builder.UseSqlite("Connection String");
                 })
-                .ConfigureDatabaseInitializers(builder =>
+                .ConfigureDatabaseInitializer(builder =>
                 {
                     // For In-Memory
                     builder.CreateDatabase();

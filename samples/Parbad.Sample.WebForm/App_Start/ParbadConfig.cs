@@ -39,7 +39,7 @@ namespace Parbad.Sample.WebForm
                         // Sqlite
                         //builder.UseSqlite("Connection String");
                     })
-                    .ConfigureDatabaseInitializers(builder =>
+                    .ConfigureDatabaseInitializer(builder =>
                     {
                         // For In-Memory
                         builder.CreateDatabase();
