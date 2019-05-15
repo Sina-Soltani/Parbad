@@ -7,8 +7,7 @@ before_build:
 build_script:
   - dotnet build "src\Parbad" -c %CONFIGURATION% --no-dependencies
 after_build:
-  - dotnet pack "src\Parbad" -c %CONFIGURATION% --no-build -o Parbad
+  - dotnet pack "src\Parbad" -c %CONFIGURATION% --no-build -o artifacts
 artifacts:
-  - path: src\Parbad\*.nupkg
-    name: Parbad
+  - path: **\*.nupkg
 deploy: off
