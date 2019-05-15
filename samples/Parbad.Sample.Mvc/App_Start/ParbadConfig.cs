@@ -21,10 +21,11 @@ namespace Parbad.Sample.Mvc
                             .AddParbadVirtual()
                             .WithOptions(options => options.GatewayPath = "/virtual");
                     })
+                    .ConfigureHttpContext(builder => builder.UseOwinFromCurrentHttpContext())
                     .ConfigureDatabase(builder =>
                     {
                         // In-Memory (For testing and development only)
-                        //builder.UseInMemoryDatabase("MyDatabase");
+                        builder.UseInMemoryDatabase("MyDatabase");
 
                         // SQL Server
                         //builder.UseSqlServer("Connection String", options => options.UseParbadMigrations());
@@ -35,7 +36,7 @@ namespace Parbad.Sample.Mvc
                         // Sqlite
                         //builder.UseSqlite("Connection String");
                     })
-                    .ConfigureDatabaseInitializers(builder =>
+                    .ConfigureDatabaseInitializer(builder =>
                     {
                         // For In-Memory
                         builder.CreateDatabase();

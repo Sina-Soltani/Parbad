@@ -1,0 +1,26 @@
+version: 2.1.{build}
+platform: Any CPU
+image: Visual Studio 2019 Preview
+configuration: Release
+before_build:
+  - appveyor-retry dotnet restore -v Minimal
+build_script:
+  - dotnet build "src\Parbad" -c %CONFIGURATION% --no-dependencies
+  - dotnet build "src\Parbad.Owin" -c %CONFIGURATION% --no-dependencies
+  - dotnet build "src\Parbad.Mvc" -c %CONFIGURATION% --no-dependencies
+  - dotnet build "src\Parbad.AspNetCore" -c %CONFIGURATION% --no-dependencies
+after_build:
+  - dotnet pack "src\Parbad" -c %CONFIGURATION% --no-build -o artifacts
+  - dotnet pack "src\Parbad.Owin" -c %CONFIGURATION% --no-build -o artifacts
+  - dotnet pack "src\Parbad.Mvc" -c %CONFIGURATION% --no-build -o artifacts
+  - dotnet pack "src\Parbad.AspNetCore" -c %CONFIGURATION% --no-build -o artifacts
+artifacts:
+  - path: 'artifacts\*.nupkg'
+deploy:
+- provider: NuGet
+  api_key:
+    secure: jCr3Vt57OtWB9DNEg/Xxt3eUXntuv/3hXMpApRaOehs6UwkJjboClNmVlZwPUCmX
+  skip_symbols: true
+  artifact: artifacts
+  on:
+    branch: master

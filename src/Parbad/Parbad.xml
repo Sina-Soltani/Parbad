@@ -222,6 +222,44 @@
             <param name="webProxy">The proxy that must be used.</param>
             <returns></returns>
         </member>
+        <member name="M:Parbad.Builder.AsanPardakhtGatewayBuilderExtensions.AddAsanPardakht(Parbad.GatewayBuilders.IGatewayBuilder)">
+            <summary>
+            Adds AsanPardakht gateway to Parbad services.
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.Builder.AsanPardakhtGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGateway},System.Action{Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGatewayOptions})">
+            <summary>
+            Configures AsanPardakht gateway options.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureOptions"></param>
+        </member>
+        <member name="M:Parbad.Builder.AsanPardakhtGatewayBuilderExtensions.WithOptionsProvider``1(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGateway},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds the given <typeparamref name="TOptionsProvider"/> to services.
+            It will be used for configuring the <see cref="T:Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGatewayOptions"/>.
+            </summary>
+            <typeparam name="TOptionsProvider"></typeparam>
+            <param name="builder"></param>
+            <param name="serviceLifetime">Lifetime of <typeparamref name="TOptionsProvider"/>.</param>
+        </member>
+        <member name="M:Parbad.Builder.AsanPardakhtGatewayBuilderExtensions.WithOptionsProvider(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGateway},System.Func{System.IServiceProvider,Parbad.Options.IParbadOptionsProvider{Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGatewayOptions}},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds the given <paramref name="factory"/> to services.
+            It will be used for configuring the <see cref="T:Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGatewayOptions"/>.
+            </summary>
+            <param name="builder"></param>
+            <param name="factory"></param>
+            <param name="serviceLifetime">Lifetime of <paramref name="factory"/>.</param>
+        </member>
+        <member name="M:Parbad.Builder.AsanPardakhtGatewayBuilderExtensions.WithConfiguration(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGateway},Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Configures AsanPardakht gateway by using an <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/>.
+            </summary>
+            <param name="builder"></param>
+            <param name="configuration">The <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/> section.</param>
+        </member>
         <member name="M:Parbad.Builder.IranKishGatewayBuilderExtensions.AddIranKish(Parbad.GatewayBuilders.IGatewayBuilder)">
             <summary>
             Adds IranKish gateway to Parbad services.
@@ -562,8 +600,8 @@
             A complete URL of your website. It will be used by the gateway for redirecting
             the client again to your website.
             <para>Note: A complete URL would be like: "http://www.mywebsite.com/foo/bar/"</para>
-            <exception cref="T:Parbad.Exceptions.CallbackUrlFormatException"></exception>
             </summary>
+            <exception cref="T:Parbad.Exceptions.CallbackUrlFormatException"></exception>
         </member>
         <member name="M:Parbad.CallbackUrl.#ctor(System.String)">
             <summary>
@@ -686,6 +724,15 @@
             for sending HTTP requests and receiving HTTP responses.
             </summary>
             <param name="configureHttpClient">HttpClient configuration.</param>
+        </member>
+        <member name="M:Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGateway.VerifyAsync(Parbad.Data.Domain.Payments.Payment,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGateway.RefundAsync(Parbad.Data.Domain.Payments.Payment,Parbad.Money,System.Threading.CancellationToken)">
+            <inheritdoc />
         </member>
         <member name="P:Parbad.GatewayProviders.IranKish.IranKishCallbackResult.InvoiceNumber">
             <summary>
@@ -1057,6 +1104,48 @@
         <member name="T:Parbad.Internal.DefaultInvoiceBuilder">
             <inheritdoc />
         </member>
+        <member name="M:Parbad.Internal.DefaultInvoiceBuilder.#ctor(System.IServiceProvider)">
+            <summary>
+            Initializes an instance of <see cref="T:Parbad.Internal.DefaultInvoiceBuilder"/> class.
+            </summary>
+            <param name="services"></param>
+        </member>
+        <member name="P:Parbad.Internal.DefaultInvoiceBuilder.TrackingNumber">
+            <inheritdoc />
+        </member>
+        <member name="P:Parbad.Internal.DefaultInvoiceBuilder.Amount">
+            <inheritdoc />
+        </member>
+        <member name="P:Parbad.Internal.DefaultInvoiceBuilder.CallbackUrl">
+            <inheritdoc />
+        </member>
+        <member name="P:Parbad.Internal.DefaultInvoiceBuilder.GatewayType">
+            <inheritdoc />
+        </member>
+        <member name="P:Parbad.Internal.DefaultInvoiceBuilder.AdditionalData">
+            <inheritdoc />
+        </member>
+        <member name="P:Parbad.Internal.DefaultInvoiceBuilder.Services">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Internal.DefaultInvoiceBuilder.SetTrackingNumberProvider(Parbad.TrackingNumberProviders.ITrackingNumberProvider)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Internal.DefaultInvoiceBuilder.SetAmount(Parbad.Money)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Internal.DefaultInvoiceBuilder.SetCallbackUrl(Parbad.CallbackUrl)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Internal.DefaultInvoiceBuilder.AddAdditionalData(System.String,System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Internal.DefaultInvoiceBuilder.SetGatewayType(System.Type)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Internal.DefaultInvoiceBuilder.BuildAsync(System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
         <member name="T:Parbad.Internal.DefaultOnlinePayment">
             <inheritdoc />
         </member>
@@ -1206,6 +1295,39 @@
         <member name="T:Parbad.InvoiceBuilder.IInvoiceBuilder">
             <summary>
             A builder which helps to build an invoice.
+            </summary>
+        </member>
+        <member name="P:Parbad.InvoiceBuilder.IInvoiceBuilder.TrackingNumber">
+            <summary>
+            Tracking number of invoice
+            </summary>
+        </member>
+        <member name="P:Parbad.InvoiceBuilder.IInvoiceBuilder.Amount">
+            <summary>
+            The amount of invoice.
+            </summary>
+        </member>
+        <member name="P:Parbad.InvoiceBuilder.IInvoiceBuilder.CallbackUrl">
+            <summary>
+            A complete URL of your website. It will be used by the gateway for redirecting
+            the client again to your website.
+            <para>Note: A complete URL would be like: "http://www.mywebsite.com/foo/bar/"</para>
+            </summary>
+        </member>
+        <member name="P:Parbad.InvoiceBuilder.IInvoiceBuilder.GatewayType">
+            <summary>
+            The type of the gateway which the invoice must be paid in.
+            </summary>
+        </member>
+        <member name="P:Parbad.InvoiceBuilder.IInvoiceBuilder.AdditionalData">
+            <summary>
+            Additional data for this invoice.
+            </summary>
+        </member>
+        <member name="P:Parbad.InvoiceBuilder.IInvoiceBuilder.Services">
+            <summary>
+            Defines a mechanism for retrieving a service object; that is, an object that
+            provides custom support to other objects.
             </summary>
         </member>
         <member name="M:Parbad.InvoiceBuilder.IInvoiceBuilder.SetTrackingNumberProvider(Parbad.TrackingNumberProviders.ITrackingNumberProvider)">
@@ -1446,13 +1568,21 @@
         <member name="T:Parbad.Money">
             <summary>
             Defines money unit.
-            <para>Note: The money unit of Iran money is RIAL. It means the amount of the invoice will be sent
-            to gateways automatically as <see cref="T:System.Int64"/> by Parbad.</para>
+            <para>
+            Note: The official unit of currency in Iran is the Iranian rial (IR).
+            It means the amount of the invoice will be sent to Iranian gateways automatically
+            as <see cref="T:System.Int64"/> by Parbad.
+            </para>
             </summary>
         </member>
         <member name="M:Parbad.Money.#ctor(System.Decimal)">
             <summary>
-            Initializes an instance of <see cref="T:Parbad.Money"/> class with the given amount.
+            Defines money unit.
+            <para>
+            Note: The official unit of currency in Iran is the Iranian rial (IR).
+            It means the amount of the invoice will be sent to Iranian gateways automatically
+            as <see cref="T:System.Int64"/> by Parbad.
+            </para>
             </summary>
             <param name="amount">The amount of money.</param>
             <exception cref="T:System.ArgumentOutOfRangeException"></exception>

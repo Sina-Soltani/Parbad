@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>latest</LangVersion>
-    <Version>2.0.0</Version>
+    <Version>2.1.0</Version>
     <Authors>Sina Soltani</Authors>
     <Description>Parbad is a free and open-source integrated online payment library which provides an easy solution to perform payment request, verify a payment and refund a paid payment.
 It supports the most popular banks in Iran such as Mellat, Melli, Parsian, Tejarat, Saman and Pasargad.
@@ -19,14 +19,14 @@ More information: https://github.com/Sina-Soltani/Parbad
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageTags>Payment Gateway Bank Iran Shetab IranKish Mellat Melli Parsian Pasargad Saman پرداخت درگاه بانک ایران شتاب ایران-کیش ملت ملی پارسیان پاسارگاد سامان</PackageTags>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageReleaseNotes>- Mellat Gateway extra functions (Bashgah Mellat) are added.
+- Asan Pardakht Gateway is added.
+- Database Initializer is added.</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>D:\Programming\Git\ParbadOldOne\src\Parbad\Parbad.xml</DocumentationFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>D:\Programming\Git\ParbadOldOne\src\Parbad\Parbad.xml</DocumentationFile>
+    <DocumentationFile>Parbad.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

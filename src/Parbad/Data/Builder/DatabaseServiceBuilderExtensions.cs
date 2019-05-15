@@ -35,16 +35,12 @@ namespace Parbad.Builder
         }
 
         /// <summary>
-        /// Configures Parbad database initializers.
-        /// Initializers are useful for creating, deleting, migrating and seeding the Parbad database.
+        /// Configures Parbad database initializer.
+        /// Initializer is useful for creating, deleting, migrating and seeding the Parbad database.
         /// <para>Note: Use ConfigureDatabase method before using this method.</para>
-        /// <para>
-        /// Note: Use one of predefined database creators depends on the database
-        /// provider (In-Memory, SQL Server, MySQL, Sqlite, etc.) that you chose.
-        /// </para>
-        /// <para>
-        /// Providers examples:
-        /// </para>
+        /// <para>Note: Use one of predefined database creators depends on the database
+        /// provider (In-Memory, SQL Server, MySQL, Sqlite, etc.) that you chose.</para>
+        /// <para>Providers examples:</para>
         /// <para>For In-Memory, use the CreateDatabase method.</para>
         /// <para>For SQL Server, use the CreateAndMigrateDatabase method.</para>
         /// <para>
@@ -59,15 +55,15 @@ namespace Parbad.Builder
         /// <para>Note: Initializers will be called in order that you specified.</para>
         /// </summary>
         /// <param name="builder"></param>
-        /// <param name="configureInitializers"></param>
-        public static IParbadBuilder ConfigureDatabaseInitializers(
+        /// <param name="configureInitializer"></param>
+        public static IParbadBuilder ConfigureDatabaseInitializer(
             this IParbadBuilder builder,
-            Action<IDatabaseInitializerBuilder> configureInitializers)
+            Action<IDatabaseInitializerBuilder> configureInitializer)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
-            if (configureInitializers == null) throw new ArgumentNullException(nameof(configureInitializers));
+            if (configureInitializer == null) throw new ArgumentNullException(nameof(configureInitializer));
 
-            configureInitializers(new DatabaseInitializerBuilder(builder.Services));
+            configureInitializer(new DatabaseInitializerBuilder(builder.Services));
 
             var services = builder.Services.BuildServiceProvider();
 
@@ -122,11 +118,11 @@ namespace Parbad.Builder
         /// <summary>
         /// Configures the context to connect to a Microsoft SQL Server database.
         /// It also creates and migrates the database.
-        /// <para>Note: This method is deprecated. Use ConfigureDatabase and ConfigureDatabaseInitializers instead.</para>
+        /// <para>Note: This method is deprecated. Use ConfigureDatabase and ConfigureDatabaseInitializer instead.</para>
         /// </summary>
         /// <param name="builder">The builder being used to configure the context.</param>
         /// <param name="connectionString">The connection string of the database to connect to.</param>
-        [Obsolete("Use ConfigureDatabase and ConfigureDatabaseInitializers instead.")]
+        [Obsolete("Use ConfigureDatabase and ConfigureDatabaseInitializer instead.")]
         public static DbContextOptionsBuilder UseParbadSqlServer(this DbContextOptionsBuilder builder,
             string connectionString)
         {

@@ -16,14 +16,11 @@ For more information see: https://www.nuget.org/packages/Parbad/</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageTags>Payment Gateway Bank Iran Shetab IranKish Mellat Melli Parsian Pasargad Saman پرداخت درگاه بانک ایران شتاب ایران-کیش ملت ملی پارسیان پاسارگاد سامان</PackageTags>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>D:\Programming\Git\ParbadOldOne\src\Parbad.Owin\Parbad.Owin.xml</DocumentationFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>D:\Programming\Git\ParbadOldOne\src\Parbad.Owin\Parbad.Owin.xml</DocumentationFile>
+    <DocumentationFile>Parbad.Owin.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

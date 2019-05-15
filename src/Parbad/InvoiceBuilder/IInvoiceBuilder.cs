@@ -2,6 +2,7 @@
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Parbad.Abstraction;
@@ -15,6 +16,37 @@ namespace Parbad.InvoiceBuilder
     /// </summary>
     public interface IInvoiceBuilder
     {
+        /// <summary>
+        /// Tracking number of invoice
+        /// </summary>
+        long TrackingNumber { get; set; }
+
+        /// <summary>
+        /// The amount of invoice.
+        /// </summary>
+        Money Amount { get; set; }
+
+        /// <summary>
+        /// A complete URL of your website. It will be used by the gateway for redirecting
+        /// the client again to your website.
+        /// <para>Note: A complete URL would be like: "http://www.mywebsite.com/foo/bar/"</para>
+        /// </summary>
+        CallbackUrl CallbackUrl { get; set; }
+
+        /// <summary>
+        /// The type of the gateway which the invoice must be paid in.
+        /// </summary>
+        Type GatewayType { get; set; }
+
+        /// <summary>
+        /// Additional data for this invoice.
+        /// </summary>
+        IDictionary<string, object> AdditionalData { get; set; }
+
+        /// <summary>
+        /// Defines a mechanism for retrieving a service object; that is, an object that
+        /// provides custom support to other objects.
+        /// </summary>
         IServiceProvider Services { get; }
 
         /// <summary>
