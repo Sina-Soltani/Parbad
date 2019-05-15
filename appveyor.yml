@@ -8,8 +8,7 @@ build_script:
   - dotnet build "src\Parbad" -c %CONFIGURATION% --no-dependencies
 after_build:
   - dotnet pack "src\Parbad" -c %CONFIGURATION% --no-build -o Parbad
-  - ps: Get-ChildItem .\*.nupkg | % { Push-AppveyorArtifact $_.FullName -FileName $_.Name }
 artifacts:
-  - path: src\Parbad\Release\*.nupkg
+  - path: src\Parbad\*.nupkg
     name: Parbad
 deploy: off
