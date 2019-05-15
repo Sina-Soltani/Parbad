@@ -20,6 +20,9 @@ More information: https://github.com/Sina-Soltani/Parbad
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageTags>Payment Gateway Bank Iran Shetab IranKish Mellat Melli Parsian Pasargad Saman پرداخت درگاه بانک ایران شتاب ایران-کیش ملت ملی پارسیان پاسارگاد سامان</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageReleaseNotes>- Mellat Gateway extra functions (Bashgah Mellat) are added.
+- Asan Pardakht Gateway is added.
+- Database Initializer is added.</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

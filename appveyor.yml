@@ -15,5 +15,12 @@ after_build:
   - dotnet pack "src\Parbad.Mvc" -c %CONFIGURATION% --no-build -o artifacts
   - dotnet pack "src\Parbad.AspNetCore" -c %CONFIGURATION% --no-build -o artifacts
 artifacts:
-- path: 'artifacts\*.nupkg'
-deploy: off
+  - path: 'artifacts\*.nupkg'
+deploy:
+- provider: NuGet
+  api_key:
+    secure: jCr3Vt57OtWB9DNEg/Xxt3eUXntuv/3hXMpApRaOehs6UwkJjboClNmVlZwPUCmX
+  skip_symbols: true
+  artifact: artifacts
+  on:
+    branch: master
