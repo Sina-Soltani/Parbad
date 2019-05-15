@@ -11,5 +11,4 @@ after_build:
 artifacts:
   - path: src\Parbad\Release\*.nupkg
     name: Parbad
-name: console_packages
 deploy: off
