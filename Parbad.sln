@@ -23,11 +23,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parbad.Mvc", "src\Parbad.Mv
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{6BB6AFB4-7951-4435-8C10-95AF86B200F8}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{82387DCB-D085-4537-B079-BE33F18BC4F8}"
-	ProjectSection(SolutionItems) = preProject
-		docs\Documentation.fa.md = docs\Documentation.fa.md
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{4BA4953D-151E-4805-9B33-FD6AC7E0A481}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parbad.Sample.Mvc", "samples\Parbad.Sample.Mvc\Parbad.Sample.Mvc.csproj", "{3A52916C-717C-46AA-B8C1-2D193B1C065B}"

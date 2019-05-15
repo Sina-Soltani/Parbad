@@ -23,6 +23,8 @@ Parbad is an integrated online payment library which helps developers and site o
 * [Payment](https://github.com/Sina-Soltani/Parbad/wiki/Payment)
 * [Invoice Builder](https://github.com/Sina-Soltani/Parbad/wiki/Invoice-Builder)
 * [Virtual Gateway](https://github.com/Sina-Soltani/Parbad/wiki/Virtual-Gateway)
+* [Database Initializer](https://github.com/Sina-Soltani/Parbad/wiki/Database-Initializer)
+* [Mellat Gateway extra functions](https://github.com/Sina-Soltani/Parbad/wiki/Mellat-Gateway-extra-functions)
 
 توجه: آموزش‌ها و مثال‌های به روز شده را در لینک‌های بالا دنبال کنید
 
