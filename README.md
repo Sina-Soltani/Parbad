@@ -2,7 +2,7 @@
 [![Nuget Downloads](https://img.shields.io/nuget/dt/parbad.svg?color=blue&label=Downloads)](https://www.nuget.org/packages/Parbad/)
 [![Build status](https://ci.appveyor.com/api/projects/status/ukr75xe2i7s59n6q?svg=true)](https://ci.appveyor.com/project/Sina-Soltani/parbad)
 
-Parbad is an integrated online payment library which helps developers and site owners to add the online payment ability to their websites. It provides a solution to perform payment request, verify the requested payment and refund a payment. 
+Parbad is an integrated online payment library which helps developers and site owners to add online payment ability to their websites. It provides an easy solution to perform payment request, verify the requested payment and refund a payment. 
 
 ![Parbad](https://github.com/Sina-Soltani/Parbad/blob/master/images/Parbad.png "Parbad")
 
