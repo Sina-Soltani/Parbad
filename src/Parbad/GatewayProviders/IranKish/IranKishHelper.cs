@@ -25,7 +25,7 @@ namespace Parbad.GatewayProviders.IranKish
 
         private const string OkResult = "100";
 
-        public static string CreateRequestData(Invoice invoice, IranKishGatewayOptions options)
+        public static string CreateRequestData(Invoice invoice, IranKishGatewayAccount account)
         {
             return
                 "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tem=\"http://tempuri.org/\">" +
@@ -33,7 +33,7 @@ namespace Parbad.GatewayProviders.IranKish
                 "<soapenv:Body>" +
                 "<tem:MakeToken>" +
                 $"<tem:amount>{(long)invoice.Amount}</tem:amount>" +
-                $"<tem:merchantId>{options.MerchantId}</tem:merchantId>" +
+                $"<tem:merchantId>{account.MerchantId}</tem:merchantId>" +
                 $"<tem:invoiceNo>{invoice.TrackingNumber}</tem:invoiceNo>" +
                 "<tem:paymentId></tem:paymentId>" +
                 "<tem:specialPaymentId></tem:specialPaymentId>" +
@@ -47,7 +47,7 @@ namespace Parbad.GatewayProviders.IranKish
         public static PaymentRequestResult CreateRequestResult(
             string webServiceResponse,
             Invoice invoice,
-            IranKishGatewayOptions options,
+            IranKishGatewayAccount account,
             IHttpContextAccessor httpContextAccessor,
             MessagesOptions messagesOptions)
         {
@@ -72,16 +72,16 @@ namespace Parbad.GatewayProviders.IranKish
                 PaymentPageUrl,
                 new Dictionary<string, string>
                 {
-                    {"merchantid", options.MerchantId},
+                    {"merchantid", account.MerchantId},
                     {"token", token}
                 });
 
-            return PaymentRequestResult.Succeed(transporter);
+            return PaymentRequestResult.Succeed(transporter, account.Name);
         }
 
         public static IranKishCallbackResult CreateCallbackResult(
             Payment payment,
-            IranKishGatewayOptions options,
+            IranKishGatewayAccount account,
             HttpRequest httpRequest,
             MessagesOptions messagesOptions)
         {
@@ -98,7 +98,7 @@ namespace Parbad.GatewayProviders.IranKish
             var isSucceed = false;
             PaymentVerifyResult verifyResult = null;
 
-            if (merchantId != options.MerchantId ||
+            if (merchantId != account.MerchantId ||
                 invoiceNumber != payment.TrackingNumber ||
                 token.IsNullOrEmpty())
             {
@@ -138,7 +138,7 @@ namespace Parbad.GatewayProviders.IranKish
             };
         }
 
-        public static string CreateVerifyData(IranKishCallbackResult callbackResult, IranKishGatewayOptions options)
+        public static string CreateVerifyData(IranKishCallbackResult callbackResult, IranKishGatewayAccount account)
         {
             return
                 "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tem=\"http://tempuri.org/\">" +
@@ -146,7 +146,7 @@ namespace Parbad.GatewayProviders.IranKish
                 "<soapenv:Body>" +
                 "<tem:KicccPaymentsVerification>" +
                 $"<tem:token>{callbackResult.Token}</tem:token>" +
-                $"<tem:merchantId>{options.MerchantId}</tem:merchantId>" +
+                $"<tem:merchantId>{account.MerchantId}</tem:merchantId>" +
                 $"<tem:referenceNumber>{callbackResult.ReferenceId}</tem:referenceNumber>" +
                 "<tem:sha1Key></tem:sha1Key>" +
                 "</tem:KicccPaymentsVerification>" +

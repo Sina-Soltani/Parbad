@@ -60,7 +60,6 @@ namespace Parbad.Internal
         {
             if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-
             _logger.LogInformation(LoggingEvents.RequestPayment, $"New payment request with the tracking number {invoice.TrackingNumber} is started." +
                                                                     $"{nameof(invoice.Amount)}:{invoice.Amount}" +
                                                                     $"GatewayName:{GatewayHelper.GetNameByType(invoice.GatewayType)}");
@@ -218,6 +217,7 @@ namespace Parbad.Internal
                     TrackingNumber = payment.TrackingNumber,
                     Amount = payment.Amount,
                     GatewayName = payment.GatewayName,
+                    GatewayAccountName = payment.GatewayAccountName,
                     TransactionCode = payment.TransactionCode,
                     IsSucceed = false,
                     Message = "The requested payment is already processed before."
@@ -263,6 +263,7 @@ namespace Parbad.Internal
                     Amount = payment.Amount,
                     IsSucceed = false,
                     GatewayName = payment.GatewayName,
+                    GatewayAccountName = payment.GatewayAccountName,
                     Message = message
                 };
             }
@@ -294,6 +295,7 @@ namespace Parbad.Internal
             verifyResult.TrackingNumber = payment.TrackingNumber;
             verifyResult.Amount = payment.Amount;
             verifyResult.GatewayName = payment.GatewayName;
+            verifyResult.GatewayAccountName = payment.GatewayAccountName;
 
             _logger.LogInformation(LoggingEvents.VerifyPayment, "Verifying finished. " +
                                                                 $"Tracking Number {payment.TrackingNumber}. " +
@@ -397,6 +399,7 @@ namespace Parbad.Internal
             refundResult.TrackingNumber = payment.TrackingNumber;
             refundResult.Amount = amountToRefund;
             refundResult.GatewayName = payment.GatewayName;
+            refundResult.GatewayAccountName = payment.GatewayAccountName;
 
             payment.Transactions.Add(new Transaction
             {

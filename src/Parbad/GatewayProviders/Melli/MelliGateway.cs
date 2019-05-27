@@ -11,6 +11,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Parbad.Abstraction;
 using Parbad.Data.Domain.Payments;
+using Parbad.GatewayBuilders;
 using Parbad.Internal;
 using Parbad.Net;
 using Parbad.Options;
@@ -19,47 +20,63 @@ using Parbad.GatewayProviders.Melli.Models;
 
 namespace Parbad.GatewayProviders.Melli
 {
+    /// <summary>
+    /// Melli Gateway.
+    /// </summary>
     [Gateway(Name)]
     public class MelliGateway : IGateway
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
-        private readonly IOptions<MelliGatewayOptions> _options;
+        private readonly IGatewayAccountProvider<MelliGatewayAccount> _accountProvider;
         private readonly IOptions<MessagesOptions> _messageOptions;
 
         public const string Name = "Melli";
 
+        /// <summary>
+        /// Initializes an instance of <see cref="MelliGateway"/>.
+        /// </summary>
+        /// <param name="httpContextAccessor"></param>
+        /// <param name="httpClientFactory"></param>
+        /// <param name="accountProvider"></param>
+        /// <param name="messageOptions"></param>
         public MelliGateway(
             IHttpContextAccessor httpContextAccessor,
             IHttpClientFactory httpClientFactory,
-            IOptions<MelliGatewayOptions> options,
+            IGatewayAccountProvider<MelliGatewayAccount> accountProvider,
             IOptions<MessagesOptions> messageOptions)
         {
             _httpContextAccessor = httpContextAccessor;
             _httpClient = httpClientFactory.CreateClient(this);
-            _options = options;
+            _accountProvider = accountProvider;
             _messageOptions = messageOptions;
         }
 
+        /// <inheritdoc />
         public virtual async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
         {
             if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-            var data = MelliHelper.CreateRequestData(invoice, _options.Value);
+            var account = await GetAccountAsync(invoice.GetAccountName()).ConfigureAwaitFalse();
+
+            var data = MelliHelper.CreateRequestData(invoice, account);
 
             var result = await PostJsonAsync<MelliApiRequestResult>(MelliHelper.ServiceRequestUrl, data, cancellationToken).ConfigureAwaitFalse();
 
-            return MelliHelper.CreateRequestResult(result, _httpContextAccessor, _messageOptions.Value);
+            return MelliHelper.CreateRequestResult(result, _httpContextAccessor, account, _messageOptions.Value);
         }
 
+        /// <inheritdoc />
         public virtual async Task<IPaymentVerifyResult> VerifyAsync(Payment payment, CancellationToken cancellationToken = default)
         {
             if (payment == null) throw new ArgumentNullException(nameof(payment));
 
+            var account = await GetAccountAsync(payment.GatewayAccountName).ConfigureAwaitFalse();
+
             var data = MelliHelper.CreateCallbackResult(
                 payment,
                 _httpContextAccessor.HttpContext.Request,
-                _options.Value,
+                account,
                 _messageOptions.Value);
 
             if (!data.IsSucceed)
@@ -72,6 +89,7 @@ namespace Parbad.GatewayProviders.Melli
             return MelliHelper.CreateVerifyResult(data.Token, result, _messageOptions.Value);
         }
 
+        /// <inheritdoc />
         public virtual Task<IPaymentRefundResult> RefundAsync(Payment payment, Money amount, CancellationToken cancellationToken = default)
         {
             return PaymentRefundResult.Failed(Resources.RefundNotSupports).ToInterfaceAsync();
@@ -86,6 +104,13 @@ namespace Parbad.GatewayProviders.Melli
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
             return JsonConvert.DeserializeObject<T>(response);
+        }
+
+        private async Task<MelliGatewayAccount> GetAccountAsync(string accountName)
+        {
+            var accounts = await _accountProvider.LoadAccountsAsync();
+
+            return accounts.GetOrDefault(accountName);
         }
     }
 }

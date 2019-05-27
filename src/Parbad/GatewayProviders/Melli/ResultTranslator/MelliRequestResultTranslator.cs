@@ -7,7 +7,7 @@ namespace Parbad.GatewayProviders.Melli.ResultTranslator
 {
     internal static class MelliRequestResultTranslator
     {
-        public static string Translate(int result, MessagesOptions options)
+        public static string Translate(int? result, MessagesOptions options)
         {
             switch (result)
             {

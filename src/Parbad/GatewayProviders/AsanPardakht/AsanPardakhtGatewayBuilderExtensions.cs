@@ -20,67 +20,23 @@ namespace Parbad.Builder
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
+            builder.AddGatewayAccountProvider<AsanPardakhtGatewayAccount>();
+
             return builder.AddGateway<AsanPardakhtGateway>(new Uri(AsanPardakhtHelper.BaseServiceUrl));
         }
 
         /// <summary>
-        /// Configures AsanPardakht gateway options.
+        /// Configures the accounts for <see cref="AsanPardakhtGateway"/>.
         /// </summary>
         /// <param name="builder"></param>
-        /// <param name="configureOptions"></param>
-        public static IGatewayConfigurationBuilder<AsanPardakhtGateway> WithOptions(
+        /// <param name="configureAccounts">Configures the accounts.</param>
+        public static IGatewayConfigurationBuilder<AsanPardakhtGateway> WithAccounts(
             this IGatewayConfigurationBuilder<AsanPardakhtGateway> builder,
-            Action<AsanPardakhtGatewayOptions> configureOptions)
+            Action<IGatewayAccountBuilder<AsanPardakhtGatewayAccount>> configureAccounts)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            return builder.WithOptions(configureOptions);
-        }
-
-        /// <summary>
-        /// Adds the given <typeparamref name="TOptionsProvider"/> to services.
-        /// It will be used for configuring the <see cref="AsanPardakhtGatewayOptions"/>.
-        /// </summary>
-        /// <typeparam name="TOptionsProvider"></typeparam>
-        /// <param name="builder"></param>
-        /// <param name="serviceLifetime">Lifetime of <typeparamref name="TOptionsProvider"/>.</param>
-        public static IGatewayConfigurationBuilder<AsanPardakhtGateway> WithOptionsProvider<TOptionsProvider>(
-            this IGatewayConfigurationBuilder<AsanPardakhtGateway> builder,
-            ServiceLifetime serviceLifetime)
-            where TOptionsProvider : class, IParbadOptionsProvider<AsanPardakhtGatewayOptions>
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-
-            return builder.WithOptionsProvider<AsanPardakhtGateway, AsanPardakhtGatewayOptions, TOptionsProvider>(serviceLifetime);
-        }
-
-        /// <summary>
-        /// Adds the given <paramref name="factory"/> to services.
-        /// It will be used for configuring the <see cref="AsanPardakhtGatewayOptions"/>.
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="factory"></param>
-        /// <param name="serviceLifetime">Lifetime of <paramref name="factory"/>.</param>
-        public static IGatewayConfigurationBuilder<AsanPardakhtGateway> WithOptionsProvider(
-            this IGatewayConfigurationBuilder<AsanPardakhtGateway> builder,
-            Func<IServiceProvider, IParbadOptionsProvider<AsanPardakhtGatewayOptions>> factory,
-            ServiceLifetime serviceLifetime)
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-
-            return builder.WithOptionsProvider<AsanPardakhtGateway, AsanPardakhtGatewayOptions>(factory, serviceLifetime);
-        }
-
-        /// <summary>
-        /// Configures AsanPardakht gateway by using an <see cref="IConfiguration"/>.
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="configuration">The <see cref="IConfiguration"/> section.</param>
-        public static IGatewayConfigurationBuilder<AsanPardakhtGateway> WithConfiguration(
-            this IGatewayConfigurationBuilder<AsanPardakhtGateway> builder,
-            IConfiguration configuration)
-        {
-            return builder.WithConfiguration<AsanPardakhtGateway, AsanPardakhtGatewayOptions>(configuration);
+            return builder.WithAccounts(configureAccounts);
         }
     }
 }

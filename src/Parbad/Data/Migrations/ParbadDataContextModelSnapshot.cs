@@ -15,7 +15,7 @@ namespace Parbad.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.3-servicing-35854")
+                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -24,14 +24,16 @@ namespace Parbad.Data.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("payment_id")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn)
-                        .HasAnnotation("Sqlite:Autoincrement", true);
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<decimal>("Amount")
                         .HasColumnName("amount");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnName("created_on");
+
+                    b.Property<string>("GatewayAccountName")
+                        .HasColumnName("gateway_account_name");
 
                     b.Property<string>("GatewayName")
                         .IsRequired()
@@ -66,7 +68,7 @@ namespace Parbad.Data.Migrations
                     b.HasIndex("TrackingNumber")
                         .IsUnique();
 
-                    b.ToTable("payment", "Parbad");
+                    b.ToTable("payment","Parbad");
                 });
 
             modelBuilder.Entity("Parbad.Data.Domain.Transactions.Transaction", b =>
@@ -74,8 +76,7 @@ namespace Parbad.Data.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("transaction_id")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn)
-                        .HasAnnotation("Sqlite:Autoincrement", true);
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("AdditionalData")
                         .HasColumnName("additional_data");
@@ -105,7 +106,7 @@ namespace Parbad.Data.Migrations
 
                     b.HasIndex("PaymentId");
 
-                    b.ToTable("transaction", "Parbad");
+                    b.ToTable("transaction","Parbad");
                 });
 
             modelBuilder.Entity("Parbad.Data.Domain.Transactions.Transaction", b =>

@@ -8,7 +8,7 @@ namespace Parbad.GatewayProviders.Melli.Models
     [Serializable]
     internal class MelliApiRequestResult
     {
-        public int ResCode { get; set; }
+        public int? ResCode { get; set; }
 
         public string Token { get; set; }
 

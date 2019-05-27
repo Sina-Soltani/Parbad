@@ -2,14 +2,11 @@
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
 using System;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Parbad.GatewayBuilders;
 using Parbad.GatewayProviders.ParbadVirtual;
 using Parbad.GatewayProviders.ParbadVirtual.MiddlewareInvoker;
 using Parbad.Internal;
-using Parbad.Options;
 
 namespace Parbad.Builder
 {
@@ -25,68 +22,31 @@ namespace Parbad.Builder
 
             builder.Services.TryAddTransient<ParbadVirtualGateway>();
             builder.Services.TryAddTransient<IParbadVirtualGatewayMiddlewareInvoker, ParbadVirtualGatewayMiddlewareInvoker>();
+            builder.AddGatewayAccountProvider<ParbadVirtualGatewayAccount>();
 
-            return new GatewayConfigurationBuilder<ParbadVirtualGateway>(builder.Services);
+            var gatewayConfigurationBuilder = new GatewayConfigurationBuilder<ParbadVirtualGateway>(builder.Services);
+            gatewayConfigurationBuilder
+                .WithAccounts(accounts =>
+                {
+                    accounts
+                        .AddInMemory(account => { });
+                });
+
+            return gatewayConfigurationBuilder;
         }
 
         /// <summary>
-        /// Configures Parbad Virtual gateway options.
+        /// Configures the accounts for <see cref="ParbadVirtualGateway"/>.
         /// </summary>
         /// <param name="builder"></param>
-        /// <param name="configureOptions"></param>
-        public static IGatewayConfigurationBuilder<ParbadVirtualGateway> WithOptions(
+        /// <param name="configureAccounts">Configures the accounts.</param>
+        public static IGatewayConfigurationBuilder<ParbadVirtualGateway> WithAccounts(
             this IGatewayConfigurationBuilder<ParbadVirtualGateway> builder,
-            Action<ParbadVirtualGatewayOptions> configureOptions)
+            Action<IGatewayAccountBuilder<ParbadVirtualGatewayAccount>> configureAccounts)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            return builder.WithOptions(configureOptions);
-        }
-
-        /// <summary>
-        /// Adds the given <typeparamref name="TOptionsProvider"/> to services.
-        /// It will be used for configuring the <see cref="ParbadVirtualGatewayOptions"/>.
-        /// </summary>
-        /// <typeparam name="TOptionsProvider"></typeparam>
-        /// <param name="builder"></param>
-        /// <param name="serviceLifetime">Lifetime of <typeparamref name="TOptionsProvider"/>.</param>
-        public static IGatewayConfigurationBuilder<ParbadVirtualGateway> WithOptionsProvider<TOptionsProvider>(
-            this IGatewayConfigurationBuilder<ParbadVirtualGateway> builder,
-            ServiceLifetime serviceLifetime)
-            where TOptionsProvider : class, IParbadOptionsProvider<ParbadVirtualGatewayOptions>
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-
-            return builder.WithOptionsProvider<ParbadVirtualGateway, ParbadVirtualGatewayOptions, TOptionsProvider>(serviceLifetime);
-        }
-
-        /// <summary>
-        /// Adds the given <paramref name="factory"/> to services.
-        /// It will be used for configuring the <see cref="ParbadVirtualGatewayOptions"/>.
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="factory"></param>
-        /// <param name="serviceLifetime">Lifetime of <paramref name="factory"/>.</param>
-        public static IGatewayConfigurationBuilder<ParbadVirtualGateway> WithOptionsProvider(
-            this IGatewayConfigurationBuilder<ParbadVirtualGateway> builder,
-            Func<IServiceProvider, IParbadOptionsProvider<ParbadVirtualGatewayOptions>> factory,
-            ServiceLifetime serviceLifetime)
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-
-            return builder.WithOptionsProvider<ParbadVirtualGateway, ParbadVirtualGatewayOptions>(factory, serviceLifetime);
-        }
-
-        /// <summary>
-        /// Configures Parbad Virtual gateway by using an <see cref="IConfiguration"/>.
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="configuration">The <see cref="IConfiguration"/> section.</param>
-        public static IGatewayConfigurationBuilder<ParbadVirtualGateway> WithConfiguration(
-            this IGatewayConfigurationBuilder<ParbadVirtualGateway> builder,
-            IConfiguration configuration)
-        {
-            return builder.WithConfiguration<ParbadVirtualGateway, ParbadVirtualGatewayOptions>(configuration);
+            return builder.WithAccounts(configureAccounts);
         }
     }
 }

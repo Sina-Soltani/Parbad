@@ -25,25 +25,28 @@ namespace Parbad.Sample.AspNetCore
                 {
                     gateways
                         .AddMellat()
-                        .WithOptions(options =>
+                        .WithAccounts(accounts =>
                         {
-                            options.TerminalId = 123;
-                            options.UserName = "MyId";
-                            options.UserPassword = "MyPassword";
+                            accounts.AddInMemory(account =>
+                            {
+                                account.TerminalId = 123;
+                                account.UserName = "MyId";
+                                account.UserPassword = "MyPassword";
+                            });
                         });
 
                     gateways
-                        .AddParbadVirtual()
-                        .WithOptions(options => options.GatewayPath = "/MyVirtualGateway");
+                        .AddParbadVirtual();
+                    //.WithOptions(options => options.GatewayPath = "/MyVirtualGateway");
                 })
                 .ConfigureHttpContext(builder => builder.UseDefaultAspNetCore())
                 .ConfigureDatabase(builder =>
                 {
                     // In-Memory (For testing and development only)
-                    builder.UseInMemoryDatabase("MyDatabase");
+                    //builder.UseInMemoryDatabase("MyDatabase");
 
                     // SQL Server
-                    //builder.UseSqlServer("Connection String", options => options.UseParbadMigrations());
+                    builder.UseSqlServer("Server=.;Database=Parbad;Trusted_Connection=True;", options => options.UseParbadMigrations());
 
                     // MySQL
                     //builder.UseMySQL("Connection String", options => options.UseParbadMigrations());
@@ -54,10 +57,10 @@ namespace Parbad.Sample.AspNetCore
                 .ConfigureDatabaseInitializer(builder =>
                 {
                     // For In-Memory
-                    builder.CreateDatabase();
+                    //builder.CreateDatabase();
 
                     // (SQL Server, MySQL, etc.)
-                    //builder.CreateAndMigrateDatabase();
+                    builder.CreateAndMigrateDatabase();
 
                     // (Sqlite, etc.)
                     //builder.DeleteAndCreateDatabase();

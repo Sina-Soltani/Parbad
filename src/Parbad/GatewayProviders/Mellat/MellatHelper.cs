@@ -29,17 +29,21 @@ namespace Parbad.GatewayProviders.Mellat
         public const string WebServiceUrl = "/pgwchannel/services/pgw";
         public const string TestWebServiceUrl = "/pgwchannel/services/pgwtest";
 
-        public static string CreateRequestData(Invoice invoice, MellatGatewayOptions options)
+        public static string CreateRequestData(Invoice invoice, MellatGatewayAccount account)
         {
             if (invoice.AdditionalData == null || !invoice.AdditionalData.ContainsKey(CumulativeAccountsKey))
             {
-                return CreateSimpleRequestData(invoice, options);
+                return CreateSimpleRequestData(invoice, account);
             }
 
-            return CreateCumulativeRequestData(invoice, options);
+            return CreateCumulativeRequestData(invoice, account);
         }
 
-        public static PaymentRequestResult CreateRequestResult(string webServiceResponse, IHttpContextAccessor httpContextAccessor, MessagesOptions messagesOptions)
+        public static PaymentRequestResult CreateRequestResult(
+            string webServiceResponse,
+            IHttpContextAccessor httpContextAccessor,
+            MessagesOptions messagesOptions,
+            GatewayAccount account)
         {
             var result = XmlHelper.GetNodeValueFromXml(webServiceResponse, "return");
 
@@ -67,7 +71,7 @@ namespace Parbad.GatewayProviders.Mellat
                     {"RefId", refId}
                 });
 
-            return PaymentRequestResult.Succeed(transporter);
+            return PaymentRequestResult.Succeed(transporter, account.Name);
         }
 
         public static MellatCallbackResult CrateCallbackResult(HttpRequest httpRequest, MessagesOptions messagesOptions)
@@ -110,18 +114,18 @@ namespace Parbad.GatewayProviders.Mellat
             };
         }
 
-        public static string CreateVerifyData(Payment payment, MellatGatewayOptions options, MellatCallbackResult callbackResult)
+        public static string CreateVerifyData(Payment payment, MellatGatewayAccount account, MellatCallbackResult callbackResult)
         {
             return
                 "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:int=\"http://interfaces.core.sw.bps.com/\">" +
                 "<soapenv:Header/>" +
                 "<soapenv:Body>" +
                 "<int:bpVerifyRequest>" +
-                $"<terminalId>{options.TerminalId}</terminalId>" +
+                $"<terminalId>{account.TerminalId}</terminalId>" +
                 "<!--Optional:-->" +
-                $"<userName>{options.UserName}</userName>" +
+                $"<userName>{account.UserName}</userName>" +
                 "<!--Optional:-->" +
-                $"<userPassword>{options.UserPassword}</userPassword>" +
+                $"<userPassword>{account.UserPassword}</userPassword>" +
                 $"<orderId>{payment.TrackingNumber}</orderId>" +
                 $"<saleOrderId>{payment.TrackingNumber}</saleOrderId>" +
                 $"<saleReferenceId>{callbackResult.SaleReferenceId}</saleReferenceId>" +
@@ -152,18 +156,18 @@ namespace Parbad.GatewayProviders.Mellat
             };
         }
 
-        public static string CreateSettleData(Payment payment, MellatCallbackResult callbackResult, MellatGatewayOptions options)
+        public static string CreateSettleData(Payment payment, MellatCallbackResult callbackResult, MellatGatewayAccount account)
         {
             return
                 "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:int=\"http://interfaces.core.sw.bps.com/\">" +
                 "<soapenv:Header/>" +
                 "<soapenv:Body>" +
                 "<int:bpSettleRequest>" +
-                $"<terminalId>{options.TerminalId}</terminalId>" +
+                $"<terminalId>{account.TerminalId}</terminalId>" +
                 "<!--Optional:-->" +
-                $"<userName>{options.UserName}</userName>" +
+                $"<userName>{account.UserName}</userName>" +
                 "<!--Optional:-->" +
-                $"<userPassword>{options.UserPassword}</userPassword>" +
+                $"<userPassword>{account.UserPassword}</userPassword>" +
                 $"<orderId>{payment.TrackingNumber}</orderId>" +
                 $"<saleOrderId>{payment.TrackingNumber}</saleOrderId>" +
                 $"<saleReferenceId>{callbackResult.SaleReferenceId}</saleReferenceId>" +
@@ -190,18 +194,18 @@ namespace Parbad.GatewayProviders.Mellat
             };
         }
 
-        public static string CreateRefundData(Payment payment, MellatGatewayOptions options)
+        public static string CreateRefundData(Payment payment, MellatGatewayAccount account)
         {
             return
                 "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:int=\"http://interfaces.core.sw.bps.com/\">" +
                 "<soapenv:Header/>" +
                 "<soapenv:Body>" +
                 "<int:bpReversalRequest>" +
-                $"<terminalId>{options.TerminalId}</terminalId>" +
+                $"<terminalId>{account.TerminalId}</terminalId>" +
                 "<!--Optional:-->" +
-                $"<userName>{options.UserName}</userName>" +
+                $"<userName>{account.UserName}</userName>" +
                 "<!--Optional:-->" +
-                $"<userPassword>{options.UserPassword}</userPassword>" +
+                $"<userPassword>{account.UserPassword}</userPassword>" +
                 $"<orderId>{payment.TrackingNumber}</orderId>" +
                 $"<saleOrderId>{payment.TrackingNumber}</saleOrderId>" +
                 $"<saleReferenceId>{payment.TransactionCode}</saleReferenceId>" +
@@ -225,18 +229,23 @@ namespace Parbad.GatewayProviders.Mellat
             };
         }
 
-        private static string CreateSimpleRequestData(Invoice invoice, MellatGatewayOptions options)
+        public static string GetWebServiceUrl(bool isTestTerminal)
+        {
+            return isTestTerminal ? TestWebServiceUrl : WebServiceUrl;
+        }
+
+        private static string CreateSimpleRequestData(Invoice invoice, MellatGatewayAccount account)
         {
             return
                 "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:int=\"http://interfaces.core.sw.bps.com/\">" +
                 "<soapenv:Header/>" +
                 "<soapenv:Body>" +
                 "<int:bpPayRequest>" +
-                $"<terminalId>{options.TerminalId}</terminalId>" +
+                $"<terminalId>{account.TerminalId}</terminalId>" +
                 "<!--Optional:-->" +
-                $"<userName>{options.UserName}</userName>" +
+                $"<userName>{account.UserName}</userName>" +
                 "<!--Optional:-->" +
-                $"<userPassword>{options.UserPassword}</userPassword>" +
+                $"<userPassword>{account.UserPassword}</userPassword>" +
                 $"<orderId>{invoice.TrackingNumber}</orderId>" +
                 $"<amount>{(long)invoice.Amount}</amount>" +
                 "<!--Optional:-->" +
@@ -253,16 +262,16 @@ namespace Parbad.GatewayProviders.Mellat
                 "</soapenv:Envelope>";
         }
 
-        private static string CreateCumulativeRequestData(Invoice invoice, MellatGatewayOptions options)
+        private static string CreateCumulativeRequestData(Invoice invoice, MellatGatewayAccount account)
         {
-            var accounts = (IList<MellatCumulativeDynamicAccount>)invoice.AdditionalData[CumulativeAccountsKey];
+            var cumulativeAccounts = (IList<MellatCumulativeDynamicAccount>)invoice.AdditionalData[CumulativeAccountsKey];
 
-            if (accounts.Count > 10)
+            if (cumulativeAccounts.Count > 10)
             {
                 throw new Exception("Cannot use more than 10 accounts for each Cumulative payment request.");
             }
 
-            var totalAmount = accounts.Sum(account => account.Amount);
+            var totalAmount = cumulativeAccounts.Sum(cumulativeAccount => cumulativeAccount.Amount);
 
             if (totalAmount != invoice.Amount)
             {
@@ -271,18 +280,18 @@ namespace Parbad.GatewayProviders.Mellat
                                     $"Accounts total amount: {totalAmount}");
             }
 
-            var additionalData = accounts.Aggregate("", (current, account) => current + $"{account};");
+            var additionalData = cumulativeAccounts.Aggregate("", (current, cumulativeAccount) => current + $"{cumulativeAccount};");
 
             return
                 "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:int=\"http://interfaces.core.sw.bps.com/\">" +
                 "<soapenv:Header/>" +
                 "<soapenv:Body>" +
                 "<int:bpCumulativeDynamicPayRequest>" +
-                $"<terminalId>{options.TerminalId}</terminalId>" +
+                $"<terminalId>{account.TerminalId}</terminalId>" +
                 "<!--Optional:-->" +
-                $"<userName>{options.UserName}</userName>" +
+                $"<userName>{account.UserName}</userName>" +
                 "<!--Optional:-->" +
-                $"<userPassword>{options.UserPassword}</userPassword>" +
+                $"<userPassword>{account.UserPassword}</userPassword>" +
                 $"<orderId>{invoice.TrackingNumber}</orderId>" +
                 $"<amount>{(long)invoice.Amount}</amount>" +
                 "<!--Optional:-->" +

@@ -20,10 +20,20 @@ namespace Parbad.GatewayBuilders
         IServiceCollection Services { get; }
 
         /// <summary>
+        /// Configures the accounts of type <typeparamref name="TAccount"/> for <typeparamref name="TGateway"/>.
+        /// </summary>
+        /// <typeparam name="TAccount">Account of <typeparamref name="TGateway"/>.</typeparam>
+        /// <param name="configureAccounts">Configures the accounts.</param>
+        IGatewayConfigurationBuilder<TGateway> WithAccounts<TAccount>(
+            Action<IGatewayAccountBuilder<TAccount>> configureAccounts)
+            where TAccount : GatewayAccount, new();
+
+        /// <summary>
         /// Adds the configured options to Parbad services.
         /// </summary>
         /// <typeparam name="TOptions"></typeparam>
         /// <param name="configureOptions"></param>
+        [Obsolete("This is obsolete and will be removed in a future version. Use the WithAccount method instead.")]
         IGatewayConfigurationBuilder<TGateway> WithOptions<TOptions>(Action<TOptions> configureOptions) where TOptions : class, new();
 
         /// <summary>

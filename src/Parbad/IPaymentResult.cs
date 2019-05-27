@@ -31,6 +31,11 @@ namespace Parbad
         string GatewayName { get; }
 
         /// <summary>
+        /// Name of the gateway account.
+        /// </summary>
+        string GatewayAccountName { get; }
+
+        /// <summary>
         /// A short message about the operation.
         /// </summary>
         string Message { get; }

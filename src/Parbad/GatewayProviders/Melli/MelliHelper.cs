@@ -25,26 +25,20 @@ namespace Parbad.GatewayProviders.Melli
         private const int SuccessCode = 0;
         private const int DuplicateTrackingNumberCode = 1011;
 
-        public static object CreateRequestData(Invoice invoice, MelliGatewayOptions options)
+        public static object CreateRequestData(Invoice invoice, MelliGatewayAccount account)
         {
-            var signedData = SignRequestData(options.TerminalId, options.TerminalKey, invoice.TrackingNumber, invoice.Amount);
+            var signedData = SignRequestData(account.TerminalId, account.TerminalKey, invoice.TrackingNumber, invoice.Amount);
 
-            return new
-            {
-                TerminalId = options.TerminalId,
-                MerchantId = options.MerchantId,
-                Amount = (long)invoice.Amount,
-                SignData = signedData,
-                ReturnUrl = invoice.CallbackUrl,
-                LocalDateTime = DateTime.Now,
-                OrderId = invoice.TrackingNumber
-            };
+            return CreateRequestObject(
+                account.TerminalId,
+                account.MerchantId,
+                invoice.Amount,
+                signedData,
+                invoice.CallbackUrl,
+                invoice.TrackingNumber);
         }
 
-        public static PaymentRequestResult CreateRequestResult(
-            MelliApiRequestResult result,
-            IHttpContextAccessor httpContextAccessor,
-            MessagesOptions messagesOptions)
+        public static PaymentRequestResult CreateRequestResult(MelliApiRequestResult result, IHttpContextAccessor httpContextAccessor, MelliGatewayAccount account, MessagesOptions messagesOptions)
         {
             if (result == null)
             {
@@ -73,10 +67,10 @@ namespace Parbad.GatewayProviders.Melli
 
             var paymentPageUrl = $"{PaymentPageUrl}/Index?token={result.Token}";
 
-            return PaymentRequestResult.Succeed(new GatewayRedirect(httpContextAccessor, paymentPageUrl));
+            return PaymentRequestResult.Succeed(new GatewayRedirect(httpContextAccessor, paymentPageUrl), account.Name);
         }
 
-        public static MelliCallbackResult CreateCallbackResult(Payment payment, HttpRequest httpRequest, MelliGatewayOptions options, MessagesOptions messagesOptions)
+        public static MelliCallbackResult CreateCallbackResult(Payment payment, HttpRequest httpRequest, MelliGatewayAccount account, MessagesOptions messagesOptions)
         {
             httpRequest.TryGetParamAs<int>("ResCode", out var apiResponseCode);
 
@@ -102,20 +96,15 @@ namespace Parbad.GatewayProviders.Melli
                 };
             }
 
-            var signedData = SignVerifyData(options.TerminalKey, apiToken);
+            var signedData = SignVerifyData(account.TerminalKey, apiToken);
 
-            var dataToVerify = new
-            {
-                token = apiToken,
-                SignData = signedData
-            };
+            var dataToVerify = CreateVerifyObject(apiToken, signedData);
 
             return new MelliCallbackResult
             {
                 IsSucceed = true,
                 Token = apiToken,
-                JsonDataToVerify = dataToVerify,
-                Result = null
+                JsonDataToVerify = dataToVerify
             };
         }
 
@@ -165,6 +154,20 @@ namespace Parbad.GatewayProviders.Melli
             }
         }
 
+        private static object CreateRequestObject(string terminalId, string merchantId, long amount, string signedData, string callbackUrl, long orderId)
+        {
+            return new
+            {
+                TerminalId = terminalId,
+                MerchantId = merchantId,
+                Amount = amount,
+                SignData = signedData,
+                ReturnUrl = callbackUrl,
+                LocalDateTime = DateTime.Now,
+                OrderId = orderId.ToString()
+            };
+        }
+
         private static string SignVerifyData(string terminalKey, string token)
         {
             try
@@ -183,6 +186,15 @@ namespace Parbad.GatewayProviders.Melli
             {
                 throw new MelliGatewayDataSigningException(exception);
             }
+        }
+
+        private static object CreateVerifyObject(string apiToken, string signedData)
+        {
+            return new
+            {
+                token = apiToken,
+                SignData = signedData
+            };
         }
     }
 }

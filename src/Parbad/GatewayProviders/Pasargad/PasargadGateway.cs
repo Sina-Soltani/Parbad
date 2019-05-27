@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Parbad.Abstraction;
 using Parbad.Data.Domain.Payments;
+using Parbad.GatewayBuilders;
 using Parbad.Internal;
 using Parbad.Net;
 using Parbad.Options;
@@ -20,7 +21,7 @@ namespace Parbad.GatewayProviders.Pasargad
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
-        private readonly IOptions<PasargadGatewayOptions> _options;
+        private readonly IGatewayAccountProvider<PasargadGatewayAccount> _accountProvider;
         private readonly IOptions<MessagesOptions> _messageOptions;
 
         public const string Name = "Pasargad";
@@ -28,21 +29,22 @@ namespace Parbad.GatewayProviders.Pasargad
         public PasargadGateway(
             IHttpContextAccessor httpContextAccessor,
             IHttpClientFactory httpClientFactory,
-            IOptions<PasargadGatewayOptions> options,
+            IGatewayAccountProvider<PasargadGatewayAccount> accountProvider,
             IOptions<MessagesOptions> messageOptions)
         {
             _httpContextAccessor = httpContextAccessor;
             _httpClient = httpClientFactory.CreateClient(this);
-            _options = options;
+            _accountProvider = accountProvider;
             _messageOptions = messageOptions;
         }
 
-        public virtual Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
+        public virtual async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
         {
             if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-            return PasargadHelper.CreateRequestResult(invoice, _httpContextAccessor, _options.Value)
-                .ToInterfaceAsync();
+            var account = await GetAccountAsync(invoice.GetAccountName()).ConfigureAwaitFalse();
+
+            return PasargadHelper.CreateRequestResult(invoice, _httpContextAccessor, account);
         }
 
         public virtual async Task<IPaymentVerifyResult> VerifyAsync(Payment payment, CancellationToken cancellationToken = default)
@@ -64,9 +66,11 @@ namespace Parbad.GatewayProviders.Pasargad
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
+            var account = await GetAccountAsync(payment.GatewayAccountName).ConfigureAwaitFalse();
+
             var checkCallbackResult = PasargadHelper.CreateCheckCallbackResult(
                 response,
-                _options.Value,
+                account,
                 callbackResult,
                 _messageOptions.Value);
 
@@ -75,7 +79,7 @@ namespace Parbad.GatewayProviders.Pasargad
                 return checkCallbackResult.Result;
             }
 
-            var data = PasargadHelper.CreateVerifyData(payment, _options.Value, callbackResult);
+            var data = PasargadHelper.CreateVerifyData(payment, account, callbackResult);
 
             responseMessage = await _httpClient.PostFormAsync(
                 PasargadHelper.VerifyPaymentPageUrl,
@@ -93,7 +97,9 @@ namespace Parbad.GatewayProviders.Pasargad
             if (payment == null) throw new ArgumentNullException(nameof(payment));
             if (amount == null) throw new ArgumentNullException(nameof(amount));
 
-            var data = PasargadHelper.CreateRefundData(payment, amount, _options.Value);
+            var account = await GetAccountAsync(payment.GatewayAccountName).ConfigureAwaitFalse();
+
+            var data = PasargadHelper.CreateRefundData(payment, amount, account);
 
             var responseMessage = await _httpClient.PostFormAsync(
                 PasargadHelper.RefundPaymentPageUrl,
@@ -104,6 +110,13 @@ namespace Parbad.GatewayProviders.Pasargad
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
             return PasargadHelper.CreateRefundResult(response, _messageOptions.Value);
+        }
+
+        private async Task<PasargadGatewayAccount> GetAccountAsync(string accountName)
+        {
+            var accounts = await _accountProvider.LoadAccountsAsync();
+
+            return accounts.GetOrDefault(accountName);
         }
     }
 }

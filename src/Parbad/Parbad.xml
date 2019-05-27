@@ -4,9 +4,20 @@
         <name>Parbad</name>
     </assembly>
     <members>
+        <member name="T:Parbad.Abstraction.GatewayAccount">
+            <summary>
+            Describes a gateway account.
+            </summary>
+        </member>
+        <member name="P:Parbad.Abstraction.GatewayAccount.Name">
+            <summary>
+            Gets or sets the name of this account. The default value is "Default".
+            <para>Note: Make sure that accounts have different names. Otherwise a <see cref="T:Parbad.Exceptions.DuplicateAccountException"/> will throw.</para>
+            </summary>
+        </member>
         <member name="T:Parbad.Abstraction.IGateway">
             <summary>
-            
+            Represents a gateway (Bank).
             </summary>
         </member>
         <member name="M:Parbad.Abstraction.IGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
@@ -30,7 +41,17 @@
             <param name="payment"></param>
             <param name="amount"></param>
             <param name="cancellationToken"></param>
-            <returns></returns>
+        </member>
+        <member name="T:Parbad.Abstraction.IGatewayProvider">
+            <summary>
+            A provider for providing an <see cref="T:Parbad.Abstraction.IGateway"/>.
+            </summary>
+        </member>
+        <member name="M:Parbad.Abstraction.IGatewayProvider.Provide(System.Type)">
+            <summary>
+            Provides an instance of <see cref="T:Parbad.Abstraction.IGateway"/> using the given <paramref name="gatewayType"/>.
+            </summary>
+            <param name="gatewayType">Type of the gateway.</param>
         </member>
         <member name="T:Parbad.Builder.IParbadBuilder">
             <summary>
@@ -150,43 +171,36 @@
             <param name="builder">The builder being used to configure the context.</param>
             <param name="connectionString">The connection string of the database to connect to.</param>
         </member>
+        <member name="M:Parbad.Builder.GatewayAccountBuilderExtensions.AddInMemory``1(Parbad.GatewayBuilders.IGatewayAccountBuilder{``0},System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Adds an in-memory account of type <typeparamref name="TAccount"/>.
+            </summary>
+            <typeparam name="TAccount"></typeparam>
+            <param name="builder"></param>
+            <param name="accounts">The accounts to add.</param>
+        </member>
+        <member name="M:Parbad.Builder.GatewayAccountBuilderExtensions.AddInMemory``1(Parbad.GatewayBuilders.IGatewayAccountBuilder{``0},System.Action{``0})">
+            <summary>
+            Adds an in-memory account of type <typeparamref name="TAccount"/>.
+            </summary>
+            <typeparam name="TAccount"></typeparam>
+            <param name="builder"></param>
+            <param name="configureAccount">Configures the <typeparamref name="TAccount"/>.</param>
+        </member>
+        <member name="M:Parbad.Builder.GatewayAccountBuilderExtensions.AddFromConfiguration``1(Parbad.GatewayBuilders.IGatewayAccountBuilder{``0},Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Adds an account of type <typeparamref name="TAccount"/> using the given <paramref name="configuration"/>.
+            </summary>
+            <typeparam name="TAccount"></typeparam>
+            <param name="builder"></param>
+            <param name="configuration"></param>
+        </member>
         <member name="M:Parbad.Builder.GatewayBuilderExtensions.ConfigureGateways(Parbad.Builder.IParbadBuilder,System.Action{Parbad.GatewayBuilders.IGatewayBuilder})">
             <summary>
             Configures the gateways.
             </summary>
             <param name="builder"></param>
             <param name="configure"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Parbad.Builder.GatewayConfigurationBuilderExtensions.WithOptionsProvider``3(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{``0},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
-            <summary>
-            Adds the given <see cref="T:Parbad.Options.IParbadOptionsProvider`1"/> to <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/>.
-            It will be used for configuring the specified option.
-            </summary>
-            <typeparam name="TGateway"></typeparam>
-            <typeparam name="TGatewayOptions">An option that should be configured to be used by the specified gateway.</typeparam>
-            <typeparam name="TOptionsProvider">An <see cref="T:Parbad.Options.IParbadOptionsProvider`1"/> that provides and
-            configures the <typeparamref name="TGatewayOptions"/></typeparam>
-            <param name="builder"></param>
-            <param name="serviceLifetime"></param>
-        </member>
-        <member name="M:Parbad.Builder.GatewayConfigurationBuilderExtensions.WithOptionsProvider``2(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{``0},System.Func{System.IServiceProvider,Parbad.Options.IParbadOptionsProvider{``1}},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
-            <summary>
-            Adds the given <see cref="T:Parbad.Options.IParbadOptionsProvider`1"/> to <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/>.
-            It will be used for configuring the specified option.
-            </summary>
-            <typeparam name="TGateway"></typeparam>
-            <typeparam name="TGatewayOptions">An option that should be configured to be used by the specified gateway.</typeparam>
-            <param name="builder"></param>
-            <param name="factory"></param>
-            <param name="serviceLifetime"></param>
-        </member>
-        <member name="M:Parbad.Builder.GatewayConfigurationBuilderExtensions.WithConfiguration``2(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{``0},Microsoft.Extensions.Configuration.IConfiguration)">
-            <summary>
-            Configures the specified gateway by using an <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/>.
-            </summary>
-            <param name="builder"></param>
-            <param name="configuration">The <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/> section.</param>
         </member>
         <member name="M:Parbad.Builder.GatewayHttpClientConfigurationBuilderExtensions.WithProxy``1(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{``0},System.Uri)">
             <summary>
@@ -224,37 +238,12 @@
             </summary>
             <param name="builder"></param>
         </member>
-        <member name="M:Parbad.Builder.AsanPardakhtGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGateway},System.Action{Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGatewayOptions})">
+        <member name="M:Parbad.Builder.AsanPardakhtGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGatewayAccount}})">
             <summary>
-            Configures AsanPardakht gateway options.
+            Configures the accounts for <see cref="T:Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGateway"/>.
             </summary>
             <param name="builder"></param>
-            <param name="configureOptions"></param>
-        </member>
-        <member name="M:Parbad.Builder.AsanPardakhtGatewayBuilderExtensions.WithOptionsProvider``1(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGateway},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
-            <summary>
-            Adds the given <typeparamref name="TOptionsProvider"/> to services.
-            It will be used for configuring the <see cref="T:Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGatewayOptions"/>.
-            </summary>
-            <typeparam name="TOptionsProvider"></typeparam>
-            <param name="builder"></param>
-            <param name="serviceLifetime">Lifetime of <typeparamref name="TOptionsProvider"/>.</param>
-        </member>
-        <member name="M:Parbad.Builder.AsanPardakhtGatewayBuilderExtensions.WithOptionsProvider(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGateway},System.Func{System.IServiceProvider,Parbad.Options.IParbadOptionsProvider{Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGatewayOptions}},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
-            <summary>
-            Adds the given <paramref name="factory"/> to services.
-            It will be used for configuring the <see cref="T:Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGatewayOptions"/>.
-            </summary>
-            <param name="builder"></param>
-            <param name="factory"></param>
-            <param name="serviceLifetime">Lifetime of <paramref name="factory"/>.</param>
-        </member>
-        <member name="M:Parbad.Builder.AsanPardakhtGatewayBuilderExtensions.WithConfiguration(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGateway},Microsoft.Extensions.Configuration.IConfiguration)">
-            <summary>
-            Configures AsanPardakht gateway by using an <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/>.
-            </summary>
-            <param name="builder"></param>
-            <param name="configuration">The <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/> section.</param>
+            <param name="configureAccounts">Configures the accounts.</param>
         </member>
         <member name="M:Parbad.Builder.IranKishGatewayBuilderExtensions.AddIranKish(Parbad.GatewayBuilders.IGatewayBuilder)">
             <summary>
@@ -262,37 +251,12 @@
             </summary>
             <param name="builder"></param>
         </member>
-        <member name="M:Parbad.Builder.IranKishGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.IranKish.IranKishGateway},System.Action{Parbad.GatewayProviders.IranKish.IranKishGatewayOptions})">
+        <member name="M:Parbad.Builder.IranKishGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.IranKish.IranKishGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.GatewayProviders.IranKish.IranKishGatewayAccount}})">
             <summary>
-            Configures IranKish gateway options.
+            Configures the accounts for <see cref="T:Parbad.GatewayProviders.IranKish.IranKishGateway"/>.
             </summary>
             <param name="builder"></param>
-            <param name="configureOptions"></param>
-        </member>
-        <member name="M:Parbad.Builder.IranKishGatewayBuilderExtensions.WithOptionsProvider``1(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.IranKish.IranKishGateway},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
-            <summary>
-            Adds the given <typeparamref name="TOptionsProvider"/> to services.
-            It will be used for configuring the <see cref="T:Parbad.GatewayProviders.IranKish.IranKishGatewayOptions"/>.
-            </summary>
-            <typeparam name="TOptionsProvider"></typeparam>
-            <param name="builder"></param>
-            <param name="serviceLifetime">Lifetime of <typeparamref name="TOptionsProvider"/>.</param>
-        </member>
-        <member name="M:Parbad.Builder.IranKishGatewayBuilderExtensions.WithOptionsProvider(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.IranKish.IranKishGateway},System.Func{System.IServiceProvider,Parbad.Options.IParbadOptionsProvider{Parbad.GatewayProviders.IranKish.IranKishGatewayOptions}},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
-            <summary>
-            Adds the given <paramref name="factory"/> to services.
-            It will be used for configuring the <see cref="T:Parbad.GatewayProviders.IranKish.IranKishGatewayOptions"/>.
-            </summary>
-            <param name="builder"></param>
-            <param name="factory"></param>
-            <param name="serviceLifetime">Lifetime of <paramref name="factory"/>.</param>
-        </member>
-        <member name="M:Parbad.Builder.IranKishGatewayBuilderExtensions.WithConfiguration(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.IranKish.IranKishGateway},Microsoft.Extensions.Configuration.IConfiguration)">
-            <summary>
-            Configures IranKish gateway by using an <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/>.
-            </summary>
-            <param name="builder"></param>
-            <param name="configuration">The <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/> section.</param>
+            <param name="configureAccounts">Configures the accounts.</param>
         </member>
         <member name="M:Parbad.Builder.MellatGatewayBuilderExtensions.AddMellat(Parbad.GatewayBuilders.IGatewayBuilder)">
             <summary>
@@ -300,37 +264,12 @@
             </summary>
             <param name="builder"></param>
         </member>
-        <member name="M:Parbad.Builder.MellatGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Mellat.MellatGateway},System.Action{Parbad.GatewayProviders.Mellat.MellatGatewayOptions})">
+        <member name="M:Parbad.Builder.MellatGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Mellat.MellatGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.GatewayProviders.Mellat.MellatGatewayAccount}})">
             <summary>
-            Configures Mellat gateway options.
+            Configures the accounts for <see cref="T:Parbad.GatewayProviders.Mellat.MellatGateway"/>.
             </summary>
             <param name="builder"></param>
-            <param name="configureOptions"></param>
-        </member>
-        <member name="M:Parbad.Builder.MellatGatewayBuilderExtensions.WithOptionsProvider``1(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Mellat.MellatGateway},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
-            <summary>
-            Adds the given <typeparamref name="TOptionsProvider"/> to services.
-            It will be used for configuring the <see cref="T:Parbad.GatewayProviders.Mellat.MellatGatewayOptions"/>.
-            </summary>
-            <typeparam name="TOptionsProvider"></typeparam>
-            <param name="builder"></param>
-            <param name="serviceLifetime">Lifetime of <typeparamref name="TOptionsProvider"/>.</param>
-        </member>
-        <member name="M:Parbad.Builder.MellatGatewayBuilderExtensions.WithOptionsProvider(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Mellat.MellatGateway},System.Func{System.IServiceProvider,Parbad.Options.IParbadOptionsProvider{Parbad.GatewayProviders.Mellat.MellatGatewayOptions}},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
-            <summary>
-            Adds the given <paramref name="factory"/> to services.
-            It will be used for configuring the <see cref="T:Parbad.GatewayProviders.Mellat.MellatGatewayOptions"/>.
-            </summary>
-            <param name="builder"></param>
-            <param name="factory"></param>
-            <param name="serviceLifetime">Lifetime of <paramref name="factory"/>.</param>
-        </member>
-        <member name="M:Parbad.Builder.MellatGatewayBuilderExtensions.WithConfiguration(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Mellat.MellatGateway},Microsoft.Extensions.Configuration.IConfiguration)">
-            <summary>
-            Configures Mellat gateway by using an <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/>.
-            </summary>
-            <param name="builder"></param>
-            <param name="configuration">The <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/> section.</param>
+            <param name="configureAccounts">Configures the accounts.</param>
         </member>
         <member name="M:Parbad.Builder.MelliGatewayBuilderExtensions.AddMelli(Parbad.GatewayBuilders.IGatewayBuilder)">
             <summary>
@@ -338,37 +277,12 @@
             </summary>
             <param name="builder"></param>
         </member>
-        <member name="M:Parbad.Builder.MelliGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Melli.MelliGateway},System.Action{Parbad.GatewayProviders.Melli.MelliGatewayOptions})">
+        <member name="M:Parbad.Builder.MelliGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Melli.MelliGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.GatewayProviders.Melli.MelliGatewayAccount}})">
             <summary>
-            Configures Melli gateway options.
+            Configures the accounts for <see cref="T:Parbad.GatewayProviders.Melli.MelliGateway"/>.
             </summary>
             <param name="builder"></param>
-            <param name="configureOptions"></param>
-        </member>
-        <member name="M:Parbad.Builder.MelliGatewayBuilderExtensions.WithOptionsProvider``1(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Melli.MelliGateway},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
-            <summary>
-            Adds the given <typeparamref name="TOptionsProvider"/> to services.
-            It will be used for configuring the <see cref="T:Parbad.GatewayProviders.Melli.MelliGatewayOptions"/>.
-            </summary>
-            <typeparam name="TOptionsProvider"></typeparam>
-            <param name="builder"></param>
-            <param name="serviceLifetime">Lifetime of <typeparamref name="TOptionsProvider"/>.</param>
-        </member>
-        <member name="M:Parbad.Builder.MelliGatewayBuilderExtensions.WithOptionsProvider(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Melli.MelliGateway},System.Func{System.IServiceProvider,Parbad.Options.IParbadOptionsProvider{Parbad.GatewayProviders.Melli.MelliGatewayOptions}},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
-            <summary>
-            Adds the given <paramref name="factory"/> to services.
-            It will be used for configuring the <see cref="T:Parbad.GatewayProviders.Melli.MelliGatewayOptions"/>.
-            </summary>
-            <param name="builder"></param>
-            <param name="factory"></param>
-            <param name="serviceLifetime">Lifetime of <paramref name="factory"/>.</param>
-        </member>
-        <member name="M:Parbad.Builder.MelliGatewayBuilderExtensions.WithConfiguration(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Melli.MelliGateway},Microsoft.Extensions.Configuration.IConfiguration)">
-            <summary>
-            Configures Melli gateway by using an <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/>.
-            </summary>
-            <param name="builder"></param>
-            <param name="configuration">The <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/> section.</param>
+            <param name="configureAccounts">Configures the accounts.</param>
         </member>
         <member name="M:Parbad.Builder.ParbadVirtualGatewayBuilderExtensions.AddParbadVirtual(Parbad.GatewayBuilders.IGatewayBuilder)">
             <summary>
@@ -376,37 +290,12 @@
             </summary>
             <param name="builder"></param>
         </member>
-        <member name="M:Parbad.Builder.ParbadVirtualGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.ParbadVirtual.ParbadVirtualGateway},System.Action{Parbad.GatewayProviders.ParbadVirtual.ParbadVirtualGatewayOptions})">
+        <member name="M:Parbad.Builder.ParbadVirtualGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.ParbadVirtual.ParbadVirtualGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.GatewayProviders.ParbadVirtual.ParbadVirtualGatewayAccount}})">
             <summary>
-            Configures Parbad Virtual gateway options.
+            Configures the accounts for <see cref="T:Parbad.GatewayProviders.ParbadVirtual.ParbadVirtualGateway"/>.
             </summary>
             <param name="builder"></param>
-            <param name="configureOptions"></param>
-        </member>
-        <member name="M:Parbad.Builder.ParbadVirtualGatewayBuilderExtensions.WithOptionsProvider``1(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.ParbadVirtual.ParbadVirtualGateway},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
-            <summary>
-            Adds the given <typeparamref name="TOptionsProvider"/> to services.
-            It will be used for configuring the <see cref="T:Parbad.GatewayProviders.ParbadVirtual.ParbadVirtualGatewayOptions"/>.
-            </summary>
-            <typeparam name="TOptionsProvider"></typeparam>
-            <param name="builder"></param>
-            <param name="serviceLifetime">Lifetime of <typeparamref name="TOptionsProvider"/>.</param>
-        </member>
-        <member name="M:Parbad.Builder.ParbadVirtualGatewayBuilderExtensions.WithOptionsProvider(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.ParbadVirtual.ParbadVirtualGateway},System.Func{System.IServiceProvider,Parbad.Options.IParbadOptionsProvider{Parbad.GatewayProviders.ParbadVirtual.ParbadVirtualGatewayOptions}},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
-            <summary>
-            Adds the given <paramref name="factory"/> to services.
-            It will be used for configuring the <see cref="T:Parbad.GatewayProviders.ParbadVirtual.ParbadVirtualGatewayOptions"/>.
-            </summary>
-            <param name="builder"></param>
-            <param name="factory"></param>
-            <param name="serviceLifetime">Lifetime of <paramref name="factory"/>.</param>
-        </member>
-        <member name="M:Parbad.Builder.ParbadVirtualGatewayBuilderExtensions.WithConfiguration(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.ParbadVirtual.ParbadVirtualGateway},Microsoft.Extensions.Configuration.IConfiguration)">
-            <summary>
-            Configures Parbad Virtual gateway by using an <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/>.
-            </summary>
-            <param name="builder"></param>
-            <param name="configuration">The <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/> section.</param>
+            <param name="configureAccounts">Configures the accounts.</param>
         </member>
         <member name="M:Parbad.Builder.ParsianGatewayBuilderExtensions.AddParsian(Parbad.GatewayBuilders.IGatewayBuilder)">
             <summary>
@@ -414,37 +303,12 @@
             </summary>
             <param name="builder"></param>
         </member>
-        <member name="M:Parbad.Builder.ParsianGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Parsian.ParsianGateway},System.Action{Parbad.GatewayProviders.Parsian.ParsianGatewayOptions})">
+        <member name="M:Parbad.Builder.ParsianGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Parsian.ParsianGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.GatewayProviders.Parsian.ParsianGatewayAccount}})">
             <summary>
-            Configures Parsian gateway options.
+            Configures the accounts for <see cref="T:Parbad.GatewayProviders.Parsian.ParsianGateway"/>.
             </summary>
             <param name="builder"></param>
-            <param name="configureOptions"></param>
-        </member>
-        <member name="M:Parbad.Builder.ParsianGatewayBuilderExtensions.WithOptionsProvider``1(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Parsian.ParsianGateway},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
-            <summary>
-            Adds the given <typeparamref name="TOptionsProvider"/> to services.
-            It will be used for configuring the <see cref="T:Parbad.GatewayProviders.Parsian.ParsianGatewayOptions"/>.
-            </summary>
-            <typeparam name="TOptionsProvider"></typeparam>
-            <param name="builder"></param>
-            <param name="serviceLifetime">Lifetime of <typeparamref name="TOptionsProvider"/>.</param>
-        </member>
-        <member name="M:Parbad.Builder.ParsianGatewayBuilderExtensions.WithOptionsProvider(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Parsian.ParsianGateway},System.Func{System.IServiceProvider,Parbad.Options.IParbadOptionsProvider{Parbad.GatewayProviders.Parsian.ParsianGatewayOptions}},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
-            <summary>
-            Adds the given <paramref name="factory"/> to services.
-            It will be used for configuring the <see cref="T:Parbad.GatewayProviders.Parsian.ParsianGatewayOptions"/>.
-            </summary>
-            <param name="builder"></param>
-            <param name="factory"></param>
-            <param name="serviceLifetime">Lifetime of <paramref name="factory"/>.</param>
-        </member>
-        <member name="M:Parbad.Builder.ParsianGatewayBuilderExtensions.WithConfiguration(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Parsian.ParsianGateway},Microsoft.Extensions.Configuration.IConfiguration)">
-            <summary>
-            Configures Parsian gateway by using an <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/>.
-            </summary>
-            <param name="builder"></param>
-            <param name="configuration">The <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/> section.</param>
+            <param name="configureAccounts">Configures the accounts.</param>
         </member>
         <member name="M:Parbad.Builder.PasargadGatewayBuilderExtensions.AddPasargad(Parbad.GatewayBuilders.IGatewayBuilder)">
             <summary>
@@ -452,37 +316,12 @@
             </summary>
             <param name="builder"></param>
         </member>
-        <member name="M:Parbad.Builder.PasargadGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Pasargad.PasargadGateway},System.Action{Parbad.GatewayProviders.Pasargad.PasargadGatewayOptions})">
+        <member name="M:Parbad.Builder.PasargadGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Pasargad.PasargadGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.GatewayProviders.Pasargad.PasargadGatewayAccount}})">
             <summary>
-            Configures Pasargad gateway options.
+            Configures the accounts for <see cref="T:Parbad.GatewayProviders.Pasargad.PasargadGateway"/>.
             </summary>
             <param name="builder"></param>
-            <param name="configureOptions"></param>
-        </member>
-        <member name="M:Parbad.Builder.PasargadGatewayBuilderExtensions.WithOptionsProvider``1(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Pasargad.PasargadGateway},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
-            <summary>
-            Adds the given <typeparamref name="TOptionsProvider"/> to services.
-            It will be used for configuring the <see cref="T:Parbad.GatewayProviders.Pasargad.PasargadGatewayOptions"/>.
-            </summary>
-            <typeparam name="TOptionsProvider"></typeparam>
-            <param name="builder"></param>
-            <param name="serviceLifetime">Lifetime of <typeparamref name="TOptionsProvider"/>.</param>
-        </member>
-        <member name="M:Parbad.Builder.PasargadGatewayBuilderExtensions.WithOptionsProvider(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Pasargad.PasargadGateway},System.Func{System.IServiceProvider,Parbad.Options.IParbadOptionsProvider{Parbad.GatewayProviders.Pasargad.PasargadGatewayOptions}},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
-            <summary>
-            Adds the given <paramref name="factory"/> to services.
-            It will be used for configuring the <see cref="T:Parbad.GatewayProviders.Pasargad.PasargadGatewayOptions"/>.
-            </summary>
-            <param name="builder"></param>
-            <param name="factory"></param>
-            <param name="serviceLifetime">Lifetime of <paramref name="factory"/>.</param>
-        </member>
-        <member name="M:Parbad.Builder.PasargadGatewayBuilderExtensions.WithConfiguration(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Pasargad.PasargadGateway},Microsoft.Extensions.Configuration.IConfiguration)">
-            <summary>
-            Configures Pasargad gateway by using an <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/>.
-            </summary>
-            <param name="builder"></param>
-            <param name="configuration">The <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/> section.</param>
+            <param name="configureAccounts">Configures the accounts.</param>
         </member>
         <member name="M:Parbad.Builder.SamanGatewayBuilderExtensions.AddSaman(Parbad.GatewayBuilders.IGatewayBuilder)">
             <summary>
@@ -490,37 +329,12 @@
             </summary>
             <param name="builder"></param>
         </member>
-        <member name="M:Parbad.Builder.SamanGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Saman.SamanGateway},System.Action{Parbad.GatewayProviders.Saman.SamanGatewayOptions})">
+        <member name="M:Parbad.Builder.SamanGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Saman.SamanGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.GatewayProviders.Saman.SamanGatewayAccount}})">
             <summary>
-            Configures Saman gateway options.
+            Configures the accounts for <see cref="T:Parbad.GatewayProviders.Saman.SamanGateway"/>.
             </summary>
             <param name="builder"></param>
-            <param name="configureOptions"></param>
-        </member>
-        <member name="M:Parbad.Builder.SamanGatewayBuilderExtensions.WithOptionsProvider``1(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Saman.SamanGateway},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
-            <summary>
-            Adds the given <typeparamref name="TOptionsProvider"/> to services.
-            It will be used for configuring the <see cref="T:Parbad.GatewayProviders.Saman.SamanGatewayOptions"/>.
-            </summary>
-            <typeparam name="TOptionsProvider"></typeparam>
-            <param name="builder"></param>
-            <param name="serviceLifetime">Lifetime of <typeparamref name="TOptionsProvider"/>.</param>
-        </member>
-        <member name="M:Parbad.Builder.SamanGatewayBuilderExtensions.WithOptionsProvider(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Saman.SamanGateway},System.Func{System.IServiceProvider,Parbad.Options.IParbadOptionsProvider{Parbad.GatewayProviders.Saman.SamanGatewayOptions}},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
-            <summary>
-            Adds the given <paramref name="factory"/> to services.
-            It will be used for configuring the <see cref="T:Parbad.GatewayProviders.Saman.SamanGatewayOptions"/>.
-            </summary>
-            <param name="builder"></param>
-            <param name="factory"></param>
-            <param name="serviceLifetime">Lifetime of <paramref name="factory"/>.</param>
-        </member>
-        <member name="M:Parbad.Builder.SamanGatewayBuilderExtensions.WithConfiguration(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.Saman.SamanGateway},Microsoft.Extensions.Configuration.IConfiguration)">
-            <summary>
-            Configures Saman gateway by using an <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/>.
-            </summary>
-            <param name="builder"></param>
-            <param name="configuration">The <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/> section.</param>
+            <param name="configureAccounts">Configures the accounts.</param>
         </member>
         <member name="M:Parbad.Builder.HttpContextBuilderExtensions.ConfigureHttpContext(Parbad.Builder.IParbadBuilder,System.Action{Parbad.Http.IHttpContextBuilder})">
             <summary>
@@ -528,14 +342,6 @@
             </summary>
             <param name="builder"></param>
             <param name="httpContextBuilder">A builder for configuring the HttpContext.</param>
-        </member>
-        <member name="M:Parbad.Builder.OptionsExtensions.ConfigureOptions(Parbad.Builder.IParbadBuilder,System.Action{Parbad.Options.IParbadOptionsBuilder})">
-            <summary>
-            Configures the options required by Parbad to an <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/>.
-            </summary>
-            <param name="builder"></param>
-            <param name="optionsBuilder">A builder for configuring the options.</param>
-            <returns></returns>
         </member>
         <member name="M:Parbad.Builder.PaymentTokenProviderExtensions.ConfigurePaymentToken(Parbad.Builder.IParbadBuilder,System.Action{Parbad.PaymentTokenProviders.IPaymentTokenBuilder})">
             <summary>
@@ -678,6 +484,65 @@
             Online payment providers.
             </summary>
         </member>
+        <member name="M:Parbad.GatewayBuilders.GatewayAccountCollectionExtensions.GetOrDefault``1(Parbad.GatewayBuilders.IGatewayAccountCollection{``0},System.String)">
+            <summary>
+            Gets an account with the given name.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="accounts"></param>
+            <param name="accountName"></param>
+            <exception cref="T:System.Exception"></exception>
+        </member>
+        <member name="T:Parbad.GatewayBuilders.IGatewayAccountBuilder`1">
+            <summary>
+            A builder for building gateway accounts.
+            </summary>
+            <typeparam name="TAccount">Type of the gateway account.</typeparam>
+        </member>
+        <member name="P:Parbad.GatewayBuilders.IGatewayAccountBuilder`1.Services">
+            <summary>
+            Specifies the contract for a collection of service descriptors.
+            </summary>
+        </member>
+        <member name="M:Parbad.GatewayBuilders.IGatewayAccountBuilder`1.Add(Parbad.GatewayBuilders.IGatewayAccountSource{`0})">
+            <summary>
+            Adds the given <paramref name="source"/> for specifying the accounts of type <typeparamref name="TAccount"/>.
+            </summary>
+            <param name="source">An account source for specifying the accounts.</param>
+        </member>
+        <member name="M:Parbad.GatewayBuilders.IGatewayAccountBuilder`1.Add``1(Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds the given <typeparamref name="TSource"/> for specifying the accounts of type <typeparamref name="TAccount"/>.
+            </summary>
+            <typeparam name="TSource">Type of the account source.</typeparam>
+            <param name="serviceLifetime">Lifetime of <typeparamref name="TSource"></typeparamref>.</param>
+        </member>
+        <member name="M:Parbad.GatewayBuilders.IGatewayAccountBuilder`1.Add(System.Func{System.IServiceProvider,Parbad.GatewayBuilders.IGatewayAccountSource{`0}},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds the given account source factory for specifying the accounts of type <typeparamref name="TAccount"/>.
+            </summary>
+            <param name="factory">A factory for creating an instance of <see cref="T:Parbad.GatewayBuilders.IGatewayAccountSource`1"/>.</param>
+            <param name="serviceLifetime">Lifetime of the given source.</param>
+        </member>
+        <member name="T:Parbad.GatewayBuilders.IGatewayAccountCollection`1">
+            <summary>
+            A collection for holding gateway accounts.
+            </summary>
+            <typeparam name="TAccount">Type of account.</typeparam>
+            <exception cref="T:Parbad.Exceptions.DuplicateAccountException"></exception>
+        </member>
+        <member name="M:Parbad.GatewayBuilders.IGatewayAccountCollection`1.Get(System.String)">
+            <summary>
+            Gets an account with the given <paramref name="name"/>.
+            </summary>
+            <param name="name">Name of account.</param>
+        </member>
+        <member name="M:Parbad.GatewayBuilders.IGatewayAccountCollection`1.GetDefaultAccount">
+            <summary>
+            Gets the default account.
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:Parbad.GatewayBuilders.IGatewayBuilder">
             <summary>
             A builder for building a gateway.
@@ -707,6 +572,13 @@
             Specifies the contract for a collection of service descriptors.
             </summary>
         </member>
+        <member name="M:Parbad.GatewayBuilders.IGatewayConfigurationBuilder`1.WithAccounts``1(System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{``0}})">
+            <summary>
+            Configures the accounts of type <typeparamref name="TAccount"/> for <typeparamref name="TGateway"/>.
+            </summary>
+            <typeparam name="TAccount">Account of <typeparamref name="TGateway"/>.</typeparam>
+            <param name="configureAccounts">Configures the accounts.</param>
+        </member>
         <member name="M:Parbad.GatewayBuilders.IGatewayConfigurationBuilder`1.WithOptions``1(System.Action{``0})">
             <summary>
             Adds the configured options to Parbad services.
@@ -720,6 +592,24 @@
             for sending HTTP requests and receiving HTTP responses.
             </summary>
             <param name="configureHttpClient">HttpClient configuration.</param>
+        </member>
+        <member name="F:Parbad.GatewayAccountInvoiceExtensions.GatewayAccountKeyName">
+            <summary>
+            Gateway Account key in <see cref="P:Parbad.Abstraction.Invoice.AdditionalData"/> property.
+            </summary>
+        </member>
+        <member name="M:Parbad.GatewayAccountInvoiceExtensions.UseAccount(Parbad.InvoiceBuilder.IInvoiceBuilder,System.String)">
+            <summary>
+            Uses the given account to communicate with the gateway.
+            </summary>
+            <param name="builder"></param>
+            <param name="accountName">Name of the account.</param>
+        </member>
+        <member name="M:Parbad.GatewayAccountInvoiceExtensions.GetAccountName(Parbad.Abstraction.Invoice)">
+            <summary>
+            Gets the account name if specified.
+            </summary>
+            <param name="invoice"></param>
         </member>
         <member name="M:Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
@@ -740,14 +630,60 @@
             Equals to TransactionCode in Parbad system.
             </summary>
         </member>
-        <member name="T:Parbad.GatewayProviders.IranKish.IranKishGatewayOptions">
+        <member name="M:Parbad.GatewayProviders.IranKish.IranKishGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.GatewayProviders.IranKish.IranKishGateway.VerifyAsync(Parbad.Data.Domain.Payments.Payment,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.GatewayProviders.IranKish.IranKishGateway.RefundAsync(Parbad.Data.Domain.Payments.Payment,Parbad.Money,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:Parbad.GatewayProviders.IranKish.IranKishGatewayAccount">
             <summary>
-            IranKish gateway options
+            IranKish gateway account.
             </summary>
         </member>
-        <member name="P:Parbad.GatewayProviders.Mellat.MellatGatewayOptions.UseTestTerminal">
+        <member name="M:Parbad.GatewayProviders.Mellat.MellatGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.GatewayProviders.Mellat.MellatGateway.VerifyAsync(Parbad.Data.Domain.Payments.Payment,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.GatewayProviders.Mellat.MellatGateway.RefundAsync(Parbad.Data.Domain.Payments.Payment,Parbad.Money,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="P:Parbad.GatewayProviders.Mellat.MellatGatewayAccount.IsTestTerminal">
             <summary>
-            Requests will be sent to the test terminal gateway of Mellat.
+            The requests will be sent to the test terminal of Mellat Gateway.
+            </summary>
+        </member>
+        <member name="T:Parbad.GatewayProviders.Melli.MelliGateway">
+            <summary>
+            Melli Gateway.
+            </summary>
+        </member>
+        <member name="M:Parbad.GatewayProviders.Melli.MelliGateway.#ctor(Microsoft.AspNetCore.Http.IHttpContextAccessor,System.Net.Http.IHttpClientFactory,Parbad.GatewayBuilders.IGatewayAccountProvider{Parbad.GatewayProviders.Melli.MelliGatewayAccount},Microsoft.Extensions.Options.IOptions{Parbad.Options.MessagesOptions})">
+            <summary>
+            Initializes an instance of <see cref="T:Parbad.GatewayProviders.Melli.MelliGateway"/>.
+            </summary>
+            <param name="httpContextAccessor"></param>
+            <param name="httpClientFactory"></param>
+            <param name="accountProvider"></param>
+            <param name="messageOptions"></param>
+        </member>
+        <member name="M:Parbad.GatewayProviders.Melli.MelliGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.GatewayProviders.Melli.MelliGateway.VerifyAsync(Parbad.Data.Domain.Payments.Payment,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.GatewayProviders.Melli.MelliGateway.RefundAsync(Parbad.Data.Domain.Payments.Payment,Parbad.Money,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:Parbad.GatewayProviders.Melli.MelliGatewayAccount">
+            <summary>
+            Melli Gateway options class.
             </summary>
         </member>
         <member name="T:Parbad.GatewayProviders.Melli.MelliGatewayDataSigningException">
@@ -760,11 +696,6 @@
             Initializes a new instance of the Parbad.Providers.Melli.MelliGatewayDataSigningException class.
             </summary>
             <param name="mainException">The main Exception object.</param>
-        </member>
-        <member name="T:Parbad.GatewayProviders.Melli.MelliGatewayOptions">
-            <summary>
-            Melli Gateway options class.
-            </summary>
         </member>
         <member name="T:Parbad.GatewayProviders.Melli.ResultTranslator.MelliRequestResponseCodes">
             <summary>
@@ -1049,6 +980,15 @@
             تراکنش در سیستم وجود ندارد..
              </summary>
         </member>
+        <member name="M:Parbad.GatewayProviders.ParbadVirtual.ParbadVirtualGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.GatewayProviders.ParbadVirtual.ParbadVirtualGateway.VerifyAsync(Parbad.Data.Domain.Payments.Payment,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.GatewayProviders.ParbadVirtual.ParbadVirtualGateway.RefundAsync(Parbad.Data.Domain.Payments.Payment,Parbad.Money,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
         <member name="P:Parbad.GatewayProviders.ParbadVirtual.ParbadVirtualGatewayOptions.GatewayPath">
             <summary>
             Path of Virtual Gateway. It would be like: /MyParbadGateway
@@ -1058,6 +998,15 @@
             <summary>
             Equals to TransactionCode in Parbad system.
             </summary>
+        </member>
+        <member name="M:Parbad.GatewayProviders.Parsian.ParsianGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.GatewayProviders.Parsian.ParsianGateway.VerifyAsync(Parbad.Data.Domain.Payments.Payment,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.GatewayProviders.Parsian.ParsianGateway.RefundAsync(Parbad.Data.Domain.Payments.Payment,Parbad.Money,System.Threading.CancellationToken)">
+            <inheritdoc />
         </member>
         <member name="P:Parbad.GatewayProviders.Pasargad.Models.PasargadCallbackResult.InvoiceNumber">
             <summary>
@@ -1183,24 +1132,6 @@
         <member name="M:Parbad.Internal.GatewayBuilder.AddGateway``1(System.Uri,Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
             <inheritdoc />
         </member>
-        <member name="T:Parbad.Internal.GatewayConfigurationBuilder`1">
-            <inheritdoc />
-        </member>
-        <member name="M:Parbad.Internal.GatewayConfigurationBuilder`1.#ctor(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
-            <summary>
-            Initializes an instance of <see cref="T:Parbad.Internal.GatewayConfigurationBuilder`1"/>.
-            </summary>
-            <param name="services"></param>
-        </member>
-        <member name="P:Parbad.Internal.GatewayConfigurationBuilder`1.Services">
-            <inheritdoc />
-        </member>
-        <member name="M:Parbad.Internal.GatewayConfigurationBuilder`1.WithOptions``1(System.Action{``0})">
-            <inheritdoc />
-        </member>
-        <member name="M:Parbad.Internal.GatewayConfigurationBuilder`1.WithHttpClient(System.Action{Microsoft.Extensions.DependencyInjection.IHttpClientBuilder})">
-            <inheritdoc />
-        </member>
         <member name="M:Parbad.Internal.GatewayHelper.IsGateway(System.Type,System.Boolean)">
             <summary>
             
@@ -1238,6 +1169,20 @@
             <exception cref="T:Parbad.Exceptions.GatewayNotFoundException"></exception>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
+        <member name="T:Parbad.Internal.InMemoryGatewayAccountSource`1">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Internal.InMemoryGatewayAccountSource`1.#ctor(System.Collections.Generic.IEnumerable{`0})">
+            <inheritdoc />
+        </member>
+        <member name="P:Parbad.Internal.InMemoryGatewayAccountSource`1.InMemoryAccounts">
+            <summary>
+            Accounts.
+            </summary>
+        </member>
+        <member name="M:Parbad.Internal.InMemoryGatewayAccountSource`1.AddAccountsAsync(Parbad.GatewayBuilders.IGatewayAccountCollection{`0})">
+            <inheritdoc />
+        </member>
         <member name="T:Parbad.Internal.OnlinePaymentAccessor">
             <inheritdoc />
         </member>
@@ -1253,22 +1198,33 @@
         <member name="P:Parbad.Internal.OnlinePaymentAccessor.OnlinePayment">
             <inheritdoc />
         </member>
-        <member name="T:Parbad.Internal.ParbadOptionsBuilder">
+        <member name="T:Parbad.Internal.PaymentResult">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.Internal.ParbadOptionsBuilder.#ctor(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+        <member name="M:Parbad.Internal.PaymentResult.#ctor">
             <summary>
-            Initializes an instance of <see cref="T:Parbad.Internal.ParbadOptionsBuilder"/>.
+            Initializes an instance of <see cref="T:Parbad.Internal.PaymentResult"/>.
             </summary>
-            <param name="services"></param>
         </member>
-        <member name="P:Parbad.Internal.ParbadOptionsBuilder.Services">
+        <member name="P:Parbad.Internal.PaymentResult.TrackingNumber">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.Internal.ParbadOptionsBuilder.AddOptionsUsingProvider``2(Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+        <member name="P:Parbad.Internal.PaymentResult.Amount">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.Internal.ParbadOptionsBuilder.AddOptionsUsingProvider``1(System.Func{System.IServiceProvider,Parbad.Options.IParbadOptionsProvider{``0}},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+        <member name="P:Parbad.Internal.PaymentResult.IsSucceed">
+            <inheritdoc />
+        </member>
+        <member name="P:Parbad.Internal.PaymentResult.GatewayName">
+            <inheritdoc />
+        </member>
+        <member name="P:Parbad.Internal.PaymentResult.GatewayAccountName">
+            <inheritdoc />
+        </member>
+        <member name="P:Parbad.Internal.PaymentResult.Message">
+            <inheritdoc />
+        </member>
+        <member name="P:Parbad.Internal.PaymentResult.AdditionalData">
             <inheritdoc />
         </member>
         <member name="T:Parbad.Internal.PaymentTokenBuilder">
@@ -1516,6 +1472,11 @@
             Name of the gateway which the client has paid the payment in.
             </summary>
         </member>
+        <member name="P:Parbad.IPaymentResult.GatewayAccountName">
+            <summary>
+            Name of the gateway account.
+            </summary>
+        </member>
         <member name="P:Parbad.IPaymentResult.Message">
             <summary>
             A short message about the operation.
@@ -1705,46 +1666,6 @@
             <param name="onlinePayment"></param>
             <param name="verifyResult"></param>
             <param name="cancellationToken"></param>
-        </member>
-        <member name="T:Parbad.Options.IParbadOptionsBuilder">
-            <summary>
-            A builder for building Parbad options.
-            </summary>
-        </member>
-        <member name="P:Parbad.Options.IParbadOptionsBuilder.Services">
-            <summary>
-            Specifies the contract for a collection of service descriptors.
-            </summary>
-        </member>
-        <member name="M:Parbad.Options.IParbadOptionsBuilder.AddOptionsUsingProvider``2(Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
-            <summary>
-            Adds the given <see cref="T:Parbad.Options.IParbadOptionsProvider`1"/> to <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/>.
-            It will be used for configuring the specified option.
-            </summary>
-            <typeparam name="TOptions"></typeparam>
-            <typeparam name="TOptionsProvider"></typeparam>
-            <param name="optionsProviderServiceLifetime"></param>
-        </member>
-        <member name="M:Parbad.Options.IParbadOptionsBuilder.AddOptionsUsingProvider``1(System.Func{System.IServiceProvider,Parbad.Options.IParbadOptionsProvider{``0}},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
-            <summary>
-            Adds the given <see cref="T:Parbad.Options.IParbadOptionsProvider`1"/> to <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/>.
-            It will be used for configuring the specified option.
-            </summary>
-            <typeparam name="TOptions"></typeparam>
-            <param name="optionsProviderFactory"></param>
-            <param name="optionsProviderServiceLifetime"></param>
-        </member>
-        <member name="T:Parbad.Options.IParbadOptionsProvider`1">
-            <summary>
-            Defines a mechanism for providing and configuring an option.
-            </summary>
-            <typeparam name="TOptions"></typeparam>
-        </member>
-        <member name="M:Parbad.Options.IParbadOptionsProvider`1.Provide(`0)">
-            <summary>
-            Configures the given <paramref name="options"/>.
-            </summary>
-            <param name="options"></param>
         </member>
         <member name="T:Parbad.ParbadBuilder">
             <inheritdoc />

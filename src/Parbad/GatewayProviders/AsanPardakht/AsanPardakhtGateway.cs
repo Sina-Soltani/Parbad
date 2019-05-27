@@ -8,6 +8,7 @@ using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Parbad.GatewayBuilders;
 using Parbad.Internal;
 using Parbad.Properties;
 
@@ -18,7 +19,7 @@ namespace Parbad.GatewayProviders.AsanPardakht
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
-        private readonly IOptions<AsanPardakhtGatewayOptions> _options;
+        private readonly IGatewayAccountProvider<AsanPardakhtGatewayAccount> _accountProvider;
         private readonly IOptions<MessagesOptions> _messageOptions;
 
         public const string Name = "AsanPardakht";
@@ -26,12 +27,12 @@ namespace Parbad.GatewayProviders.AsanPardakht
         public AsanPardakhtGateway(
             IHttpContextAccessor httpContextAccessor,
             IHttpClientFactory httpClientFactory,
-            IOptions<AsanPardakhtGatewayOptions> options,
+            IGatewayAccountProvider<AsanPardakhtGatewayAccount> accountProvider,
             IOptions<MessagesOptions> messageOptions)
         {
             _httpContextAccessor = httpContextAccessor;
             _httpClient = httpClientFactory.CreateClient(this);
-            _options = options;
+            _accountProvider = accountProvider;
             _messageOptions = messageOptions;
         }
 
@@ -40,7 +41,9 @@ namespace Parbad.GatewayProviders.AsanPardakht
         {
             if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-            var data = AsanPardakhtHelper.CreateRequestData(invoice, _options.Value);
+            var account = await GetAccountAsync(invoice.GetAccountName()).ConfigureAwaitFalse();
+
+            var data = AsanPardakhtHelper.CreateRequestData(invoice, account);
 
             var responseMessage = await _httpClient
                 .PostXmlAsync(AsanPardakhtHelper.BaseServiceUrl, data, cancellationToken)
@@ -48,7 +51,7 @@ namespace Parbad.GatewayProviders.AsanPardakht
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
-            return AsanPardakhtHelper.CreateRequestResult(response, invoice, _options.Value, _httpContextAccessor, _messageOptions.Value);
+            return AsanPardakhtHelper.CreateRequestResult(response, invoice, account, _httpContextAccessor, _messageOptions.Value);
         }
 
         /// <inheritdoc />
@@ -56,9 +59,11 @@ namespace Parbad.GatewayProviders.AsanPardakht
         {
             if (payment == null) throw new ArgumentNullException(nameof(payment));
 
+            var account = await GetAccountAsync(payment.GatewayAccountName).ConfigureAwaitFalse();
+
             var callbackResult = AsanPardakhtHelper.CreateCallbackResult(
                 payment,
-                _options.Value,
+                account,
                 _httpContextAccessor.HttpContext.Request,
                 _messageOptions.Value);
 
@@ -67,7 +72,7 @@ namespace Parbad.GatewayProviders.AsanPardakht
                 return callbackResult.Result;
             }
 
-            var data = AsanPardakhtHelper.CreateVerifyData(callbackResult, _options.Value);
+            var data = AsanPardakhtHelper.CreateVerifyData(callbackResult, account);
 
             var responseMessage = await _httpClient
                 .PostXmlAsync(AsanPardakhtHelper.BaseServiceUrl, data, cancellationToken)
@@ -82,7 +87,7 @@ namespace Parbad.GatewayProviders.AsanPardakht
                 return verifyResult.Result;
             }
 
-            data = AsanPardakhtHelper.CreateSettleData(callbackResult, _options.Value);
+            data = AsanPardakhtHelper.CreateSettleData(callbackResult, account);
 
             responseMessage = await _httpClient
                 .PostXmlAsync(AsanPardakhtHelper.BaseServiceUrl, data, cancellationToken)
@@ -97,6 +102,13 @@ namespace Parbad.GatewayProviders.AsanPardakht
         public Task<IPaymentRefundResult> RefundAsync(Payment payment, Money amount, CancellationToken cancellationToken = default)
         {
             return PaymentRefundResult.Failed(Resources.RefundNotSupports).ToInterfaceAsync();
+        }
+
+        private async Task<AsanPardakhtGatewayAccount> GetAccountAsync(string accountName)
+        {
+            var accounts = await _accountProvider.LoadAccountsAsync();
+
+            return accounts.GetOrDefault(accountName);
         }
     }
 }

@@ -8,7 +8,7 @@ using Parbad.Data.Domain.Payments;
 namespace Parbad.Abstraction
 {
     /// <summary>
-    /// 
+    /// Represents a gateway (Bank).
     /// </summary>
     public interface IGateway
     {
@@ -32,7 +32,6 @@ namespace Parbad.Abstraction
         /// <param name="payment"></param>
         /// <param name="amount"></param>
         /// <param name="cancellationToken"></param>
-        /// <returns></returns>
         Task<IPaymentRefundResult> RefundAsync(Payment payment, Money amount, CancellationToken cancellationToken = default);
     }
 }
