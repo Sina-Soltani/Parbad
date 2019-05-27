@@ -297,6 +297,13 @@
             <param name="builder"></param>
             <param name="configureAccounts">Configures the accounts.</param>
         </member>
+        <member name="M:Parbad.Builder.ParbadVirtualGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.GatewayProviders.ParbadVirtual.ParbadVirtualGateway},System.Action{Parbad.GatewayProviders.ParbadVirtual.ParbadVirtualGatewayOptions})">
+            <summary>
+            Configures Parbad Virtual gateway options.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureOptions"></param>
+        </member>
         <member name="M:Parbad.Builder.ParsianGatewayBuilderExtensions.AddParsian(Parbad.GatewayBuilders.IGatewayBuilder)">
             <summary>
             Adds Parsian gateway to Parbad services.
@@ -578,13 +585,6 @@
             </summary>
             <typeparam name="TAccount">Account of <typeparamref name="TGateway"/>.</typeparam>
             <param name="configureAccounts">Configures the accounts.</param>
-        </member>
-        <member name="M:Parbad.GatewayBuilders.IGatewayConfigurationBuilder`1.WithOptions``1(System.Action{``0})">
-            <summary>
-            Adds the configured options to Parbad services.
-            </summary>
-            <typeparam name="TOptions"></typeparam>
-            <param name="configureOptions"></param>
         </member>
         <member name="M:Parbad.GatewayBuilders.IGatewayConfigurationBuilder`1.WithHttpClient(System.Action{Microsoft.Extensions.DependencyInjection.IHttpClientBuilder})">
             <summary>

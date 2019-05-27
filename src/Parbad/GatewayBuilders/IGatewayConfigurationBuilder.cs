@@ -29,14 +29,6 @@ namespace Parbad.GatewayBuilders
             where TAccount : GatewayAccount, new();
 
         /// <summary>
-        /// Adds the configured options to Parbad services.
-        /// </summary>
-        /// <typeparam name="TOptions"></typeparam>
-        /// <param name="configureOptions"></param>
-        [Obsolete("This is obsolete and will be removed in a future version. Use the WithAccount method instead.")]
-        IGatewayConfigurationBuilder<TGateway> WithOptions<TOptions>(Action<TOptions> configureOptions) where TOptions : class, new();
-
-        /// <summary>
         /// Configures the <see cref="HttpClient"/> required by <typeparamref name="TGateway"/>
         /// for sending HTTP requests and receiving HTTP responses.
         /// </summary>

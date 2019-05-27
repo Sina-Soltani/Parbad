@@ -30,8 +30,8 @@ namespace Parbad.Sample.Mvc
                             });
 
                         gateways
-                            .AddParbadVirtual();
-                        //.WithOptions(options => options.GatewayPath = "/MyVirtualGateway");
+                            .AddParbadVirtual()
+                            .WithOptions(options => options.GatewayPath = "/MyVirtualGateway");
                     })
                     .ConfigureHttpContext(builder => builder.UseOwinFromCurrentHttpContext())
                     .ConfigureDatabase(builder =>

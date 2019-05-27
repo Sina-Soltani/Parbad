@@ -2,6 +2,7 @@
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
 using System;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Parbad.GatewayBuilders;
 using Parbad.GatewayProviders.ParbadVirtual;
@@ -47,6 +48,22 @@ namespace Parbad.Builder
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
             return builder.WithAccounts(configureAccounts);
+        }
+
+        /// <summary>
+        /// Configures Parbad Virtual gateway options.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="configureOptions"></param>
+        public static IGatewayConfigurationBuilder<ParbadVirtualGateway> WithOptions(
+            this IGatewayConfigurationBuilder<ParbadVirtualGateway> builder,
+            Action<ParbadVirtualGatewayOptions> configureOptions)
+        {
+            if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+            builder.Services.Configure(configureOptions);
+
+            return builder;
         }
     }
 }

@@ -36,8 +36,8 @@ namespace Parbad.Sample.AspNetCore
                         });
 
                     gateways
-                        .AddParbadVirtual();
-                    //.WithOptions(options => options.GatewayPath = "/MyVirtualGateway");
+                        .AddParbadVirtual()
+                        .WithOptions(options => options.GatewayPath = "/MyVirtualGateway");
                 })
                 .ConfigureHttpContext(builder => builder.UseDefaultAspNetCore())
                 .ConfigureDatabase(builder =>
