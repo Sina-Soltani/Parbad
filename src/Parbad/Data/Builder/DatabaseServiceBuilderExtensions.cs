@@ -100,42 +100,5 @@ namespace Parbad.Builder
         {
             return builder.MigrationsAssembly("Parbad");
         }
-
-        /// <summary>
-        /// Configures the storage required by Parbad to save and load the data.
-        /// Note: It uses Microsoft.EntityFrameworkCore as storage, which means you can save your data
-        /// in different database providers such as SQL Server, MySql, Sqlite, PostgreSQL, Oracle, InMemory, etc.
-        /// <para>For more information see: https://docs.microsoft.com/en-us/ef/core/providers/.</para>
-        /// <para>Note: This method is deprecated. Use ConfigureDatabase instead.</para>
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="storageBuilder"></param>
-        [Obsolete("Use ConfigureDatabase method instead.")]
-        public static IParbadBuilder ConfigureStorage(this IParbadBuilder builder, Action<DbContextOptionsBuilder> storageBuilder)
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-            if (storageBuilder == null) throw new ArgumentNullException(nameof(storageBuilder));
-
-            return builder.ConfigureDatabase(storageBuilder);
-        }
-
-        /// <summary>
-        /// Configures the context to connect to a Microsoft SQL Server database.
-        /// It also creates and migrates the database.
-        /// <para>Note: This method is deprecated. Use ConfigureDatabase and ConfigureDatabaseInitializer instead.</para>
-        /// </summary>
-        /// <param name="builder">The builder being used to configure the context.</param>
-        /// <param name="connectionString">The connection string of the database to connect to.</param>
-        [Obsolete("Use ConfigureDatabase and ConfigureDatabaseInitializer instead.")]
-        public static DbContextOptionsBuilder UseParbadSqlServer(this DbContextOptionsBuilder builder,
-            string connectionString)
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-            if (connectionString == null) throw new ArgumentNullException(nameof(connectionString));
-
-            builder.UseSqlServer(connectionString, optionsBuilder => optionsBuilder.UseParbadMigrations());
-
-            return builder;
-        }
     }
 }

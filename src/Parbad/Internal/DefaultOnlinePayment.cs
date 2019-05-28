@@ -135,24 +135,13 @@ namespace Parbad.Internal
             }
             catch (Exception exception)
             {
-                string exceptionMessage;
-
-                if (exception is OptionsValidationException)
-                {
-                    exceptionMessage = $"Gateway {gateway.GetName()} is not configured or has some validation errors.";
-                }
-                else
-                {
-                    exceptionMessage = exception.Message;
-                }
-
-                _logger.LogError(exception, exceptionMessage);
+                _logger.LogError(exception, exception.Message);
 
                 newPayment.IsCompleted = true;
                 newPayment.IsPaid = false;
                 newPayment.UpdatedOn = DateTime.UtcNow;
 
-                requestResult = PaymentRequestResult.Failed(exceptionMessage);
+                requestResult = PaymentRequestResult.Failed(exception.Message);
             }
 
             requestResult.TrackingNumber = invoice.TrackingNumber;
@@ -281,10 +270,6 @@ namespace Parbad.Internal
                     .VerifyAsync(payment, cancellationToken)
                     .ConfigureAwaitFalse() as PaymentVerifyResult;
             }
-            catch (OptionsValidationException)
-            {
-                throw new GatewayOptionsConfigurationException(gateway.GetName());
-            }
             catch (Exception exception)
             {
                 _logger.LogError(exception, "Parbad exception. An error occurred during requesting.");
@@ -384,10 +369,6 @@ namespace Parbad.Internal
                 refundResult = await gateway
                     .RefundAsync(payment, amountToRefund, cancellationToken)
                     .ConfigureAwaitFalse() as PaymentRefundResult;
-            }
-            catch (OptionsValidationException)
-            {
-                throw new GatewayOptionsConfigurationException(gateway.GetName());
             }
             catch (Exception exception)
             {

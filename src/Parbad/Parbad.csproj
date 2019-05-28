@@ -44,7 +44,6 @@ More information: https://github.com/Sina-Soltani/Parbad
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Http" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="2.2.0" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.1" />
   </ItemGroup>
 
