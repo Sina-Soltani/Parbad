@@ -159,6 +159,7 @@ namespace Parbad.Internal
             requestResult.Amount = invoice.Amount;
             requestResult.GatewayName = gateway.GetName();
 
+            newPayment.GatewayAccountName = requestResult.GatewayAccountName;
             newPayment.Transactions.Add(new Transaction
             {
                 Amount = invoice.Amount,

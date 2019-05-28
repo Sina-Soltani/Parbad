@@ -15,11 +15,10 @@ using Parbad.Properties;
 namespace Parbad.GatewayProviders.AsanPardakht
 {
     [Gateway(Name)]
-    public class AsanPardakhtGateway : IGateway
+    public class AsanPardakhtGateway : Gateway<AsanPardakhtGatewayAccount>
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
-        private readonly IGatewayAccountProvider<AsanPardakhtGatewayAccount> _accountProvider;
         private readonly IOptions<MessagesOptions> _messageOptions;
 
         public const string Name = "AsanPardakht";
@@ -28,20 +27,19 @@ namespace Parbad.GatewayProviders.AsanPardakht
             IHttpContextAccessor httpContextAccessor,
             IHttpClientFactory httpClientFactory,
             IGatewayAccountProvider<AsanPardakhtGatewayAccount> accountProvider,
-            IOptions<MessagesOptions> messageOptions)
+            IOptions<MessagesOptions> messageOptions) : base(accountProvider)
         {
             _httpContextAccessor = httpContextAccessor;
             _httpClient = httpClientFactory.CreateClient(this);
-            _accountProvider = accountProvider;
             _messageOptions = messageOptions;
         }
 
         /// <inheritdoc />
-        public async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
+        public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
         {
             if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-            var account = await GetAccountAsync(invoice.GetAccountName()).ConfigureAwaitFalse();
+            var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
 
             var data = AsanPardakhtHelper.CreateRequestData(invoice, account);
 
@@ -55,11 +53,11 @@ namespace Parbad.GatewayProviders.AsanPardakht
         }
 
         /// <inheritdoc />
-        public async Task<IPaymentVerifyResult> VerifyAsync(Payment payment, CancellationToken cancellationToken = default)
+        public override async Task<IPaymentVerifyResult> VerifyAsync(Payment payment, CancellationToken cancellationToken = default)
         {
             if (payment == null) throw new ArgumentNullException(nameof(payment));
 
-            var account = await GetAccountAsync(payment.GatewayAccountName).ConfigureAwaitFalse();
+            var account = await GetAccountAsync(payment).ConfigureAwaitFalse();
 
             var callbackResult = AsanPardakhtHelper.CreateCallbackResult(
                 payment,
@@ -99,16 +97,9 @@ namespace Parbad.GatewayProviders.AsanPardakht
         }
 
         /// <inheritdoc />
-        public Task<IPaymentRefundResult> RefundAsync(Payment payment, Money amount, CancellationToken cancellationToken = default)
+        public override Task<IPaymentRefundResult> RefundAsync(Payment payment, Money amount, CancellationToken cancellationToken = default)
         {
             return PaymentRefundResult.Failed(Resources.RefundNotSupports).ToInterfaceAsync();
-        }
-
-        private async Task<AsanPardakhtGatewayAccount> GetAccountAsync(string accountName)
-        {
-            var accounts = await _accountProvider.LoadAccountsAsync();
-
-            return accounts.GetOrDefault(accountName);
         }
     }
 }

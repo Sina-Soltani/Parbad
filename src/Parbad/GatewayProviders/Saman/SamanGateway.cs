@@ -17,11 +17,10 @@ using Parbad.Options;
 namespace Parbad.GatewayProviders.Saman
 {
     [Gateway(Name)]
-    public class SamanGateway : IGateway
+    public class SamanGateway : Gateway<SamanGatewayAccount>
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
-        private readonly IGatewayAccountProvider<SamanGatewayAccount> _accountProvider;
         private readonly IOptions<MessagesOptions> _messageOptions;
 
         public const string Name = "Saman";
@@ -30,24 +29,25 @@ namespace Parbad.GatewayProviders.Saman
             IHttpContextAccessor httpContextAccessor,
             IHttpClientFactory httpClientFactory,
             IGatewayAccountProvider<SamanGatewayAccount> accountProvider,
-            IOptions<MessagesOptions> messageOptions)
+            IOptions<MessagesOptions> messageOptions) : base(accountProvider)
         {
             _httpContextAccessor = httpContextAccessor;
             _httpClient = httpClientFactory.CreateClient(this);
-            _accountProvider = accountProvider;
             _messageOptions = messageOptions;
         }
 
-        public virtual async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
+        /// <inheritdoc />
+        public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
         {
             if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-            var account = await GetAccountAsync(invoice.GetAccountName()).ConfigureAwaitFalse();
+            var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
 
             return SamanHelper.CreateRequestResult(invoice, _httpContextAccessor, account);
         }
 
-        public virtual async Task<IPaymentVerifyResult> VerifyAsync(Payment payment, CancellationToken cancellationToken = default)
+        /// <inheritdoc />
+        public override async Task<IPaymentVerifyResult> VerifyAsync(Payment payment, CancellationToken cancellationToken = default)
         {
             if (payment == null) throw new ArgumentNullException(nameof(payment));
 
@@ -58,7 +58,7 @@ namespace Parbad.GatewayProviders.Saman
                 return callbackResult.Result;
             }
 
-            var account = await GetAccountAsync(payment.GatewayAccountName).ConfigureAwaitFalse();
+            var account = await GetAccountAsync(payment).ConfigureAwaitFalse();
 
             var data = SamanHelper.CreateVerifyData(callbackResult, account);
 
@@ -71,12 +71,13 @@ namespace Parbad.GatewayProviders.Saman
             return SamanHelper.CreateVerifyResult(response, payment, callbackResult, _messageOptions.Value);
         }
 
-        public virtual async Task<IPaymentRefundResult> RefundAsync(Payment payment, Money amount, CancellationToken cancellationToken = default)
+        /// <inheritdoc />
+        public override async Task<IPaymentRefundResult> RefundAsync(Payment payment, Money amount, CancellationToken cancellationToken = default)
         {
             if (payment == null) throw new ArgumentNullException(nameof(payment));
             if (amount == null) throw new ArgumentNullException(nameof(amount));
 
-            var account = await GetAccountAsync(payment.GatewayAccountName).ConfigureAwaitFalse();
+            var account = await GetAccountAsync(payment).ConfigureAwaitFalse();
 
             var data = SamanHelper.CreateRefundData(payment, amount, account);
 
@@ -87,13 +88,6 @@ namespace Parbad.GatewayProviders.Saman
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
             return SamanHelper.CreateRefundResult(response, _messageOptions.Value);
-        }
-
-        private async Task<SamanGatewayAccount> GetAccountAsync(string accountName)
-        {
-            var accounts = await _accountProvider.LoadAccountsAsync();
-
-            return accounts.GetOrDefault(accountName);
         }
     }
 }

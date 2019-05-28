@@ -17,11 +17,10 @@ using Parbad.Options;
 namespace Parbad.GatewayProviders.Mellat
 {
     [Gateway(Name)]
-    public class MellatGateway : IGateway
+    public class MellatGateway : Gateway<MellatGatewayAccount>
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
-        private readonly IGatewayAccountProvider<MellatGatewayAccount> _accountProvider;
         private readonly IOptions<MessagesOptions> _messagesOptions;
 
         public const string Name = "Mellat";
@@ -30,20 +29,19 @@ namespace Parbad.GatewayProviders.Mellat
             IHttpContextAccessor httpContextAccessor,
             IHttpClientFactory httpClientFactory,
             IGatewayAccountProvider<MellatGatewayAccount> accountProvider,
-            IOptions<MessagesOptions> messagesOptions)
+            IOptions<MessagesOptions> messagesOptions) : base(accountProvider)
         {
             _httpContextAccessor = httpContextAccessor;
             _httpClient = httpClientFactory.CreateClient(this);
-            _accountProvider = accountProvider;
             _messagesOptions = messagesOptions;
         }
 
         /// <inheritdoc />
-        public virtual async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
+        public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
         {
             if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-            var account = await GetAccountAsync(invoice.GetAccountName()).ConfigureAwaitFalse();
+            var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
 
             var data = MellatHelper.CreateRequestData(invoice, account);
 
@@ -57,7 +55,7 @@ namespace Parbad.GatewayProviders.Mellat
         }
 
         /// <inheritdoc />
-        public virtual async Task<IPaymentVerifyResult> VerifyAsync(Payment payment, CancellationToken cancellationToken = default)
+        public override async Task<IPaymentVerifyResult> VerifyAsync(Payment payment, CancellationToken cancellationToken = default)
         {
             if (payment == null) throw new ArgumentNullException(nameof(payment));
 
@@ -68,7 +66,7 @@ namespace Parbad.GatewayProviders.Mellat
                 return callbackResult.Result;
             }
 
-            var account = await GetAccountAsync(payment.GatewayAccountName).ConfigureAwaitFalse();
+            var account = await GetAccountAsync(payment).ConfigureAwaitFalse();
 
             var data = MellatHelper.CreateVerifyData(payment, account, callbackResult);
 
@@ -97,12 +95,12 @@ namespace Parbad.GatewayProviders.Mellat
         }
 
         /// <inheritdoc />
-        public virtual async Task<IPaymentRefundResult> RefundAsync(Payment payment, Money amount, CancellationToken cancellationToken = default)
+        public override async Task<IPaymentRefundResult> RefundAsync(Payment payment, Money amount, CancellationToken cancellationToken = default)
         {
             if (payment == null) throw new ArgumentNullException(nameof(payment));
             if (amount == null) throw new ArgumentNullException(nameof(amount));
 
-            var account = await GetAccountAsync(payment.GatewayAccountName).ConfigureAwaitFalse();
+            var account = await GetAccountAsync(payment).ConfigureAwaitFalse();
 
             var data = MellatHelper.CreateRefundData(payment, account);
 
@@ -113,13 +111,6 @@ namespace Parbad.GatewayProviders.Mellat
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
             return MellatHelper.CreateRefundResult(response, _messagesOptions.Value);
-        }
-
-        private async Task<MellatGatewayAccount> GetAccountAsync(string accountName)
-        {
-            var accounts = await _accountProvider.LoadAccountsAsync();
-
-            return accounts.GetOrDefault(accountName);
         }
     }
 }

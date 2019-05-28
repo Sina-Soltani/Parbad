@@ -17,11 +17,10 @@ using Parbad.Options;
 namespace Parbad.GatewayProviders.Parsian
 {
     [Gateway(Name)]
-    public class ParsianGateway : IGateway
+    public class ParsianGateway : Gateway<ParsianGatewayAccount>
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
-        private readonly IGatewayAccountProvider<ParsianGatewayAccount> _accountProvider;
         private readonly IOptions<MessagesOptions> _messageOptions;
 
         public const string Name = "Parsian";
@@ -30,20 +29,19 @@ namespace Parbad.GatewayProviders.Parsian
             IHttpContextAccessor httpContextAccessor,
             IHttpClientFactory httpClientFactory,
             IGatewayAccountProvider<ParsianGatewayAccount> accountProvider,
-            IOptions<MessagesOptions> messageOptions)
+            IOptions<MessagesOptions> messageOptions) : base(accountProvider)
         {
             _httpContextAccessor = httpContextAccessor;
             _httpClient = httpClientFactory.CreateClient(this);
-            _accountProvider = accountProvider;
             _messageOptions = messageOptions;
         }
 
         /// <inheritdoc />
-        public virtual async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
+        public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
         {
             if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-            var account = await GetAccountAsync(invoice.GetAccountName()).ConfigureAwaitFalse();
+            var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
 
             var data = ParsianHelper.CreateRequestData(account, invoice);
 
@@ -57,7 +55,7 @@ namespace Parbad.GatewayProviders.Parsian
         }
 
         /// <inheritdoc />
-        public virtual async Task<IPaymentVerifyResult> VerifyAsync(Payment payment, CancellationToken cancellationToken = default)
+        public override async Task<IPaymentVerifyResult> VerifyAsync(Payment payment, CancellationToken cancellationToken = default)
         {
             if (payment == null) throw new ArgumentNullException(nameof(payment));
 
@@ -68,7 +66,7 @@ namespace Parbad.GatewayProviders.Parsian
                 return callbackResult.Result;
             }
 
-            var account = await GetAccountAsync(payment.GatewayAccountName).ConfigureAwaitFalse();
+            var account = await GetAccountAsync(payment).ConfigureAwaitFalse();
 
             var data = ParsianHelper.CreateVerifyData(account, callbackResult);
 
@@ -82,11 +80,11 @@ namespace Parbad.GatewayProviders.Parsian
         }
 
         /// <inheritdoc />
-        public virtual async Task<IPaymentRefundResult> RefundAsync(Payment payment, Money amount, CancellationToken cancellationToken = default)
+        public override async Task<IPaymentRefundResult> RefundAsync(Payment payment, Money amount, CancellationToken cancellationToken = default)
         {
             if (payment == null) throw new ArgumentNullException(nameof(payment));
 
-            var account = await GetAccountAsync(payment.GatewayAccountName).ConfigureAwaitFalse();
+            var account = await GetAccountAsync(payment).ConfigureAwaitFalse();
 
             var data = ParsianHelper.CreateRefundData(account, payment, amount);
 
@@ -97,13 +95,6 @@ namespace Parbad.GatewayProviders.Parsian
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
             return ParsianHelper.CreateRefundResult(response, _messageOptions.Value);
-        }
-
-        private async Task<ParsianGatewayAccount> GetAccountAsync(string accountName)
-        {
-            var accounts = await _accountProvider.LoadAccountsAsync();
-
-            return accounts.GetOrDefault(accountName);
         }
     }
 }

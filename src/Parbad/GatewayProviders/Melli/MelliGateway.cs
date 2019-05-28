@@ -24,11 +24,10 @@ namespace Parbad.GatewayProviders.Melli
     /// Melli Gateway.
     /// </summary>
     [Gateway(Name)]
-    public class MelliGateway : IGateway
+    public class MelliGateway : Gateway<MelliGatewayAccount>
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
-        private readonly IGatewayAccountProvider<MelliGatewayAccount> _accountProvider;
         private readonly IOptions<MessagesOptions> _messageOptions;
 
         public const string Name = "Melli";
@@ -44,20 +43,19 @@ namespace Parbad.GatewayProviders.Melli
             IHttpContextAccessor httpContextAccessor,
             IHttpClientFactory httpClientFactory,
             IGatewayAccountProvider<MelliGatewayAccount> accountProvider,
-            IOptions<MessagesOptions> messageOptions)
+            IOptions<MessagesOptions> messageOptions) : base(accountProvider)
         {
             _httpContextAccessor = httpContextAccessor;
             _httpClient = httpClientFactory.CreateClient(this);
-            _accountProvider = accountProvider;
             _messageOptions = messageOptions;
         }
 
         /// <inheritdoc />
-        public virtual async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
+        public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
         {
             if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-            var account = await GetAccountAsync(invoice.GetAccountName()).ConfigureAwaitFalse();
+            var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
 
             var data = MelliHelper.CreateRequestData(invoice, account);
 
@@ -67,11 +65,11 @@ namespace Parbad.GatewayProviders.Melli
         }
 
         /// <inheritdoc />
-        public virtual async Task<IPaymentVerifyResult> VerifyAsync(Payment payment, CancellationToken cancellationToken = default)
+        public override async Task<IPaymentVerifyResult> VerifyAsync(Payment payment, CancellationToken cancellationToken = default)
         {
             if (payment == null) throw new ArgumentNullException(nameof(payment));
 
-            var account = await GetAccountAsync(payment.GatewayAccountName).ConfigureAwaitFalse();
+            var account = await GetAccountAsync(payment).ConfigureAwaitFalse();
 
             var data = MelliHelper.CreateCallbackResult(
                 payment,
@@ -90,7 +88,7 @@ namespace Parbad.GatewayProviders.Melli
         }
 
         /// <inheritdoc />
-        public virtual Task<IPaymentRefundResult> RefundAsync(Payment payment, Money amount, CancellationToken cancellationToken = default)
+        public override Task<IPaymentRefundResult> RefundAsync(Payment payment, Money amount, CancellationToken cancellationToken = default)
         {
             return PaymentRefundResult.Failed(Resources.RefundNotSupports).ToInterfaceAsync();
         }
@@ -102,13 +100,6 @@ namespace Parbad.GatewayProviders.Melli
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
             return JsonConvert.DeserializeObject<T>(response);
-        }
-
-        private async Task<MelliGatewayAccount> GetAccountAsync(string accountName)
-        {
-            var accounts = await _accountProvider.LoadAccountsAsync();
-
-            return accounts.GetOrDefault(accountName);
         }
     }
 }

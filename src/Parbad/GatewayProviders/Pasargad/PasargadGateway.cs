@@ -17,11 +17,10 @@ using Parbad.Options;
 namespace Parbad.GatewayProviders.Pasargad
 {
     [Gateway(Name)]
-    public class PasargadGateway : IGateway
+    public class PasargadGateway : Gateway<PasargadGatewayAccount>
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
-        private readonly IGatewayAccountProvider<PasargadGatewayAccount> _accountProvider;
         private readonly IOptions<MessagesOptions> _messageOptions;
 
         public const string Name = "Pasargad";
@@ -30,24 +29,25 @@ namespace Parbad.GatewayProviders.Pasargad
             IHttpContextAccessor httpContextAccessor,
             IHttpClientFactory httpClientFactory,
             IGatewayAccountProvider<PasargadGatewayAccount> accountProvider,
-            IOptions<MessagesOptions> messageOptions)
+            IOptions<MessagesOptions> messageOptions) : base(accountProvider)
         {
             _httpContextAccessor = httpContextAccessor;
             _httpClient = httpClientFactory.CreateClient(this);
-            _accountProvider = accountProvider;
             _messageOptions = messageOptions;
         }
 
-        public virtual async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
+        /// <inheritdoc />
+        public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
         {
             if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-            var account = await GetAccountAsync(invoice.GetAccountName()).ConfigureAwaitFalse();
+            var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
 
             return PasargadHelper.CreateRequestResult(invoice, _httpContextAccessor, account);
         }
 
-        public virtual async Task<IPaymentVerifyResult> VerifyAsync(Payment payment, CancellationToken cancellationToken = default)
+        /// <inheritdoc />
+        public override async Task<IPaymentVerifyResult> VerifyAsync(Payment payment, CancellationToken cancellationToken = default)
         {
             if (payment == null) throw new ArgumentNullException(nameof(payment));
 
@@ -66,7 +66,7 @@ namespace Parbad.GatewayProviders.Pasargad
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
-            var account = await GetAccountAsync(payment.GatewayAccountName).ConfigureAwaitFalse();
+            var account = await GetAccountAsync(payment).ConfigureAwaitFalse();
 
             var checkCallbackResult = PasargadHelper.CreateCheckCallbackResult(
                 response,
@@ -92,12 +92,13 @@ namespace Parbad.GatewayProviders.Pasargad
             return PasargadHelper.CreateVerifyResult(response, callbackResult, _messageOptions.Value);
         }
 
-        public virtual async Task<IPaymentRefundResult> RefundAsync(Payment payment, Money amount, CancellationToken cancellationToken = default)
+        /// <inheritdoc />
+        public override async Task<IPaymentRefundResult> RefundAsync(Payment payment, Money amount, CancellationToken cancellationToken = default)
         {
             if (payment == null) throw new ArgumentNullException(nameof(payment));
             if (amount == null) throw new ArgumentNullException(nameof(amount));
 
-            var account = await GetAccountAsync(payment.GatewayAccountName).ConfigureAwaitFalse();
+            var account = await GetAccountAsync(payment).ConfigureAwaitFalse();
 
             var data = PasargadHelper.CreateRefundData(payment, amount, account);
 
@@ -110,13 +111,6 @@ namespace Parbad.GatewayProviders.Pasargad
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
             return PasargadHelper.CreateRefundResult(response, _messageOptions.Value);
-        }
-
-        private async Task<PasargadGatewayAccount> GetAccountAsync(string accountName)
-        {
-            var accounts = await _accountProvider.LoadAccountsAsync();
-
-            return accounts.GetOrDefault(accountName);
         }
     }
 }

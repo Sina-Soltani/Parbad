@@ -4,6 +4,18 @@
         <name>Parbad</name>
     </assembly>
     <members>
+        <member name="T:Parbad.Abstraction.Gateway`1">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Abstraction.Gateway`1.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Abstraction.Gateway`1.VerifyAsync(Parbad.Data.Domain.Payments.Payment,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Abstraction.Gateway`1.RefundAsync(Parbad.Data.Domain.Payments.Payment,Parbad.Money,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
         <member name="T:Parbad.Abstraction.GatewayAccount">
             <summary>
             Describes a gateway account.
@@ -114,6 +126,10 @@
             in different database providers such as SQL Server, MySql, Sqlite, PostgreSQL, Oracle, InMemory, etc.
             For more information see: https://docs.microsoft.com/en-us/ef/core/providers/.
             </para>
+            <para>Note: Parbad database is only for internal usages such as saving and loading the payment information.
+            You don't need to think about merging and using this database with your own database.
+            The important payment information such as Tracking Number, Transaction Code, etc. will you get from the result of
+            all payment requests.</para>
             </summary>
             <param name="builder"></param>
             <param name="configureDatabaseBuilder">Configure what database must be used and how it must be created.</param>
@@ -137,7 +153,7 @@
             If you prefer to initialize the Parbad database yourself, then use the UseInitializer method
             and define how the database must be initialized.
             </para>
-            <para>Note: Initializers will be called in order that you specified.</para>
+            <para>Note: Initializer will be called in order that you specified.</para>
             </summary>
             <param name="builder"></param>
             <param name="configureInitializer"></param>
@@ -286,7 +302,7 @@
         </member>
         <member name="M:Parbad.Builder.ParbadVirtualGatewayBuilderExtensions.AddParbadVirtual(Parbad.GatewayBuilders.IGatewayBuilder)">
             <summary>
-            Adds ParbadVirtual gateway to Parbad services.
+            Adds the Parbad Virtual Gateway to Parbad services.
             </summary>
             <param name="builder"></param>
         </member>
@@ -390,7 +406,7 @@
             </summary>
             <param name="builder"></param>
             <param name="configuration">The configuration section for <see cref="T:Parbad.PaymentTokenProviders.QueryStringPaymentTokenOptions"/>.
-            The default key is <see cref="F:Parbad.PaymentTokenProviders.QueryStringPaymentTokenOptions.ConfigurationKey"/></param>
+            The default key is Parbad:PaymentTokenProvider:QueryString</param>
         </member>
         <member name="M:Parbad.Builder.QueryStringPaymentTokenProviderExtensions.GetQueryStringPaymentTokenProviderConfiguration(Microsoft.Extensions.Configuration.IConfiguration)">
             <summary>
@@ -491,14 +507,23 @@
             Online payment providers.
             </summary>
         </member>
-        <member name="M:Parbad.GatewayBuilders.GatewayAccountCollectionExtensions.GetOrDefault``1(Parbad.GatewayBuilders.IGatewayAccountCollection{``0},System.String)">
+        <member name="F:Parbad.GatewayAccountInvoiceExtensions.GatewayAccountKeyName">
             <summary>
-            Gets an account with the given name.
+            Gateway Account key in <see cref="P:Parbad.Abstraction.Invoice.AdditionalData"/> property.
             </summary>
-            <typeparam name="T"></typeparam>
-            <param name="accounts"></param>
-            <param name="accountName"></param>
-            <exception cref="T:System.Exception"></exception>
+        </member>
+        <member name="M:Parbad.GatewayAccountInvoiceExtensions.UseAccount(Parbad.InvoiceBuilder.IInvoiceBuilder,System.String)">
+            <summary>
+            Uses the given account to communicate with the gateway.
+            </summary>
+            <param name="builder"></param>
+            <param name="accountName">Name of the account.</param>
+        </member>
+        <member name="M:Parbad.GatewayAccountInvoiceExtensions.GetAccountName(Parbad.Abstraction.Invoice)">
+            <summary>
+            Gets the account name if specified.
+            </summary>
+            <param name="invoice"></param>
         </member>
         <member name="T:Parbad.GatewayBuilders.IGatewayAccountBuilder`1">
             <summary>
@@ -592,24 +617,6 @@
             for sending HTTP requests and receiving HTTP responses.
             </summary>
             <param name="configureHttpClient">HttpClient configuration.</param>
-        </member>
-        <member name="F:Parbad.GatewayAccountInvoiceExtensions.GatewayAccountKeyName">
-            <summary>
-            Gateway Account key in <see cref="P:Parbad.Abstraction.Invoice.AdditionalData"/> property.
-            </summary>
-        </member>
-        <member name="M:Parbad.GatewayAccountInvoiceExtensions.UseAccount(Parbad.InvoiceBuilder.IInvoiceBuilder,System.String)">
-            <summary>
-            Uses the given account to communicate with the gateway.
-            </summary>
-            <param name="builder"></param>
-            <param name="accountName">Name of the account.</param>
-        </member>
-        <member name="M:Parbad.GatewayAccountInvoiceExtensions.GetAccountName(Parbad.Abstraction.Invoice)">
-            <summary>
-            Gets the account name if specified.
-            </summary>
-            <param name="invoice"></param>
         </member>
         <member name="M:Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
@@ -1012,6 +1019,24 @@
             <summary>
             Equals to ReferenceID in Parbad system.
             </summary>
+        </member>
+        <member name="M:Parbad.GatewayProviders.Pasargad.PasargadGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.GatewayProviders.Pasargad.PasargadGateway.VerifyAsync(Parbad.Data.Domain.Payments.Payment,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.GatewayProviders.Pasargad.PasargadGateway.RefundAsync(Parbad.Data.Domain.Payments.Payment,Parbad.Money,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.GatewayProviders.Saman.SamanGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.GatewayProviders.Saman.SamanGateway.VerifyAsync(Parbad.Data.Domain.Payments.Payment,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.GatewayProviders.Saman.SamanGateway.RefundAsync(Parbad.Data.Domain.Payments.Payment,Parbad.Money,System.Threading.CancellationToken)">
+            <inheritdoc />
         </member>
         <member name="M:Parbad.GatewayTransporterExtensions.Transport(Parbad.IGatewayTransporter)">
             <summary>
@@ -1737,7 +1762,7 @@
         </member>
         <member name="P:Parbad.PaymentTokenProviders.QueryStringPaymentTokenOptions.QueryName">
             <summary>
-            The default value is <see cref="F:Parbad.PaymentTokenProviders.QueryStringPaymentTokenOptions.DefaultQueryName"/>.
+            The default value is "paymentToken".
             </summary>
         </member>
         <member name="T:Parbad.Properties.Resources">
@@ -1784,11 +1809,6 @@
         <member name="P:Parbad.Properties.Resources.RefundNotSupports">
             <summary>
               Looks up a localized string similar to The Refund operation is not supported by this gateway..
-            </summary>
-        </member>
-        <member name="P:Parbad.Properties.Resources.TextFile1">
-            <summary>
-              Looks up a localized string similar to asd.
             </summary>
         </member>
         <member name="P:Parbad.Properties.Resources.VirtualGatewayRequestHtml">
