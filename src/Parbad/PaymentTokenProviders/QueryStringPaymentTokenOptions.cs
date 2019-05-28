@@ -15,7 +15,7 @@ namespace Parbad.PaymentTokenProviders
         public static readonly string DefaultQueryName = "paymentToken";
 
         /// <summary>
-        /// The default value is <see cref="DefaultQueryName"/>.
+        /// The default value is "paymentToken".
         /// </summary>
         public string QueryName { get; set; } = DefaultQueryName;
     }

@@ -20,6 +20,10 @@ namespace Parbad.Builder
         /// in different database providers such as SQL Server, MySql, Sqlite, PostgreSQL, Oracle, InMemory, etc.
         /// For more information see: https://docs.microsoft.com/en-us/ef/core/providers/.
         /// </para>
+        /// <para>Note: Parbad database is only for internal usages such as saving and loading the payment information.
+        /// You don't need to think about merging and using this database with your own database.
+        /// The important payment information such as Tracking Number, Transaction Code, etc. will you get from the result of
+        /// all payment requests.</para>
         /// </summary>
         /// <param name="builder"></param>
         /// <param name="configureDatabaseBuilder">Configure what database must be used and how it must be created.</param>
@@ -52,7 +56,7 @@ namespace Parbad.Builder
         /// If you prefer to initialize the Parbad database yourself, then use the UseInitializer method
         /// and define how the database must be initialized.
         /// </para>
-        /// <para>Note: Initializers will be called in order that you specified.</para>
+        /// <para>Note: Initializer will be called in order that you specified.</para>
         /// </summary>
         /// <param name="builder"></param>
         /// <param name="configureInitializer"></param>

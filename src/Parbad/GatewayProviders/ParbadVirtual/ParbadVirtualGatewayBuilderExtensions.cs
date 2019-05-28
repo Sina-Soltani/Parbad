@@ -14,7 +14,7 @@ namespace Parbad.Builder
     public static class ParbadVirtualGatewayBuilderExtensions
     {
         /// <summary>
-        /// Adds ParbadVirtual gateway to Parbad services.
+        /// Adds the Parbad Virtual Gateway to Parbad services.
         /// </summary>
         /// <param name="builder"></param>
         public static IGatewayConfigurationBuilder<ParbadVirtualGateway> AddParbadVirtual(this IGatewayBuilder builder)
