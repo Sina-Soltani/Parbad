@@ -97,8 +97,6 @@ namespace Parbad.GatewayProviders.Melli
 
         private async Task<T> PostJsonAsync<T>(string url, object data, CancellationToken cancellationToken = default)
         {
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Ssl3;
-
             var responseMessage = await _httpClient.PostJsonAsync(url, data, cancellationToken).ConfigureAwaitFalse();
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();

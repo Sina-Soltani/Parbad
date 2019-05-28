@@ -271,14 +271,14 @@ namespace Parbad.GatewayProviders.Mellat
                 throw new Exception("Cannot use more than 10 accounts for each Cumulative payment request.");
             }
 
-            var totalAmount = cumulativeAccounts.Sum(cumulativeAccount => cumulativeAccount.Amount);
+            //var totalAmount = cumulativeAccounts.Sum(cumulativeAccount => cumulativeAccount.Amount);
 
-            if (totalAmount != invoice.Amount)
-            {
-                throw new Exception("The total amount of Mellat Cumulative accounts is not equals to the amount of the invoice." +
-                                    $"Invoice amount: {invoice.Amount}." +
-                                    $"Accounts total amount: {totalAmount}");
-            }
+            //if (totalAmount != invoice.Amount)
+            //{
+            //    throw new Exception("The total amount of Mellat Cumulative accounts is not equals to the amount of the invoice." +
+            //                        $"Invoice amount: {invoice.Amount}." +
+            //                        $"Accounts total amount: {totalAmount}");
+            //}
 
             var additionalData = cumulativeAccounts.Aggregate("", (current, cumulativeAccount) => current + $"{cumulativeAccount};");
 
