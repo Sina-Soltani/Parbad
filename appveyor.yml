@@ -1,6 +1,6 @@
 version: 2.1.{build}
 platform: Any CPU
-image: Visual Studio 2017
+image: Visual Studio 2019
 configuration: Release
 before_build:
   - appveyor-retry dotnet restore -v Minimal
@@ -24,3 +24,6 @@ deploy:
     secure: jCr3Vt57OtWB9DNEg/Xxt3eUXntuv/3hXMpApRaOehs6UwkJjboClNmVlZwPUCmX
   skip_symbols: true
   artifact: Release
+  on:
+    branch: master
+    configuration: release
