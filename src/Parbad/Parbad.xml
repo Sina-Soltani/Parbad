@@ -1786,6 +1786,11 @@
               Looks up a localized string similar to The Refund operation is not supported by this gateway..
             </summary>
         </member>
+        <member name="P:Parbad.Properties.Resources.TextFile1">
+            <summary>
+              Looks up a localized string similar to asd.
+            </summary>
+        </member>
         <member name="P:Parbad.Properties.Resources.VirtualGatewayRequestHtml">
              <summary>
                Looks up a localized string similar to &lt;!DOCTYPE html&gt;
