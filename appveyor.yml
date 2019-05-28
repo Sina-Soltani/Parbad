@@ -16,7 +16,7 @@ after_build:
   - dotnet pack "src\Parbad.AspNetCore" -c %CONFIGURATION% --no-build -o artifacts
 test: off
 artifacts:
-  - path: 'artifacts\*.nupkg'
+  - path: '**\artifacts\*.nupkg'
     name: Release
 deploy:
 - provider: NuGet
