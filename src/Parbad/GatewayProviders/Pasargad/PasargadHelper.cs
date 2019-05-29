@@ -29,15 +29,15 @@ namespace Parbad.GatewayProviders.Pasargad
         private const string ActionNumber = "1003";
         private const string RefundNumber = "1004";
 
-        public static PaymentRequestResult CreateRequestResult(Invoice invoice, IHttpContextAccessor httpContextAccessor, PasargadGatewayOptions options)
+        public static PaymentRequestResult CreateRequestResult(Invoice invoice, IHttpContextAccessor httpContextAccessor, PasargadGatewayAccount account)
         {
             var invoiceDate = GetTimeStamp(DateTime.Now);
 
             var timeStamp = invoiceDate;
 
             var dataToSign = string.Format("#{0}#{1}#{2}#{3}#{4}#{5}#{6}#{7}#",
-                options.MerchantCode,
-                options.TerminalCode,
+                account.MerchantCode,
+                account.TerminalCode,
                 invoice.TrackingNumber,
                 invoiceDate,
                 (long)invoice.Amount,
@@ -45,15 +45,15 @@ namespace Parbad.GatewayProviders.Pasargad
                 ActionNumber,
                 timeStamp);
 
-            var signedData = SignData(options.PrivateKey, dataToSign);
+            var signedData = SignData(account.PrivateKey, dataToSign);
 
             var transporter = new GatewayPost(
                 httpContextAccessor,
                 PaymentPageUrl,
                 new Dictionary<string, string>
                 {
-                    {"merchantCode", options.MerchantCode },
-                    {"terminalCode",  options.TerminalCode},
+                    {"merchantCode", account.MerchantCode },
+                    {"terminalCode",  account.TerminalCode},
                     {"invoiceNumber",  invoice.TrackingNumber.ToString()},
                     {"invoiceDate", invoiceDate },
                     {"amount",  invoice.Amount.ToLongString()},
@@ -63,7 +63,7 @@ namespace Parbad.GatewayProviders.Pasargad
                     {"sign",  signedData}
                 });
 
-            var result = PaymentRequestResult.Succeed(transporter);
+            var result = PaymentRequestResult.Succeed(transporter, account.Name);
 
             result.DatabaseAdditionalData.Add("timeStamp", timeStamp);
 
@@ -106,7 +106,7 @@ namespace Parbad.GatewayProviders.Pasargad
             };
         }
 
-        public static PasargadCheckCallbackResult CreateCheckCallbackResult(string webServiceResponse, PasargadGatewayOptions options, PasargadCallbackResult callbackResult, MessagesOptions messagesOptions)
+        public static PasargadCheckCallbackResult CreateCheckCallbackResult(string webServiceResponse, PasargadGatewayAccount account, PasargadCallbackResult callbackResult, MessagesOptions messagesOptions)
         {
             var compareReferenceId = XmlHelper.GetNodeValueFromXml(webServiceResponse, "invoiceNumber");
             var compareAction = XmlHelper.GetNodeValueFromXml(webServiceResponse, "action");
@@ -132,8 +132,8 @@ namespace Parbad.GatewayProviders.Pasargad
                 isSucceed = responseResult.Equals("true", StringComparison.OrdinalIgnoreCase) &&
                             compareReferenceId == callbackResult.InvoiceNumber &&
                             compareAction == ActionNumber &&
-                            compareMerchantCode == options.MerchantCode &&
-                            compareTerminalCode == options.TerminalCode;
+                            compareMerchantCode == account.MerchantCode &&
+                            compareTerminalCode == account.TerminalCode;
 
                 if (!isSucceed)
                 {
@@ -148,26 +148,26 @@ namespace Parbad.GatewayProviders.Pasargad
             };
         }
 
-        public static IEnumerable<KeyValuePair<string, string>> CreateVerifyData(Payment payment, PasargadGatewayOptions options, PasargadCallbackResult callbackResult)
+        public static IEnumerable<KeyValuePair<string, string>> CreateVerifyData(Payment payment, PasargadGatewayAccount account, PasargadCallbackResult callbackResult)
         {
             var timeStamp = GetTimeStamp(DateTime.Now);
 
             var dataToSign = string.Format("#{0}#{1}#{2}#{3}#{4}#{5}#",
-                options.MerchantCode,
-                options.TerminalCode,
+                account.MerchantCode,
+                account.TerminalCode,
                 payment.TrackingNumber,
                 callbackResult.InvoiceDate,
                 (long)payment.Amount,
                 timeStamp);
 
-            var signData = SignData(options.PrivateKey, dataToSign);
+            var signData = SignData(account.PrivateKey, dataToSign);
 
             return new[]
             {
                 new KeyValuePair<string, string>("InvoiceNumber", payment.TrackingNumber.ToString()),
                 new KeyValuePair<string, string>("InvoiceDate", callbackResult.InvoiceDate),
-                new KeyValuePair<string, string>("MerchantCode", options.MerchantCode),
-                new KeyValuePair<string, string>("TerminalCode", options.TerminalCode),
+                new KeyValuePair<string, string>("MerchantCode", account.MerchantCode),
+                new KeyValuePair<string, string>("TerminalCode", account.TerminalCode),
                 new KeyValuePair<string, string>("Amount", ((long)payment.Amount).ToString()),
                 new KeyValuePair<string, string>("TimeStamp", timeStamp),
                 new KeyValuePair<string, string>("Sign", signData)
@@ -192,7 +192,7 @@ namespace Parbad.GatewayProviders.Pasargad
             };
         }
 
-        public static IEnumerable<KeyValuePair<string, string>> CreateRefundData(Payment payment, Money amount, PasargadGatewayOptions options)
+        public static IEnumerable<KeyValuePair<string, string>> CreateRefundData(Payment payment, Money amount, PasargadGatewayAccount account)
         {
             var transactionRecord = payment.Transactions.FirstOrDefault(transaction => transaction.Type == TransactionType.Request);
 
@@ -209,22 +209,22 @@ namespace Parbad.GatewayProviders.Pasargad
             var timeStamp = GetTimeStamp(DateTime.Now);
 
             var dataToSign = string.Format("#{0}#{1}#{2}#{3}#{4}#{5}#{6}#",
-                options.MerchantCode,
-                options.TerminalCode,
+                account.MerchantCode,
+                account.TerminalCode,
                 payment.TrackingNumber,
                 invoiceDate,
                 (long)amount,
                 RefundNumber,
                 timeStamp);
 
-            var signedData = SignData(options.PrivateKey, dataToSign);
+            var signedData = SignData(account.PrivateKey, dataToSign);
 
             return new[]
             {
                 new KeyValuePair<string, string>("InvoiceNumber", payment.TrackingNumber.ToString()),
                 new KeyValuePair<string, string>("InvoiceDate", invoiceDate),
-                new KeyValuePair<string, string>("MerchantCode", options.MerchantCode),
-                new KeyValuePair<string, string>("TerminalCode", options.TerminalCode),
+                new KeyValuePair<string, string>("MerchantCode", account.MerchantCode),
+                new KeyValuePair<string, string>("TerminalCode", account.TerminalCode),
                 new KeyValuePair<string, string>("Amount", amount.ToLongString()),
                 new KeyValuePair<string, string>("action", RefundNumber),
                 new KeyValuePair<string, string>("TimeStamp", timeStamp),

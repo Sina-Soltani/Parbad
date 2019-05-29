@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Parbad.Abstraction;
 using Parbad.Data.Domain.Payments;
+using Parbad.GatewayBuilders;
 using Parbad.Internal;
 using Parbad.Net;
 using Parbad.Options;
@@ -16,11 +17,10 @@ using Parbad.Options;
 namespace Parbad.GatewayProviders.Saman
 {
     [Gateway(Name)]
-    public class SamanGateway : IGateway
+    public class SamanGateway : Gateway<SamanGatewayAccount>
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
-        private readonly IOptions<SamanGatewayOptions> _options;
         private readonly IOptions<MessagesOptions> _messageOptions;
 
         public const string Name = "Saman";
@@ -28,24 +28,26 @@ namespace Parbad.GatewayProviders.Saman
         public SamanGateway(
             IHttpContextAccessor httpContextAccessor,
             IHttpClientFactory httpClientFactory,
-            IOptions<SamanGatewayOptions> options,
-            IOptions<MessagesOptions> messageOptions)
+            IGatewayAccountProvider<SamanGatewayAccount> accountProvider,
+            IOptions<MessagesOptions> messageOptions) : base(accountProvider)
         {
             _httpContextAccessor = httpContextAccessor;
             _httpClient = httpClientFactory.CreateClient(this);
-            _options = options;
             _messageOptions = messageOptions;
         }
 
-        public virtual Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
+        /// <inheritdoc />
+        public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
         {
             if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-            return SamanHelper.CreateRequestResult(invoice, _httpContextAccessor, _options.Value)
-                .ToInterfaceAsync();
+            var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
+
+            return SamanHelper.CreateRequestResult(invoice, _httpContextAccessor, account);
         }
 
-        public virtual async Task<IPaymentVerifyResult> VerifyAsync(Payment payment, CancellationToken cancellationToken = default)
+        /// <inheritdoc />
+        public override async Task<IPaymentVerifyResult> VerifyAsync(Payment payment, CancellationToken cancellationToken = default)
         {
             if (payment == null) throw new ArgumentNullException(nameof(payment));
 
@@ -56,7 +58,9 @@ namespace Parbad.GatewayProviders.Saman
                 return callbackResult.Result;
             }
 
-            var data = SamanHelper.CreateVerifyData(callbackResult, _options.Value);
+            var account = await GetAccountAsync(payment).ConfigureAwaitFalse();
+
+            var data = SamanHelper.CreateVerifyData(callbackResult, account);
 
             var responseMessage = await _httpClient
                 .PostXmlAsync(SamanHelper.WebServiceUrl, data, cancellationToken)
@@ -67,12 +71,15 @@ namespace Parbad.GatewayProviders.Saman
             return SamanHelper.CreateVerifyResult(response, payment, callbackResult, _messageOptions.Value);
         }
 
-        public virtual async Task<IPaymentRefundResult> RefundAsync(Payment payment, Money amount, CancellationToken cancellationToken = default)
+        /// <inheritdoc />
+        public override async Task<IPaymentRefundResult> RefundAsync(Payment payment, Money amount, CancellationToken cancellationToken = default)
         {
             if (payment == null) throw new ArgumentNullException(nameof(payment));
             if (amount == null) throw new ArgumentNullException(nameof(amount));
 
-            var data = SamanHelper.CreateRefundData(payment, amount, _options.Value);
+            var account = await GetAccountAsync(payment).ConfigureAwaitFalse();
+
+            var data = SamanHelper.CreateRefundData(payment, amount, account);
 
             var responseMessage = await _httpClient
                 .PostXmlAsync(SamanHelper.WebServiceUrl, data, cancellationToken)

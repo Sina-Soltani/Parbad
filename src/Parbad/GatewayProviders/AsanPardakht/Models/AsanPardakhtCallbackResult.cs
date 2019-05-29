@@ -1,6 +1,6 @@
 ﻿using Parbad.Internal;
 
-namespace Parbad.GatewayProviders.AsanPardakht
+namespace Parbad.GatewayProviders.AsanPardakht.Models
 {
     internal class AsanPardakhtCallbackResult
     {

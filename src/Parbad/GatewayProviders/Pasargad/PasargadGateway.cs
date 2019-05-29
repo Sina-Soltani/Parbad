@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Parbad.Abstraction;
 using Parbad.Data.Domain.Payments;
+using Parbad.GatewayBuilders;
 using Parbad.Internal;
 using Parbad.Net;
 using Parbad.Options;
@@ -16,11 +17,10 @@ using Parbad.Options;
 namespace Parbad.GatewayProviders.Pasargad
 {
     [Gateway(Name)]
-    public class PasargadGateway : IGateway
+    public class PasargadGateway : Gateway<PasargadGatewayAccount>
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
-        private readonly IOptions<PasargadGatewayOptions> _options;
         private readonly IOptions<MessagesOptions> _messageOptions;
 
         public const string Name = "Pasargad";
@@ -28,24 +28,26 @@ namespace Parbad.GatewayProviders.Pasargad
         public PasargadGateway(
             IHttpContextAccessor httpContextAccessor,
             IHttpClientFactory httpClientFactory,
-            IOptions<PasargadGatewayOptions> options,
-            IOptions<MessagesOptions> messageOptions)
+            IGatewayAccountProvider<PasargadGatewayAccount> accountProvider,
+            IOptions<MessagesOptions> messageOptions) : base(accountProvider)
         {
             _httpContextAccessor = httpContextAccessor;
             _httpClient = httpClientFactory.CreateClient(this);
-            _options = options;
             _messageOptions = messageOptions;
         }
 
-        public virtual Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
+        /// <inheritdoc />
+        public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
         {
             if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-            return PasargadHelper.CreateRequestResult(invoice, _httpContextAccessor, _options.Value)
-                .ToInterfaceAsync();
+            var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
+
+            return PasargadHelper.CreateRequestResult(invoice, _httpContextAccessor, account);
         }
 
-        public virtual async Task<IPaymentVerifyResult> VerifyAsync(Payment payment, CancellationToken cancellationToken = default)
+        /// <inheritdoc />
+        public override async Task<IPaymentVerifyResult> VerifyAsync(Payment payment, CancellationToken cancellationToken = default)
         {
             if (payment == null) throw new ArgumentNullException(nameof(payment));
 
@@ -64,9 +66,11 @@ namespace Parbad.GatewayProviders.Pasargad
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
+            var account = await GetAccountAsync(payment).ConfigureAwaitFalse();
+
             var checkCallbackResult = PasargadHelper.CreateCheckCallbackResult(
                 response,
-                _options.Value,
+                account,
                 callbackResult,
                 _messageOptions.Value);
 
@@ -75,7 +79,7 @@ namespace Parbad.GatewayProviders.Pasargad
                 return checkCallbackResult.Result;
             }
 
-            var data = PasargadHelper.CreateVerifyData(payment, _options.Value, callbackResult);
+            var data = PasargadHelper.CreateVerifyData(payment, account, callbackResult);
 
             responseMessage = await _httpClient.PostFormAsync(
                 PasargadHelper.VerifyPaymentPageUrl,
@@ -88,12 +92,15 @@ namespace Parbad.GatewayProviders.Pasargad
             return PasargadHelper.CreateVerifyResult(response, callbackResult, _messageOptions.Value);
         }
 
-        public virtual async Task<IPaymentRefundResult> RefundAsync(Payment payment, Money amount, CancellationToken cancellationToken = default)
+        /// <inheritdoc />
+        public override async Task<IPaymentRefundResult> RefundAsync(Payment payment, Money amount, CancellationToken cancellationToken = default)
         {
             if (payment == null) throw new ArgumentNullException(nameof(payment));
             if (amount == null) throw new ArgumentNullException(nameof(amount));
 
-            var data = PasargadHelper.CreateRefundData(payment, amount, _options.Value);
+            var account = await GetAccountAsync(payment).ConfigureAwaitFalse();
+
+            var data = PasargadHelper.CreateRefundData(payment, amount, account);
 
             var responseMessage = await _httpClient.PostFormAsync(
                 PasargadHelper.RefundPaymentPageUrl,

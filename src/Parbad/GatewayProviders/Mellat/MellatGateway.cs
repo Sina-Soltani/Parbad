@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Parbad.Abstraction;
 using Parbad.Data.Domain.Payments;
+using Parbad.GatewayBuilders;
 using Parbad.Internal;
 using Parbad.Net;
 using Parbad.Options;
@@ -16,11 +17,10 @@ using Parbad.Options;
 namespace Parbad.GatewayProviders.Mellat
 {
     [Gateway(Name)]
-    public class MellatGateway : IGateway
+    public class MellatGateway : Gateway<MellatGatewayAccount>
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
-        private readonly IOptions<MellatGatewayOptions> _options;
         private readonly IOptions<MessagesOptions> _messagesOptions;
 
         public const string Name = "Mellat";
@@ -28,31 +28,34 @@ namespace Parbad.GatewayProviders.Mellat
         public MellatGateway(
             IHttpContextAccessor httpContextAccessor,
             IHttpClientFactory httpClientFactory,
-            IOptions<MellatGatewayOptions> options,
-            IOptions<MessagesOptions> messagesOptions)
+            IGatewayAccountProvider<MellatGatewayAccount> accountProvider,
+            IOptions<MessagesOptions> messagesOptions) : base(accountProvider)
         {
             _httpContextAccessor = httpContextAccessor;
             _httpClient = httpClientFactory.CreateClient(this);
-            _options = options;
             _messagesOptions = messagesOptions;
         }
 
-        public virtual async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
+        /// <inheritdoc />
+        public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
         {
             if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-            var data = MellatHelper.CreateRequestData(invoice, _options.Value);
+            var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
+
+            var data = MellatHelper.CreateRequestData(invoice, account);
 
             var responseMessage = await _httpClient
-                .PostXmlAsync(GetWebServiceUrl(), data, cancellationToken)
+                .PostXmlAsync(MellatHelper.GetWebServiceUrl(account.IsTestTerminal), data, cancellationToken)
                 .ConfigureAwaitFalse();
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
-            return MellatHelper.CreateRequestResult(response, _httpContextAccessor, _messagesOptions.Value);
+            return MellatHelper.CreateRequestResult(response, _httpContextAccessor, _messagesOptions.Value, account);
         }
 
-        public virtual async Task<IPaymentVerifyResult> VerifyAsync(Payment payment, CancellationToken cancellationToken = default)
+        /// <inheritdoc />
+        public override async Task<IPaymentVerifyResult> VerifyAsync(Payment payment, CancellationToken cancellationToken = default)
         {
             if (payment == null) throw new ArgumentNullException(nameof(payment));
 
@@ -63,10 +66,12 @@ namespace Parbad.GatewayProviders.Mellat
                 return callbackResult.Result;
             }
 
-            var data = MellatHelper.CreateVerifyData(payment, _options.Value, callbackResult);
+            var account = await GetAccountAsync(payment).ConfigureAwaitFalse();
+
+            var data = MellatHelper.CreateVerifyData(payment, account, callbackResult);
 
             var responseMessage = await _httpClient
-                .PostXmlAsync(GetWebServiceUrl(), data, cancellationToken)
+                .PostXmlAsync(MellatHelper.GetWebServiceUrl(account.IsTestTerminal), data, cancellationToken)
                 .ConfigureAwaitFalse();
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
@@ -78,10 +83,10 @@ namespace Parbad.GatewayProviders.Mellat
                 return verifyResult.Result;
             }
 
-            data = MellatHelper.CreateSettleData(payment, callbackResult, _options.Value);
+            data = MellatHelper.CreateSettleData(payment, callbackResult, account);
 
             responseMessage = await _httpClient
-                .PostXmlAsync(GetWebServiceUrl(), data, cancellationToken)
+                .PostXmlAsync(MellatHelper.GetWebServiceUrl(account.IsTestTerminal), data, cancellationToken)
                 .ConfigureAwaitFalse();
 
             response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
@@ -89,25 +94,23 @@ namespace Parbad.GatewayProviders.Mellat
             return MellatHelper.CreateSettleResult(response, callbackResult, _messagesOptions.Value);
         }
 
-        public virtual async Task<IPaymentRefundResult> RefundAsync(Payment payment, Money amount, CancellationToken cancellationToken = default)
+        /// <inheritdoc />
+        public override async Task<IPaymentRefundResult> RefundAsync(Payment payment, Money amount, CancellationToken cancellationToken = default)
         {
             if (payment == null) throw new ArgumentNullException(nameof(payment));
             if (amount == null) throw new ArgumentNullException(nameof(amount));
 
-            var data = MellatHelper.CreateRefundData(payment, _options.Value);
+            var account = await GetAccountAsync(payment).ConfigureAwaitFalse();
+
+            var data = MellatHelper.CreateRefundData(payment, account);
 
             var responseMessage = await _httpClient
-                .PostXmlAsync(GetWebServiceUrl(), data, cancellationToken)
+                .PostXmlAsync(MellatHelper.GetWebServiceUrl(account.IsTestTerminal), data, cancellationToken)
                 .ConfigureAwaitFalse();
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
             return MellatHelper.CreateRefundResult(response, _messagesOptions.Value);
-        }
-
-        private string GetWebServiceUrl()
-        {
-            return _options.Value.UseTestTerminal ? MellatHelper.TestWebServiceUrl : MellatHelper.WebServiceUrl;
         }
     }
 }

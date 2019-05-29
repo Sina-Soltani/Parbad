@@ -1,6 +1,8 @@
-﻿namespace Parbad.GatewayProviders.AsanPardakht
+﻿using Parbad.Abstraction;
+
+namespace Parbad.GatewayProviders.AsanPardakht
 {
-    public class AsanPardakhtGatewayOptions
+    public class AsanPardakhtGatewayAccount : GatewayAccount
     {
         public string MerchantConfigurationId { get; set; }
 

@@ -6,34 +6,32 @@
     <Version>2.1.0</Version>
     <Authors>Sina Soltani</Authors>
     <Description>Parbad is a free and open-source integrated online payment library which provides an easy solution to perform payment request, verify a payment and refund a paid payment.
-It supports the most popular banks in Iran such as Mellat, Melli, Parsian, Tejarat, Saman and Pasargad.
+It supports the most known banks in Iran such as Mellat, Melli, Parsian, Tejarat, Saman, Pasargad and Asan Pardakht.
 
 More information: https://github.com/Sina-Soltani/Parbad
 
 پَرباد یک کتابخانه رایگان و اوپن سورس است که امکان افزودن پرداخت آنلاین را به وب اپلیکیشن‌ها محیا میکند</Description>
     <Copyright>Copyright © Sina Soltani 2016</Copyright>
-    <PackageLicenseUrl>https://github.com/Sina-Soltani/Parbad/blob/master/LICENSE.txt</PackageLicenseUrl>
+    <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/Sina-Soltani/Parbad</PackageProjectUrl>
     <PackageIconUrl>https://raw.githubusercontent.com/Sina-Soltani/Parbad/master/images/Parbad.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/Sina-Soltani/Parbad</RepositoryUrl>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <PackageTags>Payment Gateway Bank Iran Shetab IranKish Mellat Melli Parsian Pasargad Saman پرداخت درگاه بانک ایران شتاب ایران-کیش ملت ملی پارسیان پاسارگاد سامان</PackageTags>
+    <PackageTags>Payment Gateway Bank Iran Shetab IranKish Mellat Melli Sadad Parsian Pasargad Saman Asan-Pardakht پرداخت درگاه بانک ایران شتاب ایران-کیش ملت ملی سداد پارسیان پاسارگاد سامان آسان-پرداخت</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageReleaseNotes>- Mellat Gateway extra functions (Bashgah Mellat) are added.
 - Asan Pardakht Gateway is added.
 - Database Initializer is added.</PackageReleaseNotes>
+    <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>Parbad.xml</DocumentationFile>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="Http\Internal\**" />
-    <EmbeddedResource Remove="Http\Internal\**" />
-    <None Remove="Http\Internal\**" />
-  </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>Parbad.xml</DocumentationFile>
+  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
@@ -46,7 +44,6 @@ More information: https://github.com/Sina-Soltani/Parbad
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Http" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="2.2.0" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.1" />
   </ItemGroup>
 

@@ -12,16 +12,12 @@ namespace Parbad
     {
         public static IInvoiceBuilder AddMellatCumulativeAccount(this IInvoiceBuilder builder, long subServiceId, long amount)
         {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-
-            return builder.AddMellatCumulativeAccount(subServiceId, amount, 0);
+            return AddMellatCumulativeAccount(builder, subServiceId, amount, 0);
         }
 
         public static IInvoiceBuilder AddMellatCumulativeAccount(this IInvoiceBuilder builder, long subServiceId, long amount, long payerId)
         {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-
-            return builder.AddMellatCumulativeAccounts(new List<MellatCumulativeDynamicAccount>
+            return AddMellatCumulativeAccounts(builder, new List<MellatCumulativeDynamicAccount>
             {
                 new MellatCumulativeDynamicAccount(subServiceId, amount, payerId)
             });

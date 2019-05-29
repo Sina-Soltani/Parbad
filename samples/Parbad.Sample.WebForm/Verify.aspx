@@ -17,6 +17,10 @@
             <td><asp:Label ID="LblGateway" runat="server" Text=""></asp:Label></td>
         </tr>
         <tr>
+            <td>Gateway account name</td>
+            <td><asp:Label ID="LblGatewayAccountName" runat="server" Text=""></asp:Label></td>
+        </tr>
+        <tr>
             <td>Transaction code</td>
             <td><asp:Label ID="LblTransactionCode" runat="server" Text=""></asp:Label></td>
         </tr>

@@ -9,33 +9,36 @@ using Parbad.Net;
 
 namespace Parbad.Internal
 {
-    /// <inheritdoc />
-    public class GatewayConfigurationBuilder<TGateway> : IGatewayConfigurationBuilder<TGateway>
+    internal class GatewayConfigurationBuilder<TGateway> : IGatewayConfigurationBuilder<TGateway>
         where TGateway : class, IGateway
     {
-        /// <summary>
-        /// Initializes an instance of <see cref="GatewayConfigurationBuilder{TGateway}"/>.
-        /// </summary>
-        /// <param name="services"></param>
         public GatewayConfigurationBuilder(IServiceCollection services)
         {
             Services = services;
         }
 
-        /// <inheritdoc />
         public IServiceCollection Services { get; }
 
-        /// <inheritdoc />
-        public IGatewayConfigurationBuilder<TGateway> WithOptions<TOptions>(Action<TOptions> configureOptions) where TOptions : class, new()
+        public IGatewayConfigurationBuilder<TGateway> WithAccounts<TAccount>(Action<IGatewayAccountBuilder<TAccount>> configureAccounts)
+            where TAccount : GatewayAccount, new()
         {
-            if (configureOptions == null) throw new ArgumentNullException(nameof(configureOptions));
+            if (configureAccounts == null) throw new ArgumentNullException(nameof(configureAccounts));
 
-            Services.Configure(configureOptions);
+            configureAccounts(new GatewayAccountBuilder<TAccount>(Services));
 
             return this;
         }
 
-        /// <inheritdoc />
+        public IGatewayConfigurationBuilder<TGateway> WithOptions<TOptions>(Action<TOptions> configureOptions)
+            where TOptions : class, new()
+        {
+            if (configureOptions == null) throw new ArgumentNullException(nameof(configureOptions));
+
+            //Services.Configure(configureOptions);
+
+            return this;
+        }
+
         public IGatewayConfigurationBuilder<TGateway> WithHttpClient(Action<IHttpClientBuilder> configureHttpClient)
         {
             if (configureHttpClient == null) throw new ArgumentNullException(nameof(configureHttpClient));

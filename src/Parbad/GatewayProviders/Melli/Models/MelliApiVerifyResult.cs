@@ -8,7 +8,7 @@ namespace Parbad.GatewayProviders.Melli.Models
     [Serializable]
     internal class MelliApiVerifyResult
     {
-        public int ResCode { get; set; }
+        public int? ResCode { get; set; }
 
         public long Amount { get; set; }
 

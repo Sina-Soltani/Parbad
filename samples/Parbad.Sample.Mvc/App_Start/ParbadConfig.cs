@@ -15,11 +15,23 @@ namespace Parbad.Sample.Mvc
                     {
                         gateways
                             .AddMellat()
-                            .WithOptionsProvider<MellatOptionsProvider>(ServiceLifetime.Transient);
+                            .WithAccounts(accounts =>
+                            {
+                                // Add an account
+                                //accounts.AddInMemory(account =>
+                                //{
+                                //    account.TerminalId = 123;
+                                //    account.UserName = "MyId";
+                                //    account.UserPassword = "MyPassword";
+                                //});
+
+                                // Sample: Add the accounts from your database or a service.
+                                accounts.Add<MellatAccountSource>(ServiceLifetime.Transient);
+                            });
 
                         gateways
                             .AddParbadVirtual()
-                            .WithOptions(options => options.GatewayPath = "/virtual");
+                            .WithOptions(options => options.GatewayPath = "/MyVirtualGateway");
                     })
                     .ConfigureHttpContext(builder => builder.UseOwinFromCurrentHttpContext())
                     .ConfigureDatabase(builder =>

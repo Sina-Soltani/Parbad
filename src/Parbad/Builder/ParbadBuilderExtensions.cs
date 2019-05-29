@@ -33,6 +33,8 @@ namespace Microsoft.Extensions.DependencyInjection
 
             builder.ConfigurePaymentToken(tokenBuilder => tokenBuilder.UseGuidQueryStringPaymentTokenProvider());
 
+            builder.Services.AddOptions();
+
             return builder;
         }
     }

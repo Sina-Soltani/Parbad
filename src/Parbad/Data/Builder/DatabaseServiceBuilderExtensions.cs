@@ -20,6 +20,10 @@ namespace Parbad.Builder
         /// in different database providers such as SQL Server, MySql, Sqlite, PostgreSQL, Oracle, InMemory, etc.
         /// For more information see: https://docs.microsoft.com/en-us/ef/core/providers/.
         /// </para>
+        /// <para>Note: Parbad database is only for internal usages such as saving and loading the payment information.
+        /// You don't need to think about merging and using this database with your own database.
+        /// The important payment information such as Tracking Number, Transaction Code, etc. will you get from the result of
+        /// all payment requests.</para>
         /// </summary>
         /// <param name="builder"></param>
         /// <param name="configureDatabaseBuilder">Configure what database must be used and how it must be created.</param>
@@ -52,7 +56,7 @@ namespace Parbad.Builder
         /// If you prefer to initialize the Parbad database yourself, then use the UseInitializer method
         /// and define how the database must be initialized.
         /// </para>
-        /// <para>Note: Initializers will be called in order that you specified.</para>
+        /// <para>Note: Initializer will be called in order that you specified.</para>
         /// </summary>
         /// <param name="builder"></param>
         /// <param name="configureInitializer"></param>
@@ -95,43 +99,6 @@ namespace Parbad.Builder
             where TExtension : RelationalOptionsExtension, new()
         {
             return builder.MigrationsAssembly("Parbad");
-        }
-
-        /// <summary>
-        /// Configures the storage required by Parbad to save and load the data.
-        /// Note: It uses Microsoft.EntityFrameworkCore as storage, which means you can save your data
-        /// in different database providers such as SQL Server, MySql, Sqlite, PostgreSQL, Oracle, InMemory, etc.
-        /// <para>For more information see: https://docs.microsoft.com/en-us/ef/core/providers/.</para>
-        /// <para>Note: This method is deprecated. Use ConfigureDatabase instead.</para>
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="storageBuilder"></param>
-        [Obsolete("Use ConfigureDatabase method instead.")]
-        public static IParbadBuilder ConfigureStorage(this IParbadBuilder builder, Action<DbContextOptionsBuilder> storageBuilder)
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-            if (storageBuilder == null) throw new ArgumentNullException(nameof(storageBuilder));
-
-            return builder.ConfigureDatabase(storageBuilder);
-        }
-
-        /// <summary>
-        /// Configures the context to connect to a Microsoft SQL Server database.
-        /// It also creates and migrates the database.
-        /// <para>Note: This method is deprecated. Use ConfigureDatabase and ConfigureDatabaseInitializer instead.</para>
-        /// </summary>
-        /// <param name="builder">The builder being used to configure the context.</param>
-        /// <param name="connectionString">The connection string of the database to connect to.</param>
-        [Obsolete("Use ConfigureDatabase and ConfigureDatabaseInitializer instead.")]
-        public static DbContextOptionsBuilder UseParbadSqlServer(this DbContextOptionsBuilder builder,
-            string connectionString)
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-            if (connectionString == null) throw new ArgumentNullException(nameof(connectionString));
-
-            builder.UseSqlServer(connectionString, optionsBuilder => optionsBuilder.UseParbadMigrations());
-
-            return builder;
         }
     }
 }

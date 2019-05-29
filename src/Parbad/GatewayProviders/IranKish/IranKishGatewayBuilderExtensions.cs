@@ -2,11 +2,8 @@
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
 using System;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Parbad.GatewayBuilders;
 using Parbad.GatewayProviders.IranKish;
-using Parbad.Options;
 
 namespace Parbad.Builder
 {
@@ -20,67 +17,23 @@ namespace Parbad.Builder
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
+            builder.AddGatewayAccountProvider<IranKishGatewayAccount>();
+
             return builder.AddGateway<IranKishGateway>(new Uri(IranKishHelper.BaseServiceUrl));
         }
 
         /// <summary>
-        /// Configures IranKish gateway options.
+        /// Configures the accounts for <see cref="IranKishGateway"/>.
         /// </summary>
         /// <param name="builder"></param>
-        /// <param name="configureOptions"></param>
-        public static IGatewayConfigurationBuilder<IranKishGateway> WithOptions(
+        /// <param name="configureAccounts">Configures the accounts.</param>
+        public static IGatewayConfigurationBuilder<IranKishGateway> WithAccounts(
             this IGatewayConfigurationBuilder<IranKishGateway> builder,
-            Action<IranKishGatewayOptions> configureOptions)
+            Action<IGatewayAccountBuilder<IranKishGatewayAccount>> configureAccounts)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            return builder.WithOptions(configureOptions);
-        }
-
-        /// <summary>
-        /// Adds the given <typeparamref name="TOptionsProvider"/> to services.
-        /// It will be used for configuring the <see cref="IranKishGatewayOptions"/>.
-        /// </summary>
-        /// <typeparam name="TOptionsProvider"></typeparam>
-        /// <param name="builder"></param>
-        /// <param name="serviceLifetime">Lifetime of <typeparamref name="TOptionsProvider"/>.</param>
-        public static IGatewayConfigurationBuilder<IranKishGateway> WithOptionsProvider<TOptionsProvider>(
-            this IGatewayConfigurationBuilder<IranKishGateway> builder,
-            ServiceLifetime serviceLifetime)
-            where TOptionsProvider : class, IParbadOptionsProvider<IranKishGatewayOptions>
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-
-            return builder.WithOptionsProvider<IranKishGateway, IranKishGatewayOptions, TOptionsProvider>(serviceLifetime);
-        }
-
-        /// <summary>
-        /// Adds the given <paramref name="factory"/> to services.
-        /// It will be used for configuring the <see cref="IranKishGatewayOptions"/>.
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="factory"></param>
-        /// <param name="serviceLifetime">Lifetime of <paramref name="factory"/>.</param>
-        public static IGatewayConfigurationBuilder<IranKishGateway> WithOptionsProvider(
-            this IGatewayConfigurationBuilder<IranKishGateway> builder,
-            Func<IServiceProvider, IParbadOptionsProvider<IranKishGatewayOptions>> factory,
-            ServiceLifetime serviceLifetime)
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-
-            return builder.WithOptionsProvider<IranKishGateway, IranKishGatewayOptions>(factory, serviceLifetime);
-        }
-
-        /// <summary>
-        /// Configures IranKish gateway by using an <see cref="IConfiguration"/>.
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="configuration">The <see cref="IConfiguration"/> section.</param>
-        public static IGatewayConfigurationBuilder<IranKishGateway> WithConfiguration(
-            this IGatewayConfigurationBuilder<IranKishGateway> builder,
-            IConfiguration configuration)
-        {
-            return builder.WithConfiguration<IranKishGateway, IranKishGatewayOptions>(configuration);
+            return builder.WithAccounts(configureAccounts);
         }
     }
 }

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Parbad.Abstraction;
 using Parbad.Data.Domain.Payments;
+using Parbad.GatewayBuilders;
 using Parbad.Http;
 using Parbad.Internal;
 using Parbad.Options;
@@ -16,7 +17,7 @@ using Parbad.Options;
 namespace Parbad.GatewayProviders.ParbadVirtual
 {
     [Gateway(Name)]
-    public class ParbadVirtualGateway : IGateway
+    public class ParbadVirtualGateway : Gateway<ParbadVirtualGatewayAccount>
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IOptions<ParbadVirtualGatewayOptions> _options;
@@ -27,16 +28,20 @@ namespace Parbad.GatewayProviders.ParbadVirtual
         public ParbadVirtualGateway(
             IHttpContextAccessor httpContextAccessor,
             IOptions<ParbadVirtualGatewayOptions> options,
-            IOptions<MessagesOptions> messageOptions)
+            IGatewayAccountProvider<ParbadVirtualGatewayAccount> accountProvider,
+            IOptions<MessagesOptions> messageOptions) : base(accountProvider)
         {
             _httpContextAccessor = httpContextAccessor;
             _options = options;
             _messageOptions = messageOptions;
         }
 
-        public virtual Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
+        /// <inheritdoc />
+        public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
         {
             var request = _httpContextAccessor.HttpContext.Request;
+
+            var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
 
             var url = $"{request.Scheme}" +
                       "://" +
@@ -54,10 +59,11 @@ namespace Parbad.GatewayProviders.ParbadVirtual
                     {"redirectUrl", invoice.CallbackUrl }
                 });
 
-            return PaymentRequestResult.Succeed(transporter).ToInterfaceAsync();
+            return PaymentRequestResult.Succeed(transporter, account.Name);
         }
 
-        public virtual Task<IPaymentVerifyResult> VerifyAsync(Payment payment, CancellationToken cancellationToken = default)
+        /// <inheritdoc />
+        public override Task<IPaymentVerifyResult> VerifyAsync(Payment payment, CancellationToken cancellationToken = default)
         {
             if (!_httpContextAccessor.HttpContext.Request.TryGetParam("Result", out var result))
             {
@@ -78,7 +84,8 @@ namespace Parbad.GatewayProviders.ParbadVirtual
             }.ToInterfaceAsync();
         }
 
-        public virtual Task<IPaymentRefundResult> RefundAsync(Payment payment, Money amount, CancellationToken cancellationToken = default)
+        /// <inheritdoc />
+        public override Task<IPaymentRefundResult> RefundAsync(Payment payment, Money amount, CancellationToken cancellationToken = default)
         {
             return PaymentRefundResult.Succeed().ToInterfaceAsync();
         }

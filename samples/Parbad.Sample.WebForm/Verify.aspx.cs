@@ -25,6 +25,7 @@ namespace Parbad.Sample.WebForm
             LblTrackingNumber.Text = result.TrackingNumber.ToString();
             LblAmount.Text = result.Amount.ToString();
             LblGateway.Text = result.GatewayName;
+            LblGatewayAccountName.Text = result.GatewayAccountName;
             LblTransactionCode.Text = result.TransactionCode;
             LblIsSucceed.Text = result.IsSucceed.ToString();
             LblMessage.Text = result.Message;

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using Parbad.GatewayProviders.AsanPardakht.Models;
 using Parbad.Internal;
 using Parbad.Utilities;
 
@@ -17,12 +18,12 @@ namespace Parbad.GatewayProviders.AsanPardakht
         public const string PaymentPageUrl = "https://asan.shaparak.ir/";
         public const string BaseServiceUrl = "https://services.asanpardakht.net/paygate/merchantservices.asmx";
 
-        public static string CreateRequestData(Invoice invoice, AsanPardakhtGatewayOptions options)
+        public static string CreateRequestData(Invoice invoice, AsanPardakhtGatewayAccount account)
         {
             var requestToEncrypt = string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8}",
                 1,
-                options.UserName,
-                options.Password,
+                account.UserName,
+                account.Password,
                 invoice.TrackingNumber,
                 invoice.Amount.ToLongString(),
                 "datetime",
@@ -31,14 +32,14 @@ namespace Parbad.GatewayProviders.AsanPardakht
                 "0"
             );
 
-            var encryptedRequest = Encrypt(requestToEncrypt, options.Key, options.IV);
+            var encryptedRequest = Encrypt(requestToEncrypt, account.Key, account.IV);
 
             return
                 "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tem=\"http://tempuri.org/\">" +
                 "<soapenv:Header/>" +
                 "<soapenv:Body>" +
                 "<tem:RequestOperation>" +
-                $"<tem:merchantConfigurationID>{options.MerchantConfigurationId}</tem:merchantConfigurationID>" +
+                $"<tem:merchantConfigurationID>{account.MerchantConfigurationId}</tem:merchantConfigurationID>" +
                 "<!--Optional:-->" +
                 $"<tem:encryptedRequest>{encryptedRequest}</tem:encryptedRequest>" +
                 "</tem:RequestOperation>" +
@@ -49,7 +50,7 @@ namespace Parbad.GatewayProviders.AsanPardakht
         public static PaymentRequestResult CreateRequestResult(
             string response,
             Invoice invoice,
-            AsanPardakhtGatewayOptions options,
+            AsanPardakhtGatewayAccount account,
             IHttpContextAccessor httpContextAccessor,
             MessagesOptions messagesOptions)
         {
@@ -75,12 +76,12 @@ namespace Parbad.GatewayProviders.AsanPardakht
                     {"RefId", splitedResult[1]}
                 });
 
-            return PaymentRequestResult.Succeed(transporter);
+            return PaymentRequestResult.Succeed(transporter, account.Name);
         }
 
         public static AsanPardakhtCallbackResult CreateCallbackResult(
             Payment payment,
-            AsanPardakhtGatewayOptions options,
+            AsanPardakhtGatewayAccount account,
             HttpRequest httpRequest,
             MessagesOptions messagesOptions)
         {
@@ -103,7 +104,7 @@ namespace Parbad.GatewayProviders.AsanPardakht
             }
             else
             {
-                var decryptedResult = Decrypt(returningParams, options.Key, options.IV);
+                var decryptedResult = Decrypt(returningParams, account.Key, account.IV);
 
                 var splitedResult = decryptedResult.Split(',');
 
@@ -164,17 +165,17 @@ namespace Parbad.GatewayProviders.AsanPardakht
             };
         }
 
-        public static string CreateVerifyData(AsanPardakhtCallbackResult callbackResult, AsanPardakhtGatewayOptions options)
+        public static string CreateVerifyData(AsanPardakhtCallbackResult callbackResult, AsanPardakhtGatewayAccount account)
         {
-            var requestToEncrypt = options.UserName + "," + options.Password;
-            var encryptedRequest = Encrypt(requestToEncrypt, options.Key, options.IV);
+            var requestToEncrypt = account.UserName + "," + account.Password;
+            var encryptedRequest = Encrypt(requestToEncrypt, account.Key, account.IV);
 
             return
                 "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tem=\"http://tempuri.org/\">" +
                 "<soapenv:Header/>" +
                 "<soapenv:Body>" +
                 "<tem:RequestVerification>" +
-                $"<tem:merchantConfigurationID>{options.MerchantConfigurationId}</tem:merchantConfigurationID>" +
+                $"<tem:merchantConfigurationID>{account.MerchantConfigurationId}</tem:merchantConfigurationID>" +
                 "<!--Optional:-->" +
                 $"<tem:encryptedCredentials>{encryptedRequest}</tem:encryptedCredentials>" +
                 $"<tem:payGateTranID>{callbackResult.PayGateTranId}</tem:payGateTranID>" +
@@ -209,17 +210,17 @@ namespace Parbad.GatewayProviders.AsanPardakht
             };
         }
 
-        public static string CreateSettleData(AsanPardakhtCallbackResult callbackResult, AsanPardakhtGatewayOptions options)
+        public static string CreateSettleData(AsanPardakhtCallbackResult callbackResult, AsanPardakhtGatewayAccount account)
         {
-            var requestToEncrypt = options.UserName + "," + options.Password;
-            var encryptedRequest = Encrypt(requestToEncrypt, options.Key, options.IV);
+            var requestToEncrypt = account.UserName + "," + account.Password;
+            var encryptedRequest = Encrypt(requestToEncrypt, account.Key, account.IV);
 
             return
                 "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tem=\"http://tempuri.org/\">" +
                 "<soapenv:Header/>" +
                 "<soapenv:Body>" +
                 "<tem:RequestReconciliation>" +
-                $"<tem:merchantConfigurationID>{options.MerchantConfigurationId}</tem:merchantConfigurationID>" +
+                $"<tem:merchantConfigurationID>{account.MerchantConfigurationId}</tem:merchantConfigurationID>" +
                 "<!--Optional:-->" +
                 $"<tem:encryptedCredentials>{encryptedRequest}</tem:encryptedCredentials>" +
                 $"<tem:payGateTranID>{callbackResult.PayGateTranId}</tem:payGateTranID>" +

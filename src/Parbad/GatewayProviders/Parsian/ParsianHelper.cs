@@ -22,7 +22,7 @@ namespace Parbad.GatewayProviders.Parsian
         public const string VerifyServiceUrl = "/NewIPGServices/Confirm/ConfirmService.asmx";
         public const string RefundServiceUrl = "/NewIPGServices/Reverse/ReversalService.asmx";
 
-        public static string CreateRequestData(ParsianGatewayOptions options, Invoice invoice)
+        public static string CreateRequestData(ParsianGatewayAccount account, Invoice invoice)
         {
             return
                 "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:sal=\"https://pec.Shaparak.ir/NewIPGServices/Sale/SaleService\">" +
@@ -32,7 +32,7 @@ namespace Parbad.GatewayProviders.Parsian
                 "<!--Optional:-->" +
                 "<sal:requestData>" +
                 "<!--Optional:-->" +
-                $"<sal:LoginAccount>{options.LoginAccount}</sal:LoginAccount>" +
+                $"<sal:LoginAccount>{account.LoginAccount}</sal:LoginAccount>" +
                 $"<sal:Amount>{(long)invoice.Amount}</sal:Amount>" +
                 $"<sal:OrderId>{invoice.TrackingNumber}</sal:OrderId>" +
                 "<!--Optional:-->" +
@@ -47,7 +47,7 @@ namespace Parbad.GatewayProviders.Parsian
                 "</soapenv:Envelope> ";
         }
 
-        public static PaymentRequestResult CreateRequestResult(string webServiceResponse, IHttpContextAccessor httpContextAccessor, MessagesOptions messagesOptions)
+        public static PaymentRequestResult CreateRequestResult(string webServiceResponse, IHttpContextAccessor httpContextAccessor, ParsianGatewayAccount account, MessagesOptions messagesOptions)
         {
             var token = XmlHelper.GetNodeValueFromXml(webServiceResponse, "Token", "https://pec.Shaparak.ir/NewIPGServices/Sale/SaleService");
             var status = XmlHelper.GetNodeValueFromXml(webServiceResponse, "Status", "https://pec.Shaparak.ir/NewIPGServices/Sale/SaleService");
@@ -69,11 +69,7 @@ namespace Parbad.GatewayProviders.Parsian
 
             var paymentPageUrl = $"{PaymentPageUrl}?Token={token}";
 
-            var result = new PaymentRequestResult
-            {
-                IsSucceed = true,
-                GatewayTransporter = new GatewayRedirect(httpContextAccessor, paymentPageUrl)
-            };
+            var result = PaymentRequestResult.Succeed(new GatewayRedirect(httpContextAccessor, paymentPageUrl), account.Name);
 
             result.DatabaseAdditionalData.Add("token", token);
 
@@ -128,7 +124,7 @@ namespace Parbad.GatewayProviders.Parsian
             };
         }
 
-        public static string CreateVerifyData(ParsianGatewayOptions options, ParsianCallbackResult callbackResult)
+        public static string CreateVerifyData(ParsianGatewayAccount account, ParsianCallbackResult callbackResult)
         {
             return
                 "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:con=\"https://pec.Shaparak.ir/NewIPGServices/Confirm/ConfirmService\">" +
@@ -138,7 +134,7 @@ namespace Parbad.GatewayProviders.Parsian
                 "<!--Optional:-->" +
                 "<con:requestData>" +
                 "<!--Optional:-->" +
-                $"<con:LoginAccount>{options.LoginAccount}</con:LoginAccount>" +
+                $"<con:LoginAccount>{account.LoginAccount}</con:LoginAccount>" +
                 $"<con:Token>{callbackResult.Token}</con:Token>" +
                 "</con:requestData>" +
                 "</con:ConfirmPayment>" +
@@ -170,7 +166,7 @@ namespace Parbad.GatewayProviders.Parsian
             return result;
         }
 
-        public static string CreateRefundData(ParsianGatewayOptions options, Payment payment, Money amount)
+        public static string CreateRefundData(ParsianGatewayAccount account, Payment payment, Money amount)
         {
             var transaction = payment.Transactions.SingleOrDefault(item => item.Type == TransactionType.Verify);
 
@@ -189,7 +185,7 @@ namespace Parbad.GatewayProviders.Parsian
                 "<!--Optional:-->" +
                 "<rev:requestData>" +
                 "<!--Optional:-->" +
-                $"<rev:LoginAccount>{options.LoginAccount}</rev:LoginAccount>" +
+                $"<rev:LoginAccount>{account.LoginAccount}</rev:LoginAccount>" +
                 $"<rev:Token>{token}</rev:Token>" +
                 "</rev:requestData>" +
                 "</rev:ReversalRequest>" +

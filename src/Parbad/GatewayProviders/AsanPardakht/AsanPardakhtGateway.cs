@@ -8,17 +8,17 @@ using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Parbad.GatewayBuilders;
 using Parbad.Internal;
 using Parbad.Properties;
 
 namespace Parbad.GatewayProviders.AsanPardakht
 {
     [Gateway(Name)]
-    public class AsanPardakhtGateway : IGateway
+    public class AsanPardakhtGateway : Gateway<AsanPardakhtGatewayAccount>
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
-        private readonly IOptions<AsanPardakhtGatewayOptions> _options;
         private readonly IOptions<MessagesOptions> _messageOptions;
 
         public const string Name = "AsanPardakht";
@@ -26,21 +26,22 @@ namespace Parbad.GatewayProviders.AsanPardakht
         public AsanPardakhtGateway(
             IHttpContextAccessor httpContextAccessor,
             IHttpClientFactory httpClientFactory,
-            IOptions<AsanPardakhtGatewayOptions> options,
-            IOptions<MessagesOptions> messageOptions)
+            IGatewayAccountProvider<AsanPardakhtGatewayAccount> accountProvider,
+            IOptions<MessagesOptions> messageOptions) : base(accountProvider)
         {
             _httpContextAccessor = httpContextAccessor;
             _httpClient = httpClientFactory.CreateClient(this);
-            _options = options;
             _messageOptions = messageOptions;
         }
 
         /// <inheritdoc />
-        public async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
+        public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
         {
             if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-            var data = AsanPardakhtHelper.CreateRequestData(invoice, _options.Value);
+            var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
+
+            var data = AsanPardakhtHelper.CreateRequestData(invoice, account);
 
             var responseMessage = await _httpClient
                 .PostXmlAsync(AsanPardakhtHelper.BaseServiceUrl, data, cancellationToken)
@@ -48,17 +49,19 @@ namespace Parbad.GatewayProviders.AsanPardakht
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
-            return AsanPardakhtHelper.CreateRequestResult(response, invoice, _options.Value, _httpContextAccessor, _messageOptions.Value);
+            return AsanPardakhtHelper.CreateRequestResult(response, invoice, account, _httpContextAccessor, _messageOptions.Value);
         }
 
         /// <inheritdoc />
-        public async Task<IPaymentVerifyResult> VerifyAsync(Payment payment, CancellationToken cancellationToken = default)
+        public override async Task<IPaymentVerifyResult> VerifyAsync(Payment payment, CancellationToken cancellationToken = default)
         {
             if (payment == null) throw new ArgumentNullException(nameof(payment));
 
+            var account = await GetAccountAsync(payment).ConfigureAwaitFalse();
+
             var callbackResult = AsanPardakhtHelper.CreateCallbackResult(
                 payment,
-                _options.Value,
+                account,
                 _httpContextAccessor.HttpContext.Request,
                 _messageOptions.Value);
 
@@ -67,7 +70,7 @@ namespace Parbad.GatewayProviders.AsanPardakht
                 return callbackResult.Result;
             }
 
-            var data = AsanPardakhtHelper.CreateVerifyData(callbackResult, _options.Value);
+            var data = AsanPardakhtHelper.CreateVerifyData(callbackResult, account);
 
             var responseMessage = await _httpClient
                 .PostXmlAsync(AsanPardakhtHelper.BaseServiceUrl, data, cancellationToken)
@@ -82,7 +85,7 @@ namespace Parbad.GatewayProviders.AsanPardakht
                 return verifyResult.Result;
             }
 
-            data = AsanPardakhtHelper.CreateSettleData(callbackResult, _options.Value);
+            data = AsanPardakhtHelper.CreateSettleData(callbackResult, account);
 
             responseMessage = await _httpClient
                 .PostXmlAsync(AsanPardakhtHelper.BaseServiceUrl, data, cancellationToken)
@@ -94,7 +97,7 @@ namespace Parbad.GatewayProviders.AsanPardakht
         }
 
         /// <inheritdoc />
-        public Task<IPaymentRefundResult> RefundAsync(Payment payment, Money amount, CancellationToken cancellationToken = default)
+        public override Task<IPaymentRefundResult> RefundAsync(Payment payment, Money amount, CancellationToken cancellationToken = default)
         {
             return PaymentRefundResult.Failed(Resources.RefundNotSupports).ToInterfaceAsync();
         }

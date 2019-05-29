@@ -54,6 +54,10 @@ namespace Parbad.Data.Domain.Payments
                 .HasColumnName("is_paid")
                 .IsRequired(required: true);
 
+            builder.Property(entity => entity.GatewayAccountName)
+                .HasColumnName("gateway_account_name")
+                .IsRequired(required: false);
+
             builder.Property(entity => entity.CreatedOn)
                 .HasColumnName("created_on")
                 .IsRequired(required: true);

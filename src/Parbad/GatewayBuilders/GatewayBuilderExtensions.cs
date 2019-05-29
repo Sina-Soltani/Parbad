@@ -14,7 +14,6 @@ namespace Parbad.Builder
         /// </summary>
         /// <param name="builder"></param>
         /// <param name="configure"></param>
-        /// <returns></returns>
         public static IParbadBuilder ConfigureGateways(this IParbadBuilder builder, Action<IGatewayBuilder> configure)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));

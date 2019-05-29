@@ -9,7 +9,7 @@
 
 For more information see: https://www.nuget.org/packages/Parbad/</Description>
     <Copyright>Copyright © Sina Soltani 2016</Copyright>
-    <PackageLicenseUrl>https://github.com/Sina-Soltani/Parbad/blob/master/LICENSE.txt</PackageLicenseUrl>
+    <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/Sina-Soltani/Parbad</PackageProjectUrl>
     <PackageIconUrl>https://raw.githubusercontent.com/Sina-Soltani/Parbad/master/images/Parbad.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/Sina-Soltani/Parbad</RepositoryUrl>
@@ -17,11 +17,15 @@ For more information see: https://www.nuget.org/packages/Parbad/</Description>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageId>Parbad.Mvc5</PackageId>
     <Product>Parbad.Mvc5</Product>
-    <PackageTags>Payment Gateway Bank Iran Shetab IranKish Mellat Melli Parsian Pasargad Saman پرداخت درگاه بانک ایران شتاب ایران-کیش ملت ملی پارسیان پاسارگاد سامان</PackageTags>
+    <PackageTags>mvc Payment Gateway Bank Iran Shetab IranKish Mellat Melli Sadad Parsian Pasargad Saman Asan-Pardakht پرداخت درگاه بانک ایران شتاب ایران-کیش ملت ملی سداد پارسیان پاسارگاد سامان آسان-پرداخت</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>Parbad.Mvc.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DocumentationFile>Parbad.Mvc.xml</DocumentationFile>
   </PropertyGroup>
 

@@ -1,14 +1,12 @@
-// Copyright (c) Parbad. All rights reserved.
-// Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
-
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using Parbad.Abstraction;
 
 namespace Parbad.GatewayProviders.Melli
 {
     /// <summary>
     /// Melli Gateway options class.
     /// </summary>
-    public class MelliGatewayOptions
+    public class MelliGatewayAccount : GatewayAccount
     {
         [Required(ErrorMessage = "TerminalId is required.", AllowEmptyStrings = false)]
         public string TerminalId { get; set; }

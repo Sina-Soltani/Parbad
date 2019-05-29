@@ -20,11 +20,13 @@ namespace Parbad.GatewayBuilders
         IServiceCollection Services { get; }
 
         /// <summary>
-        /// Adds the configured options to Parbad services.
+        /// Configures the accounts of type <typeparamref name="TAccount"/> for <typeparamref name="TGateway"/>.
         /// </summary>
-        /// <typeparam name="TOptions"></typeparam>
-        /// <param name="configureOptions"></param>
-        IGatewayConfigurationBuilder<TGateway> WithOptions<TOptions>(Action<TOptions> configureOptions) where TOptions : class, new();
+        /// <typeparam name="TAccount">Account of <typeparamref name="TGateway"/>.</typeparam>
+        /// <param name="configureAccounts">Configures the accounts.</param>
+        IGatewayConfigurationBuilder<TGateway> WithAccounts<TAccount>(
+            Action<IGatewayAccountBuilder<TAccount>> configureAccounts)
+            where TAccount : GatewayAccount, new();
 
         /// <summary>
         /// Configures the <see cref="HttpClient"/> required by <typeparamref name="TGateway"/>

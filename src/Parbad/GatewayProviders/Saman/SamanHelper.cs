@@ -22,7 +22,7 @@ namespace Parbad.GatewayProviders.Saman
         public const string BaseServiceUrl = "https://sep.shaparak.ir/";
         public const string WebServiceUrl = "/payments/referencepayment.asmx";
 
-        public static PaymentRequestResult CreateRequestResult(Invoice invoice, IHttpContextAccessor httpContextAccessor, SamanGatewayOptions options)
+        public static PaymentRequestResult CreateRequestResult(Invoice invoice, IHttpContextAccessor httpContextAccessor, SamanGatewayAccount account)
         {
             var transporter = new GatewayPost(
                 httpContextAccessor,
@@ -30,12 +30,12 @@ namespace Parbad.GatewayProviders.Saman
                 new Dictionary<string, string>
                 {
                     {"Amount", invoice.Amount.ToLongString()},
-                    {"MID", options.MerchantId},
+                    {"MID", account.MerchantId},
                     {"ResNum", invoice.TrackingNumber.ToString()},
                     {"RedirectURL", invoice.CallbackUrl}
                 });
 
-            return PaymentRequestResult.Succeed(transporter);
+            return PaymentRequestResult.Succeed(transporter, account.Name);
         }
 
         public static SamanCallbackResult CreateCallbackResult(HttpRequest httpRequest, MessagesOptions messagesOptions)
@@ -76,7 +76,7 @@ namespace Parbad.GatewayProviders.Saman
             };
         }
 
-        public static string CreateVerifyData(SamanCallbackResult callbackResult, SamanGatewayOptions options)
+        public static string CreateVerifyData(SamanCallbackResult callbackResult, SamanGatewayAccount account)
         {
             return
                 "<soapenv:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:urn=\"urn:Foo\">" +
@@ -84,7 +84,7 @@ namespace Parbad.GatewayProviders.Saman
                 "<soapenv:Body>" +
                 "<urn:verifyTransaction soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">" +
                 $"<String_1 xsi:type=\"xsd:string\">{callbackResult.TransactionId}</String_1>" +
-                $"<String_2 xsi:type=\"xsd:string\">{options.MerchantId}</String_2>" +
+                $"<String_2 xsi:type=\"xsd:string\">{account.MerchantId}</String_2>" +
                 "</urn:verifyTransaction>" +
                 "</soapenv:Body>" +
                 "</soapenv:Envelope>";
@@ -112,7 +112,7 @@ namespace Parbad.GatewayProviders.Saman
             };
         }
 
-        public static string CreateRefundData(Payment payment, Money amount, SamanGatewayOptions options)
+        public static string CreateRefundData(Payment payment, Money amount, SamanGatewayAccount account)
         {
             return
                 "<soapenv:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:urn=\"urn:Foo\">" +
@@ -121,8 +121,8 @@ namespace Parbad.GatewayProviders.Saman
                 "<urn:reverseTransaction soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">" +
                 $"<String_1 xsi:type=\"xsd:string\">{payment.TransactionCode}</String_1>" +
                 $"<String_2 xsi:type=\"xsd:string\">{(long)amount}</String_2>" +
-                $"<Username xsi:type=\"xsd:string\">{options.MerchantId}</Username>" +
-                $"<Password xsi:type=\"xsd:string\">{options.Password}</Password>" +
+                $"<Username xsi:type=\"xsd:string\">{account.MerchantId}</Username>" +
+                $"<Password xsi:type=\"xsd:string\">{account.Password}</Password>" +
                 "</urn:reverseTransaction>" +
                 "</soapenv:Body>" +
                 "</soapenv:Envelope>";

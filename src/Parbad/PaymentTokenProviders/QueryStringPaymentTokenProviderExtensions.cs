@@ -52,7 +52,7 @@ namespace Parbad.Builder
         /// </summary>
         /// <param name="builder"></param>
         /// <param name="configuration">The configuration section for <see cref="QueryStringPaymentTokenOptions"/>.
-        /// The default key is <see cref="QueryStringPaymentTokenOptions.ConfigurationKey"/></param>
+        /// The default key is Parbad:PaymentTokenProvider:QueryString</param>
         public static IPaymentTokenBuilder UseGuidQueryStringPaymentTokenProvider(this IPaymentTokenBuilder builder,
             IConfiguration configuration)
         {

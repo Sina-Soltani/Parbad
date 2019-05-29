@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Parbad.Abstraction;
 using Parbad.Data.Domain.Payments;
+using Parbad.GatewayBuilders;
 using Parbad.Internal;
 using Parbad.Net;
 using Parbad.Options;
@@ -17,11 +18,10 @@ using Parbad.Properties;
 namespace Parbad.GatewayProviders.IranKish
 {
     [Gateway(Name)]
-    public class IranKishGateway : IGateway
+    public class IranKishGateway : Gateway<IranKishGatewayAccount>
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
-        private readonly IOptions<IranKishGatewayOptions> _options;
         private readonly IOptions<MessagesOptions> _messageOptions;
 
         public const string Name = "IranKish";
@@ -29,21 +29,24 @@ namespace Parbad.GatewayProviders.IranKish
         public IranKishGateway(
             IHttpContextAccessor httpContextAccessor,
             IHttpClientFactory httpClientFactory,
-            IOptions<IranKishGatewayOptions> options,
-            IOptions<MessagesOptions> messageOptions)
+            IGatewayAccountProvider<IranKishGatewayAccount> accountProvider,
+            IOptions<MessagesOptions> messageOptions) : base(accountProvider)
         {
             _httpContextAccessor = httpContextAccessor;
             _httpClient = httpClientFactory.CreateClient(this);
-            _options = options;
             _messageOptions = messageOptions;
         }
 
-        public virtual async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
+        /// <inheritdoc />
+        public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
         {
             if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-            var data = IranKishHelper.CreateRequestData(invoice, _options.Value);
+            var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
 
+            var data = IranKishHelper.CreateRequestData(invoice, account);
+
+            _httpClient.DefaultRequestHeaders.Clear();
             _httpClient.DefaultRequestHeaders.Add(IranKishHelper.HttpRequestHeader.Key, IranKishHelper.HttpRequestHeader.Value);
 
             var responseMessage = await _httpClient
@@ -52,16 +55,19 @@ namespace Parbad.GatewayProviders.IranKish
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
-            return IranKishHelper.CreateRequestResult(response, invoice, _options.Value, _httpContextAccessor, _messageOptions.Value);
+            return IranKishHelper.CreateRequestResult(response, invoice, account, _httpContextAccessor, _messageOptions.Value);
         }
 
-        public virtual async Task<IPaymentVerifyResult> VerifyAsync(Payment payment, CancellationToken cancellationToken = default)
+        /// <inheritdoc />
+        public override async Task<IPaymentVerifyResult> VerifyAsync(Payment payment, CancellationToken cancellationToken = default)
         {
             if (payment == null) throw new ArgumentNullException(nameof(payment));
 
+            var account = await GetAccountAsync(payment).ConfigureAwaitFalse();
+
             var callbackResult = IranKishHelper.CreateCallbackResult(
                 payment,
-                _options.Value,
+                account,
                 _httpContextAccessor.HttpContext.Request,
                 _messageOptions.Value);
 
@@ -70,8 +76,9 @@ namespace Parbad.GatewayProviders.IranKish
                 return callbackResult.Result;
             }
 
-            var data = IranKishHelper.CreateVerifyData(callbackResult, _options.Value);
+            var data = IranKishHelper.CreateVerifyData(callbackResult, account);
 
+            _httpClient.DefaultRequestHeaders.Clear();
             _httpClient.DefaultRequestHeaders.Add(IranKishHelper.HttpVerifyHeader.Key, IranKishHelper.HttpVerifyHeader.Value);
 
             var responseMessage = await _httpClient
@@ -83,7 +90,8 @@ namespace Parbad.GatewayProviders.IranKish
             return IranKishHelper.CreateVerifyResult(response, payment, callbackResult, _messageOptions.Value);
         }
 
-        public virtual Task<IPaymentRefundResult> RefundAsync(Payment payment, Money amount, CancellationToken cancellationToken = default)
+        /// <inheritdoc />
+        public override Task<IPaymentRefundResult> RefundAsync(Payment payment, Money amount, CancellationToken cancellationToken = default)
         {
             return PaymentRefundResult.Failed(Resources.RefundNotSupports).ToInterfaceAsync();
         }

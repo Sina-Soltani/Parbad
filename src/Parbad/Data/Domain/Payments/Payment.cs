@@ -22,6 +22,8 @@ namespace Parbad.Data.Domain.Payments
 
         public bool IsPaid { get; set; }
 
+        public string GatewayAccountName { get; set; }
+
         public List<Transaction> Transactions { get; set; } = new List<Transaction>();
     }
 }

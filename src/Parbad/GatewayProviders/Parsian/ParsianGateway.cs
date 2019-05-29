@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Parbad.Abstraction;
 using Parbad.Data.Domain.Payments;
+using Parbad.GatewayBuilders;
 using Parbad.Internal;
 using Parbad.Net;
 using Parbad.Options;
@@ -16,11 +17,10 @@ using Parbad.Options;
 namespace Parbad.GatewayProviders.Parsian
 {
     [Gateway(Name)]
-    public class ParsianGateway : IGateway
+    public class ParsianGateway : Gateway<ParsianGatewayAccount>
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
-        private readonly IOptions<ParsianGatewayOptions> _options;
         private readonly IOptions<MessagesOptions> _messageOptions;
 
         public const string Name = "Parsian";
@@ -28,20 +28,22 @@ namespace Parbad.GatewayProviders.Parsian
         public ParsianGateway(
             IHttpContextAccessor httpContextAccessor,
             IHttpClientFactory httpClientFactory,
-            IOptions<ParsianGatewayOptions> options,
-            IOptions<MessagesOptions> messageOptions)
+            IGatewayAccountProvider<ParsianGatewayAccount> accountProvider,
+            IOptions<MessagesOptions> messageOptions) : base(accountProvider)
         {
             _httpContextAccessor = httpContextAccessor;
             _httpClient = httpClientFactory.CreateClient(this);
-            _options = options;
             _messageOptions = messageOptions;
         }
 
-        public virtual async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
+        /// <inheritdoc />
+        public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
         {
             if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-            var data = ParsianHelper.CreateRequestData(_options.Value, invoice);
+            var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
+
+            var data = ParsianHelper.CreateRequestData(account, invoice);
 
             var responseMessage = await _httpClient
                 .PostXmlAsync(ParsianHelper.RequestServiceUrl, data, cancellationToken)
@@ -49,10 +51,11 @@ namespace Parbad.GatewayProviders.Parsian
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
-            return ParsianHelper.CreateRequestResult(response, _httpContextAccessor, _messageOptions.Value);
+            return ParsianHelper.CreateRequestResult(response, _httpContextAccessor, account, _messageOptions.Value);
         }
 
-        public virtual async Task<IPaymentVerifyResult> VerifyAsync(Payment payment, CancellationToken cancellationToken = default)
+        /// <inheritdoc />
+        public override async Task<IPaymentVerifyResult> VerifyAsync(Payment payment, CancellationToken cancellationToken = default)
         {
             if (payment == null) throw new ArgumentNullException(nameof(payment));
 
@@ -63,7 +66,9 @@ namespace Parbad.GatewayProviders.Parsian
                 return callbackResult.Result;
             }
 
-            var data = ParsianHelper.CreateVerifyData(_options.Value, callbackResult);
+            var account = await GetAccountAsync(payment).ConfigureAwaitFalse();
+
+            var data = ParsianHelper.CreateVerifyData(account, callbackResult);
 
             var responseMessage = await _httpClient
                 .PostXmlAsync(ParsianHelper.VerifyServiceUrl, data, cancellationToken)
@@ -74,11 +79,14 @@ namespace Parbad.GatewayProviders.Parsian
             return ParsianHelper.CreateVerifyResult(response, callbackResult, _messageOptions.Value);
         }
 
-        public virtual async Task<IPaymentRefundResult> RefundAsync(Payment payment, Money amount, CancellationToken cancellationToken = default)
+        /// <inheritdoc />
+        public override async Task<IPaymentRefundResult> RefundAsync(Payment payment, Money amount, CancellationToken cancellationToken = default)
         {
             if (payment == null) throw new ArgumentNullException(nameof(payment));
 
-            var data = ParsianHelper.CreateRefundData(_options.Value, payment, amount);
+            var account = await GetAccountAsync(payment).ConfigureAwaitFalse();
+
+            var data = ParsianHelper.CreateRefundData(account, payment, amount);
 
             var responseMessage = await _httpClient
                 .PostXmlAsync(ParsianHelper.RefundServiceUrl, data, cancellationToken)

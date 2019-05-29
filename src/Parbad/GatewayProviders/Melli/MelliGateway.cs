@@ -11,6 +11,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Parbad.Abstraction;
 using Parbad.Data.Domain.Payments;
+using Parbad.GatewayBuilders;
 using Parbad.Internal;
 using Parbad.Net;
 using Parbad.Options;
@@ -19,47 +20,61 @@ using Parbad.GatewayProviders.Melli.Models;
 
 namespace Parbad.GatewayProviders.Melli
 {
+    /// <summary>
+    /// Melli Gateway.
+    /// </summary>
     [Gateway(Name)]
-    public class MelliGateway : IGateway
+    public class MelliGateway : Gateway<MelliGatewayAccount>
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
-        private readonly IOptions<MelliGatewayOptions> _options;
         private readonly IOptions<MessagesOptions> _messageOptions;
 
         public const string Name = "Melli";
 
+        /// <summary>
+        /// Initializes an instance of <see cref="MelliGateway"/>.
+        /// </summary>
+        /// <param name="httpContextAccessor"></param>
+        /// <param name="httpClientFactory"></param>
+        /// <param name="accountProvider"></param>
+        /// <param name="messageOptions"></param>
         public MelliGateway(
             IHttpContextAccessor httpContextAccessor,
             IHttpClientFactory httpClientFactory,
-            IOptions<MelliGatewayOptions> options,
-            IOptions<MessagesOptions> messageOptions)
+            IGatewayAccountProvider<MelliGatewayAccount> accountProvider,
+            IOptions<MessagesOptions> messageOptions) : base(accountProvider)
         {
             _httpContextAccessor = httpContextAccessor;
             _httpClient = httpClientFactory.CreateClient(this);
-            _options = options;
             _messageOptions = messageOptions;
         }
 
-        public virtual async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
+        /// <inheritdoc />
+        public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
         {
             if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-            var data = MelliHelper.CreateRequestData(invoice, _options.Value);
+            var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
+
+            var data = MelliHelper.CreateRequestData(invoice, account);
 
             var result = await PostJsonAsync<MelliApiRequestResult>(MelliHelper.ServiceRequestUrl, data, cancellationToken).ConfigureAwaitFalse();
 
-            return MelliHelper.CreateRequestResult(result, _httpContextAccessor, _messageOptions.Value);
+            return MelliHelper.CreateRequestResult(result, _httpContextAccessor, account, _messageOptions.Value);
         }
 
-        public virtual async Task<IPaymentVerifyResult> VerifyAsync(Payment payment, CancellationToken cancellationToken = default)
+        /// <inheritdoc />
+        public override async Task<IPaymentVerifyResult> VerifyAsync(Payment payment, CancellationToken cancellationToken = default)
         {
             if (payment == null) throw new ArgumentNullException(nameof(payment));
+
+            var account = await GetAccountAsync(payment).ConfigureAwaitFalse();
 
             var data = MelliHelper.CreateCallbackResult(
                 payment,
                 _httpContextAccessor.HttpContext.Request,
-                _options.Value,
+                account,
                 _messageOptions.Value);
 
             if (!data.IsSucceed)
@@ -72,15 +87,14 @@ namespace Parbad.GatewayProviders.Melli
             return MelliHelper.CreateVerifyResult(data.Token, result, _messageOptions.Value);
         }
 
-        public virtual Task<IPaymentRefundResult> RefundAsync(Payment payment, Money amount, CancellationToken cancellationToken = default)
+        /// <inheritdoc />
+        public override Task<IPaymentRefundResult> RefundAsync(Payment payment, Money amount, CancellationToken cancellationToken = default)
         {
             return PaymentRefundResult.Failed(Resources.RefundNotSupports).ToInterfaceAsync();
         }
 
         private async Task<T> PostJsonAsync<T>(string url, object data, CancellationToken cancellationToken = default)
         {
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Ssl3;
-
             var responseMessage = await _httpClient.PostJsonAsync(url, data, cancellationToken).ConfigureAwaitFalse();
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();

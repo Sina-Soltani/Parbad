@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Parbad.Builder;
+using Parbad.Sample.WebForm.Services;
 
 namespace Parbad.Sample.WebForm
 {
@@ -13,16 +15,22 @@ namespace Parbad.Sample.WebForm
                     {
                         gateways
                             .AddMellat()
-                            .WithOptions(options =>
+                            .WithAccounts(accounts =>
                             {
-                                options.TerminalId = 123;
-                                options.UserName = "foo";
-                                options.UserPassword = "bar";
+                                accounts.AddInMemory(account =>
+                                {
+                                    account.TerminalId = 123;
+                                    account.UserName = "MyId";
+                                    account.UserPassword = "MyPassword";
+                                });
+
+                                // Sample: Add the accounts from your database or a service.
+                                //accounts.Add<MellatAccountSource>(ServiceLifetime.Transient);
                             });
 
                         gateways
                             .AddParbadVirtual()
-                            .WithOptions(options => options.GatewayPath = "/virtual");
+                            .WithOptions(options => options.GatewayPath = "/MyVirtualGateway");
                     })
                     .ConfigureHttpContext(builder => builder.UseOwinFromCurrentHttpContext())
                     .ConfigureDatabase(builder =>

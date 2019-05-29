@@ -60,7 +60,6 @@ namespace Parbad.Internal
         {
             if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-
             _logger.LogInformation(LoggingEvents.RequestPayment, $"New payment request with the tracking number {invoice.TrackingNumber} is started." +
                                                                     $"{nameof(invoice.Amount)}:{invoice.Amount}" +
                                                                     $"GatewayName:{GatewayHelper.GetNameByType(invoice.GatewayType)}");
@@ -136,30 +135,20 @@ namespace Parbad.Internal
             }
             catch (Exception exception)
             {
-                string exceptionMessage;
-
-                if (exception is OptionsValidationException)
-                {
-                    exceptionMessage = $"Gateway {gateway.GetName()} is not configured or has some validation errors.";
-                }
-                else
-                {
-                    exceptionMessage = exception.Message;
-                }
-
-                _logger.LogError(exception, exceptionMessage);
+                _logger.LogError(exception, exception.Message);
 
                 newPayment.IsCompleted = true;
                 newPayment.IsPaid = false;
                 newPayment.UpdatedOn = DateTime.UtcNow;
 
-                requestResult = PaymentRequestResult.Failed(exceptionMessage);
+                requestResult = PaymentRequestResult.Failed(exception.Message);
             }
 
             requestResult.TrackingNumber = invoice.TrackingNumber;
             requestResult.Amount = invoice.Amount;
             requestResult.GatewayName = gateway.GetName();
 
+            newPayment.GatewayAccountName = requestResult.GatewayAccountName;
             newPayment.Transactions.Add(new Transaction
             {
                 Amount = invoice.Amount,
@@ -218,6 +207,7 @@ namespace Parbad.Internal
                     TrackingNumber = payment.TrackingNumber,
                     Amount = payment.Amount,
                     GatewayName = payment.GatewayName,
+                    GatewayAccountName = payment.GatewayAccountName,
                     TransactionCode = payment.TransactionCode,
                     IsSucceed = false,
                     Message = "The requested payment is already processed before."
@@ -263,6 +253,7 @@ namespace Parbad.Internal
                     Amount = payment.Amount,
                     IsSucceed = false,
                     GatewayName = payment.GatewayName,
+                    GatewayAccountName = payment.GatewayAccountName,
                     Message = message
                 };
             }
@@ -279,10 +270,6 @@ namespace Parbad.Internal
                     .VerifyAsync(payment, cancellationToken)
                     .ConfigureAwaitFalse() as PaymentVerifyResult;
             }
-            catch (OptionsValidationException)
-            {
-                throw new GatewayOptionsConfigurationException(gateway.GetName());
-            }
             catch (Exception exception)
             {
                 _logger.LogError(exception, "Parbad exception. An error occurred during requesting.");
@@ -294,6 +281,7 @@ namespace Parbad.Internal
             verifyResult.TrackingNumber = payment.TrackingNumber;
             verifyResult.Amount = payment.Amount;
             verifyResult.GatewayName = payment.GatewayName;
+            verifyResult.GatewayAccountName = payment.GatewayAccountName;
 
             _logger.LogInformation(LoggingEvents.VerifyPayment, "Verifying finished. " +
                                                                 $"Tracking Number {payment.TrackingNumber}. " +
@@ -382,10 +370,6 @@ namespace Parbad.Internal
                     .RefundAsync(payment, amountToRefund, cancellationToken)
                     .ConfigureAwaitFalse() as PaymentRefundResult;
             }
-            catch (OptionsValidationException)
-            {
-                throw new GatewayOptionsConfigurationException(gateway.GetName());
-            }
             catch (Exception exception)
             {
                 _logger.LogError(exception, "Parbad exception. An error occurred during requesting.");
@@ -397,6 +381,7 @@ namespace Parbad.Internal
             refundResult.TrackingNumber = payment.TrackingNumber;
             refundResult.Amount = amountToRefund;
             refundResult.GatewayName = payment.GatewayName;
+            refundResult.GatewayAccountName = payment.GatewayAccountName;
 
             payment.Transactions.Add(new Transaction
             {
