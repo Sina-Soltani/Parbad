@@ -18,12 +18,4 @@ test: off
 artifacts:
   - path: '**\artifacts\*.nupkg'
     name: Release
-deploy:
-- provider: NuGet
-  api_key:
-    secure: jCr3Vt57OtWB9DNEg/Xxt3eUXntuv/3hXMpApRaOehs6UwkJjboClNmVlZwPUCmX
-  skip_symbols: true
-  artifact: Release
-  on:
-    branch: master
-    configuration: release
+deploy: off
