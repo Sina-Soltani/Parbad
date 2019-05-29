@@ -516,6 +516,11 @@
             Specifies the contract for a collection of service descriptors.
             </summary>
         </member>
+        <member name="M:Parbad.GatewayBuilders.IGatewayAccountBuilder`1.Clear">
+            <summary>
+            Removes the account sources of this gateway.
+            </summary>
+        </member>
         <member name="M:Parbad.GatewayBuilders.IGatewayAccountBuilder`1.Add(Parbad.GatewayBuilders.IGatewayAccountSource{`0})">
             <summary>
             Adds the given <paramref name="source"/> for specifying the accounts of type <typeparamref name="TAccount"/>.

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Parbad.Abstraction;
 using Parbad.GatewayBuilders;
 
@@ -14,6 +15,13 @@ namespace Parbad.Internal
         }
 
         public IServiceCollection Services { get; }
+
+        public IGatewayAccountBuilder<TAccount> Clear()
+        {
+            Services.RemoveAll<IGatewayAccountSource<TAccount>>();
+
+            return this;
+        }
 
         public IGatewayAccountBuilder<TAccount> Add(IGatewayAccountSource<TAccount> source)
         {

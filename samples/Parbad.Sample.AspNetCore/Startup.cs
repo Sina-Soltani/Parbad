@@ -33,6 +33,9 @@ namespace Parbad.Sample.AspNetCore
                                 account.UserName = "MyId";
                                 account.UserPassword = "MyPassword";
                             });
+
+                            // Sample: Add the accounts using your database or a service.
+                            //accounts.Add<MellatAccountSource>(ServiceLifetime.Transient);
                         });
 
                     gateways
@@ -43,10 +46,10 @@ namespace Parbad.Sample.AspNetCore
                 .ConfigureDatabase(builder =>
                 {
                     // In-Memory (For testing and development only)
-                    //builder.UseInMemoryDatabase("MyDatabase");
+                    builder.UseInMemoryDatabase("MyDatabase");
 
                     // SQL Server
-                    builder.UseSqlServer("Server=.;Database=Parbad;Trusted_Connection=True;", options => options.UseParbadMigrations());
+                    //builder.UseSqlServer("Connection String", options => options.UseParbadMigrations());
 
                     // MySQL
                     //builder.UseMySQL("Connection String", options => options.UseParbadMigrations());
@@ -57,10 +60,10 @@ namespace Parbad.Sample.AspNetCore
                 .ConfigureDatabaseInitializer(builder =>
                 {
                     // For In-Memory
-                    //builder.CreateDatabase();
+                    builder.CreateDatabase();
 
                     // (SQL Server, MySQL, etc.)
-                    builder.CreateAndMigrateDatabase();
+                    //builder.CreateAndMigrateDatabase();
 
                     // (Sqlite, etc.)
                     //builder.DeleteAndCreateDatabase();

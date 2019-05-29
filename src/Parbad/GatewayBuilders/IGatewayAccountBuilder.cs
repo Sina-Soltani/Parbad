@@ -16,6 +16,11 @@ namespace Parbad.GatewayBuilders
         IServiceCollection Services { get; }
 
         /// <summary>
+        /// Removes the account sources of this gateway.
+        /// </summary>
+        IGatewayAccountBuilder<TAccount> Clear();
+
+        /// <summary>
         /// Adds the given <paramref name="source"/> for specifying the accounts of type <typeparamref name="TAccount"/>.
         /// </summary>
         /// <param name="source">An account source for specifying the accounts.</param>
