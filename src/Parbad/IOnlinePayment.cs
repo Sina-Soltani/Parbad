@@ -9,7 +9,7 @@ using Parbad.Abstraction;
 namespace Parbad
 {
     /// <summary>
-    /// Provides solution to perform payment request, verify the requested payment and
+    /// Provides an easy solution to perform payment request, verify the requested payment and
     /// refund a payment.
     /// </summary>
     public interface IOnlinePayment
