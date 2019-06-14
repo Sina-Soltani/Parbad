@@ -13,6 +13,8 @@ namespace Parbad.Builder
     {
         /// <summary>
         /// Uses <see cref="IMemoryCache"/> for saving and loading data.
+        /// <para>Note: The information inside the memory will be removed
+        /// if the website or server goes down for any reasons. Use MemoryCache only for development.</para>
         /// </summary>
         /// <param name="builder"></param>
         public static IStorageBuilder UseMemoryCache(this IStorageBuilder builder)
@@ -20,6 +22,8 @@ namespace Parbad.Builder
 
         /// <summary>
         /// Uses <see cref="IMemoryCache"/> for saving and loading data.
+        /// <para>Note: The information inside the memory will be removed
+        /// if the website or server goes down for any reasons. Use MemoryCache only for development.</para>
         /// </summary>
         /// <param name="builder"></param>
         /// <param name="configureOptions"></param>
