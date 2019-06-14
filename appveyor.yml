@@ -1,4 +1,4 @@
-version: 2.1.{build}
+version: 3.0.{build}
 platform: Any CPU
 image: Visual Studio 2017
 configuration: Release
@@ -9,11 +9,15 @@ build_script:
   - dotnet build "src\Parbad.Owin" -c %CONFIGURATION% --no-dependencies
   - dotnet build "src\Parbad.Mvc" -c %CONFIGURATION% --no-dependencies
   - dotnet build "src\Parbad.AspNetCore" -c %CONFIGURATION% --no-dependencies
+  - dotnet build "src\Parbad.Storage\Cache\src" -c %CONFIGURATION% --no-dependencies
+  - dotnet build "src\Parbad.Storage\EntityFrameworkCore\src" -c %CONFIGURATION% --no-dependencies
 after_build:
   - dotnet pack "src\Parbad" -c %CONFIGURATION% -o artifacts
   - dotnet pack "src\Parbad.Owin" -c %CONFIGURATION% --no-build -o artifacts
   - dotnet pack "src\Parbad.Mvc" -c %CONFIGURATION% --no-build -o artifacts
   - dotnet pack "src\Parbad.AspNetCore" -c %CONFIGURATION% --no-build -o artifacts
+  - dotnet pack "src\Parbad.Storage\Cache\src" -c %CONFIGURATION% --no-build -o artifacts
+  - dotnet pack "src\Parbad.Storage\EntityFrameworkCore\src" -c %CONFIGURATION% --no-build -o artifacts
 test: off
 artifacts:
   - path: '**\artifacts\*.nupkg'
