@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Parbad.Abstraction;
-using Parbad.Data.Domain.Payments;
 using Parbad.GatewayBuilders;
 using Parbad.Internal;
 using Parbad.Net;
@@ -47,9 +46,9 @@ namespace Parbad.GatewayProviders.Saman
         }
 
         /// <inheritdoc />
-        public override async Task<IPaymentVerifyResult> VerifyAsync(Payment payment, CancellationToken cancellationToken = default)
+        public override async Task<IPaymentVerifyResult> VerifyAsync(VerifyContext context, CancellationToken cancellationToken = default)
         {
-            if (payment == null) throw new ArgumentNullException(nameof(payment));
+            if (context == null) throw new ArgumentNullException(nameof(context));
 
             var callbackResult = SamanHelper.CreateCallbackResult(_httpContextAccessor.HttpContext.Request, _messageOptions.Value);
 
@@ -58,7 +57,7 @@ namespace Parbad.GatewayProviders.Saman
                 return callbackResult.Result;
             }
 
-            var account = await GetAccountAsync(payment).ConfigureAwaitFalse();
+            var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 
             var data = SamanHelper.CreateVerifyData(callbackResult, account);
 
@@ -68,18 +67,18 @@ namespace Parbad.GatewayProviders.Saman
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
-            return SamanHelper.CreateVerifyResult(response, payment, callbackResult, _messageOptions.Value);
+            return SamanHelper.CreateVerifyResult(response, context, callbackResult, _messageOptions.Value);
         }
 
         /// <inheritdoc />
-        public override async Task<IPaymentRefundResult> RefundAsync(Payment payment, Money amount, CancellationToken cancellationToken = default)
+        public override async Task<IPaymentRefundResult> RefundAsync(VerifyContext context, Money amount, CancellationToken cancellationToken = default)
         {
-            if (payment == null) throw new ArgumentNullException(nameof(payment));
+            if (context == null) throw new ArgumentNullException(nameof(context));
             if (amount == null) throw new ArgumentNullException(nameof(amount));
 
-            var account = await GetAccountAsync(payment).ConfigureAwaitFalse();
+            var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 
-            var data = SamanHelper.CreateRefundData(payment, amount, account);
+            var data = SamanHelper.CreateRefundData(context, amount, account);
 
             var responseMessage = await _httpClient
                 .PostXmlAsync(SamanHelper.WebServiceUrl, data, cancellationToken)

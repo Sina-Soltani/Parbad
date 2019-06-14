@@ -6,4 +6,5 @@ using System.Runtime.CompilerServices;
 [assembly:
     InternalsVisibleTo("Parbad.Owin"),
     InternalsVisibleTo("Parbad.Mvc"),
-    InternalsVisibleTo("Parbad.AspNetCore")]
+    InternalsVisibleTo("Parbad.AspNetCore"),
+    InternalsVisibleTo("Parbad.Storage.EntityFrameworkCore")]

@@ -353,6 +353,14 @@
       <Project>{a1815d72-31a8-45bf-95b5-2a1f1008e0f8}</Project>
       <Name>Parbad.Owin</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Parbad.Storage\Cache\src\Parbad.Storage.Cache.csproj">
+      <Project>{cb53d8c8-452a-4d74-a3d9-cbe9167009dd}</Project>
+      <Name>Parbad.Storage.Cache</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Parbad.Storage\EntityFrameworkCore\src\Parbad.Storage.EntityFrameworkCore.csproj">
+      <Project>{601e9a72-3154-4d7b-aada-68167a60e29e}</Project>
+      <Name>Parbad.Storage.EntityFrameworkCore</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Parbad\Parbad.csproj">
       <Project>{53d0b3cc-2fd4-4113-a368-60715fb8518e}</Project>
       <Name>Parbad</Name>

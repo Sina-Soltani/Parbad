@@ -1,0 +1,193 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Parbad.Storage.Cache</name>
+    </assembly>
+    <members>
+        <member name="T:Parbad.Storage.Cache.Abstractions.CacheStorage">
+            <summary>
+            Abstract cache implementation of Parbad storage.
+            </summary>
+        </member>
+        <member name="P:Parbad.Storage.Cache.Abstractions.CacheStorage.Payments">
+            <inheritdoc />
+        </member>
+        <member name="P:Parbad.Storage.Cache.Abstractions.CacheStorage.Transactions">
+            <inheritdoc />
+        </member>
+        <member name="P:Parbad.Storage.Cache.Abstractions.CacheStorage.Collection">
+            <summary>
+            A collection for holding the data.
+            </summary>
+        </member>
+        <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.CreatePaymentAsync(Parbad.Storage.Abstractions.Payment,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.UpdatePaymentAsync(Parbad.Storage.Abstractions.Payment,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.DeletePaymentAsync(Parbad.Storage.Abstractions.Payment,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.CreateTransactionAsync(Parbad.Storage.Abstractions.Transaction,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.UpdateTransactionAsync(Parbad.Storage.Abstractions.Transaction,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.DeleteTransactionAsync(Parbad.Storage.Abstractions.Transaction,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.FindPayment(Parbad.Storage.Abstractions.Payment)">
+            <summary>
+            Finds a payment in storage.
+            </summary>
+            <param name="payment"></param>
+        </member>
+        <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.FindTransaction(Parbad.Storage.Abstractions.Transaction)">
+            <summary>
+            Finds a transaction in storage.
+            </summary>
+            <param name="transaction"></param>
+        </member>
+        <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.GenerateNewPaymentId">
+            <summary>
+            Generates a unique id for a new payment record.
+            </summary>
+        </member>
+        <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.GenerateNewTransactionId">
+            <summary>
+            Generates a unique id for a new transaction record.
+            </summary>
+        </member>
+        <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.SaveChangesAsync(System.Threading.CancellationToken)">
+            <summary>
+            Saves the current data in storage.
+            </summary>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="T:Parbad.Storage.Cache.Abstractions.ICacheStorageCollection">
+            <summary>
+            A collection for holding the data.
+            </summary>
+        </member>
+        <member name="P:Parbad.Storage.Cache.Abstractions.ICacheStorageCollection.Payments">
+            <summary>
+            Gets or sets a list of current payment records.
+            </summary>
+        </member>
+        <member name="P:Parbad.Storage.Cache.Abstractions.ICacheStorageCollection.Transactions">
+            <summary>
+            Gets or sets a list of current transaction records.
+            </summary>
+        </member>
+        <member name="T:Parbad.Storage.Cache.DistributedCache.DistributedCacheStorage">
+            <summary>
+            Distributed cache implementation of Parbad storage.
+            </summary>
+        </member>
+        <member name="M:Parbad.Storage.Cache.DistributedCache.DistributedCacheStorage.#ctor(Microsoft.Extensions.Caching.Distributed.IDistributedCache,Microsoft.Extensions.Options.IOptions{Parbad.Storage.Cache.DistributedCache.DistributedCacheStorageOptions})">
+            <summary>
+            Initializes an instance of <see cref="T:Parbad.Storage.Cache.DistributedCache.DistributedCacheStorage"/>.
+            </summary>
+            <param name="distributedCache"></param>
+            <param name="options"></param>
+        </member>
+        <member name="P:Parbad.Storage.Cache.DistributedCache.DistributedCacheStorage.Collection">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.Cache.DistributedCache.DistributedCacheStorage.SaveChangesAsync(System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:Parbad.Storage.Cache.DistributedCache.DistributedCacheStorageOptions">
+            <summary>
+            Distributed cache storage options.
+            </summary>
+        </member>
+        <member name="P:Parbad.Storage.Cache.DistributedCache.DistributedCacheStorageOptions.CacheKey">
+            <summary>
+            Gets or sets the key name which will be used by <see cref="T:Microsoft.Extensions.Caching.Distributed.IDistributedCache"/>.
+            The default value is "parbad.storage.cache"
+            </summary>
+        </member>
+        <member name="P:Parbad.Storage.Cache.DistributedCache.DistributedCacheStorageOptions.CacheEntryOptions">
+            <summary>
+            Provides the cache options for an entry in <see cref="T:Microsoft.Extensions.Caching.Distributed.IDistributedCache"/>.
+            </summary>
+        </member>
+        <member name="T:Parbad.Storage.Cache.Internal.CacheStorageCollection">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.Cache.Internal.CacheStorageCollection.#ctor">
+            <summary>
+            Initializes an instance of <see cref="T:Parbad.Storage.Cache.Internal.CacheStorageCollection"/>.
+            </summary>
+        </member>
+        <member name="P:Parbad.Storage.Cache.Internal.CacheStorageCollection.Payments">
+            <inheritdoc />
+        </member>
+        <member name="P:Parbad.Storage.Cache.Internal.CacheStorageCollection.Transactions">
+            <inheritdoc />
+        </member>
+        <member name="T:Parbad.Storage.Cache.MemoryCache.MemoryCacheStorage">
+            <summary>
+            Memory cache implementation of Parbad storage.
+            </summary>
+        </member>
+        <member name="M:Parbad.Storage.Cache.MemoryCache.MemoryCacheStorage.#ctor(Microsoft.Extensions.Caching.Memory.IMemoryCache,Microsoft.Extensions.Options.IOptions{Parbad.Storage.Cache.MemoryCache.MemoryCacheStorageOptions})">
+            <summary>
+            Initializes an instance of <see cref="T:Parbad.Storage.Cache.MemoryCache.MemoryCacheStorage"/>.
+            </summary>
+            <param name="memoryCache"></param>
+            <param name="options"></param>
+        </member>
+        <member name="P:Parbad.Storage.Cache.MemoryCache.MemoryCacheStorage.Collection">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.Cache.MemoryCache.MemoryCacheStorage.SaveChangesAsync(System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:Parbad.Storage.Cache.MemoryCache.MemoryCacheStorageOptions">
+            <summary>
+            Memory cache storage options.
+            </summary>
+        </member>
+        <member name="P:Parbad.Storage.Cache.MemoryCache.MemoryCacheStorageOptions.CacheKey">
+            <summary>
+            Gets or sets the key name which will be used by <see cref="T:Microsoft.Extensions.Caching.Memory.IMemoryCache"/>.
+            The default value is "parbad.storage.cache"
+            </summary>
+        </member>
+        <member name="P:Parbad.Storage.Cache.MemoryCache.MemoryCacheStorageOptions.CacheEntryOptions">
+            <summary>
+            Represents the cache options applied to an entry of the <see cref="T:Microsoft.Extensions.Caching.Memory.IMemoryCache"/> instance.
+            </summary>
+        </member>
+        <member name="M:Parbad.Builder.DistributedCacheStorageBuilderExtensions.UseDistributedCache(Parbad.Storage.Builder.IStorageBuilder)">
+            <summary>
+            Uses <see cref="T:Microsoft.Extensions.Caching.Distributed.IDistributedCache"/> for saving and loading data.
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.Builder.DistributedCacheStorageBuilderExtensions.UseDistributedCache(Parbad.Storage.Builder.IStorageBuilder,System.Action{Parbad.Storage.Cache.DistributedCache.DistributedCacheStorageOptions})">
+            <summary>
+            Uses <see cref="T:Microsoft.Extensions.Caching.Distributed.IDistributedCache"/> for saving and loading data.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureOptions"></param>
+        </member>
+        <member name="M:Parbad.Builder.MemoryCacheStorageBuilderExtensions.UseMemoryCache(Parbad.Storage.Builder.IStorageBuilder)">
+            <summary>
+            Uses <see cref="T:Microsoft.Extensions.Caching.Memory.IMemoryCache"/> for saving and loading data.
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.Builder.MemoryCacheStorageBuilderExtensions.UseMemoryCache(Parbad.Storage.Builder.IStorageBuilder,System.Action{Parbad.Storage.Cache.MemoryCache.MemoryCacheStorageOptions})">
+            <summary>
+            Uses <see cref="T:Microsoft.Extensions.Caching.Memory.IMemoryCache"/> for saving and loading data.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureOptions"></param>
+        </member>
+    </members>
+</doc>

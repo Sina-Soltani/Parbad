@@ -3,7 +3,6 @@
 
 using Microsoft.AspNetCore.Http;
 using Parbad.Abstraction;
-using Parbad.Data.Domain.Payments;
 using Parbad.Options;
 using System;
 using System.Collections.Generic;
@@ -83,7 +82,7 @@ namespace Parbad.GatewayProviders.AsanPardakht
         }
 
         public static AsanPardakhtCallbackResult CreateCallbackResult(
-            Payment payment,
+            VerifyContext context,
             AsanPardakhtGatewayAccount account,
             HttpRequest httpRequest,
             MessagesOptions messagesOptions)
@@ -100,7 +99,7 @@ namespace Parbad.GatewayProviders.AsanPardakht
             {
                 verifyResult = new PaymentVerifyResult
                 {
-                    TrackingNumber = payment.TrackingNumber,
+                    TrackingNumber = context.Payment.TrackingNumber,
                     IsSucceed = false,
                     Message = messagesOptions.InvalidDataReceivedFromGateway
                 };
@@ -133,7 +132,7 @@ namespace Parbad.GatewayProviders.AsanPardakht
                 {
                     if (long.TryParse(amount, out var longAmount))
                     {
-                        if (longAmount != (long)payment.Amount)
+                        if (longAmount != (long)context.Payment.Amount)
                         {
                             isSucceed = false;
                             message = "مبلغ پرداخت شده با مبلغ درخواست شده مطابقت ندارد.";
@@ -151,7 +150,7 @@ namespace Parbad.GatewayProviders.AsanPardakht
                     verifyResult = new PaymentVerifyResult
                     {
                         IsSucceed = false,
-                        TrackingNumber = payment.TrackingNumber,
+                        TrackingNumber = context.Payment.TrackingNumber,
                         TransactionCode = rrn,
                         Message = message
                     };

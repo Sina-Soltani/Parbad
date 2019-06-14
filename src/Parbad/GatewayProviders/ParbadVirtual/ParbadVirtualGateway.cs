@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Parbad.Abstraction;
-using Parbad.Data.Domain.Payments;
 using Parbad.GatewayBuilders;
 using Parbad.Http;
 using Parbad.Internal;
@@ -63,7 +62,7 @@ namespace Parbad.GatewayProviders.ParbadVirtual
         }
 
         /// <inheritdoc />
-        public override Task<IPaymentVerifyResult> VerifyAsync(Payment payment, CancellationToken cancellationToken = default)
+        public override Task<IPaymentVerifyResult> VerifyAsync(VerifyContext context, CancellationToken cancellationToken = default)
         {
             if (!_httpContextAccessor.HttpContext.Request.TryGetParam("Result", out var result))
             {
@@ -85,7 +84,7 @@ namespace Parbad.GatewayProviders.ParbadVirtual
         }
 
         /// <inheritdoc />
-        public override Task<IPaymentRefundResult> RefundAsync(Payment payment, Money amount, CancellationToken cancellationToken = default)
+        public override Task<IPaymentRefundResult> RefundAsync(VerifyContext context, Money amount, CancellationToken cancellationToken = default)
         {
             return PaymentRefundResult.Succeed().ToInterfaceAsync();
         }

@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Parbad.Abstraction;
-using Parbad.Data.Domain.Payments;
 using Parbad.Http;
 using Parbad.Internal;
 using Parbad.Options;
@@ -80,7 +79,7 @@ namespace Parbad.GatewayProviders.IranKish
         }
 
         public static IranKishCallbackResult CreateCallbackResult(
-            Payment payment,
+            VerifyContext context,
             IranKishGatewayAccount account,
             HttpRequest httpRequest,
             MessagesOptions messagesOptions)
@@ -99,7 +98,7 @@ namespace Parbad.GatewayProviders.IranKish
             PaymentVerifyResult verifyResult = null;
 
             if (merchantId != account.MerchantId ||
-                invoiceNumber != payment.TrackingNumber ||
+                invoiceNumber != context.Payment.TrackingNumber ||
                 token.IsNullOrEmpty())
             {
                 verifyResult = new PaymentVerifyResult
@@ -156,7 +155,7 @@ namespace Parbad.GatewayProviders.IranKish
 
         public static PaymentVerifyResult CreateVerifyResult(
             string webServiceResponse,
-            Payment payment,
+            VerifyContext context,
             IranKishCallbackResult callbackResult,
             MessagesOptions messagesOptions)
         {
@@ -174,7 +173,7 @@ namespace Parbad.GatewayProviders.IranKish
                 };
             }
 
-            var isSuccess = numericResult != (long)payment.Amount;
+            var isSuccess = numericResult != (long)context.Payment.Amount;
 
             var translatedMessage = isSuccess
                 ? messagesOptions.PaymentSucceed
