@@ -4,9 +4,9 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Parbad.Data.Domain.Payments;
 using Parbad.GatewayBuilders;
 using Parbad.Internal;
+using Parbad.Storage.Abstractions;
 
 namespace Parbad.Abstraction
 {
@@ -24,10 +24,10 @@ namespace Parbad.Abstraction
         public abstract Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default);
 
         /// <inheritdoc />
-        public abstract Task<IPaymentVerifyResult> VerifyAsync(Payment payment, CancellationToken cancellationToken = default);
+        public abstract Task<IPaymentVerifyResult> VerifyAsync(VerifyContext context, CancellationToken cancellationToken = default);
 
         /// <inheritdoc />
-        public abstract Task<IPaymentRefundResult> RefundAsync(Payment payment, Money amount, CancellationToken cancellationToken = default);
+        public abstract Task<IPaymentRefundResult> RefundAsync(VerifyContext context, Money amount, CancellationToken cancellationToken = default);
 
         protected virtual async Task<TAccount> GetAccountAsync(Invoice invoice)
         {

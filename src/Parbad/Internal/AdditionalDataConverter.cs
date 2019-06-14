@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using Parbad.Data.Domain.Transactions;
+using Parbad.Storage.Abstractions;
 
 namespace Parbad.Internal
 {

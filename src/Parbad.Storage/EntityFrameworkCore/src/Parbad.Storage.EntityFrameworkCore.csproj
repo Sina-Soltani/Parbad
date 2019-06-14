@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Parbad.Storage.EntityFrameworkCore</PackageId>
+    <Version>1.0.0</Version>
+    <LangVersion>latest</LangVersion>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
+    <Description>Entityframework Core implementation of Parbad storage.</Description>
+    <PackageProjectUrl>https://github.com/Sina-Soltani/Parbad</PackageProjectUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/Sina-Soltani/Parbad/master/images/Parbad.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/Sina-Soltani/Parbad</RepositoryUrl>
+    <Copyright>Copyright © Sina Soltani 2016</Copyright>
+    <PackageTags>Payment Gateway Bank Iran Shetab IranKish Mellat Melli Sadad Parsian Pasargad Saman Asan-Pardakht entityframework پرداخت درگاه بانک ایران شتاب ایران-کیش ملت ملی سداد پارسیان پاسارگاد سامان آسان-پرداخت</PackageTags>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Authors>Sina Soltani</Authors>
+    <Product>Parbad.Storage.EntityframeworkCore</Product>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>Parbad.Storage.EntityFrameworkCore.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>Parbad.Storage.EntityFrameworkCore.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="2.2.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Parbad\Parbad.csproj" />
+  </ItemGroup>
+
+</Project>

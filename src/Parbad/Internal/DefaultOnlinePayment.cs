@@ -4,24 +4,20 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Parbad.Abstraction;
-using Parbad.Data.Context;
-using Parbad.Data.Domain.Payments;
-using Parbad.Data.Domain.Transactions;
 using Parbad.Options;
-using Parbad.Exceptions;
 using Parbad.PaymentTokenProviders;
 using Parbad.Properties;
+using Parbad.Storage.Abstractions;
 
 namespace Parbad.Internal
 {
     /// <inheritdoc />
     public class DefaultOnlinePayment : IOnlinePayment
     {
-        private readonly ParbadDataContext _database;
+        private readonly IStorageManager _storageManager;
         private readonly IPaymentTokenProvider _tokenProvider;
         private readonly IGatewayProvider _gatewayProvider;
         private readonly IOptions<MessagesOptions> _messagesOptions;
@@ -31,24 +27,25 @@ namespace Parbad.Internal
         /// Initializes an instance of <see cref="DefaultOnlinePayment"/>.
         /// </summary>
         /// <param name="services"></param>
-        /// <param name="database"></param>
+        /// <param name="storageManager"></param>
         /// <param name="tokenProvider"></param>
         /// <param name="gatewayProvider"></param>
         /// <param name="messagesOptions"></param>
         /// <param name="logger"></param>
         public DefaultOnlinePayment(
             IServiceProvider services,
-            ParbadDataContext database,
+            IStorageManager storageManager,
             IPaymentTokenProvider tokenProvider,
             IGatewayProvider gatewayProvider,
             IOptions<MessagesOptions> messagesOptions,
             ILogger<IOnlinePayment> logger)
         {
             Services = services;
-            _database = database;
+            _storageManager = storageManager;
             _tokenProvider = tokenProvider;
             _messagesOptions = messagesOptions;
             _logger = logger;
+            _storageManager = storageManager;
             _gatewayProvider = gatewayProvider;
         }
 
@@ -65,9 +62,7 @@ namespace Parbad.Internal
                                                                     $"GatewayName:{GatewayHelper.GetNameByType(invoice.GatewayType)}");
 
             //  Check the tracking number
-            if (await _database.Payments
-                .AnyAsync(model => model.TrackingNumber == invoice.TrackingNumber, cancellationToken)
-                .ConfigureAwaitFalse())
+            if (await _storageManager.DoesPaymentExistAsync(invoice.TrackingNumber, cancellationToken).ConfigureAwaitFalse())
             {
                 _logger.LogInformation(LoggingEvents.RequestPayment, _messagesOptions.Value.DuplicateTrackingNumber);
 
@@ -86,9 +81,7 @@ namespace Parbad.Internal
                 .ConfigureAwaitFalse();
 
             //  Check the created payment token
-            if (await _database.Payments
-                .AnyAsync(model => model.Token == paymentToken, cancellationToken)
-                .ConfigureAwaitFalse())
+            if (await _storageManager.DoesPaymentExistAsync(paymentToken, cancellationToken).ConfigureAwaitFalse())
             {
                 var message = $"The payment token \"{paymentToken}\" already exists.";
 
@@ -99,7 +92,6 @@ namespace Parbad.Internal
 
             var gateway = _gatewayProvider.Provide(invoice.GatewayType);
 
-            //  Add database
             var newPayment = new Payment
             {
                 TrackingNumber = invoice.TrackingNumber,
@@ -107,17 +99,10 @@ namespace Parbad.Internal
                 IsCompleted = false,
                 IsPaid = false,
                 Token = paymentToken,
-                GatewayName = gateway.GetName(),
-                CreatedOn = DateTime.UtcNow
+                GatewayName = gateway.GetName()
             };
 
-            _database.Payments.Add(newPayment);
-
-            if (await _database.SaveChangesAsync(cancellationToken).ConfigureAwaitFalse() == 0)
-            {
-                _logger.LogError(LoggingEvents.RequestPayment, "Nothing is saved into the database.");
-                throw new DatabaseSaveRecordException();
-            }
+            await _storageManager.CreatePaymentAsync(newPayment, cancellationToken).ConfigureAwaitFalse();
 
             _logger.LogInformation(LoggingEvents.RequestPayment, $"The payment with tracking number {invoice.TrackingNumber} is about to processing." +
                                                                     $"{nameof(invoice.Amount)}:{invoice.Amount}" +
@@ -139,7 +124,6 @@ namespace Parbad.Internal
 
                 newPayment.IsCompleted = true;
                 newPayment.IsPaid = false;
-                newPayment.UpdatedOn = DateTime.UtcNow;
 
                 requestResult = PaymentRequestResult.Failed(exception.Message);
             }
@@ -149,21 +133,20 @@ namespace Parbad.Internal
             requestResult.GatewayName = gateway.GetName();
 
             newPayment.GatewayAccountName = requestResult.GatewayAccountName;
-            newPayment.Transactions.Add(new Transaction
+
+            await _storageManager.UpdatePaymentAsync(newPayment, cancellationToken).ConfigureAwaitFalse();
+
+            var newTransaction = new Transaction
             {
                 Amount = invoice.Amount,
                 Type = TransactionType.Request,
                 IsSucceed = requestResult.IsSucceed,
                 Message = requestResult.Message,
                 AdditionalData = AdditionalDataConverter.ToJson(requestResult),
-                CreatedOn = DateTime.UtcNow
-            });
+                PaymentId = newPayment.Id
+            };
 
-            if (await _database.SaveChangesAsync(cancellationToken).ConfigureAwaitFalse() == 0)
-            {
-                _logger.LogError(LoggingEvents.RequestPayment, "Nothing is saved into database.");
-                throw new DatabaseSaveRecordException();
-            }
+            await _storageManager.CreateTransactionAsync(newTransaction, cancellationToken).ConfigureAwaitFalse();
 
             return requestResult;
         }
@@ -182,10 +165,7 @@ namespace Parbad.Internal
                 throw new PaymentTokenProviderException("No Token is received.");
             }
 
-            var payment = await _database.Payments
-                .Include(model => model.Transactions)
-                .SingleOrDefaultAsync(model => model.Token == paymentToken, cancellationToken)
-                .ConfigureAwaitFalse();
+            var payment = await _storageManager.GetPaymentByTokenAsync(paymentToken, cancellationToken).ConfigureAwaitFalse();
 
             if (payment == null)
             {
@@ -230,22 +210,19 @@ namespace Parbad.Internal
 
                 payment.IsCompleted = true;
                 payment.IsPaid = false;
-                payment.UpdatedOn = DateTime.UtcNow;
-                payment.Transactions.Add(new Transaction
+
+                await _storageManager.UpdatePaymentAsync(payment, cancellationToken).ConfigureAwaitFalse();
+
+                var newTransaction = new Transaction
                 {
                     Amount = payment.Amount,
                     IsSucceed = false,
                     Message = message,
                     Type = TransactionType.Verify,
-                    CreatedOn = DateTime.UtcNow
-                });
+                    PaymentId = payment.Id
+                };
 
-                if (await _database.SaveChangesAsync(cancellationToken).ConfigureAwaitFalse() == 0)
-                {
-                    _logger.LogError(LoggingEvents.VerifyPayment, "Nothing is saved into database.");
-
-                    throw new DatabaseSaveRecordException();
-                }
+                await _storageManager.CreateTransactionAsync(newTransaction, cancellationToken).ConfigureAwaitFalse();
 
                 return new PaymentVerifyResult
                 {
@@ -260,6 +237,9 @@ namespace Parbad.Internal
 
             var gateway = _gatewayProvider.Provide(payment.GatewayName);
 
+            var transactions = await _storageManager.GetTransactionsAsync(payment, cancellationToken).ConfigureAwaitFalse();
+            var verifyContext = new VerifyContext(payment, transactions);
+
             _logger.LogInformation(LoggingEvents.VerifyPayment, $"The payment with the tracking Number {payment.TrackingNumber} is about to verifying.");
 
             PaymentVerifyResult verifyResult;
@@ -267,7 +247,7 @@ namespace Parbad.Internal
             try
             {
                 verifyResult = await gateway
-                    .VerifyAsync(payment, cancellationToken)
+                    .VerifyAsync(verifyContext, cancellationToken)
                     .ConfigureAwaitFalse() as PaymentVerifyResult;
             }
             catch (Exception exception)
@@ -292,23 +272,20 @@ namespace Parbad.Internal
             payment.IsCompleted = true;
             payment.IsPaid = verifyResult.IsSucceed;
             payment.TransactionCode = verifyResult.TransactionCode;
-            payment.UpdatedOn = DateTime.UtcNow;
-            payment.Transactions.Add(new Transaction
+
+            await _storageManager.UpdatePaymentAsync(payment, cancellationToken).ConfigureAwaitFalse();
+
+            var transaction = new Transaction
             {
                 Amount = verifyResult.Amount,
                 IsSucceed = verifyResult.IsSucceed,
                 Message = verifyResult.Message,
                 Type = TransactionType.Verify,
                 AdditionalData = AdditionalDataConverter.ToJson(verifyResult),
-                CreatedOn = DateTime.UtcNow
-            });
+                PaymentId = payment.Id
+            };
 
-            if (await _database.SaveChangesAsync(cancellationToken).ConfigureAwaitFalse() == 0)
-            {
-                _logger.LogError(LoggingEvents.VerifyPayment, "Nothing is saved into database.");
-
-                throw new DatabaseSaveRecordException();
-            }
+            await _storageManager.CreateTransactionAsync(transaction, cancellationToken).ConfigureAwaitFalse();
 
             _logger.LogInformation(LoggingEvents.VerifyPayment, "Verify ends.");
 
@@ -322,10 +299,12 @@ namespace Parbad.Internal
 
             _logger.LogInformation(LoggingEvents.RefundPayment, $"Refund starts for the payment with tracking number {invoice.TrackingNumber}.");
 
-            var payment = await _database.Payments
-                .Include(model => model.Transactions)
-                .SingleOrDefaultAsync(model => model.TrackingNumber == invoice.TrackingNumber, cancellationToken)
-                .ConfigureAwaitFalse();
+            //var payment = await _database.Payments
+            //    .Include(model => model.Transactions)
+            //    .SingleOrDefaultAsync(model => model.TrackingNumber == invoice.TrackingNumber, cancellationToken)
+            //    .ConfigureAwaitFalse();
+
+            var payment = await _storageManager.GetPaymentByTrackingNumberAsync(invoice.TrackingNumber, cancellationToken).ConfigureAwaitFalse();
 
             if (payment == null)
             {
@@ -362,12 +341,15 @@ namespace Parbad.Internal
 
             var gateway = _gatewayProvider.Provide(payment.GatewayName);
 
+            var transactions = await _storageManager.GetTransactionsAsync(payment, cancellationToken).ConfigureAwaitFalse();
+            var verifyContext = new VerifyContext(payment, transactions);
+
             PaymentRefundResult refundResult;
 
             try
             {
                 refundResult = await gateway
-                    .RefundAsync(payment, amountToRefund, cancellationToken)
+                    .RefundAsync(verifyContext, amountToRefund, cancellationToken)
                     .ConfigureAwaitFalse() as PaymentRefundResult;
             }
             catch (Exception exception)
@@ -383,22 +365,17 @@ namespace Parbad.Internal
             refundResult.GatewayName = payment.GatewayName;
             refundResult.GatewayAccountName = payment.GatewayAccountName;
 
-            payment.Transactions.Add(new Transaction
+            var newtTransaction = new Transaction
             {
                 Amount = refundResult.Amount,
                 Type = TransactionType.Refund,
                 IsSucceed = refundResult.IsSucceed,
                 Message = refundResult.Message,
                 AdditionalData = AdditionalDataConverter.ToJson(refundResult),
-                CreatedOn = DateTime.UtcNow
-            });
+                PaymentId = payment.Id
+            };
 
-            if (await _database.SaveChangesAsync(cancellationToken).ConfigureAwaitFalse() == 0)
-            {
-                _logger.LogError(LoggingEvents.RefundPayment, "Refund ends. Nothing is saved into database.");
-
-                throw new DatabaseSaveRecordException();
-            }
+            await _storageManager.CreateTransactionAsync(newtTransaction, cancellationToken).ConfigureAwaitFalse();
 
             _logger.LogInformation(LoggingEvents.RefundPayment, "Refund ends.");
 

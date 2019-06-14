@@ -33,9 +33,6 @@ namespace Parbad.Sample.AspNetCore
                                 account.UserName = "MyId";
                                 account.UserPassword = "MyPassword";
                             });
-
-                            // Sample: Add the accounts using your database or a service.
-                            //accounts.Add<MellatAccountSource>(ServiceLifetime.Transient);
                         });
 
                     gateways
@@ -43,39 +40,7 @@ namespace Parbad.Sample.AspNetCore
                         .WithOptions(options => options.GatewayPath = "/MyVirtualGateway");
                 })
                 .ConfigureHttpContext(builder => builder.UseDefaultAspNetCore())
-                .ConfigureDatabase(builder =>
-                {
-                    // In-Memory (For testing and development only)
-                    builder.UseInMemoryDatabase("MyDatabase");
-
-                    // SQL Server
-                    //builder.UseSqlServer("Connection String", options => options.UseParbadMigrations());
-
-                    // MySQL
-                    //builder.UseMySQL("Connection String", options => options.UseParbadMigrations());
-
-                    // Sqlite
-                    //builder.UseSqlite("Connection String");
-                })
-                .ConfigureDatabaseInitializer(builder =>
-                {
-                    // For In-Memory
-                    builder.CreateDatabase();
-
-                    // (SQL Server, MySQL, etc.)
-                    //builder.CreateAndMigrateDatabase();
-
-                    // (Sqlite, etc.)
-                    //builder.DeleteAndCreateDatabase();
-
-                    // Define a custom database initializer
-                    //builder.UseInitializer(async context =>
-                    //{
-                    //    await context.Database.EnsureDeletedAsync();
-                    //    await context.Database.EnsureCreatedAsync();
-                    //    await context.Database.MigrateAsync();
-                    //});
-                });
+                .ConfigureStorage(builder => builder.UseMemoryCache());
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

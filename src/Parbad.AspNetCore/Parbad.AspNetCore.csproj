@@ -10,7 +10,7 @@
     <PackageIconUrl>https://raw.githubusercontent.com/Sina-Soltani/Parbad/master/images/Parbad.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/Sina-Soltani/Parbad</RepositoryUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Version>1.0.0</Version>
     <Description>ASP.NET CORE integration for Parbad project.
 

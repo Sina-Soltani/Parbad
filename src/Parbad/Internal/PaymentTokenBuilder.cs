@@ -7,8 +7,7 @@ using Parbad.PaymentTokenProviders;
 
 namespace Parbad.Internal
 {
-    /// <inheritdoc />
-    public class PaymentTokenBuilder : IPaymentTokenBuilder
+    internal class PaymentTokenBuilder : IPaymentTokenBuilder
     {
         public PaymentTokenBuilder(IServiceCollection services)
         {

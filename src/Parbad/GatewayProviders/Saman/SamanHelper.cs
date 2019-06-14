@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Parbad.Abstraction;
-using Parbad.Data.Domain.Payments;
 using Parbad.GatewayProviders.Saman.Models;
 using Parbad.GatewayProviders.Saman.ResultTranslators;
 using Parbad.Http;
@@ -90,7 +89,7 @@ namespace Parbad.GatewayProviders.Saman
                 "</soapenv:Envelope>";
         }
 
-        public static PaymentVerifyResult CreateVerifyResult(string webServiceResponse, Payment payment, SamanCallbackResult callbackResult, MessagesOptions messagesOptions)
+        public static PaymentVerifyResult CreateVerifyResult(string webServiceResponse, VerifyContext context, SamanCallbackResult callbackResult, MessagesOptions messagesOptions)
         {
             var result = XmlHelper.GetNodeValueFromXml(webServiceResponse, "result");
 
@@ -98,7 +97,7 @@ namespace Parbad.GatewayProviders.Saman
             //  it must be equals to TotalAmount in database.
             var numericResult = Convert.ToInt64(result);
 
-            var isSuccess = numericResult > 0 && numericResult == (long)payment.Amount;
+            var isSuccess = numericResult > 0 && numericResult == (long)context.Payment.Amount;
 
             var message = isSuccess
                 ? messagesOptions.PaymentSucceed
@@ -112,14 +111,14 @@ namespace Parbad.GatewayProviders.Saman
             };
         }
 
-        public static string CreateRefundData(Payment payment, Money amount, SamanGatewayAccount account)
+        public static string CreateRefundData(VerifyContext context, Money amount, SamanGatewayAccount account)
         {
             return
                 "<soapenv:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:urn=\"urn:Foo\">" +
                 "<soapenv:Header/>" +
                 "<soapenv:Body>" +
                 "<urn:reverseTransaction soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">" +
-                $"<String_1 xsi:type=\"xsd:string\">{payment.TransactionCode}</String_1>" +
+                $"<String_1 xsi:type=\"xsd:string\">{context.Payment.TransactionCode}</String_1>" +
                 $"<String_2 xsi:type=\"xsd:string\">{(long)amount}</String_2>" +
                 $"<Username xsi:type=\"xsd:string\">{account.MerchantId}</Username>" +
                 $"<Password xsi:type=\"xsd:string\">{account.Password}</Password>" +

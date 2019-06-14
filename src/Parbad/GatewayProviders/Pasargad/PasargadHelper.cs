@@ -8,12 +8,11 @@ using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using Parbad.Abstraction;
-using Parbad.Data.Domain.Payments;
-using Parbad.Data.Domain.Transactions;
 using Parbad.GatewayProviders.Pasargad.Models;
 using Parbad.Http;
 using Parbad.Internal;
 using Parbad.Options;
+using Parbad.Storage.Abstractions;
 using Parbad.Utilities;
 
 namespace Parbad.GatewayProviders.Pasargad
@@ -148,27 +147,27 @@ namespace Parbad.GatewayProviders.Pasargad
             };
         }
 
-        public static IEnumerable<KeyValuePair<string, string>> CreateVerifyData(Payment payment, PasargadGatewayAccount account, PasargadCallbackResult callbackResult)
+        public static IEnumerable<KeyValuePair<string, string>> CreateVerifyData(VerifyContext context, PasargadGatewayAccount account, PasargadCallbackResult callbackResult)
         {
             var timeStamp = GetTimeStamp(DateTime.Now);
 
             var dataToSign = string.Format("#{0}#{1}#{2}#{3}#{4}#{5}#",
                 account.MerchantCode,
                 account.TerminalCode,
-                payment.TrackingNumber,
+                context.Payment.TrackingNumber,
                 callbackResult.InvoiceDate,
-                (long)payment.Amount,
+                (long)context.Payment.Amount,
                 timeStamp);
 
             var signData = SignData(account.PrivateKey, dataToSign);
 
             return new[]
             {
-                new KeyValuePair<string, string>("InvoiceNumber", payment.TrackingNumber.ToString()),
+                new KeyValuePair<string, string>("InvoiceNumber", context.Payment.TrackingNumber.ToString()),
                 new KeyValuePair<string, string>("InvoiceDate", callbackResult.InvoiceDate),
                 new KeyValuePair<string, string>("MerchantCode", account.MerchantCode),
                 new KeyValuePair<string, string>("TerminalCode", account.TerminalCode),
-                new KeyValuePair<string, string>("Amount", ((long)payment.Amount).ToString()),
+                new KeyValuePair<string, string>("Amount", ((long)context.Payment.Amount).ToString()),
                 new KeyValuePair<string, string>("TimeStamp", timeStamp),
                 new KeyValuePair<string, string>("Sign", signData)
             };
@@ -192,13 +191,13 @@ namespace Parbad.GatewayProviders.Pasargad
             };
         }
 
-        public static IEnumerable<KeyValuePair<string, string>> CreateRefundData(Payment payment, Money amount, PasargadGatewayAccount account)
+        public static IEnumerable<KeyValuePair<string, string>> CreateRefundData(VerifyContext context, Money amount, PasargadGatewayAccount account)
         {
-            var transactionRecord = payment.Transactions.FirstOrDefault(transaction => transaction.Type == TransactionType.Request);
+            var transactionRecord = context.Transactions.FirstOrDefault(transaction => transaction.Type == TransactionType.Request);
 
             if (transactionRecord == null)
             {
-                throw new Exception($"Cannot find transaction record for Payment-{payment.TrackingNumber}");
+                throw new Exception($"Cannot find transaction record for Payment-{context.Payment.TrackingNumber}");
             }
 
             if (!AdditionalDataConverter.ToDictionary(transactionRecord).TryGetValue("invoiceDate", out var invoiceDate))
@@ -211,7 +210,7 @@ namespace Parbad.GatewayProviders.Pasargad
             var dataToSign = string.Format("#{0}#{1}#{2}#{3}#{4}#{5}#{6}#",
                 account.MerchantCode,
                 account.TerminalCode,
-                payment.TrackingNumber,
+                context.Payment.TrackingNumber,
                 invoiceDate,
                 (long)amount,
                 RefundNumber,
@@ -221,7 +220,7 @@ namespace Parbad.GatewayProviders.Pasargad
 
             return new[]
             {
-                new KeyValuePair<string, string>("InvoiceNumber", payment.TrackingNumber.ToString()),
+                new KeyValuePair<string, string>("InvoiceNumber", context.Payment.TrackingNumber.ToString()),
                 new KeyValuePair<string, string>("InvoiceDate", invoiceDate),
                 new KeyValuePair<string, string>("MerchantCode", account.MerchantCode),
                 new KeyValuePair<string, string>("TerminalCode", account.TerminalCode),

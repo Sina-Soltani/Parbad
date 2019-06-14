@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Parbad.Abstraction;
-using Parbad.Data.Domain.Payments;
 using Parbad.GatewayBuilders;
 using Parbad.Internal;
 using Parbad.Net;
@@ -55,9 +54,9 @@ namespace Parbad.GatewayProviders.Mellat
         }
 
         /// <inheritdoc />
-        public override async Task<IPaymentVerifyResult> VerifyAsync(Payment payment, CancellationToken cancellationToken = default)
+        public override async Task<IPaymentVerifyResult> VerifyAsync(VerifyContext context, CancellationToken cancellationToken = default)
         {
-            if (payment == null) throw new ArgumentNullException(nameof(payment));
+            if (context == null) throw new ArgumentNullException(nameof(context));
 
             var callbackResult = MellatHelper.CrateCallbackResult(_httpContextAccessor.HttpContext.Request, _messagesOptions.Value);
 
@@ -66,9 +65,9 @@ namespace Parbad.GatewayProviders.Mellat
                 return callbackResult.Result;
             }
 
-            var account = await GetAccountAsync(payment).ConfigureAwaitFalse();
+            var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 
-            var data = MellatHelper.CreateVerifyData(payment, account, callbackResult);
+            var data = MellatHelper.CreateVerifyData(context, account, callbackResult);
 
             var responseMessage = await _httpClient
                 .PostXmlAsync(MellatHelper.GetWebServiceUrl(account.IsTestTerminal), data, cancellationToken)
@@ -83,7 +82,7 @@ namespace Parbad.GatewayProviders.Mellat
                 return verifyResult.Result;
             }
 
-            data = MellatHelper.CreateSettleData(payment, callbackResult, account);
+            data = MellatHelper.CreateSettleData(context, callbackResult, account);
 
             responseMessage = await _httpClient
                 .PostXmlAsync(MellatHelper.GetWebServiceUrl(account.IsTestTerminal), data, cancellationToken)
@@ -95,14 +94,14 @@ namespace Parbad.GatewayProviders.Mellat
         }
 
         /// <inheritdoc />
-        public override async Task<IPaymentRefundResult> RefundAsync(Payment payment, Money amount, CancellationToken cancellationToken = default)
+        public override async Task<IPaymentRefundResult> RefundAsync(VerifyContext context, Money amount, CancellationToken cancellationToken = default)
         {
-            if (payment == null) throw new ArgumentNullException(nameof(payment));
+            if (context == null) throw new ArgumentNullException(nameof(context));
             if (amount == null) throw new ArgumentNullException(nameof(amount));
 
-            var account = await GetAccountAsync(payment).ConfigureAwaitFalse();
+            var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 
-            var data = MellatHelper.CreateRefundData(payment, account);
+            var data = MellatHelper.CreateRefundData(context, account);
 
             var responseMessage = await _httpClient
                 .PostXmlAsync(MellatHelper.GetWebServiceUrl(account.IsTestTerminal), data, cancellationToken)

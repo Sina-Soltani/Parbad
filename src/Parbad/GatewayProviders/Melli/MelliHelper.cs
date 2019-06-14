@@ -6,7 +6,6 @@ using System.Security.Cryptography;
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using Parbad.Abstraction;
-using Parbad.Data.Domain.Payments;
 using Parbad.GatewayProviders.Melli.Models;
 using Parbad.GatewayProviders.Melli.ResultTranslator;
 using Parbad.Http;
@@ -70,7 +69,7 @@ namespace Parbad.GatewayProviders.Melli
             return PaymentRequestResult.Succeed(new GatewayRedirect(httpContextAccessor, paymentPageUrl), account.Name);
         }
 
-        public static MelliCallbackResult CreateCallbackResult(Payment payment, HttpRequest httpRequest, MelliGatewayAccount account, MessagesOptions messagesOptions)
+        public static MelliCallbackResult CreateCallbackResult(VerifyContext context, HttpRequest httpRequest, MelliGatewayAccount account, MessagesOptions messagesOptions)
         {
             httpRequest.TryGetParamAs<int>("ResCode", out var apiResponseCode);
 
@@ -86,7 +85,7 @@ namespace Parbad.GatewayProviders.Melli
             httpRequest.TryGetParam("Token", out var apiToken);
             httpRequest.TryGetParamAs<long>("OrderId", out var apiOrderId);
 
-            if (apiOrderId != payment.TrackingNumber)
+            if (apiOrderId != context.Payment.TrackingNumber)
             {
                 return new MelliCallbackResult
                 {

@@ -3,7 +3,6 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using Parbad.Data.Domain.Payments;
 
 namespace Parbad.Abstraction
 {
@@ -22,16 +21,16 @@ namespace Parbad.Abstraction
         /// <summary>
         /// Verifies the requested payment to check whether or not the invoice has was paid in the gateway by the client.
         /// </summary>
-        /// <param name="payment"></param>
+        /// <param name="context"></param>
         /// <param name="cancellationToken"></param>
-        Task<IPaymentVerifyResult> VerifyAsync(Payment payment, CancellationToken cancellationToken = default);
+        Task<IPaymentVerifyResult> VerifyAsync(VerifyContext context, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Performs a refund request for the given invoice.
         /// </summary>
-        /// <param name="payment"></param>
+        /// <param name="context"></param>
         /// <param name="amount"></param>
         /// <param name="cancellationToken"></param>
-        Task<IPaymentRefundResult> RefundAsync(Payment payment, Money amount, CancellationToken cancellationToken = default);
+        Task<IPaymentRefundResult> RefundAsync(VerifyContext context, Money amount, CancellationToken cancellationToken = default);
     }
 }

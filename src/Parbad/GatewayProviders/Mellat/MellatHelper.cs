@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Parbad.Abstraction;
-using Parbad.Data.Domain.Payments;
 using Parbad.GatewayProviders.Mellat.Models;
 using Parbad.Http;
 using Parbad.Utilities;
@@ -114,7 +113,7 @@ namespace Parbad.GatewayProviders.Mellat
             };
         }
 
-        public static string CreateVerifyData(Payment payment, MellatGatewayAccount account, MellatCallbackResult callbackResult)
+        public static string CreateVerifyData(VerifyContext context, MellatGatewayAccount account, MellatCallbackResult callbackResult)
         {
             return
                 "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:int=\"http://interfaces.core.sw.bps.com/\">" +
@@ -126,8 +125,8 @@ namespace Parbad.GatewayProviders.Mellat
                 $"<userName>{account.UserName}</userName>" +
                 "<!--Optional:-->" +
                 $"<userPassword>{account.UserPassword}</userPassword>" +
-                $"<orderId>{payment.TrackingNumber}</orderId>" +
-                $"<saleOrderId>{payment.TrackingNumber}</saleOrderId>" +
+                $"<orderId>{context.Payment.TrackingNumber}</orderId>" +
+                $"<saleOrderId>{context.Payment.TrackingNumber}</saleOrderId>" +
                 $"<saleReferenceId>{callbackResult.SaleReferenceId}</saleReferenceId>" +
                 "</int:bpVerifyRequest>" +
                 "</soapenv:Body>" +
@@ -156,7 +155,7 @@ namespace Parbad.GatewayProviders.Mellat
             };
         }
 
-        public static string CreateSettleData(Payment payment, MellatCallbackResult callbackResult, MellatGatewayAccount account)
+        public static string CreateSettleData(VerifyContext context, MellatCallbackResult callbackResult, MellatGatewayAccount account)
         {
             return
                 "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:int=\"http://interfaces.core.sw.bps.com/\">" +
@@ -168,8 +167,8 @@ namespace Parbad.GatewayProviders.Mellat
                 $"<userName>{account.UserName}</userName>" +
                 "<!--Optional:-->" +
                 $"<userPassword>{account.UserPassword}</userPassword>" +
-                $"<orderId>{payment.TrackingNumber}</orderId>" +
-                $"<saleOrderId>{payment.TrackingNumber}</saleOrderId>" +
+                $"<orderId>{context.Payment.TrackingNumber}</orderId>" +
+                $"<saleOrderId>{context.Payment.TrackingNumber}</saleOrderId>" +
                 $"<saleReferenceId>{callbackResult.SaleReferenceId}</saleReferenceId>" +
                 "</int:bpSettleRequest>" +
                 "</soapenv:Body>" +
@@ -194,7 +193,7 @@ namespace Parbad.GatewayProviders.Mellat
             };
         }
 
-        public static string CreateRefundData(Payment payment, MellatGatewayAccount account)
+        public static string CreateRefundData(VerifyContext context, MellatGatewayAccount account)
         {
             return
                 "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:int=\"http://interfaces.core.sw.bps.com/\">" +
@@ -206,9 +205,9 @@ namespace Parbad.GatewayProviders.Mellat
                 $"<userName>{account.UserName}</userName>" +
                 "<!--Optional:-->" +
                 $"<userPassword>{account.UserPassword}</userPassword>" +
-                $"<orderId>{payment.TrackingNumber}</orderId>" +
-                $"<saleOrderId>{payment.TrackingNumber}</saleOrderId>" +
-                $"<saleReferenceId>{payment.TransactionCode}</saleReferenceId>" +
+                $"<orderId>{context.Payment.TrackingNumber}</orderId>" +
+                $"<saleOrderId>{context.Payment.TrackingNumber}</saleOrderId>" +
+                $"<saleReferenceId>{context.Payment.TransactionCode}</saleReferenceId>" +
                 "</int:bpReversalRequest>" +
                 "</soapenv:Body>" +
                 "</soapenv:Envelope>";

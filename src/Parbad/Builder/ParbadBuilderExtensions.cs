@@ -7,6 +7,7 @@ using Parbad.Abstraction;
 using Parbad.Builder;
 using Parbad.Internal;
 using Parbad.InvoiceBuilder;
+using Parbad.TrackingNumberProviders;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -18,6 +19,8 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IParbadBuilder AddParbad(this IServiceCollection services)
         {
             var builder = new ParbadBuilder(services);
+
+            builder.Services.AddOptions();
 
             builder.Services.TryAddTransient<IOnlinePayment, DefaultOnlinePayment>();
             builder.Services.TryAddSingleton<IOnlinePaymentAccessor, OnlinePaymentAccessor>();
@@ -32,8 +35,6 @@ namespace Microsoft.Extensions.DependencyInjection
             builder.ConfigureMessages(options => { });
 
             builder.ConfigurePaymentToken(tokenBuilder => tokenBuilder.UseGuidQueryStringPaymentTokenProvider());
-
-            builder.Services.AddOptions();
 
             return builder;
         }

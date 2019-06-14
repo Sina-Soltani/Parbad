@@ -5,11 +5,10 @@ using System;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Parbad.Abstraction;
-using Parbad.Data.Domain.Payments;
-using Parbad.Data.Domain.Transactions;
 using Parbad.GatewayProviders.Parsian.Models;
 using Parbad.Internal;
 using Parbad.Options;
+using Parbad.Storage.Abstractions;
 using Parbad.Utilities;
 
 namespace Parbad.GatewayProviders.Parsian
@@ -76,7 +75,7 @@ namespace Parbad.GatewayProviders.Parsian
             return result;
         }
 
-        public static ParsianCallbackResult CreateCallbackResult(Payment payment, HttpRequest httpRequest, MessagesOptions messagesOptions)
+        public static ParsianCallbackResult CreateCallbackResult(VerifyContext context, HttpRequest httpRequest, MessagesOptions messagesOptions)
         {
             httpRequest.Form.TryGetValue("token", out var token);
             httpRequest.Form.TryGetValue("status", out var status);
@@ -97,8 +96,8 @@ namespace Parbad.GatewayProviders.Parsian
                     orderId.IsNullOrEmpty() ||
                     !long.TryParse(orderId, out var numberOrderNumber) ||
                     !long.TryParse(amount, out var numberAmount) ||
-                    numberOrderNumber != payment.TrackingNumber ||
-                    numberAmount != (long)payment.Amount)
+                    numberOrderNumber != context.Payment.TrackingNumber ||
+                    numberAmount != (long)context.Payment.Amount)
                 {
                     isSucceed = false;
                     message = messagesOptions.InvalidDataReceivedFromGateway;
@@ -166,15 +165,15 @@ namespace Parbad.GatewayProviders.Parsian
             return result;
         }
 
-        public static string CreateRefundData(ParsianGatewayAccount account, Payment payment, Money amount)
+        public static string CreateRefundData(ParsianGatewayAccount account, VerifyContext context, Money amount)
         {
-            var transaction = payment.Transactions.SingleOrDefault(item => item.Type == TransactionType.Verify);
+            var transaction = context.Transactions.SingleOrDefault(item => item.Type == TransactionType.Verify);
 
-            if (transaction == null) throw new InvalidOperationException($"No transaction record found in database for payment with tracking number {payment.TrackingNumber}.");
+            if (transaction == null) throw new InvalidOperationException($"No transaction record found in database for payment with tracking number {context.Payment.TrackingNumber}.");
 
             if (!AdditionalDataConverter.ToDictionary(transaction).TryGetValue("token", out var token))
             {
-                throw new InvalidOperationException($"No token found in database for payment with tracking number {payment.TrackingNumber}.");
+                throw new InvalidOperationException($"No token found in database for payment with tracking number {context.Payment.TrackingNumber}.");
             }
 
             return

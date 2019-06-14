@@ -10,10 +10,10 @@
         <member name="M:Parbad.Abstraction.Gateway`1.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.Abstraction.Gateway`1.VerifyAsync(Parbad.Data.Domain.Payments.Payment,System.Threading.CancellationToken)">
+        <member name="M:Parbad.Abstraction.Gateway`1.VerifyAsync(Parbad.VerifyContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.Abstraction.Gateway`1.RefundAsync(Parbad.Data.Domain.Payments.Payment,Parbad.Money,System.Threading.CancellationToken)">
+        <member name="M:Parbad.Abstraction.Gateway`1.RefundAsync(Parbad.VerifyContext,Parbad.Money,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
         <member name="T:Parbad.Abstraction.GatewayAccount">
@@ -39,18 +39,18 @@
             <param name="invoice">The invoice which must be pay.</param>
             <param name="cancellationToken"></param>
         </member>
-        <member name="M:Parbad.Abstraction.IGateway.VerifyAsync(Parbad.Data.Domain.Payments.Payment,System.Threading.CancellationToken)">
+        <member name="M:Parbad.Abstraction.IGateway.VerifyAsync(Parbad.VerifyContext,System.Threading.CancellationToken)">
             <summary>
             Verifies the requested payment to check whether or not the invoice has was paid in the gateway by the client.
             </summary>
-            <param name="payment"></param>
+            <param name="context"></param>
             <param name="cancellationToken"></param>
         </member>
-        <member name="M:Parbad.Abstraction.IGateway.RefundAsync(Parbad.Data.Domain.Payments.Payment,Parbad.Money,System.Threading.CancellationToken)">
+        <member name="M:Parbad.Abstraction.IGateway.RefundAsync(Parbad.VerifyContext,Parbad.Money,System.Threading.CancellationToken)">
             <summary>
             Performs a refund request for the given invoice.
             </summary>
-            <param name="payment"></param>
+            <param name="context"></param>
             <param name="amount"></param>
             <param name="cancellationToken"></param>
         </member>
@@ -90,82 +90,6 @@
             For example you can inject the <see cref="T:Parbad.IOnlinePayment"/> where ever you need.
             </para>
             </summary>
-        </member>
-        <member name="M:Parbad.Builder.DatabaseInitializerExtensions.UseInitializer(Parbad.Data.Initializers.IDatabaseInitializerBuilder,System.Func{Parbad.Data.Context.ParbadDataContext,System.Threading.Tasks.Task})">
-            <summary>
-            Adds the specified Initializer to Parbad services.
-            Initializers will be called in order that you specified.
-            </summary>
-            <param name="builder"></param>
-            <param name="configureInitializer"></param>
-        </member>
-        <member name="M:Parbad.Builder.DatabaseInitializerExtensions.CreateDatabase(Parbad.Data.Initializers.IDatabaseInitializerBuilder)">
-            <summary>
-            Creates the Parbad database If it does not exist.
-            </summary>
-            <param name="builder"></param>
-        </member>
-        <member name="M:Parbad.Builder.DatabaseInitializerExtensions.CreateAndMigrateDatabase(Parbad.Data.Initializers.IDatabaseInitializerBuilder)">
-            <summary>
-            Creates the Parbad database If it does not exist.
-            Will migrate the database too.
-            </summary>
-            <param name="builder"></param>
-        </member>
-        <member name="M:Parbad.Builder.DatabaseInitializerExtensions.DeleteAndCreateDatabase(Parbad.Data.Initializers.IDatabaseInitializerBuilder)">
-            <summary>
-            Deletes and creates the Parbad database.
-            </summary>
-            <param name="builder"></param>
-        </member>
-        <member name="M:Parbad.Builder.DatabaseServiceBuilderExtensions.ConfigureDatabase(Parbad.Builder.IParbadBuilder,System.Action{Microsoft.EntityFrameworkCore.DbContextOptionsBuilder})">
-            <summary>
-            Configures the database required by Parbad to save and load payments and transactions data.
-            <para>
-            Note: It uses Microsoft.EntityFrameworkCore as storage, which means you can save your data
-            in different database providers such as SQL Server, MySql, Sqlite, PostgreSQL, Oracle, InMemory, etc.
-            For more information see: https://docs.microsoft.com/en-us/ef/core/providers/.
-            </para>
-            <para>Note: Parbad database is only for internal usages such as saving and loading the payment information.
-            You don't need to think about merging and using this database with your own database.
-            The important payment information such as Tracking Number, Transaction Code, etc. will you get from the result of
-            all payment requests.</para>
-            </summary>
-            <param name="builder"></param>
-            <param name="configureDatabaseBuilder">Configure what database must be used and how it must be created.</param>
-        </member>
-        <member name="M:Parbad.Builder.DatabaseServiceBuilderExtensions.ConfigureDatabaseInitializer(Parbad.Builder.IParbadBuilder,System.Action{Parbad.Data.Initializers.IDatabaseInitializerBuilder})">
-            <summary>
-            Configures Parbad database initializer.
-            Initializer is useful for creating, deleting, migrating and seeding the Parbad database.
-            <para>Note: Use ConfigureDatabase method before using this method.</para>
-            <para>Note: Use one of predefined database creators depends on the database
-            provider (In-Memory, SQL Server, MySQL, Sqlite, etc.) that you chose.</para>
-            <para>Providers examples:</para>
-            <para>For In-Memory, use the CreateDatabase method.</para>
-            <para>For SQL Server, use the CreateAndMigrateDatabase method.</para>
-            <para>
-            For Sqlite, use DeleteAndCreateDatabase.
-            Because Sqlite has some limitations with migrations.
-            In this case, one way to fix this is to first delete the old Parbad database and then create it again.
-            </para>
-            <para>
-            If you prefer to initialize the Parbad database yourself, then use the UseInitializer method
-            and define how the database must be initialized.
-            </para>
-            <para>Note: Initializer will be called in order that you specified.</para>
-            </summary>
-            <param name="builder"></param>
-            <param name="configureInitializer"></param>
-        </member>
-        <member name="M:Parbad.Builder.DatabaseServiceBuilderExtensions.UseParbadMigrations``2(Microsoft.EntityFrameworkCore.Infrastructure.RelationalDbContextOptionsBuilder{``0,``1})">
-            <summary>
-            Uses the MigrationsAssembly method internally and passes the Parbad assembly name
-            as parameter for configuring the migrations.
-            </summary>
-            <typeparam name="TBuilder"></typeparam>
-            <typeparam name="TExtension"></typeparam>
-            <param name="builder"></param>
         </member>
         <member name="M:Parbad.Builder.GatewayAccountBuilderExtensions.AddInMemory``1(Parbad.GatewayBuilders.IGatewayAccountBuilder{``0},System.Collections.Generic.IEnumerable{``0})">
             <summary>
@@ -427,61 +351,6 @@
             <param name="name"></param>
             <param name="value"></param>
         </member>
-        <member name="T:Parbad.Data.Domain.Payments.PaymentConfiguration">
-            <summary>
-            Payment entity configuration.
-            </summary>
-        </member>
-        <member name="M:Parbad.Data.Domain.Payments.PaymentConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{Parbad.Data.Domain.Payments.Payment})">
-            <inheritdoc />
-        </member>
-        <member name="T:Parbad.Data.Domain.Transactions.TransactionConfiguration">
-            <summary>
-            Transaction entity configuration.
-            </summary>
-        </member>
-        <member name="M:Parbad.Data.Domain.Transactions.TransactionConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{Parbad.Data.Domain.Transactions.Transaction})">
-            <inheritdoc />
-        </member>
-        <member name="T:Parbad.Data.Initializers.IDatabaseInitializer">
-            <summary>
-            An initializer to initialize the database required by Parbad.
-            </summary>
-        </member>
-        <member name="M:Parbad.Data.Initializers.IDatabaseInitializer.InitializeAsync(Parbad.Data.Context.ParbadDataContext,System.Threading.CancellationToken)">
-            <summary>
-            Initializes the database.
-            </summary>
-            <param name="context">Parbad database.</param>
-            <param name="cancellationToken"></param>
-        </member>
-        <member name="T:Parbad.Data.Initializers.IDatabaseInitializerBuilder">
-            <summary>
-            A builder for building Parbad database initializers.
-            </summary>
-        </member>
-        <member name="P:Parbad.Data.Initializers.IDatabaseInitializerBuilder.Services">
-            <summary>
-            Provides solution to perform payment request, verify the requested payment and
-            refund a payment.
-            </summary>
-        </member>
-        <member name="M:Parbad.Data.Initializers.IDatabaseInitializerBuilder.AddInitializer``1(Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
-            <summary>
-            Adds the specified <typeparamref name="TInitializer"/> to Parbad services.
-            Initializers will be called in order that you specified.
-            </summary>
-            <typeparam name="TInitializer"></typeparam>
-            <param name="initializerLifetime">The lifetime of the specified <typeparamref name="TInitializer"/>.</param>
-        </member>
-        <member name="M:Parbad.Data.Initializers.IDatabaseInitializerBuilder.AddInitializer(System.Func{System.IServiceProvider,Parbad.Data.Initializers.IDatabaseInitializer},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
-            <summary>
-            Adds the specified Initializer to Parbad services.
-            Initializers will be called in order that you specified.
-            </summary>
-            <param name="implementationFactory"></param>
-            <param name="initializerLifetime">The lifetime of the specified Initializer.</param>
-        </member>
         <member name="T:Parbad.Gateway">
             <summary>
             Online payment providers.
@@ -606,10 +475,10 @@
         <member name="M:Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGateway.VerifyAsync(Parbad.Data.Domain.Payments.Payment,System.Threading.CancellationToken)">
+        <member name="M:Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGateway.VerifyAsync(Parbad.VerifyContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGateway.RefundAsync(Parbad.Data.Domain.Payments.Payment,Parbad.Money,System.Threading.CancellationToken)">
+        <member name="M:Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGateway.RefundAsync(Parbad.VerifyContext,Parbad.Money,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
         <member name="P:Parbad.GatewayProviders.IranKish.IranKishCallbackResult.InvoiceNumber">
@@ -625,10 +494,10 @@
         <member name="M:Parbad.GatewayProviders.IranKish.IranKishGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.GatewayProviders.IranKish.IranKishGateway.VerifyAsync(Parbad.Data.Domain.Payments.Payment,System.Threading.CancellationToken)">
+        <member name="M:Parbad.GatewayProviders.IranKish.IranKishGateway.VerifyAsync(Parbad.VerifyContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.GatewayProviders.IranKish.IranKishGateway.RefundAsync(Parbad.Data.Domain.Payments.Payment,Parbad.Money,System.Threading.CancellationToken)">
+        <member name="M:Parbad.GatewayProviders.IranKish.IranKishGateway.RefundAsync(Parbad.VerifyContext,Parbad.Money,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
         <member name="T:Parbad.GatewayProviders.IranKish.IranKishGatewayAccount">
@@ -639,10 +508,10 @@
         <member name="M:Parbad.GatewayProviders.Mellat.MellatGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.GatewayProviders.Mellat.MellatGateway.VerifyAsync(Parbad.Data.Domain.Payments.Payment,System.Threading.CancellationToken)">
+        <member name="M:Parbad.GatewayProviders.Mellat.MellatGateway.VerifyAsync(Parbad.VerifyContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.GatewayProviders.Mellat.MellatGateway.RefundAsync(Parbad.Data.Domain.Payments.Payment,Parbad.Money,System.Threading.CancellationToken)">
+        <member name="M:Parbad.GatewayProviders.Mellat.MellatGateway.RefundAsync(Parbad.VerifyContext,Parbad.Money,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
         <member name="P:Parbad.GatewayProviders.Mellat.MellatGatewayAccount.IsTestTerminal">
@@ -667,10 +536,10 @@
         <member name="M:Parbad.GatewayProviders.Melli.MelliGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.GatewayProviders.Melli.MelliGateway.VerifyAsync(Parbad.Data.Domain.Payments.Payment,System.Threading.CancellationToken)">
+        <member name="M:Parbad.GatewayProviders.Melli.MelliGateway.VerifyAsync(Parbad.VerifyContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.GatewayProviders.Melli.MelliGateway.RefundAsync(Parbad.Data.Domain.Payments.Payment,Parbad.Money,System.Threading.CancellationToken)">
+        <member name="M:Parbad.GatewayProviders.Melli.MelliGateway.RefundAsync(Parbad.VerifyContext,Parbad.Money,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
         <member name="T:Parbad.GatewayProviders.Melli.MelliGatewayAccount">
@@ -975,10 +844,10 @@
         <member name="M:Parbad.GatewayProviders.ParbadVirtual.ParbadVirtualGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.GatewayProviders.ParbadVirtual.ParbadVirtualGateway.VerifyAsync(Parbad.Data.Domain.Payments.Payment,System.Threading.CancellationToken)">
+        <member name="M:Parbad.GatewayProviders.ParbadVirtual.ParbadVirtualGateway.VerifyAsync(Parbad.VerifyContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.GatewayProviders.ParbadVirtual.ParbadVirtualGateway.RefundAsync(Parbad.Data.Domain.Payments.Payment,Parbad.Money,System.Threading.CancellationToken)">
+        <member name="M:Parbad.GatewayProviders.ParbadVirtual.ParbadVirtualGateway.RefundAsync(Parbad.VerifyContext,Parbad.Money,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
         <member name="P:Parbad.GatewayProviders.ParbadVirtual.ParbadVirtualGatewayOptions.GatewayPath">
@@ -994,10 +863,10 @@
         <member name="M:Parbad.GatewayProviders.Parsian.ParsianGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.GatewayProviders.Parsian.ParsianGateway.VerifyAsync(Parbad.Data.Domain.Payments.Payment,System.Threading.CancellationToken)">
+        <member name="M:Parbad.GatewayProviders.Parsian.ParsianGateway.VerifyAsync(Parbad.VerifyContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.GatewayProviders.Parsian.ParsianGateway.RefundAsync(Parbad.Data.Domain.Payments.Payment,Parbad.Money,System.Threading.CancellationToken)">
+        <member name="M:Parbad.GatewayProviders.Parsian.ParsianGateway.RefundAsync(Parbad.VerifyContext,Parbad.Money,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
         <member name="P:Parbad.GatewayProviders.Pasargad.Models.PasargadCallbackResult.InvoiceNumber">
@@ -1008,19 +877,19 @@
         <member name="M:Parbad.GatewayProviders.Pasargad.PasargadGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.GatewayProviders.Pasargad.PasargadGateway.VerifyAsync(Parbad.Data.Domain.Payments.Payment,System.Threading.CancellationToken)">
+        <member name="M:Parbad.GatewayProviders.Pasargad.PasargadGateway.VerifyAsync(Parbad.VerifyContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.GatewayProviders.Pasargad.PasargadGateway.RefundAsync(Parbad.Data.Domain.Payments.Payment,Parbad.Money,System.Threading.CancellationToken)">
+        <member name="M:Parbad.GatewayProviders.Pasargad.PasargadGateway.RefundAsync(Parbad.VerifyContext,Parbad.Money,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
         <member name="M:Parbad.GatewayProviders.Saman.SamanGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.GatewayProviders.Saman.SamanGateway.VerifyAsync(Parbad.Data.Domain.Payments.Payment,System.Threading.CancellationToken)">
+        <member name="M:Parbad.GatewayProviders.Saman.SamanGateway.VerifyAsync(Parbad.VerifyContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.GatewayProviders.Saman.SamanGateway.RefundAsync(Parbad.Data.Domain.Payments.Payment,Parbad.Money,System.Threading.CancellationToken)">
+        <member name="M:Parbad.GatewayProviders.Saman.SamanGateway.RefundAsync(Parbad.VerifyContext,Parbad.Money,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
         <member name="M:Parbad.GatewayTransporterExtensions.Transport(Parbad.IGatewayTransporter)">
@@ -1037,24 +906,6 @@
             <summary>
             Transports the client to the specified gateway.
             </summary>
-        </member>
-        <member name="T:Parbad.Internal.DatabaseInitializerBuilder">
-            <inheritdoc />
-        </member>
-        <member name="M:Parbad.Internal.DatabaseInitializerBuilder.#ctor(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
-            <summary>
-            Initializes an instance of <see cref="T:Parbad.Internal.DatabaseInitializerBuilder"/> class.
-            </summary>
-            <param name="services"></param>
-        </member>
-        <member name="P:Parbad.Internal.DatabaseInitializerBuilder.Services">
-            <inheritdoc />
-        </member>
-        <member name="M:Parbad.Internal.DatabaseInitializerBuilder.AddInitializer``1(Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
-            <inheritdoc />
-        </member>
-        <member name="M:Parbad.Internal.DatabaseInitializerBuilder.AddInitializer(System.Func{System.IServiceProvider,Parbad.Data.Initializers.IDatabaseInitializer},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
-            <inheritdoc />
         </member>
         <member name="T:Parbad.Internal.DefaultInvoiceBuilder">
             <inheritdoc />
@@ -1104,12 +955,12 @@
         <member name="T:Parbad.Internal.DefaultOnlinePayment">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.Internal.DefaultOnlinePayment.#ctor(System.IServiceProvider,Parbad.Data.Context.ParbadDataContext,Parbad.PaymentTokenProviders.IPaymentTokenProvider,Parbad.Abstraction.IGatewayProvider,Microsoft.Extensions.Options.IOptions{Parbad.Options.MessagesOptions},Microsoft.Extensions.Logging.ILogger{Parbad.IOnlinePayment})">
+        <member name="M:Parbad.Internal.DefaultOnlinePayment.#ctor(System.IServiceProvider,Parbad.Storage.Abstractions.IStorageManager,Parbad.PaymentTokenProviders.IPaymentTokenProvider,Parbad.Abstraction.IGatewayProvider,Microsoft.Extensions.Options.IOptions{Parbad.Options.MessagesOptions},Microsoft.Extensions.Logging.ILogger{Parbad.IOnlinePayment})">
             <summary>
             Initializes an instance of <see cref="T:Parbad.Internal.DefaultOnlinePayment"/>.
             </summary>
             <param name="services"></param>
-            <param name="database"></param>
+            <param name="storageManager"></param>
             <param name="tokenProvider"></param>
             <param name="gatewayProvider"></param>
             <param name="messagesOptions"></param>
@@ -1235,9 +1086,6 @@
             <inheritdoc />
         </member>
         <member name="P:Parbad.Internal.PaymentResult.AdditionalData">
-            <inheritdoc />
-        </member>
-        <member name="T:Parbad.Internal.PaymentTokenBuilder">
             <inheritdoc />
         </member>
         <member name="T:Parbad.Internal.UserInputTrackingNumberProvider">
@@ -1393,7 +1241,7 @@
         </member>
         <member name="T:Parbad.IOnlinePayment">
             <summary>
-            Provides solution to perform payment request, verify the requested payment and
+            Provides an easy solution to perform payment request, verify the requested payment and
             refund a payment.
             </summary>
         </member>
@@ -1702,6 +1550,11 @@
             A builder for building the <see cref="T:Parbad.PaymentTokenProviders.IPaymentTokenProvider"/> services.
             </summary>
         </member>
+        <member name="P:Parbad.PaymentTokenProviders.IPaymentTokenBuilder.Services">
+            <summary>
+            Specifies the contract for a collection of service descriptors.
+            </summary>
+        </member>
         <member name="M:Parbad.PaymentTokenProviders.IPaymentTokenBuilder.AddPaymentTokenProvider``1(Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
             <summary>
             Adds a provider to the <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> with the given
@@ -1855,6 +1708,109 @@
             Initializes the <see cref="T:Parbad.StaticOnlinePayment"/> class for static usage.
             </summary>
             <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="T:Parbad.Storage.Abstractions.IStorage">
+            <summary>
+            A storage which used by Parbad for saving and loading data.
+            </summary>
+        </member>
+        <member name="P:Parbad.Storage.Abstractions.IStorage.Payments">
+            <summary>
+            Gets a list of <see cref="T:Parbad.Storage.Abstractions.Payment"/>.
+            </summary>
+        </member>
+        <member name="P:Parbad.Storage.Abstractions.IStorage.Transactions">
+            <summary>
+            Gets a list of <see cref="T:Parbad.Storage.Abstractions.Transaction"/>.
+            </summary>
+        </member>
+        <member name="M:Parbad.Storage.Abstractions.IStorage.CreatePaymentAsync(Parbad.Storage.Abstractions.Payment,System.Threading.CancellationToken)">
+            <summary>
+            Creates a new payment.
+            </summary>
+            <param name="payment"></param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="M:Parbad.Storage.Abstractions.IStorage.UpdatePaymentAsync(Parbad.Storage.Abstractions.Payment,System.Threading.CancellationToken)">
+            <summary>
+            Updates the given <paramref name="payment"/>.
+            </summary>
+            <param name="payment"></param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="M:Parbad.Storage.Abstractions.IStorage.DeletePaymentAsync(Parbad.Storage.Abstractions.Payment,System.Threading.CancellationToken)">
+            <summary>
+            Deletes the given <paramref name="payment"/>.
+            </summary>
+            <param name="payment"></param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="M:Parbad.Storage.Abstractions.IStorage.CreateTransactionAsync(Parbad.Storage.Abstractions.Transaction,System.Threading.CancellationToken)">
+            <summary>
+            Creates a new transaction.
+            </summary>
+            <param name="transaction"></param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="M:Parbad.Storage.Abstractions.IStorage.UpdateTransactionAsync(Parbad.Storage.Abstractions.Transaction,System.Threading.CancellationToken)">
+            <summary>
+            Updates the given <paramref name="transaction"/>.
+            </summary>
+            <param name="transaction"></param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="M:Parbad.Storage.Abstractions.IStorage.DeleteTransactionAsync(Parbad.Storage.Abstractions.Transaction,System.Threading.CancellationToken)">
+            <summary>
+            Deletes the given <paramref name="transaction"/>.
+            </summary>
+            <param name="transaction"></param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="T:Parbad.Storage.Abstractions.TransactionType">
+            <summary>
+            Type of transaction.
+            </summary>
+        </member>
+        <member name="T:Parbad.Storage.StorageManager">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.StorageManager.#ctor(Parbad.Storage.Abstractions.IStorage)">
+            <summary>
+            Initializes in instance of <see cref="T:Parbad.Storage.StorageManager"/>.
+            </summary>
+            <param name="storage"></param>
+        </member>
+        <member name="P:Parbad.Storage.StorageManager.Storage">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Parbad.Storage.StorageManager.CreatePaymentAsync(Parbad.Storage.Abstractions.Payment,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.StorageManager.UpdatePaymentAsync(Parbad.Storage.Abstractions.Payment,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.StorageManager.CreateTransactionAsync(Parbad.Storage.Abstractions.Transaction,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.StorageManager.UpdateTransactionAsync(Parbad.Storage.Abstractions.Transaction,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.StorageManager.GetPaymentByTrackingNumberAsync(System.Int64,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.StorageManager.GetPaymentByTokenAsync(System.String,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.StorageManager.DoesPaymentExistAsync(System.Int64,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.StorageManager.DoesPaymentExistAsync(System.String,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.StorageManager.GetTransactionsAsync(Parbad.Storage.Abstractions.Payment,System.Threading.CancellationToken)">
+            <inheritdoc />
         </member>
         <member name="F:Parbad.TrackingNumberProviders.AutoTrackingNumberOptions.ConfigurationKey">
             <summary>

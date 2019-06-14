@@ -11,6 +11,9 @@ namespace Parbad.PaymentTokenProviders
     /// </summary>
     public interface IPaymentTokenBuilder
     {
+        /// <summary>
+        /// Specifies the contract for a collection of service descriptors.
+        /// </summary>
         IServiceCollection Services { get; }
 
         /// <summary>
