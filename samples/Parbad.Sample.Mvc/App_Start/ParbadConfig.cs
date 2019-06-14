@@ -1,7 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Parbad.Builder;
-using Parbad.Sample.Mvc.Services;
+﻿using Parbad.Builder;
 
 namespace Parbad.Sample.Mvc
 {
