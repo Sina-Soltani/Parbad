@@ -179,12 +179,16 @@
         <member name="M:Parbad.Builder.MemoryCacheStorageBuilderExtensions.UseMemoryCache(Parbad.Storage.Builder.IStorageBuilder)">
             <summary>
             Uses <see cref="T:Microsoft.Extensions.Caching.Memory.IMemoryCache"/> for saving and loading data.
+            <para>Note: The information inside the memory will be removed
+            if the website or server goes down for any reasons. Use MemoryCache only for development.</para>
             </summary>
             <param name="builder"></param>
         </member>
         <member name="M:Parbad.Builder.MemoryCacheStorageBuilderExtensions.UseMemoryCache(Parbad.Storage.Builder.IStorageBuilder,System.Action{Parbad.Storage.Cache.MemoryCache.MemoryCacheStorageOptions})">
             <summary>
             Uses <see cref="T:Microsoft.Extensions.Caching.Memory.IMemoryCache"/> for saving and loading data.
+            <para>Note: The information inside the memory will be removed
+            if the website or server goes down for any reasons. Use MemoryCache only for development.</para>
             </summary>
             <param name="builder"></param>
             <param name="configureOptions"></param>

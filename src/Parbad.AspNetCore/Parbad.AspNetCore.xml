@@ -25,7 +25,7 @@
         <member name="M:Parbad.Builder.AspNetCoreHttpContextBuilderExtensions.UseDefaultAspNetCore(Parbad.Http.IHttpContextBuilder)">
             <summary>
             Uses the default ASP.NET CORE <see cref="T:Microsoft.AspNetCore.Http.IHttpContextAccessor"/>. If it exists, no action is
-            taken. If it does not exist then the <see cref="T:Microsoft.AspNetCore.Http.HttpContextAccessor"/> is added.
+            taken. If it does not exist then a default implementation for the <see cref="T:Microsoft.AspNetCore.Http.IHttpContextAccessor"/> is added.
             </summary>
             <param name="builder"></param>
         </member>
