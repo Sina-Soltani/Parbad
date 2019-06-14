@@ -20,10 +20,10 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>Parbad.Storage.EntityframeworkCore.xml</DocumentationFile>
+    <DocumentationFile>Parbad.Storage.EntityFrameworkCore.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>Parbad.Storage.EntityframeworkCore.xml</DocumentationFile>
+    <DocumentationFile>Parbad.Storage.EntityFrameworkCore.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
