@@ -30,6 +30,10 @@
                 <td><asp:Label ID="LblGateway" runat="server" Text=""></asp:Label></td>
             </tr>
             <tr>
+                <td>Gateway account name</td>
+                <td><asp:Label ID="LblGatewayAccountName" runat="server" Text=""></asp:Label></td>
+            </tr>
+            <tr>
                 <td>Is succeed</td>
                 <td><asp:Label ID="LblIsSucceed" runat="server" Text=""></asp:Label></td>
             </tr>

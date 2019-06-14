@@ -94,6 +94,15 @@ namespace Parbad.Sample.WebForm {
         protected global::System.Web.UI.WebControls.Label LblGateway;
         
         /// <summary>
+        /// LblGatewayAccountName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label LblGatewayAccountName;
+        
+        /// <summary>
         /// LblIsSucceed control.
         /// </summary>
         /// <remarks>

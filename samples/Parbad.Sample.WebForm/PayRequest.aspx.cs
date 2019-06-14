@@ -23,7 +23,7 @@ namespace Parbad.Sample.WebForm
             var result = StaticOnlinePayment.Instance.Request(invoice =>
             {
                 invoice
-                    .UseAutoIncrementTrackingNumber(50)
+                    .UseAutoIncrementTrackingNumber()
                     .SetAmount(long.Parse(TxtAmount.Text))
                     .SetCallbackUrl(verifyUrl)
                     .UseGateway(gateway);
@@ -43,6 +43,7 @@ namespace Parbad.Sample.WebForm
                 LblTrackingNumber.Text = result.TrackingNumber.ToString();
                 LblAmount.Text = result.Amount.ToString();
                 LblGateway.Text = result.GatewayName;
+                LblGatewayAccountName.Text = result.GatewayAccountName;
                 LblIsSucceed.Text = result.IsSucceed.ToString();
                 LblMessage.Text = result.Message;
             }
