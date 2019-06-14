@@ -10,14 +10,12 @@ using Owin;
 using Parbad.Builder;
 using Parbad.Sample.Mvc;
 using Parbad.Sample.Mvc.Controllers;
-using Parbad.Sample.Mvc.Services;
 
 [assembly: OwinStartup(typeof(Startup))]
 
 namespace Parbad.Sample.Mvc
 {
     // This file is an example of How to integrate Parbad with a Dependency Injection library such as Autofac.
-
     public class Startup
     {
         public void ConfigureServices(ContainerBuilder containerBuilder)
@@ -28,13 +26,8 @@ namespace Parbad.Sample.Mvc
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
-
             // Register MVC controllers using Autofac
             containerBuilder.RegisterControllers(typeof(HomeController).Assembly);
-            // Register a service that gets the Mellat gateway settings from database.
-            // This service is added to Parbad inside ParbadConfig.Configure() method.
-            containerBuilder.RegisterType<MySettingsService>().As<IMySettingsService>().InstancePerLifetimeScope();
-
 
             // Parbad configuration
             var parbadBuilder = ParbadConfig.Configure();

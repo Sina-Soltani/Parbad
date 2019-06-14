@@ -285,8 +285,6 @@
     <Compile Include="Models\RequestViewModel.cs" />
     <Compile Include="Models\RefundViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\IMySettingsService.cs" />
-    <Compile Include="Services\MellatAccountSource.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
