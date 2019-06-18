@@ -128,6 +128,46 @@
         <member name="M:Parbad.Storage.EntityFrameworkCore.Domain.Transactions.TransactionConfiguration.Configure(Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder{Parbad.Storage.EntityFrameworkCore.Domain.Transactions.TransactionEntity})">
             <inheritdoc />
         </member>
+        <member name="T:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorage">
+            <summary>
+            EntityFramework Core implementation of <see cref="T:Parbad.Storage.Abstractions.IStorage"/>.
+            </summary>
+        </member>
+        <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorage.#ctor(Parbad.Storage.EntityFrameworkCore.Context.ParbadDataContext)">
+            <summary>
+            Initializes an instance of <see cref="T:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorage"/>.
+            </summary>
+            <param name="context"></param>
+        </member>
+        <member name="P:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorage.Payments">
+            <inheritdoc />
+        </member>
+        <member name="P:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorage.Transactions">
+            <inheritdoc />
+        </member>
+        <member name="P:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorage.Context">
+            <summary>
+            Parbad db context.
+            </summary>
+        </member>
+        <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorage.CreatePaymentAsync(Parbad.Storage.Abstractions.Payment,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorage.UpdatePaymentAsync(Parbad.Storage.Abstractions.Payment,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorage.DeletePaymentAsync(Parbad.Storage.Abstractions.Payment,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorage.CreateTransactionAsync(Parbad.Storage.Abstractions.Transaction,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorage.UpdateTransactionAsync(Parbad.Storage.Abstractions.Transaction,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorage.DeleteTransactionAsync(Parbad.Storage.Abstractions.Transaction,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
         <member name="T:Parbad.Storage.EntityFrameworkCore.Initializers.IDatabaseInitializer">
             <summary>
             An initializer to initialize the database required by Parbad.

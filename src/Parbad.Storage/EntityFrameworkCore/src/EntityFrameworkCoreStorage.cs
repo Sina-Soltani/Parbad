@@ -12,24 +12,39 @@ using Parbad.Storage.EntityFrameworkCore.Internal;
 
 namespace Parbad.Storage.EntityFrameworkCore
 {
+    /// <summary>
+    /// EntityFramework Core implementation of <see cref="IStorage"/>.
+    /// </summary>
     public class EntityFrameworkCoreStorage : IStorage
     {
+        /// <summary>
+        /// Initializes an instance of <see cref="EntityFrameworkCoreStorage"/>.
+        /// </summary>
+        /// <param name="context"></param>
         public EntityFrameworkCoreStorage(ParbadDataContext context)
         {
             Context = context;
         }
 
+        /// <inheritdoc />
         public virtual IQueryable<Payment> Payments => Context.Payments.AsNoTracking();
 
+        /// <inheritdoc />
         public virtual IQueryable<Transaction> Transactions => Context.Transactions.AsNoTracking();
 
+        /// <summary>
+        /// Parbad db context.
+        /// </summary>
         protected ParbadDataContext Context { get; }
 
+        /// <inheritdoc />
         public virtual async Task CreatePaymentAsync(Payment payment, CancellationToken cancellationToken = default)
         {
             if (payment == null) throw new ArgumentNullException(nameof(payment));
 
             var domain = payment.ToDomain();
+            domain.CreatedOn = DateTime.UtcNow;
+
             Context.Payments.Add(domain);
 
             await Context.SaveChangesAsync(cancellationToken);
@@ -39,6 +54,7 @@ namespace Parbad.Storage.EntityFrameworkCore
             payment.Id = domain.Id;
         }
 
+        /// <inheritdoc />
         public virtual async Task UpdatePaymentAsync(Payment payment, CancellationToken cancellationToken = default)
         {
             if (payment == null) throw new ArgumentNullException(nameof(payment));
@@ -58,6 +74,7 @@ namespace Parbad.Storage.EntityFrameworkCore
             await Context.SaveChangesAsync(cancellationToken);
         }
 
+        /// <inheritdoc />
         public virtual async Task DeletePaymentAsync(Payment payment, CancellationToken cancellationToken = default)
         {
             if (payment == null) throw new ArgumentNullException(nameof(payment));
@@ -74,11 +91,14 @@ namespace Parbad.Storage.EntityFrameworkCore
             await Context.SaveChangesAsync(cancellationToken);
         }
 
+        /// <inheritdoc />
         public virtual async Task CreateTransactionAsync(Transaction transaction, CancellationToken cancellationToken = default)
         {
             if (transaction == null) throw new ArgumentNullException(nameof(transaction));
 
             var domain = transaction.ToDomain();
+            domain.CreatedOn = DateTime.UtcNow;
+
             Context.Transactions.Add(domain);
 
             await Context.SaveChangesAsync(cancellationToken);
@@ -86,6 +106,7 @@ namespace Parbad.Storage.EntityFrameworkCore
             transaction.Id = domain.Id;
         }
 
+        /// <inheritdoc />
         public virtual async Task UpdateTransactionAsync(Transaction transaction, CancellationToken cancellationToken = default)
         {
             if (transaction == null) throw new ArgumentNullException(nameof(transaction));
@@ -105,6 +126,7 @@ namespace Parbad.Storage.EntityFrameworkCore
             await Context.SaveChangesAsync(cancellationToken);
         }
 
+        /// <inheritdoc />
         public virtual async Task DeleteTransactionAsync(Transaction transaction, CancellationToken cancellationToken = default)
         {
             if (transaction == null) throw new ArgumentNullException(nameof(transaction));
