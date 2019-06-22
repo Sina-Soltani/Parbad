@@ -1802,23 +1802,114 @@
             <param name="transaction"></param>
             <param name="cancellationToken"></param>
         </member>
+        <member name="T:Parbad.Storage.Abstractions.IStorageManager">
+            <summary>
+            Provides the APIs for managing payment and transaction in a persistence store.
+            </summary>
+        </member>
+        <member name="M:Parbad.Storage.Abstractions.IStorageManager.CreatePaymentAsync(Parbad.Storage.Abstractions.Payment,System.Threading.CancellationToken)">
+            <summary>
+            Creates a new payment.
+            </summary>
+            <param name="payment"></param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="M:Parbad.Storage.Abstractions.IStorageManager.UpdatePaymentAsync(Parbad.Storage.Abstractions.Payment,System.Threading.CancellationToken)">
+            <summary>
+            Updates the given <paramref name="payment"/>.
+            </summary>
+            <param name="payment"></param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="M:Parbad.Storage.Abstractions.IStorageManager.CreateTransactionAsync(Parbad.Storage.Abstractions.Transaction,System.Threading.CancellationToken)">
+            <summary>
+            Creates a new transaction.
+            </summary>
+            <param name="transaction"></param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="M:Parbad.Storage.Abstractions.IStorageManager.GetPaymentByTrackingNumberAsync(System.Int64,System.Threading.CancellationToken)">
+            <summary>
+            Gets a payment by its tracking number.
+            </summary>
+            <param name="trackingNumber"></param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="M:Parbad.Storage.Abstractions.IStorageManager.GetPaymentByTokenAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Gets a payment by its token.
+            </summary>
+            <param name="paymentToken"></param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="M:Parbad.Storage.Abstractions.IStorageManager.DoesPaymentExistAsync(System.Int64,System.Threading.CancellationToken)">
+            <summary>
+            Checks whether a payment exists with the given <paramref name="trackingNumber"/>.
+            </summary>
+            <param name="trackingNumber"></param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="M:Parbad.Storage.Abstractions.IStorageManager.DoesPaymentExistAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Checks whether a payment exists with the given <paramref name="paymentToken"/>.
+            </summary>
+            <param name="paymentToken"></param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="M:Parbad.Storage.Abstractions.IStorageManager.GetTransactionsAsync(Parbad.Storage.Abstractions.Payment,System.Threading.CancellationToken)">
+            <summary>
+            Gets a list of transactions of the given <paramref name="payment"/>.
+            </summary>
+            <param name="payment"></param>
+            <param name="cancellationToken"></param>
+        </member>
         <member name="T:Parbad.Storage.Abstractions.TransactionType">
             <summary>
             Type of transaction.
             </summary>
+        </member>
+        <member name="T:Parbad.Storage.Builder.IStorageBuilder">
+            <summary>
+            A builder for building the Parbad storage.
+            </summary>
+        </member>
+        <member name="P:Parbad.Storage.Builder.IStorageBuilder.Services">
+            <summary>
+            Specifies the contract for a collection of service descriptors.
+            </summary>
+        </member>
+        <member name="M:Parbad.Storage.Builder.IStorageBuilder.AddStorage``1(Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds the given storage to Parbad services.
+            </summary>
+            <typeparam name="TStorage"></typeparam>
+            <param name="lifetime">Lifetime of the given storage.</param>
+        </member>
+        <member name="M:Parbad.Storage.Builder.IStorageBuilder.AddStorage(Parbad.Storage.Abstractions.IStorage)">
+            <summary>
+            Adds the given storage to Parbad services as singleton.
+            </summary>
+            <param name="storage"></param>
+        </member>
+        <member name="M:Parbad.Storage.Builder.IStorageBuilder.AddStorage(System.Func{System.IServiceProvider,Parbad.Storage.Abstractions.IStorage},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds the given storage to Parbad services.
+            </summary>
+            <param name="factory"></param>
+            <param name="lifetime">Lifetime of the given storage.</param>
         </member>
         <member name="T:Parbad.Storage.StorageManager">
             <inheritdoc />
         </member>
         <member name="M:Parbad.Storage.StorageManager.#ctor(Parbad.Storage.Abstractions.IStorage)">
             <summary>
-            Initializes in instance of <see cref="T:Parbad.Storage.StorageManager"/>.
+            Initializes an instance of <see cref="T:Parbad.Storage.StorageManager"/>.
             </summary>
             <param name="storage"></param>
         </member>
         <member name="P:Parbad.Storage.StorageManager.Storage">
             <summary>
-            
+            Gets an instance of <see cref="T:Parbad.Storage.Abstractions.IStorage"/>.
             </summary>
         </member>
         <member name="M:Parbad.Storage.StorageManager.CreatePaymentAsync(Parbad.Storage.Abstractions.Payment,System.Threading.CancellationToken)">
@@ -1828,9 +1919,6 @@
             <inheritdoc />
         </member>
         <member name="M:Parbad.Storage.StorageManager.CreateTransactionAsync(Parbad.Storage.Abstractions.Transaction,System.Threading.CancellationToken)">
-            <inheritdoc />
-        </member>
-        <member name="M:Parbad.Storage.StorageManager.UpdateTransactionAsync(Parbad.Storage.Abstractions.Transaction,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
         <member name="M:Parbad.Storage.StorageManager.GetPaymentByTrackingNumberAsync(System.Int64,System.Threading.CancellationToken)">

@@ -13,7 +13,7 @@ namespace Parbad.Storage
     public class StorageManager : IStorageManager
     {
         /// <summary>
-        /// Initializes in instance of <see cref="StorageManager"/>.
+        /// Initializes an instance of <see cref="StorageManager"/>.
         /// </summary>
         /// <param name="storage"></param>
         public StorageManager(IStorage storage)
@@ -22,7 +22,7 @@ namespace Parbad.Storage
         }
 
         /// <summary>
-        /// 
+        /// Gets an instance of <see cref="IStorage"/>.
         /// </summary>
         protected IStorage Storage { get; }
 
@@ -37,10 +37,6 @@ namespace Parbad.Storage
         /// <inheritdoc />
         public virtual Task CreateTransactionAsync(Transaction transaction, CancellationToken cancellationToken = default)
             => Storage.CreateTransactionAsync(transaction, cancellationToken);
-
-        /// <inheritdoc />
-        public virtual Task UpdateTransactionAsync(Transaction transaction, CancellationToken cancellationToken = default)
-            => Storage.UpdateTransactionAsync(transaction, cancellationToken);
 
         /// <inheritdoc />
         public virtual Task<Payment> GetPaymentByTrackingNumberAsync(long trackingNumber, CancellationToken cancellationToken = default)
