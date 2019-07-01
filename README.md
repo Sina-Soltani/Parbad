@@ -27,11 +27,11 @@ Parbad is free and open-source integrated online payment library which helps dev
 * [Samples](https://github.com/Sina-Soltani/Parbad/wiki/Samples)
 * [Any question, problem or suggestion?](https://github.com/Sina-Soltani/Parbad/issues/new)
 
+توجه: آموزش‌ها و مثال‌های به روز شده را توسط لینک‌های بالا دنبال کنید
+
 # Videos
 
 * [ASP.NET CORE](https://youtu.be/zGGpf-Csj8Y)
 * [ASP.NET MVC](https://youtu.be/gnofCtdPP5k)
-
-توجه: آموزش‌ها و مثال‌های به روز شده را توسط لینک‌های بالا دنبال کنید
 
 [مشاهده مقاله به فارسی](https://www.dotnettips.info/post/3009/%d9%be%d8%b1%d8%a8%d8%a7%d8%af-%d8%a2%d9%85%d9%88%d8%b2%d8%b4-%d9%be%db%8c%d8%a7%d8%af%d9%87%e2%80%8c%d8%b3%d8%a7%d8%b2%db%8c-%d9%be%d8%b1%d8%af%d8%a7%d8%ae%d8%aa-%d8%a2%d9%86%d9%84%d8%a7%db%8c%d9%86-%d8%af%d8%b1-%d8%af%d8%a7%d8%aa-%d9%86%d8%aa-%d9%85%d9%82%d8%af%d9%85%d9%87)
