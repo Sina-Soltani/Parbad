@@ -1,6 +1,6 @@
 # Parbad - Online Payment Library for .NET developers
 
-![Parbad](https://github.com/Sina-Soltani/Parbad/blob/master/images/Parbad.png "Parbad")
+![image](https://raw.githubusercontent.com/Sina-Soltani/Parbad/master/images/Parbad.png)
 
 Parbad is free and open-source integrated online payment library which helps developers and website owners to add the online payment ability to their websites. It provides an easy solution to perform payment request, verify the requested payment and refund a payment.
 
