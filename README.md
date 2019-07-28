@@ -16,6 +16,9 @@ Parbad is free and open-source integrated online payment library which helps dev
 * Created with modern and standard technologies
 * Supports ASP.NET WebForms, ASP.NET MVC and ASP.NET CORE
 
+# How it works?
+![image](https://raw.githubusercontent.com/Sina-Soltani/Parbad/master/images/How-it-works.png)
+
 # Topics
 
 * [Installation](https://github.com/Sina-Soltani/Parbad/wiki/Installation)
