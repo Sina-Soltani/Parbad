@@ -1,4 +1,4 @@
-# Online Payment Library for .NET developers
+# Parbad - Online Payment Library for .NET developers
 
 ![Parbad](https://github.com/Sina-Soltani/Parbad/blob/master/images/Parbad.png "Parbad")
 
