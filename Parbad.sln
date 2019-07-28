@@ -8,6 +8,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
 		appveyor.yml = appveyor.yml
+		images\How-it-works.jpg = images\How-it-works.jpg
 		LICENSE.txt = LICENSE.txt
 		images\Parbad-Readme.png = images\Parbad-Readme.png
 		images\Parbad.png = images\Parbad.png
@@ -37,7 +38,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parbad.Sample.AspNetCore", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parbad.Storage.EntityFrameworkCore", "src\Parbad.Storage\EntityFrameworkCore\src\Parbad.Storage.EntityFrameworkCore.csproj", "{601E9A72-3154-4D7B-AADA-68167A60E29E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parbad.Storage.Cache", "src\Parbad.Storage\Cache\src\Parbad.Storage.Cache.csproj", "{CB53D8C8-452A-4D74-A3D9-CBE9167009DD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parbad.Storage.Cache", "src\Parbad.Storage\Cache\src\Parbad.Storage.Cache.csproj", "{CB53D8C8-452A-4D74-A3D9-CBE9167009DD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
