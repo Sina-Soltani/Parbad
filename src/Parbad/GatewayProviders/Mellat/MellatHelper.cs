@@ -20,15 +20,12 @@ namespace Parbad.GatewayProviders.Mellat
         private const string DuplicateOrderNumberResult = "41";
         private const string AlreadyVerifiedResult = "43";
         private const string SettleSuccess = "45";
-        private const long MassiveAmount = 50000000;
 
         internal const string CumulativeAccountsKey = "MellatCumulativeAccounts";
 
         public const string BaseServiceUrl = "https://bpm.shaparak.ir/";
         public const string WebServiceUrl = "/pgwchannel/services/pgw";
         public const string PaymentPageUrl = "https://bpm.shaparak.ir/pgwchannel/startpay.mellat";
-        public const string MassiveAmountWebServiceUrl = "/pgwchannel2/services/pgw";
-        public const string MassiveAmountPaymentPageUrl = "https://bpm.shaparak.ir/pgwchannel2/startpay.mellat";
         public const string TestWebServiceUrl = "/pgwchannel/services/pgwtest";
 
         public static string CreateRequestData(Invoice invoice, MellatGatewayAccount account)
@@ -231,20 +228,11 @@ namespace Parbad.GatewayProviders.Mellat
             };
         }
 
-        public static string GetWebServiceUrl(bool isTestTerminal, Money amount)
+        public static string GetWebServiceUrl(bool isTestTerminal)
         {
             return isTestTerminal
                 ? TestWebServiceUrl
-                : amount < MassiveAmount
-                    ? WebServiceUrl
-                    : MassiveAmountWebServiceUrl;
-        }
-
-        public static string GetPaymentPageUrl(Money amount)
-        {
-            return amount < MassiveAmount
-                    ? PaymentPageUrl
-                    : MassiveAmountPaymentPageUrl;
+                : WebServiceUrl;
         }
 
         private static string CreateSimpleRequestData(Invoice invoice, MellatGatewayAccount account)

@@ -269,10 +269,14 @@ namespace Parbad.GatewayProviders.Pasargad
         {
             using (var rsa = new RSACryptoServiceProvider())
             {
+                byte[] encryptedData;
+#if NETSTANDARD2_0
+                rsa.FromXml(privateKey);
+                encryptedData = rsa.SignData(Encoding.UTF8.GetBytes(dataToSign), HashAlgorithmName.SHA1, RSASignaturePadding.Pkcs1);
+#else
                 rsa.FromXmlString(privateKey);
-
-                var encryptedData = rsa.SignData(Encoding.UTF8.GetBytes(dataToSign), new SHA1CryptoServiceProvider());
-
+                encryptedData = rsa.SignData(Encoding.UTF8.GetBytes(dataToSign), new SHA1CryptoServiceProvider());
+#endif
                 return Convert.ToBase64String(encryptedData);
             }
         }

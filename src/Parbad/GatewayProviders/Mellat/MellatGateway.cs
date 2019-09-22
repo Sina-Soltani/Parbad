@@ -45,7 +45,7 @@ namespace Parbad.GatewayProviders.Mellat
             var data = MellatHelper.CreateRequestData(invoice, account);
 
             var responseMessage = await _httpClient
-                .PostXmlAsync(MellatHelper.GetWebServiceUrl(account.IsTestTerminal, invoice.Amount), data, cancellationToken)
+                .PostXmlAsync(MellatHelper.GetWebServiceUrl(account.IsTestTerminal), data, cancellationToken)
                 .ConfigureAwaitFalse();
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
@@ -70,7 +70,7 @@ namespace Parbad.GatewayProviders.Mellat
             var data = MellatHelper.CreateVerifyData(context, account, callbackResult);
 
             var responseMessage = await _httpClient
-                .PostXmlAsync(MellatHelper.GetWebServiceUrl(account.IsTestTerminal, context.Payment.Amount), data, cancellationToken)
+                .PostXmlAsync(MellatHelper.GetWebServiceUrl(account.IsTestTerminal), data, cancellationToken)
                 .ConfigureAwaitFalse();
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
@@ -85,7 +85,7 @@ namespace Parbad.GatewayProviders.Mellat
             data = MellatHelper.CreateSettleData(context, callbackResult, account);
 
             responseMessage = await _httpClient
-                .PostXmlAsync(MellatHelper.GetWebServiceUrl(account.IsTestTerminal, context.Payment.Amount), data, cancellationToken)
+                .PostXmlAsync(MellatHelper.GetWebServiceUrl(account.IsTestTerminal), data, cancellationToken)
                 .ConfigureAwaitFalse();
 
             response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
@@ -104,7 +104,7 @@ namespace Parbad.GatewayProviders.Mellat
             var data = MellatHelper.CreateRefundData(context, account);
 
             var responseMessage = await _httpClient
-                .PostXmlAsync(MellatHelper.GetWebServiceUrl(account.IsTestTerminal, context.Payment.Amount), data, cancellationToken)
+                .PostXmlAsync(MellatHelper.GetWebServiceUrl(account.IsTestTerminal), data, cancellationToken)
                 .ConfigureAwaitFalse();
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
