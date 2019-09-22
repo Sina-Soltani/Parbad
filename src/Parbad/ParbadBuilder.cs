@@ -1,6 +1,7 @@
 // Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
+using System;
 using Microsoft.Extensions.DependencyInjection;
 using Parbad.Builder;
 
@@ -15,7 +16,7 @@ namespace Parbad
         /// <param name="services"></param>
         public ParbadBuilder(IServiceCollection services)
         {
-            Services = services;
+            Services = services ?? throw new ArgumentNullException(nameof(services));
         }
 
         /// <inheritdoc />
