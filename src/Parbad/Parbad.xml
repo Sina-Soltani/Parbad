@@ -465,6 +465,18 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="T:Parbad.GatewayBuilders.IGatewayAccountSource`1">
+            <summary>
+            A source which used to add the accounts of the specified gateway.
+            </summary>
+            <typeparam name="TAccount"></typeparam>
+        </member>
+        <member name="M:Parbad.GatewayBuilders.IGatewayAccountSource`1.AddAccountsAsync(Parbad.GatewayBuilders.IGatewayAccountCollection{`0})">
+            <summary>
+            Adds the accounts for specified gateway.
+            </summary>
+            <param name="accounts"></param>
+        </member>
         <member name="T:Parbad.GatewayBuilders.IGatewayBuilder">
             <summary>
             A builder for building a gateway.
@@ -1008,7 +1020,16 @@
         <member name="M:Parbad.Internal.DefaultOnlinePayment.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
+        <member name="M:Parbad.Internal.DefaultOnlinePayment.FetchAsync(System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Internal.DefaultOnlinePayment.VerifyAsync(System.Int64,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
         <member name="M:Parbad.Internal.DefaultOnlinePayment.VerifyAsync(System.Action{Parbad.IPaymentVerifyingContext},System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Internal.DefaultOnlinePayment.CancelAsync(System.Int64,System.String,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
         <member name="M:Parbad.Internal.DefaultOnlinePayment.RefundAsync(Parbad.RefundInvoice,System.Threading.CancellationToken)">
@@ -1294,12 +1315,30 @@
             <param name="invoice">The invoice that must be paid.</param>
             <param name="cancellationToken"></param>
         </member>
-        <member name="M:Parbad.IOnlinePayment.VerifyAsync(System.Action{Parbad.IPaymentVerifyingContext},System.Threading.CancellationToken)">
+        <member name="M:Parbad.IOnlinePayment.FetchAsync(System.Threading.CancellationToken)">
             <summary>
-            Verifies the requested payment to check whether or not the invoice has was paid in the gateway by the client.
+            Fetches the invoice from the incoming request.
             </summary>
-            <param name="context">Describes the information of requested payment.</param>
             <param name="cancellationToken"></param>
+            <exception cref="T:Parbad.PaymentTokenProviders.PaymentTokenProviderException"></exception>
+            <exception cref="T:Parbad.Exceptions.InvoiceNotFoundException"></exception>
+        </member>
+        <member name="M:Parbad.IOnlinePayment.VerifyAsync(System.Int64,System.Threading.CancellationToken)">
+            <summary>
+            Verifies the given invoice.
+            </summary>
+            <param name="trackingNumber">The tracking number of the invoice which must be verified.</param>
+            <param name="cancellationToken"></param>
+            <exception cref="T:Parbad.Exceptions.InvoiceNotFoundException"></exception>
+        </member>
+        <member name="M:Parbad.IOnlinePayment.CancelAsync(System.Int64,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Cancels the given invoice. No Verifying request will be sent to the gateway.
+            </summary>
+            <param name="trackingNumber">The tracking number of the invoice which must be verified.</param>
+            <param name="cancellationReason">The reason for cancelling the operation. It will be saved in Message field in database.</param>
+            <param name="cancellationToken"></param>
+            <exception cref="T:Parbad.Exceptions.InvoiceNotFoundException"></exception>
         </member>
         <member name="M:Parbad.IOnlinePayment.RefundAsync(Parbad.RefundInvoice,System.Threading.CancellationToken)">
             <summary>
@@ -1307,7 +1346,14 @@
             </summary>
             <param name="invoice">The invoice that must be refunded.</param>
             <param name="cancellationToken"></param>
-            <returns></returns>
+            <exception cref="T:Parbad.Exceptions.InvoiceNotFoundException"></exception>
+        </member>
+        <member name="M:Parbad.IOnlinePayment.VerifyAsync(System.Action{Parbad.IPaymentVerifyingContext},System.Threading.CancellationToken)">
+            <summary>
+            Verifies the requested payment to check whether or not the invoice has was paid in the gateway by the client.
+            </summary>
+            <param name="context">Describes the information of requested payment.</param>
+            <param name="cancellationToken"></param>
         </member>
         <member name="T:Parbad.IOnlinePaymentAccessor">
             <summary>
@@ -1325,6 +1371,16 @@
             Gets an instance of <see cref="T:Parbad.IOnlinePayment"/>.
             </summary>
             <exception cref="T:Parbad.Exceptions.ParbadServiceNotInitializedException"></exception>
+        </member>
+        <member name="T:Parbad.IPaymentCancelResult">
+            <summary>
+            Describes the result of the Cancel operation.
+            </summary>
+        </member>
+        <member name="T:Parbad.IPaymentFetchResult">
+            <summary>
+            Describes the result of the Fetch operation.
+            </summary>
         </member>
         <member name="T:Parbad.IPaymentRefundResult">
             <summary>
@@ -1354,6 +1410,9 @@
         <member name="P:Parbad.IPaymentResult.Amount">
             <summary>
             The amount of the payment.
+            <para>Examples:</para>
+            <para>long a = result.Amount;</para>
+            <para>decimal a = result.Amount;</para>
             </summary>
         </member>
         <member name="P:Parbad.IPaymentResult.IsSucceed">
@@ -1423,6 +1482,10 @@
             Note: The official unit of currency in Iran is the Iranian rial (IR).
             It means the amount of the invoice will be sent to Iranian gateways automatically
             as <see cref="T:System.Int64"/> by Parbad.
+            </para>
+            <para>Examples:
+            <para>decimal a = Money</para>
+            <para>long a = Money</para>
             </para>
             </summary>
         </member>
@@ -1497,6 +1560,67 @@
             <param name="onlinePayment"></param>
             <param name="configureInvoice">A builder which helps to build an invoice.</param>
             <param name="cancellationToken"></param>
+        </member>
+        <member name="M:Parbad.OnlinePaymentExtensions.Fetch(Parbad.IOnlinePayment)">
+            <summary>
+            Fetches the invoice from the incoming request.
+            </summary>
+            <param name="onlinePayment"></param>
+            <exception cref="T:Parbad.PaymentTokenProviders.PaymentTokenProviderException"></exception>
+            <exception cref="T:Parbad.Exceptions.InvoiceNotFoundException"></exception>
+        </member>
+        <member name="M:Parbad.OnlinePaymentExtensions.Verify(Parbad.IOnlinePayment,System.Int64)">
+            <summary>
+            Verifies the given invoice.
+            </summary>
+            <param name="onlinePayment"></param>
+            <param name="trackingNumber">The tracking number of the invoice which must be verified.</param>
+            <exception cref="T:Parbad.Exceptions.InvoiceNotFoundException"></exception>
+        </member>
+        <member name="M:Parbad.OnlinePaymentExtensions.VerifyAsync(Parbad.IOnlinePayment,Parbad.IPaymentFetchResult,System.Threading.CancellationToken)">
+            <summary>
+            Verifies the given invoice.
+            </summary>
+            <param name="onlinePayment"></param>
+            <param name="invoice"></param>
+            <param name="cancellationToken"></param>
+            <exception cref="T:Parbad.Exceptions.InvoiceNotFoundException"></exception>
+        </member>
+        <member name="M:Parbad.OnlinePaymentExtensions.Verify(Parbad.IOnlinePayment,Parbad.IPaymentFetchResult)">
+            <summary>
+            Verifies the given invoice.
+            </summary>
+            <param name="onlinePayment"></param>
+            <param name="invoice"></param>
+            <exception cref="T:Parbad.Exceptions.InvoiceNotFoundException"></exception>
+        </member>
+        <member name="M:Parbad.OnlinePaymentExtensions.Cancel(Parbad.IOnlinePayment,System.Int64,System.String)">
+            <summary>
+            Cancels the given invoice. No Verifying request will be sent to the gateway.
+            </summary>
+            <param name="onlinePayment"></param>
+            <param name="trackingNumber">The tracking number of the invoice which must be verified.</param>
+            <param name="cancellationReason">The reason for cancelling the operation. It will be saved in Message field in database.</param>
+            <exception cref="T:Parbad.Exceptions.InvoiceNotFoundException"></exception>
+        </member>
+        <member name="M:Parbad.OnlinePaymentExtensions.CancelAsync(Parbad.IOnlinePayment,Parbad.IPaymentFetchResult,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Cancels the given invoice. No Verifying request will be sent to the gateway.
+            </summary>
+            <param name="onlinePayment"></param>
+            <param name="invoice"></param>
+            <param name="cancellationReason">The reason for cancelling the operation. It will be saved in Message field in database.</param>
+            <param name="cancellationToken"></param>
+            <exception cref="T:Parbad.Exceptions.InvoiceNotFoundException"></exception>
+        </member>
+        <member name="M:Parbad.OnlinePaymentExtensions.Cancel(Parbad.IOnlinePayment,Parbad.IPaymentFetchResult,System.String)">
+            <summary>
+            Cancels the given invoice. No Verifying request will be sent to the gateway.
+            </summary>
+            <param name="onlinePayment"></param>
+            <param name="invoice"></param>
+            <param name="cancellationReason">The reason for cancelling the operation. It will be saved in Message field in database.</param>
+            <exception cref="T:Parbad.Exceptions.InvoiceNotFoundException"></exception>
         </member>
         <member name="M:Parbad.OnlinePaymentExtensions.Verify(Parbad.IOnlinePayment,System.Action{Parbad.IPaymentVerifyingContext})">
             <summary>

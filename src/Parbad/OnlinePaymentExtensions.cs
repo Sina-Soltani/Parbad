@@ -5,8 +5,10 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Parbad.Abstraction;
+using Parbad.Exceptions;
 using Parbad.Internal;
 using Parbad.InvoiceBuilder;
+using Parbad.PaymentTokenProviders;
 
 namespace Parbad
 {
@@ -113,10 +115,108 @@ namespace Parbad
         }
 
         /// <summary>
+        /// Fetches the invoice from the incoming request.
+        /// </summary>
+        /// <param name="onlinePayment"></param>
+        /// <exception cref="PaymentTokenProviderException"></exception>
+        /// <exception cref="InvoiceNotFoundException"></exception>
+        public static IPaymentFetchResult Fetch(this IOnlinePayment onlinePayment)
+            => onlinePayment.FetchAsync().GetAwaiter().GetResult();
+
+        /// <summary>
+        /// Verifies the given invoice.
+        /// </summary>
+        /// <param name="onlinePayment"></param>
+        /// <param name="trackingNumber">The tracking number of the invoice which must be verified.</param>
+        /// <exception cref="InvoiceNotFoundException"></exception>
+        public static IPaymentVerifyResult Verify(this IOnlinePayment onlinePayment, long trackingNumber)
+            => onlinePayment.VerifyAsync(trackingNumber).GetAwaiter().GetResult();
+
+        /// <summary>
+        /// Verifies the given invoice.
+        /// </summary>
+        /// <param name="onlinePayment"></param>
+        /// <param name="invoice"></param>
+        /// <param name="cancellationToken"></param>
+        /// <exception cref="InvoiceNotFoundException"></exception>
+        public static Task<IPaymentVerifyResult> VerifyAsync(
+            this IOnlinePayment onlinePayment,
+            IPaymentFetchResult invoice,
+            CancellationToken cancellationToken = default)
+        {
+            if (invoice == null) throw new ArgumentNullException(nameof(invoice));
+
+            return onlinePayment.VerifyAsync(invoice.TrackingNumber, cancellationToken);
+        }
+
+        /// <summary>
+        /// Verifies the given invoice.
+        /// </summary>
+        /// <param name="onlinePayment"></param>
+        /// <param name="invoice"></param>
+        /// <exception cref="InvoiceNotFoundException"></exception>
+        public static IPaymentVerifyResult Verify(this IOnlinePayment onlinePayment, IPaymentFetchResult invoice)
+        {
+            if (invoice == null) throw new ArgumentNullException(nameof(invoice));
+
+            return onlinePayment.VerifyAsync(invoice.TrackingNumber).GetAwaiter().GetResult();
+        }
+
+        /// <summary>
+        /// Cancels the given invoice. No Verifying request will be sent to the gateway.
+        /// </summary>
+        /// <param name="onlinePayment"></param>
+        /// <param name="trackingNumber">The tracking number of the invoice which must be verified.</param>
+        /// <param name="cancellationReason">The reason for cancelling the operation. It will be saved in Message field in database.</param>
+        /// <exception cref="InvoiceNotFoundException"></exception>
+        public static IPaymentCancelResult Cancel(
+            this IOnlinePayment onlinePayment,
+            long trackingNumber,
+            string cancellationReason = null)
+            => onlinePayment.CancelAsync(trackingNumber, cancellationReason).GetAwaiter().GetResult();
+
+        /// <summary>
+        /// Cancels the given invoice. No Verifying request will be sent to the gateway.
+        /// </summary>
+        /// <param name="onlinePayment"></param>
+        /// <param name="invoice"></param>
+        /// <param name="cancellationReason">The reason for cancelling the operation. It will be saved in Message field in database.</param>
+        /// <param name="cancellationToken"></param>
+        /// <exception cref="InvoiceNotFoundException"></exception>
+        public static Task<IPaymentCancelResult> CancelAsync(
+            this IOnlinePayment onlinePayment,
+            IPaymentFetchResult invoice,
+            string cancellationReason = null,
+            CancellationToken cancellationToken = default)
+        {
+            if (invoice == null) throw new ArgumentNullException(nameof(invoice));
+
+            return onlinePayment.CancelAsync(invoice.TrackingNumber, cancellationReason, cancellationToken);
+        }
+
+        /// <summary>
+        /// Cancels the given invoice. No Verifying request will be sent to the gateway.
+        /// </summary>
+        /// <param name="onlinePayment"></param>
+        /// <param name="invoice"></param>
+        /// <param name="cancellationReason">The reason for cancelling the operation. It will be saved in Message field in database.</param>
+        /// <exception cref="InvoiceNotFoundException"></exception>
+        public static IPaymentCancelResult Cancel(
+            this IOnlinePayment onlinePayment,
+            IPaymentFetchResult invoice,
+            string cancellationReason = null)
+        {
+            if (invoice == null) throw new ArgumentNullException(nameof(invoice));
+
+            return onlinePayment.CancelAsync(invoice.TrackingNumber, cancellationReason).GetAwaiter().GetResult();
+        }
+
+        /// <summary>
         /// Verifies the requested payment to check whether or not the invoice has was paid in the gateway by the client.
         /// </summary>
         /// <param name="onlinePayment"></param>
         /// <param name="paymentVerifyingContext">Describes the information of requested payment.</param>
+        [Obsolete("This method is obsolete and will be removed in a future version. The recommended alternative is Verify(long trackingNumber).", error: false)]
         public static IPaymentVerifyResult Verify(
             this IOnlinePayment onlinePayment,
             Action<IPaymentVerifyingContext> paymentVerifyingContext)

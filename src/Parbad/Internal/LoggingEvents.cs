@@ -7,9 +7,13 @@ namespace Parbad.Internal
     {
         public const int RequestPayment = 100;
 
+        public const int FetchPayment = 101;
+
         public const int VerifyPayment = 101;
 
-        public const int RefundPayment = 102;
+        public const int CancelPayment = 102;
+
+        public const int RefundPayment = 103;
 
         public const int DatabaseCreation = 200;
     }

@@ -1,0 +1,30 @@
+﻿@model Parbad.IPaymentCancelResult
+
+<h1>Cancel result</h1>
+
+<table class="table">
+    <tr>
+        <td>Tracking number</td>
+        <td>@Model.TrackingNumber</td>
+    </tr>
+    <tr>
+        <td>Amount</td>
+        <td>@Model.Amount</td>
+    </tr>
+    <tr>
+        <td>Gateway</td>
+        <td>@Model.GatewayName</td>
+    </tr>
+    <tr>
+        <td>Gateway account name</td>
+        <td>@Model.GatewayAccountName</td>
+    </tr>
+    <tr>
+        <td>Is succeed</td>
+        <td>@Model.IsSucceed</td>
+    </tr>
+    <tr>
+        <td>Message</td>
+        <td>@Model.Message</td>
+    </tr>
+</table>

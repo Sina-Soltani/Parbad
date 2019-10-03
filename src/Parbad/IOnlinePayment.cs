@@ -5,6 +5,8 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Parbad.Abstraction;
+using Parbad.Exceptions;
+using Parbad.PaymentTokenProviders;
 
 namespace Parbad
 {
@@ -28,18 +30,44 @@ namespace Parbad
         Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Verifies the requested payment to check whether or not the invoice has was paid in the gateway by the client.
+        /// Fetches the invoice from the incoming request.
         /// </summary>
-        /// <param name="context">Describes the information of requested payment.</param>
         /// <param name="cancellationToken"></param>
-        Task<IPaymentVerifyResult> VerifyAsync(Action<IPaymentVerifyingContext> context, CancellationToken cancellationToken = default);
+        /// <exception cref="PaymentTokenProviderException"></exception>
+        /// <exception cref="InvoiceNotFoundException"></exception>
+        Task<IPaymentFetchResult> FetchAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Verifies the given invoice.
+        /// </summary>
+        /// <param name="trackingNumber">The tracking number of the invoice which must be verified.</param>
+        /// <param name="cancellationToken"></param>
+        /// <exception cref="InvoiceNotFoundException"></exception>
+        Task<IPaymentVerifyResult> VerifyAsync(long trackingNumber, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Cancels the given invoice. No Verifying request will be sent to the gateway.
+        /// </summary>
+        /// <param name="trackingNumber">The tracking number of the invoice which must be verified.</param>
+        /// <param name="cancellationReason">The reason for cancelling the operation. It will be saved in Message field in database.</param>
+        /// <param name="cancellationToken"></param>
+        /// <exception cref="InvoiceNotFoundException"></exception>
+        Task<IPaymentCancelResult> CancelAsync(long trackingNumber, string cancellationReason = null, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Performs a refund request for the given invoice.
         /// </summary>
         /// <param name="invoice">The invoice that must be refunded.</param>
         /// <param name="cancellationToken"></param>
-        /// <returns></returns>
+        /// <exception cref="InvoiceNotFoundException"></exception>
         Task<IPaymentRefundResult> RefundAsync(RefundInvoice invoice, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Verifies the requested payment to check whether or not the invoice has was paid in the gateway by the client.
+        /// </summary>
+        /// <param name="context">Describes the information of requested payment.</param>
+        /// <param name="cancellationToken"></param>
+        [Obsolete("This method is obsolete and will be removed in a future version. The recommended alternative is Verify(long trackingNumber).", error: false)]
+        Task<IPaymentVerifyResult> VerifyAsync(Action<IPaymentVerifyingContext> context, CancellationToken cancellationToken = default);
     }
 }

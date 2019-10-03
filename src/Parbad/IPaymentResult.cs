@@ -17,6 +17,9 @@ namespace Parbad
 
         /// <summary>
         /// The amount of the payment.
+        /// <para>Examples:</para>
+        /// <para>long a = result.Amount;</para>
+        /// <para>decimal a = result.Amount;</para>
         /// </summary>
         Money Amount { get; }
 

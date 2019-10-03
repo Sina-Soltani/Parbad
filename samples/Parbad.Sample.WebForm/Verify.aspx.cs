@@ -6,32 +6,32 @@ namespace Parbad.Sample.WebForm
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            var result = StaticOnlinePayment.Instance.Verify(invoice =>
+            IPaymentResult result;
+            var transactionCode = "";
+
+            var invoice = StaticOnlinePayment.Instance.Fetch();
+
+            if (Is_There_Still_Product_In_Shop(invoice.TrackingNumber))
             {
-                // You can check your database, whether or not you have still products to sell
-                // در این مرحله هنوز درخواست تأیید و واریز وجه از وب سایت شما به بانک ارسال نشده است
-                // بنابراین شما می توانید اطلاعات صورتحساب را با پایگاه داده خود چک کنید
-                // و در صورت لزوم تراکنش را لغو کنید
+                var verifyResult = StaticOnlinePayment.Instance.Verify(invoice);
+                result = verifyResult;
+                transactionCode = verifyResult.TransactionCode;
+            }
+            else
+            {
+                result = StaticOnlinePayment.Instance.Cancel(invoice, cancellationReason: "Sorry, We have no more products to sell.");
+            }
 
-                if (!Is_There_Still_Enough_SmartPhone_In_Shop(invoice.TrackingNumber))
-                {
-                    invoice.CancelPayment("We have no more smart phones to sell.");
-                }
-            });
-
-            // Note: This is just for development and testing.
-            // Don't show the actual result object to clients in production environment.
-            // Instead, show only the important information such as IsSucceed, Tracking Number and Transaction Code.
             LblTrackingNumber.Text = result.TrackingNumber.ToString();
             LblAmount.Text = result.Amount.ToString();
             LblGateway.Text = result.GatewayName;
             LblGatewayAccountName.Text = result.GatewayAccountName;
-            LblTransactionCode.Text = result.TransactionCode;
+            LblTransactionCode.Text = transactionCode;
             LblIsSucceed.Text = result.IsSucceed.ToString();
             LblMessage.Text = result.Message;
         }
 
-        private static bool Is_There_Still_Enough_SmartPhone_In_Shop(long trackingNumber)
+        private static bool Is_There_Still_Product_In_Shop(long trackingNumber)
         {
             // Yes, we still have smart phones :)
 

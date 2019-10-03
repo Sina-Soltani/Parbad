@@ -56,23 +56,18 @@ namespace Parbad.Sample.Mvc.Controllers
         // بنابراین بهتر است هیچگونه خصوصیتی برای این اکشن متد در نظر گرفته نشود
         public async Task<ActionResult> Verify()
         {
-            var result = await _onlinePayment.VerifyAsync(invoice =>
+            var invoice = await _onlinePayment.FetchAsync();
+
+            if (Is_There_Still_Product_In_Shop(invoice.TrackingNumber))
             {
-                // You can check your database, whether or not you have still products to sell
-                // در این مرحله هنوز درخواست تأیید و واریز وجه از وب سایت شما به بانک ارسال نشده است
-                // بنابراین شما می توانید اطلاعات صورتحساب را با پایگاه داده خود چک کنید
-                // و در صورت لزوم تراکنش را لغو کنید
+                var verifyResult = await _onlinePayment.VerifyAsync(invoice);
 
-                if (!Is_There_Still_Enough_SmartPhone_In_Shop(invoice.TrackingNumber))
-                {
-                    invoice.CancelPayment("We have no more smart phones to sell.");
-                }
-            });
+                return View(verifyResult);
+            }
 
-            // Note: This is just for development and testing.
-            // Don't show the actual result object to clients in production environment.
-            // Instead, show only the important information such as IsSucceed, Tracking Number and Transaction Code.
-            return View(result);
+            var cancelResult = await _onlinePayment.CancelAsync(invoice, cancellationReason: "Sorry, We have no more products to sell.");
+
+            return View("CancelResult", cancelResult);
         }
 
         [HttpGet]
@@ -97,7 +92,7 @@ namespace Parbad.Sample.Mvc.Controllers
             return View("RefundResult", result);
         }
 
-        private static bool Is_There_Still_Enough_SmartPhone_In_Shop(long trackingNumber)
+        private static bool Is_There_Still_Product_In_Shop(long trackingNumber)
         {
             // Yes, we still have smart phones :)
 

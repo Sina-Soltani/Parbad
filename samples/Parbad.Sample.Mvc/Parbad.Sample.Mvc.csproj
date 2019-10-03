@@ -336,6 +336,7 @@
     <Content Include="Views\Payment\RefundResult.cshtml" />
     <Content Include="Views\Payment\PayRequestError.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\Payment\CancelResult.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

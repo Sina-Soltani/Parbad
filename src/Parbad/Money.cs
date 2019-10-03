@@ -14,6 +14,10 @@ namespace Parbad
     /// It means the amount of the invoice will be sent to Iranian gateways automatically
     /// as <see cref="Int64"/> by Parbad.
     /// </para>
+    /// <para>Examples:
+    /// <para>decimal a = Money</para>
+    /// <para>long a = Money</para>
+    /// </para>
     /// </summary>
     public class Money : IComparable<Money>
     {
