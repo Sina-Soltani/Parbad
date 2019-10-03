@@ -81,7 +81,6 @@ namespace Parbad.GatewayProviders.Parsian
             httpRequest.Form.TryGetValue("status", out var status);
             httpRequest.Form.TryGetValue("orderId", out var orderId);
             httpRequest.Form.TryGetValue("amount", out var amount);
-            httpRequest.Form.TryGetValue("RRN", out var rrn);
 
             var isSucceed = !status.IsNullOrEmpty() &&
                             status == "0" &&
@@ -91,8 +90,7 @@ namespace Parbad.GatewayProviders.Parsian
 
             if (isSucceed)
             {
-                if (rrn.IsNullOrEmpty() ||
-                    amount.IsNullOrEmpty() ||
+                if (amount.IsNullOrEmpty() ||
                     orderId.IsNullOrEmpty() ||
                     !long.TryParse(orderId, out var numberOrderNumber) ||
                     !long.TryParse(amount, out var numberAmount) ||
@@ -118,7 +116,6 @@ namespace Parbad.GatewayProviders.Parsian
             return new ParsianCallbackResult
             {
                 IsSucceed = isSucceed,
-                RRN = rrn,
                 Result = verifyResult
             };
         }
@@ -141,13 +138,15 @@ namespace Parbad.GatewayProviders.Parsian
                 "</soapenv:Envelope>";
         }
 
-        public static PaymentVerifyResult CreateVerifyResult(string webServiceResponse, ParsianCallbackResult callbackResult, MessagesOptions messagesOptions)
+        public static PaymentVerifyResult CreateVerifyResult(string webServiceResponse, MessagesOptions messagesOptions)
         {
             var status = XmlHelper.GetNodeValueFromXml(webServiceResponse, "Status", "https://pec.Shaparak.ir/NewIPGServices/Confirm/ConfirmService");
             var rrn = XmlHelper.GetNodeValueFromXml(webServiceResponse, "RRN", "https://pec.Shaparak.ir/NewIPGServices/Confirm/ConfirmService");
             var token = XmlHelper.GetNodeValueFromXml(webServiceResponse, "Token", "https://pec.Shaparak.ir/NewIPGServices/Confirm/ConfirmService");
 
-            var isSucceed = !status.IsNullOrEmpty() && status == "0";
+            var isSucceed = !status.IsNullOrEmpty() &&
+                            status == "0" &&
+                            !rrn.IsNullOrEmpty();
 
             var message = isSucceed
                 ? messagesOptions.PaymentSucceed

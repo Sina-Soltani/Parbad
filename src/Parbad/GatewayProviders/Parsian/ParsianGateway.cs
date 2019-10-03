@@ -75,7 +75,7 @@ namespace Parbad.GatewayProviders.Parsian
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
-            return ParsianHelper.CreateVerifyResult(response, callbackResult, _messageOptions.Value);
+            return ParsianHelper.CreateVerifyResult(response, _messageOptions.Value);
         }
 
         /// <inheritdoc />
