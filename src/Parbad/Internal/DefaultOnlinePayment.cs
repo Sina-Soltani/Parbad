@@ -336,7 +336,7 @@ namespace Parbad.Internal
             }
             else
             {
-                amountToRefund = payment.Amount;
+                amountToRefund = invoice.Amount;
             }
 
             var gateway = _gatewayProvider.Provide(payment.GatewayName);
