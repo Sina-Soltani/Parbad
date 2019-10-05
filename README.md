@@ -30,7 +30,7 @@ Parbad is a free and open-source integrated online payment library which helps d
 * [Virtual Gateway](https://github.com/Sina-Soltani/Parbad/wiki/Virtual-Gateway)
 * [Mellat Gateway extra functions](https://github.com/Sina-Soltani/Parbad/wiki/Mellat-Gateway-extra-functions)
 * [Samples](https://github.com/Sina-Soltani/Parbad/wiki/Samples)
-* [Any question, problem or suggestion?](https://github.com/Sina-Soltani/Parbad/issues/new)
+* [Any question, problem or suggestion?](https://github.com/Sina-Soltani/Parbad/issues/new/choose)
 
 توجه: آموزش‌ها و مثال‌های به روز شده را توسط لینک‌های بالا دنبال کنید
 
