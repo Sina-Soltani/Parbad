@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Parbad.Abstraction;
 using Parbad.GatewayBuilders;
 using Parbad.Internal;
@@ -67,19 +66,6 @@ namespace Parbad.Builder
             if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
             builder.Add(new MsConfigurationGatewayAccountSource<TAccount>(configuration));
-
-            return builder;
-        }
-
-        internal static IGatewayBuilder AddGatewayAccountProvider<TAccount>(this IGatewayBuilder builder)
-            where TAccount : GatewayAccount
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-
-            builder.Services
-                .TryAddTransient<
-                    IGatewayAccountProvider<TAccount>,
-                    GatewayAccountProvider<TAccount>>();
 
             return builder;
         }

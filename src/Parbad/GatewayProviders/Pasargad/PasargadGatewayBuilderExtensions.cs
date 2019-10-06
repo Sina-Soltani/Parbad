@@ -17,8 +17,6 @@ namespace Parbad.Builder
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            builder.AddGatewayAccountProvider<PasargadGatewayAccount>();
-
             return builder.AddGateway<PasargadGateway>(new Uri(PasargadHelper.BaseServiceUrl));
         }
 

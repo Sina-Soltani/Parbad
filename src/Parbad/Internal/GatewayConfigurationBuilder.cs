@@ -3,6 +3,7 @@
 
 using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Parbad.Abstraction;
 using Parbad.GatewayBuilders;
 using Parbad.Net;
@@ -26,15 +27,10 @@ namespace Parbad.Internal
 
             configureAccounts(new GatewayAccountBuilder<TAccount>(Services));
 
-            return this;
-        }
-
-        public IGatewayConfigurationBuilder<TGateway> WithOptions<TOptions>(Action<TOptions> configureOptions)
-            where TOptions : class, new()
-        {
-            if (configureOptions == null) throw new ArgumentNullException(nameof(configureOptions));
-
-            //Services.Configure(configureOptions);
+            Services
+                .TryAddTransient<
+                    IGatewayAccountProvider<TAccount>,
+                    GatewayAccountProvider<TAccount>>();
 
             return this;
         }

@@ -17,8 +17,6 @@ namespace Parbad.Builder
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            builder.AddGatewayAccountProvider<ParsianGatewayAccount>();
-
             return builder.AddGateway<ParsianGateway>(new Uri(ParsianHelper.BaseServiceUrl));
         }
 

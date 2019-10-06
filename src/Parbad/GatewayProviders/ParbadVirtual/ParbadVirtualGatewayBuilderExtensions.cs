@@ -23,7 +23,6 @@ namespace Parbad.Builder
 
             builder.Services.TryAddTransient<ParbadVirtualGateway>();
             builder.Services.TryAddTransient<IParbadVirtualGatewayMiddlewareInvoker, ParbadVirtualGatewayMiddlewareInvoker>();
-            builder.AddGatewayAccountProvider<ParbadVirtualGatewayAccount>();
 
             var gatewayConfigurationBuilder = new GatewayConfigurationBuilder<ParbadVirtualGateway>(builder.Services);
             gatewayConfigurationBuilder

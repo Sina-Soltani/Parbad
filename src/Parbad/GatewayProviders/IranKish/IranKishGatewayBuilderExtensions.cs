@@ -17,8 +17,6 @@ namespace Parbad.Builder
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            builder.AddGatewayAccountProvider<IranKishGatewayAccount>();
-
             return builder.AddGateway<IranKishGateway>(new Uri(IranKishHelper.BaseServiceUrl));
         }
 

@@ -17,8 +17,6 @@ namespace Parbad.Builder
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            builder.AddGatewayAccountProvider<MellatGatewayAccount>();
-
             return builder.AddGateway<MellatGateway>(new Uri(MellatHelper.BaseServiceUrl));
         }
 

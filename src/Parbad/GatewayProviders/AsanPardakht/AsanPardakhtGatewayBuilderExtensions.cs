@@ -20,8 +20,6 @@ namespace Parbad.Builder
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            builder.AddGatewayAccountProvider<AsanPardakhtGatewayAccount>();
-
             return builder.AddGateway<AsanPardakhtGateway>(new Uri(AsanPardakhtHelper.BaseServiceUrl));
         }
 

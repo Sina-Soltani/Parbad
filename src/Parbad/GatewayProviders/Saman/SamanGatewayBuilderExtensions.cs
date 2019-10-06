@@ -17,8 +17,6 @@ namespace Parbad.Builder
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            builder.AddGatewayAccountProvider<SamanGatewayAccount>();
-
             return builder.AddGateway<SamanGateway>(new Uri(SamanHelper.BaseServiceUrl));
         }
 
