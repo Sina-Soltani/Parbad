@@ -75,12 +75,10 @@ namespace Parbad.GatewayProviders.Parsian
             return result;
         }
 
-        public static ParsianCallbackResult CreateCallbackResult(VerifyContext context, HttpRequest httpRequest, MessagesOptions messagesOptions)
+        public static ParsianCallbackResult CreateCallbackResult(HttpRequest httpRequest, MessagesOptions messagesOptions)
         {
             httpRequest.Form.TryGetValue("token", out var token);
             httpRequest.Form.TryGetValue("status", out var status);
-            httpRequest.Form.TryGetValue("orderId", out var orderId);
-            httpRequest.Form.TryGetValue("amount", out var amount);
 
             var isSucceed = !status.IsNullOrEmpty() &&
                             status == "0" &&
@@ -88,22 +86,10 @@ namespace Parbad.GatewayProviders.Parsian
 
             string message = null;
 
-            if (isSucceed)
-            {
-                if (amount.IsNullOrEmpty() ||
-                    orderId.IsNullOrEmpty() ||
-                    !long.TryParse(orderId, out var numberOrderNumber) ||
-                    !long.TryParse(amount, out var numberAmount) ||
-                    numberOrderNumber != context.Payment.TrackingNumber ||
-                    numberAmount != (long)context.Payment.Amount)
-                {
-                    isSucceed = false;
-                    message = messagesOptions.InvalidDataReceivedFromGateway;
-                }
-            }
-            else
+            if (!isSucceed)
             {
                 message = $"Error {status}";
+
             }
 
             PaymentVerifyResult verifyResult = null;

@@ -58,7 +58,7 @@ namespace Parbad.GatewayProviders.Parsian
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
-            var callbackResult = ParsianHelper.CreateCallbackResult(context, _httpContextAccessor.HttpContext.Request, _messageOptions.Value);
+            var callbackResult = ParsianHelper.CreateCallbackResult(_httpContextAccessor.HttpContext.Request, _messageOptions.Value);
 
             if (!callbackResult.IsSucceed)
             {
