@@ -8,8 +8,19 @@ using Parbad.InvoiceBuilder;
 
 namespace Parbad
 {
-    public static class MellatGatewayExtraFunctionsExtensions
+    public static class MellatGatewayExtensions
     {
+        /// <summary>
+        /// The invoice will be sent to Mellat gateway.
+        /// </summary>
+        /// <param name="builder"></param>
+        public static IInvoiceBuilder UseMellatGateway(this IInvoiceBuilder builder)
+        {
+            if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+            return builder.SetGatewayType<MellatGateway>();
+        }
+
         public static IInvoiceBuilder AddMellatCumulativeAccount(this IInvoiceBuilder builder, long subServiceId, long amount)
         {
             return AddMellatCumulativeAccount(builder, subServiceId, amount, 0);
