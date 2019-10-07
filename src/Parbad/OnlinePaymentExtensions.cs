@@ -18,7 +18,7 @@ namespace Parbad
         /// Performs a new payment request with the given data.
         /// </summary>
         /// <param name="onlinePayment"></param>
-        /// <param name="gateway">The gateway which the client must pay the invoice in.</param>
+        /// <param name="gatewayName">The gateway which the client must pay the invoice in.</param>
         /// <param name="trackingNumber">
         /// A tracking number for this request. It will be sent to the gateway.
         /// <para>Note: It must be unique for each requests.</para>
@@ -30,11 +30,11 @@ namespace Parbad
         /// </param>
         public static IPaymentRequestResult Request(
             this IOnlinePayment onlinePayment,
-            Gateway gateway,
+            string gatewayName,
             long trackingNumber,
             decimal amount,
             string callbackUrl) =>
-            onlinePayment.RequestAsync(gateway, trackingNumber, amount, callbackUrl)
+            onlinePayment.RequestAsync(gatewayName, trackingNumber, amount, callbackUrl)
                 .GetAwaiter()
                 .GetResult();
 
@@ -62,7 +62,7 @@ namespace Parbad
         /// Performs a new payment request with the given data.
         /// </summary>
         /// <param name="onlinePayment"></param>
-        /// <param name="gateway">The gateway which the client must pay the invoice in.</param>
+        /// <param name="gatewayName">The gateway which the client must pay the invoice in.</param>
         /// <param name="trackingNumber">
         /// A tracking number for this request. It will be sent to the gateway.
         /// <para>Note: It must be unique for each requests.</para>
@@ -75,7 +75,7 @@ namespace Parbad
         /// <param name="cancellationToken"></param>
         public static Task<IPaymentRequestResult> RequestAsync(
             this IOnlinePayment onlinePayment,
-            Gateway gateway,
+            string gatewayName,
             long trackingNumber,
             decimal amount,
             string callbackUrl,
@@ -87,7 +87,7 @@ namespace Parbad
                     .SetTrackingNumber(trackingNumber)
                     .SetAmount(amount)
                     .SetCallbackUrl(callbackUrl)
-                    .UseGateway(gateway);
+                    .UseGateway(gatewayName);
             }, cancellationToken);
         }
 

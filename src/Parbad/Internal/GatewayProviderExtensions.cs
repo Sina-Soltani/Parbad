@@ -19,7 +19,7 @@ namespace Parbad.Internal
         {
             if (gatewayProvider == null) throw new ArgumentNullException(nameof(gatewayProvider));
 
-            return gatewayProvider.Provide(GatewayHelper.FindGatewayTypeByName(gatewayName));
+            return gatewayProvider.Provide(GatewayHelper.FindGatewayTypeByName(gatewayName, true));
         }
     }
 }

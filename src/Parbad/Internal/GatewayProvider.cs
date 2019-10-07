@@ -27,7 +27,7 @@ namespace Parbad.Internal
 
             if (gateway == null)
             {
-                throw new GatewayNotFoundException(GatewayHelper.GetNameByType(gatewayType));
+                throw new GatewayNotFoundException(GatewayHelper.GetCompleteGatewayName(gatewayType));
             }
 
             return (IGateway)gateway;

@@ -1,5 +1,4 @@
-﻿@using Parbad
-@model PayViewModel
+﻿@model PayViewModel
 @{
     ViewData["Title"] = "Pay";
 }
@@ -13,7 +12,7 @@
     </div>
     <div class="form-group">
         <label asp-for="SelectedGateway"></label>
-        <select asp-for="SelectedGateway" asp-items="Html.GetEnumSelectList<Gateway>()" class="form-control">
+        <select asp-for="SelectedGateway" asp-items="Html.GetEnumSelectList<Gateways>()" class="form-control">
             <option>Select a gateway...</option>
         </select>
         <span asp-validation-for="SelectedGateway" class="text-danger"></span>

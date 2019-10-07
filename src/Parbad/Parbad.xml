@@ -387,11 +387,6 @@
             <param name="name"></param>
             <param name="value"></param>
         </member>
-        <member name="T:Parbad.Gateway">
-            <summary>
-            Online payment providers.
-            </summary>
-        </member>
         <member name="F:Parbad.GatewayAccountInvoiceExtensions.GatewayAccountKeyName">
             <summary>
             Gateway Account key in <see cref="P:Parbad.Abstraction.Invoice.AdditionalData"/> property.
@@ -940,6 +935,54 @@
         <member name="M:Parbad.GatewayProviders.Saman.SamanGateway.RefundAsync(Parbad.VerifyContext,Parbad.Money,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
+        <member name="M:Parbad.AsanPardakhtGatewayInvoiceBuilderExtensions.AsanPardakht(Parbad.InvoiceBuilder.IInvoiceBuilder)">
+            <summary>
+            The invoice will be sent to Asan Pardakht gateway.
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.IranKishGatewayInvoiceBuilderExtensions.UseIranKish(Parbad.InvoiceBuilder.IInvoiceBuilder)">
+            <summary>
+            The invoice will be sent to Iran Kish gateway.
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.MellatGatewayInvoiceBuilderExtensions.UseMellat(Parbad.InvoiceBuilder.IInvoiceBuilder)">
+            <summary>
+            The invoice will be sent to Mellat gateway.
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.MelliGatewayInvoiceBuilderExtensions.UseMelli(Parbad.InvoiceBuilder.IInvoiceBuilder)">
+            <summary>
+            The invoice will be sent to Melli gateway.
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.ParbadGatewayInvoiceBuilderExtensions.UseParbadVirtual(Parbad.InvoiceBuilder.IInvoiceBuilder)">
+            <summary>
+            The invoice will be sent to Parbad Virtual gateway.
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.ParsianGatewayInvoiceBuilderExtensions.UseParsian(Parbad.InvoiceBuilder.IInvoiceBuilder)">
+            <summary>
+            The invoice will be sent to Parsian gateway.
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.PasargadGatewayInvoiceBuilderExtensions.UsePasargad(Parbad.InvoiceBuilder.IInvoiceBuilder)">
+            <summary>
+            The invoice will be sent to Pasargad gateway.
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.SamanGatewayInvoiceBuilderExtensions.UseSaman(Parbad.InvoiceBuilder.IInvoiceBuilder)">
+            <summary>
+            The invoice will be sent to Saman gateway.
+            </summary>
+            <param name="builder"></param>
+        </member>
         <member name="M:Parbad.GatewayTransporterExtensions.Transport(Parbad.IGatewayTransporter)">
             <summary>
             Transports the client to the specified gateway.
@@ -1270,19 +1313,10 @@
             <param name="builder"></param>
             <exception cref="T:Parbad.Exceptions.InvalidGatewayTypeException"></exception>
         </member>
-        <member name="M:Parbad.InvoiceBuilderExtensions.UseGateway(Parbad.InvoiceBuilder.IInvoiceBuilder,Parbad.Gateway)">
-            <summary>
-            Sets the gateway from the pre-defined <see cref="T:Parbad.Gateway"/> enum.
-            </summary>
-            <param name="builder"></param>
-            <param name="gateway"></param>
-            <exception cref="T:System.ComponentModel.InvalidEnumArgumentException"></exception>
-            <exception cref="T:System.ArgumentNullException"></exception>
-        </member>
         <member name="M:Parbad.InvoiceBuilderExtensions.UseGateway(Parbad.InvoiceBuilder.IInvoiceBuilder,System.String)">
             <summary>
             Sets the gateway using the given name. The given name must match the values of
-            <see cref="T:Parbad.Gateway"/> enum.
+            <see cref="!:Gateway"/> enum.
             </summary>
             <param name="builder"></param>
             <param name="gatewayName"></param>
@@ -1506,12 +1540,12 @@
             Manages the <see cref="T:System.Net.Http.HttpClient"/> for a specific gateway.
             </summary>
         </member>
-        <member name="M:Parbad.OnlinePaymentExtensions.Request(Parbad.IOnlinePayment,Parbad.Gateway,System.Int64,System.Decimal,System.String)">
+        <member name="M:Parbad.OnlinePaymentExtensions.Request(Parbad.IOnlinePayment,System.String,System.Int64,System.Decimal,System.String)">
             <summary>
             Performs a new payment request with the given data.
             </summary>
             <param name="onlinePayment"></param>
-            <param name="gateway">The gateway which the client must pay the invoice in.</param>
+            <param name="gatewayName">The gateway which the client must pay the invoice in.</param>
             <param name="trackingNumber">
             A tracking number for this request. It will be sent to the gateway.
             <para>Note: It must be unique for each requests.</para>
@@ -1536,12 +1570,12 @@
             <param name="onlinePayment"></param>
             <param name="invoice">The invoice that must be paid.</param>
         </member>
-        <member name="M:Parbad.OnlinePaymentExtensions.RequestAsync(Parbad.IOnlinePayment,Parbad.Gateway,System.Int64,System.Decimal,System.String,System.Threading.CancellationToken)">
+        <member name="M:Parbad.OnlinePaymentExtensions.RequestAsync(Parbad.IOnlinePayment,System.String,System.Int64,System.Decimal,System.String,System.Threading.CancellationToken)">
             <summary>
             Performs a new payment request with the given data.
             </summary>
             <param name="onlinePayment"></param>
-            <param name="gateway">The gateway which the client must pay the invoice in.</param>
+            <param name="gatewayName">The gateway which the client must pay the invoice in.</param>
             <param name="trackingNumber">
             A tracking number for this request. It will be sent to the gateway.
             <para>Note: It must be unique for each requests.</para>

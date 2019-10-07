@@ -1,4 +1,4 @@
-﻿namespace Parbad.Sample.Mvc.Models
+﻿namespace Parbad.Sample.WebForm.Models
 {
     public enum Gateways
     {
@@ -10,12 +10,5 @@
         Melli,
         AsanPardakht,
         ParbadVirtual
-    }
-
-    public class RequestViewModel
-    {
-        public long Amount { get; set; }
-
-        public Gateways Gateway { get; set; }
     }
 }

@@ -2,11 +2,23 @@
 
 namespace Parbad.Sample.AspNetCore.Models
 {
+    public enum Gateways
+    {
+        Saman,
+        Mellat,
+        Parsian,
+        Pasargad,
+        IranKish,
+        Melli,
+        AsanPardakht,
+        ParbadVirtual
+    }
+
     public class PayViewModel
     {
         public long Amount { get; set; }
 
         [Display(Name = "Gateway")]
-        public Gateway SelectedGateway { get; set; }
+        public Gateways SelectedGateway { get; set; }
     }
 }

@@ -54,23 +54,6 @@ namespace Parbad
         }
 
         /// <summary>
-        /// Sets the gateway from the pre-defined <see cref="Gateway"/> enum.
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="gateway"></param>
-        /// <exception cref="InvalidEnumArgumentException"></exception>
-        /// <exception cref="ArgumentNullException"></exception>
-        public static IInvoiceBuilder UseGateway(this IInvoiceBuilder builder, Gateway gateway)
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-            if (!Enum.IsDefined(typeof(Gateway), gateway)) throw new InvalidEnumArgumentException(nameof(gateway), (int)gateway, typeof(Gateway));
-
-            var gatewayType = GatewayHelper.FindGatewayTypeByName(gateway.ToString());
-
-            return builder.SetGatewayType(gatewayType);
-        }
-
-        /// <summary>
         /// Sets the gateway using the given name. The given name must match the values of
         /// <see cref="Gateway"/> enum.
         /// </summary>

@@ -8,7 +8,7 @@ using Parbad.InvoiceBuilder;
 
 namespace Parbad
 {
-    public static class MellatGatewayExtraFunctionsExtensions
+    public static class MellatGatewayExtensions
     {
         public static IInvoiceBuilder AddMellatCumulativeAccount(this IInvoiceBuilder builder, long subServiceId, long amount)
         {
@@ -48,7 +48,7 @@ namespace Parbad
             builder.AdditionalData.Remove(MellatHelper.CumulativeAccountsKey);
             builder.AddAdditionalData(MellatHelper.CumulativeAccountsKey, existingAccounts);
 
-            builder.UseGateway(Gateway.Mellat);
+            builder.UseMellat();
 
             return builder;
         }

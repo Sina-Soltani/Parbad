@@ -49,31 +49,45 @@ namespace Parbad.Internal
             return FindAllGatewaysFromAssemblyContaining<IGateway>();
         }
 
-        public static string GetName(this IGateway gateway)
+        public static string GetCompleteGatewayName(this IGateway gateway)
         {
             if (gateway == null) throw new ArgumentNullException(nameof(gateway));
 
-            return GetNameByType(gateway.GetType());
+            return GetCompleteGatewayName(gateway.GetType());
         }
 
-        public static string GetName<TGateway>() where TGateway : class, IGateway
+        public static string GetCompleteGatewayName<TGateway>() where TGateway : class, IGateway
         {
-            return GetNameByType(typeof(TGateway));
+            return GetCompleteGatewayName(typeof(TGateway));
         }
 
-        public static string GetNameByType(Type gatewayType)
+        public static string GetCompleteGatewayName(Type gatewayType)
         {
             if (gatewayType == null) throw new ArgumentNullException(nameof(gatewayType));
 
             IsGateway(gatewayType, throwException: true);
 
-            var name = gatewayType.HasAttribute<GatewayAttribute>()
+            return gatewayType.Name;
+        }
+
+        public static string GetRoutingGatewayName(Type gatewayType)
+        {
+            if (gatewayType == null) throw new ArgumentNullException(nameof(gatewayType));
+
+            IsGateway(gatewayType, throwException: true);
+
+            return gatewayType.HasAttribute<GatewayAttribute>()
                 ? gatewayType.GetCustomAttribute<GatewayAttribute>().Name
                 : gatewayType.Name;
+        }
 
-            name = name.ToggleStringAtEnd("Gateway", true);
+        public static string GetRoutingGatewayName(this IGateway gateway)
+        {
+            if (gateway == null) throw new ArgumentNullException(nameof(gateway));
 
-            return name;
+            var gatewayType = gateway.GetType();
+
+            return GetRoutingGatewayName(gatewayType);
         }
 
         public static bool CompareName(Type gatewayType, string gatewayName)
@@ -81,9 +95,7 @@ namespace Parbad.Internal
             if (gatewayType == null) throw new ArgumentNullException(nameof(gatewayType));
             if (gatewayName == null) throw new ArgumentNullException(nameof(gatewayName));
 
-            gatewayName = gatewayName.ToggleStringAtEnd("Gateway", true);
-
-            return string.Equals(gatewayName, GetNameByType(gatewayType), StringComparison.OrdinalIgnoreCase);
+            return string.Equals(gatewayName, GetRoutingGatewayName(gatewayType), StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>
@@ -95,14 +107,21 @@ namespace Parbad.Internal
         {
             if (gatewayName == null) throw new ArgumentNullException(nameof(gatewayName));
 
-            var gatewayType = FindAllGatewaysTypes().SingleOrDefault(type => CompareName(type, gatewayName));
+            var gateways = FindAllGatewaysTypes().Where(type => CompareName(type, gatewayName)).ToList();
 
-            if (gatewayType == null && throwException)
+            if (gateways.Count == 0)
             {
-                throw new GatewayNotFoundException(gatewayName);
+                if (throwException) throw new GatewayNotFoundException(gatewayName);
+
+                return null;
             }
 
-            return gatewayType;
+            if (gateways.Count > 1)
+            {
+                throw new InvalidOperationException($"More than one gateway exist with the name {gatewayName}");
+            }
+
+            return gateways[0];
         }
     }
 }

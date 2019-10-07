@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Parbad.Sample.WebForm.Models;
 
 namespace Parbad.Sample.WebForm
 {
@@ -18,7 +19,7 @@ namespace Parbad.Sample.WebForm
         {
             var verifyUrl = $"{Request.Url.Scheme}://{Request.Url.Authority}/Verify";
 
-            var gateway = (Gateway)long.Parse(DropGateway.SelectedValue);
+            var gateway = (Gateways)long.Parse(DropGateway.SelectedValue);
 
             var result = StaticOnlinePayment.Instance.Request(invoice =>
             {
@@ -26,7 +27,7 @@ namespace Parbad.Sample.WebForm
                     .UseAutoIncrementTrackingNumber()
                     .SetAmount(long.Parse(TxtAmount.Text))
                     .SetCallbackUrl(verifyUrl)
-                    .UseGateway(gateway);
+                    .UseGateway(gateway.ToString());
             });
 
             if (result.IsSucceed)
@@ -51,7 +52,7 @@ namespace Parbad.Sample.WebForm
 
         public void FillDropDownList()
         {
-            var values = Enum.GetValues(typeof(Gateway)).Cast<Gateway>();
+            var values = Enum.GetValues(typeof(Gateways)).Cast<Gateways>();
 
             var items = new Dictionary<byte, string>();
 

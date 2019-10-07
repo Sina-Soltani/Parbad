@@ -36,7 +36,7 @@ namespace Parbad.Sample.Mvc.Controllers
                     .UseAutoIncrementTrackingNumber()
                     .SetAmount(payViewModel.Amount)
                     .SetCallbackUrl(verifyUrl)
-                    .UseGateway(payViewModel.Gateway);
+                    .UseGateway(payViewModel.Gateway.ToString());
             });
 
             if (result.IsSucceed)
