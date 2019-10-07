@@ -75,21 +75,56 @@ namespace Parbad.GatewayProviders.Parsian
             return result;
         }
 
-        public static ParsianCallbackResult CreateCallbackResult(HttpRequest httpRequest, MessagesOptions messagesOptions)
+        public static ParsianCallbackResult CreateCallbackResult(HttpRequest httpRequest, VerifyContext context, MessagesOptions messagesOptions)
         {
             httpRequest.Form.TryGetValue("token", out var token);
             httpRequest.Form.TryGetValue("status", out var status);
+            httpRequest.Form.TryGetValue("orderId", out var orderId);
+            httpRequest.Form.TryGetValue("amount", out var amount);
 
-            var isSucceed = !status.IsNullOrEmpty() &&
-                            status == "0" &&
-                            !token.IsNullOrEmpty();
+            var isSucceed = true;
 
             string message = null;
 
-            if (!isSucceed)
+            if (status.IsNullOrEmpty())
             {
-                message = $"Error {status}";
-
+                isSucceed = false;
+                message = "Error in Callback section. status is null or empty.";
+            }
+            else if (status != "0")
+            {
+                isSucceed = false;
+                message = $"Error in Callback section. Status: {status}";
+            }
+            else
+            {
+                if (token.IsNullOrEmpty())
+                {
+                    isSucceed = false;
+                    message = "Error in Callback section. Token is null or empty.";
+                }
+                else if (orderId.IsNullOrEmpty())
+                {
+                    isSucceed = false;
+                    message = "Error in Callback section. OrderId is null or empty.";
+                }
+                else if (amount.IsNullOrEmpty())
+                {
+                    isSucceed = false;
+                    message = "Error in Callback section. Amount is null or empty.";
+                }
+                else if (!long.TryParse(orderId, out var numberOrderNumber) ||
+                         numberOrderNumber != context.Payment.TrackingNumber)
+                {
+                    isSucceed = false;
+                    message = "Error in Callback section. OrderNumber is not equal with the data in database.";
+                }
+                else if (!long.TryParse(amount, out var numberAmount) ||
+                         numberAmount != (long)context.Payment.Amount)
+                {
+                    isSucceed = false;
+                    message = "Error in Callback section. Amount is not equal with the data in database.";
+                }
             }
 
             PaymentVerifyResult verifyResult = null;
@@ -102,6 +137,7 @@ namespace Parbad.GatewayProviders.Parsian
             return new ParsianCallbackResult
             {
                 IsSucceed = isSucceed,
+                Token = token,
                 Result = verifyResult
             };
         }
@@ -136,7 +172,7 @@ namespace Parbad.GatewayProviders.Parsian
 
             var message = isSucceed
                 ? messagesOptions.PaymentSucceed
-                : $"Error {status}";
+                : $"Error in Verifying section: {status}";
 
             var result = new PaymentVerifyResult
             {
