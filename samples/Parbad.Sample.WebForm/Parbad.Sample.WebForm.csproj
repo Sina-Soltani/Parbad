@@ -311,6 +311,7 @@
     <Compile Include="Default.aspx.designer.cs">
       <DependentUpon>Default.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Models\Gateways.cs" />
     <Compile Include="PayRequest.aspx.cs">
       <DependentUpon>PayRequest.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

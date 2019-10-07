@@ -58,9 +58,7 @@ namespace Parbad.Internal
         {
             if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-            _logger.LogInformation(LoggingEvents.RequestPayment, $"New payment request with the tracking number {invoice.TrackingNumber} is started." +
-                                                                    $"{nameof(invoice.Amount)}:{invoice.Amount}" +
-                                                                    $"GatewayName:{GatewayHelper.GetNameByType(invoice.GatewayType)}");
+            _logger.LogInformation(LoggingEvents.RequestPayment, $"Requesting the invoice {invoice.TrackingNumber} is started.");
 
             //  Check the tracking number
             if (await _storageManager.DoesPaymentExistAsync(invoice.TrackingNumber, cancellationToken).ConfigureAwaitFalse())
@@ -84,7 +82,7 @@ namespace Parbad.Internal
             //  Check the created payment token
             if (await _storageManager.DoesPaymentExistAsync(paymentToken, cancellationToken).ConfigureAwaitFalse())
             {
-                var message = $"The payment token \"{paymentToken}\" already exists.";
+                var message = $"Requesting the invoice {invoice.TrackingNumber} is finished. The payment token \"{paymentToken}\" already exists.";
 
                 _logger.LogError(LoggingEvents.RequestPayment, message);
 
@@ -100,14 +98,10 @@ namespace Parbad.Internal
                 IsCompleted = false,
                 IsPaid = false,
                 Token = paymentToken,
-                GatewayName = gateway.GetName()
+                GatewayName = gateway.GetRoutingGatewayName()
             };
 
             await _storageManager.CreatePaymentAsync(newPayment, cancellationToken).ConfigureAwaitFalse();
-
-            _logger.LogInformation(LoggingEvents.RequestPayment, $"The payment with tracking number {invoice.TrackingNumber} is about to processing." +
-                                                                    $"{nameof(invoice.Amount)}:{invoice.Amount}" +
-                                                                    $"GatewayName:{GatewayHelper.GetNameByType(invoice.GatewayType)}");
 
             PaymentRequestResult requestResult;
 
@@ -117,7 +111,7 @@ namespace Parbad.Internal
                     .RequestAsync(invoice, cancellationToken)
                     .ConfigureAwaitFalse() as PaymentRequestResult;
 
-                if (requestResult == null) throw new Exception($"Gateway {gateway.GetName()} returns null instead of a result.");
+                if (requestResult == null) throw new Exception($"Requesting the invoice {invoice.TrackingNumber} is finished. The gateway {gateway.GetCompleteGatewayName()} returns null instead of a result.");
             }
             catch (Exception exception)
             {
@@ -131,7 +125,7 @@ namespace Parbad.Internal
 
             requestResult.TrackingNumber = invoice.TrackingNumber;
             requestResult.Amount = invoice.Amount;
-            requestResult.GatewayName = gateway.GetName();
+            requestResult.GatewayName = gateway.GetRoutingGatewayName();
 
             newPayment.GatewayAccountName = requestResult.GatewayAccountName;
 
@@ -148,6 +142,8 @@ namespace Parbad.Internal
             };
 
             await _storageManager.CreateTransactionAsync(newTransaction, cancellationToken).ConfigureAwaitFalse();
+
+            _logger.LogInformation(LoggingEvents.RequestPayment, $"Requesting the invoice {invoice.TrackingNumber} is finished.");
 
             return requestResult;
         }
@@ -249,7 +245,7 @@ namespace Parbad.Internal
                 throw;
             }
 
-            if (verifyResult == null) throw new Exception($"Gateway {gateway.GetName()} returns null instead of a result.");
+            if (verifyResult == null) throw new Exception($"The {gateway.GetCompleteGatewayName()} returns null instead of a result.");
 
             verifyResult.TrackingNumber = payment.TrackingNumber;
             verifyResult.Amount = payment.Amount;
@@ -384,7 +380,7 @@ namespace Parbad.Internal
                 throw;
             }
 
-            if (verifyResult == null) throw new Exception($"Gateway {gateway.GetName()} returns null instead of a result.");
+            if (verifyResult == null) throw new Exception($"The gateway {gateway.GetCompleteGatewayName()} returns null instead of a result.");
 
             verifyResult.TrackingNumber = payment.TrackingNumber;
             verifyResult.Amount = payment.Amount;
@@ -541,7 +537,7 @@ namespace Parbad.Internal
                 throw;
             }
 
-            if (refundResult == null) throw new Exception($"Gateway {gateway.GetName()} returns null instead of a result.");
+            if (refundResult == null) throw new Exception($"Gateway {gateway.GetCompleteGatewayName()} returns null instead of a result.");
 
             refundResult.TrackingNumber = payment.TrackingNumber;
             refundResult.Amount = amountToRefund;

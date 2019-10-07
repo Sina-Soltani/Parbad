@@ -18,7 +18,7 @@ namespace Parbad.Net
         {
             if (services == null) throw new ArgumentNullException(nameof(services));
 
-            return services.AddHttpClient(GatewayHelper.GetName<TGateway>());
+            return services.AddHttpClient(GatewayHelper.GetCompleteGatewayName<TGateway>());
         }
 
         public static HttpClient CreateClient(this IHttpClientFactory factory, IGateway gateway)
@@ -26,7 +26,7 @@ namespace Parbad.Net
             if (factory == null) throw new ArgumentNullException(nameof(factory));
             if (gateway == null) throw new ArgumentNullException(nameof(gateway));
 
-            return factory.CreateClient(gateway.GetType().Name);
+            return factory.CreateClient(gateway.GetCompleteGatewayName());
         }
     }
 }
