@@ -76,9 +76,14 @@ namespace Parbad.Internal
 
             IsGateway(gatewayType, throwException: true);
 
-            return gatewayType.HasAttribute<GatewayAttribute>()
-                ? gatewayType.GetCustomAttribute<GatewayAttribute>().Name
-                : gatewayType.Name;
+            if (gatewayType.HasAttribute<GatewayAttribute>())
+            {
+                return gatewayType.GetCustomAttribute<GatewayAttribute>().Name;
+            }
+
+            var gatewayName = GetCompleteGatewayName(gatewayType).ToggleStringAtEnd("Gateway", false);
+
+            return gatewayName;
         }
 
         public static string GetRoutingGatewayName(this IGateway gateway)
