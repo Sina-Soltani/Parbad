@@ -17,12 +17,13 @@ namespace Parbad.InvoiceBuilder
     public interface IInvoiceBuilder
     {
         /// <summary>
-        /// Tracking number of invoice
+        /// Tracking number of invoice.
         /// </summary>
         long TrackingNumber { get; set; }
 
         /// <summary>
-        /// The amount of invoice.
+        /// The amount of the invoice.
+        /// <para>Note: You can also enter long and decimal numbers.</para>
         /// </summary>
         Money Amount { get; set; }
 

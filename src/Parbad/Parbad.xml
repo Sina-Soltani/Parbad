@@ -65,6 +65,56 @@
             </summary>
             <param name="gatewayType">Type of the gateway.</param>
         </member>
+        <member name="T:Parbad.Abstraction.Invoice">
+            <summary>
+            Describes an invoice which must be requested.
+            </summary>
+        </member>
+        <member name="M:Parbad.Abstraction.Invoice.#ctor(System.Int64,Parbad.Money,Parbad.CallbackUrl,System.Type,System.Collections.Generic.IDictionary{System.String,System.Object})">
+            <summary>
+            Initializes an instance of <see cref="T:Parbad.Abstraction.Invoice"/>.
+            </summary>
+            <param name="trackingNumber">Tracking number of invoice.</param>
+            <param name="amount">The amount of invoice.
+            <para>Note: You can also enter long and decimal numbers.</para>
+            </param>
+            <param name="callbackUrl">A complete URL of your website. It will be used by the gateway for redirecting the client again to your website.
+            <para>Note: A complete URL would be like: "http://www.mywebsite.com/foo/bar/"</para>
+            </param>
+            <param name="gatewayType">The type of the gateway which the invoice must be paid in.</param>
+            <param name="additionalData">Additional data for this invoice.</param>
+        </member>
+        <member name="P:Parbad.Abstraction.Invoice.TrackingNumber">
+            <summary>
+            Tracking number of invoice.
+            </summary>
+        </member>
+        <member name="P:Parbad.Abstraction.Invoice.Amount">
+            <summary>
+            The amount of the invoice.
+            <para>Note: You can also enter long and decimal numbers. It can also be parsed to long and decimal.</para>
+            <para>Examples:</para>
+            <para>long a = invoice.Amount;</para>
+            <para>decimal a = invoice.Amount;</para>
+            </summary>
+        </member>
+        <member name="P:Parbad.Abstraction.Invoice.CallbackUrl">
+            <summary>
+            A complete URL of your website. It will be used by the gateway for redirecting
+            the client again to your website.
+            <para>Note: A complete URL would be like: "http://www.mywebsite.com/foo/bar/"</para>
+            </summary>
+        </member>
+        <member name="P:Parbad.Abstraction.Invoice.GatewayType">
+            <summary>
+            The type of the gateway which the invoice must be paid in.
+            </summary>
+        </member>
+        <member name="P:Parbad.Abstraction.Invoice.AdditionalData">
+            <summary>
+            Additional data for this invoice.
+            </summary>
+        </member>
         <member name="T:Parbad.Builder.IParbadBuilder">
             <summary>
             A builder for building the Parbad services.
@@ -1209,12 +1259,13 @@
         </member>
         <member name="P:Parbad.InvoiceBuilder.IInvoiceBuilder.TrackingNumber">
             <summary>
-            Tracking number of invoice
+            Tracking number of invoice.
             </summary>
         </member>
         <member name="P:Parbad.InvoiceBuilder.IInvoiceBuilder.Amount">
             <summary>
-            The amount of invoice.
+            The amount of the invoice.
+            <para>Note: You can also enter long and decimal numbers.</para>
             </summary>
         </member>
         <member name="P:Parbad.InvoiceBuilder.IInvoiceBuilder.CallbackUrl">
