@@ -2,6 +2,7 @@
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
 using System;
+using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Parbad.Abstraction;
@@ -119,11 +120,18 @@ namespace Parbad.GatewayProviders.Parsian
                     isSucceed = false;
                     message = "Error in Callback section. OrderNumber is not equal with the data in database.";
                 }
-                else if (!long.TryParse(amount, out var numberAmount) ||
-                         numberAmount != (long)context.Payment.Amount)
+                else
                 {
-                    isSucceed = false;
-                    message = "Error in Callback section. Amount is not equal with the data in database.";
+                    if (!long.TryParse(amount, NumberStyles.Any, CultureInfo.CurrentCulture, out var numberAmount))
+                    {
+                        isSucceed = false;
+                        message = $"Error in Callback section. Cannot parse the amount value {amount}";
+                    }
+                    else if (numberAmount != (long)context.Payment.Amount)
+                    {
+                        isSucceed = false;
+                        message = "Error in Callback section. Amount is not equal with the data in database.";
+                    }
                 }
             }
 
