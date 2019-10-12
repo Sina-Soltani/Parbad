@@ -23,7 +23,7 @@ namespace Parbad.Abstraction
         /// </summary>
         /// <param name="context"></param>
         /// <param name="cancellationToken"></param>
-        Task<IPaymentVerifyResult> VerifyAsync(VerifyContext context, CancellationToken cancellationToken = default);
+        Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Performs a refund request for the given invoice.
@@ -31,6 +31,6 @@ namespace Parbad.Abstraction
         /// <param name="context"></param>
         /// <param name="amount"></param>
         /// <param name="cancellationToken"></param>
-        Task<IPaymentRefundResult> RefundAsync(VerifyContext context, Money amount, CancellationToken cancellationToken = default);
+        Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default);
     }
 }

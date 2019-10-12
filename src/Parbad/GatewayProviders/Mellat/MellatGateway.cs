@@ -54,7 +54,7 @@ namespace Parbad.GatewayProviders.Mellat
         }
 
         /// <inheritdoc />
-        public override async Task<IPaymentVerifyResult> VerifyAsync(VerifyContext context, CancellationToken cancellationToken = default)
+        public override async Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
@@ -94,7 +94,7 @@ namespace Parbad.GatewayProviders.Mellat
         }
 
         /// <inheritdoc />
-        public override async Task<IPaymentRefundResult> RefundAsync(VerifyContext context, Money amount, CancellationToken cancellationToken = default)
+        public override async Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
             if (amount == null) throw new ArgumentNullException(nameof(amount));

@@ -113,7 +113,7 @@ namespace Parbad.GatewayProviders.Mellat
             };
         }
 
-        public static string CreateVerifyData(VerifyContext context, MellatGatewayAccount account, MellatCallbackResult callbackResult)
+        public static string CreateVerifyData(InvoiceContext context, MellatGatewayAccount account, MellatCallbackResult callbackResult)
         {
             return
                 "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:int=\"http://interfaces.core.sw.bps.com/\">" +
@@ -155,7 +155,7 @@ namespace Parbad.GatewayProviders.Mellat
             };
         }
 
-        public static string CreateSettleData(VerifyContext context, MellatCallbackResult callbackResult, MellatGatewayAccount account)
+        public static string CreateSettleData(InvoiceContext context, MellatCallbackResult callbackResult, MellatGatewayAccount account)
         {
             return
                 "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:int=\"http://interfaces.core.sw.bps.com/\">" +
@@ -193,7 +193,7 @@ namespace Parbad.GatewayProviders.Mellat
             };
         }
 
-        public static string CreateRefundData(VerifyContext context, MellatGatewayAccount account)
+        public static string CreateRefundData(InvoiceContext context, MellatGatewayAccount account)
         {
             return
                 "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:int=\"http://interfaces.core.sw.bps.com/\">" +

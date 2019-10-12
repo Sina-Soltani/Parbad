@@ -89,7 +89,7 @@ namespace Parbad.GatewayProviders.Saman
                 "</soapenv:Envelope>";
         }
 
-        public static PaymentVerifyResult CreateVerifyResult(string webServiceResponse, VerifyContext context, SamanCallbackResult callbackResult, MessagesOptions messagesOptions)
+        public static PaymentVerifyResult CreateVerifyResult(string webServiceResponse, InvoiceContext context, SamanCallbackResult callbackResult, MessagesOptions messagesOptions)
         {
             var result = XmlHelper.GetNodeValueFromXml(webServiceResponse, "result");
 
@@ -111,7 +111,7 @@ namespace Parbad.GatewayProviders.Saman
             };
         }
 
-        public static string CreateRefundData(VerifyContext context, Money amount, SamanGatewayAccount account)
+        public static string CreateRefundData(InvoiceContext context, Money amount, SamanGatewayAccount account)
         {
             return
                 "<soapenv:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:urn=\"urn:Foo\">" +

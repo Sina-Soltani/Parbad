@@ -24,10 +24,10 @@ namespace Parbad.Abstraction
         public abstract Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default);
 
         /// <inheritdoc />
-        public abstract Task<IPaymentVerifyResult> VerifyAsync(VerifyContext context, CancellationToken cancellationToken = default);
+        public abstract Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default);
 
         /// <inheritdoc />
-        public abstract Task<IPaymentRefundResult> RefundAsync(VerifyContext context, Money amount, CancellationToken cancellationToken = default);
+        public abstract Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default);
 
         protected virtual async Task<TAccount> GetAccountAsync(Invoice invoice)
         {

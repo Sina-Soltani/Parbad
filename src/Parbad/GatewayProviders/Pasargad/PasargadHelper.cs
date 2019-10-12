@@ -147,7 +147,7 @@ namespace Parbad.GatewayProviders.Pasargad
             };
         }
 
-        public static IEnumerable<KeyValuePair<string, string>> CreateVerifyData(VerifyContext context, PasargadGatewayAccount account, PasargadCallbackResult callbackResult)
+        public static IEnumerable<KeyValuePair<string, string>> CreateVerifyData(InvoiceContext context, PasargadGatewayAccount account, PasargadCallbackResult callbackResult)
         {
             var timeStamp = GetTimeStamp(DateTime.Now);
 
@@ -191,7 +191,7 @@ namespace Parbad.GatewayProviders.Pasargad
             };
         }
 
-        public static IEnumerable<KeyValuePair<string, string>> CreateRefundData(VerifyContext context, Money amount, PasargadGatewayAccount account)
+        public static IEnumerable<KeyValuePair<string, string>> CreateRefundData(InvoiceContext context, Money amount, PasargadGatewayAccount account)
         {
             var transactionRecord = context.Transactions.FirstOrDefault(transaction => transaction.Type == TransactionType.Request);
 

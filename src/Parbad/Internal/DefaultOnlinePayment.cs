@@ -229,7 +229,7 @@ namespace Parbad.Internal
             var gateway = _gatewayProvider.Provide(payment.GatewayName);
 
             var transactions = await _storageManager.GetTransactionsAsync(payment, cancellationToken).ConfigureAwaitFalse();
-            var verifyContext = new VerifyContext(payment, transactions);
+            var verifyContext = new InvoiceContext(payment, transactions);
 
             PaymentVerifyResult verifyResult;
 
@@ -362,7 +362,7 @@ namespace Parbad.Internal
             var gateway = _gatewayProvider.Provide(payment.GatewayName);
 
             var transactions = await _storageManager.GetTransactionsAsync(payment, cancellationToken).ConfigureAwaitFalse();
-            var verifyContext = new VerifyContext(payment, transactions);
+            var verifyContext = new InvoiceContext(payment, transactions);
 
             _logger.LogInformation(LoggingEvents.VerifyPayment, $"The payment with the tracking Number {payment.TrackingNumber} is about to verifying.");
 
@@ -521,7 +521,7 @@ namespace Parbad.Internal
             var gateway = _gatewayProvider.Provide(payment.GatewayName);
 
             var transactions = await _storageManager.GetTransactionsAsync(payment, cancellationToken).ConfigureAwaitFalse();
-            var verifyContext = new VerifyContext(payment, transactions);
+            var verifyContext = new InvoiceContext(payment, transactions);
 
             PaymentRefundResult refundResult;
 
