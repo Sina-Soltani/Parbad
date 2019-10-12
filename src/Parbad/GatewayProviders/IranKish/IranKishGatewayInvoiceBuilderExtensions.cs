@@ -14,7 +14,7 @@ namespace Parbad
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            return builder.SetGatewayType<IranKishGateway>();
+            return builder.UseGateway(IranKishGateway.Name);
         }
     }
 }

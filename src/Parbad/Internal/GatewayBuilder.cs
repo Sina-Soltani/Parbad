@@ -27,6 +27,8 @@ namespace Parbad.Internal
         public IGatewayConfigurationBuilder<TGateway> AddGateway<TGateway>(Uri baseServiceUrl,
             ServiceLifetime serviceLifetime = ServiceLifetime.Transient) where TGateway : class, IGateway
         {
+            Services.AddSingleton(new GatewayDescriptor(typeof(TGateway)));
+
             Services.TryAdd<TGateway>(serviceLifetime);
 
             return new GatewayConfigurationBuilder<TGateway>(Services)

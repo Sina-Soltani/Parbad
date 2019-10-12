@@ -27,7 +27,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             builder.Services.TryAddTransient<IInvoiceBuilder, DefaultInvoiceBuilder>();
 
-            builder.Services.TryAddTransient<IGatewayProvider, GatewayProvider>();
+            builder.Services.TryAddTransient<IGatewayProvider, DefaultGatewayProvider>();
 
             builder.Services.TryAddTransient<AutoIncrementTrackingNumberProvider>();
             builder.Services.TryAddTransient<AutoRandomTrackingNumberProvider>();

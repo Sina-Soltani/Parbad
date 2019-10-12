@@ -10,10 +10,10 @@
         <member name="M:Parbad.Abstraction.Gateway`1.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.Abstraction.Gateway`1.VerifyAsync(Parbad.VerifyContext,System.Threading.CancellationToken)">
+        <member name="M:Parbad.Abstraction.Gateway`1.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.Abstraction.Gateway`1.RefundAsync(Parbad.VerifyContext,Parbad.Money,System.Threading.CancellationToken)">
+        <member name="M:Parbad.Abstraction.Gateway`1.RefundAsync(Parbad.InvoiceContext,Parbad.Money,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
         <member name="T:Parbad.Abstraction.GatewayAccount">
@@ -25,6 +25,22 @@
             <summary>
             Gets or sets the name of this account. The default value is "Default".
             <para>Note: Make sure that accounts have different names. Otherwise a <see cref="T:Parbad.Exceptions.DuplicateAccountException"/> will throw.</para>
+            </summary>
+        </member>
+        <member name="T:Parbad.Abstraction.GatewayDescriptor">
+            <summary>
+            Describes the type of a gateway.
+            </summary>
+        </member>
+        <member name="M:Parbad.Abstraction.GatewayDescriptor.#ctor(System.Type)">
+            <summary>
+            Initializes an instance of <see cref="T:Parbad.Abstraction.GatewayDescriptor"/>.
+            </summary>
+            <param name="gatewayType">Type of the gateway.</param>
+        </member>
+        <member name="P:Parbad.Abstraction.GatewayDescriptor.GatewayType">
+            <summary>
+            Gets the type of the gateway.
             </summary>
         </member>
         <member name="T:Parbad.Abstraction.IGateway">
@@ -39,14 +55,14 @@
             <param name="invoice">The invoice which must be pay.</param>
             <param name="cancellationToken"></param>
         </member>
-        <member name="M:Parbad.Abstraction.IGateway.VerifyAsync(Parbad.VerifyContext,System.Threading.CancellationToken)">
+        <member name="M:Parbad.Abstraction.IGateway.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
             <summary>
             Verifies the requested payment to check whether or not the invoice has was paid in the gateway by the client.
             </summary>
             <param name="context"></param>
             <param name="cancellationToken"></param>
         </member>
-        <member name="M:Parbad.Abstraction.IGateway.RefundAsync(Parbad.VerifyContext,Parbad.Money,System.Threading.CancellationToken)">
+        <member name="M:Parbad.Abstraction.IGateway.RefundAsync(Parbad.InvoiceContext,Parbad.Money,System.Threading.CancellationToken)">
             <summary>
             Performs a refund request for the given invoice.
             </summary>
@@ -59,18 +75,18 @@
             A provider for providing an <see cref="T:Parbad.Abstraction.IGateway"/>.
             </summary>
         </member>
-        <member name="M:Parbad.Abstraction.IGatewayProvider.Provide(System.Type)">
+        <member name="M:Parbad.Abstraction.IGatewayProvider.Provide(System.String)">
             <summary>
-            Provides an instance of <see cref="T:Parbad.Abstraction.IGateway"/> using the given <paramref name="gatewayType"/>.
+            Provides an instance of <see cref="T:Parbad.Abstraction.IGateway"/> using the given <paramref name="gatewayName"/>.
             </summary>
-            <param name="gatewayType">Type of the gateway.</param>
+            <param name="gatewayName">Name of the gateway.</param>
         </member>
         <member name="T:Parbad.Abstraction.Invoice">
             <summary>
             Describes an invoice which must be requested.
             </summary>
         </member>
-        <member name="M:Parbad.Abstraction.Invoice.#ctor(System.Int64,Parbad.Money,Parbad.CallbackUrl,System.Type,System.Collections.Generic.IDictionary{System.String,System.Object})">
+        <member name="M:Parbad.Abstraction.Invoice.#ctor(System.Int64,Parbad.Money,Parbad.CallbackUrl,System.String,System.Collections.Generic.IDictionary{System.String,System.Object})">
             <summary>
             Initializes an instance of <see cref="T:Parbad.Abstraction.Invoice"/>.
             </summary>
@@ -81,17 +97,17 @@
             <param name="callbackUrl">A complete URL of your website. It will be used by the gateway for redirecting the client again to your website.
             <para>Note: A complete URL would be like: "http://www.mywebsite.com/foo/bar/"</para>
             </param>
-            <param name="gatewayType">The type of the gateway which the invoice must be paid in.</param>
+            <param name="gatewayName">Name of the gateway which the invoice must be paid in.</param>
             <param name="additionalData">Additional data for this invoice.</param>
         </member>
         <member name="P:Parbad.Abstraction.Invoice.TrackingNumber">
             <summary>
-            Tracking number of invoice.
+            Gets the Tracking number of the invoice.
             </summary>
         </member>
         <member name="P:Parbad.Abstraction.Invoice.Amount">
             <summary>
-            The amount of the invoice.
+            Gets the amount of the invoice.
             <para>Note: You can also enter long and decimal numbers. It can also be parsed to long and decimal.</para>
             <para>Examples:</para>
             <para>long a = invoice.Amount;</para>
@@ -105,14 +121,14 @@
             <para>Note: A complete URL would be like: "http://www.mywebsite.com/foo/bar/"</para>
             </summary>
         </member>
-        <member name="P:Parbad.Abstraction.Invoice.GatewayType">
+        <member name="P:Parbad.Abstraction.Invoice.GatewayName">
             <summary>
-            The type of the gateway which the invoice must be paid in.
+            Gets the name of the gateway which the invoice must be paid in.
             </summary>
         </member>
         <member name="P:Parbad.Abstraction.Invoice.AdditionalData">
             <summary>
-            Additional data for this invoice.
+            Gets the additional data of the invoice.
             </summary>
         </member>
         <member name="T:Parbad.Builder.IParbadBuilder">
@@ -568,10 +584,10 @@
         <member name="M:Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGateway.VerifyAsync(Parbad.VerifyContext,System.Threading.CancellationToken)">
+        <member name="M:Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGateway.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGateway.RefundAsync(Parbad.VerifyContext,Parbad.Money,System.Threading.CancellationToken)">
+        <member name="M:Parbad.GatewayProviders.AsanPardakht.AsanPardakhtGateway.RefundAsync(Parbad.InvoiceContext,Parbad.Money,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
         <member name="P:Parbad.GatewayProviders.IranKish.IranKishCallbackResult.InvoiceNumber">
@@ -587,10 +603,10 @@
         <member name="M:Parbad.GatewayProviders.IranKish.IranKishGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.GatewayProviders.IranKish.IranKishGateway.VerifyAsync(Parbad.VerifyContext,System.Threading.CancellationToken)">
+        <member name="M:Parbad.GatewayProviders.IranKish.IranKishGateway.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.GatewayProviders.IranKish.IranKishGateway.RefundAsync(Parbad.VerifyContext,Parbad.Money,System.Threading.CancellationToken)">
+        <member name="M:Parbad.GatewayProviders.IranKish.IranKishGateway.RefundAsync(Parbad.InvoiceContext,Parbad.Money,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
         <member name="T:Parbad.GatewayProviders.IranKish.IranKishGatewayAccount">
@@ -601,10 +617,10 @@
         <member name="M:Parbad.GatewayProviders.Mellat.MellatGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.GatewayProviders.Mellat.MellatGateway.VerifyAsync(Parbad.VerifyContext,System.Threading.CancellationToken)">
+        <member name="M:Parbad.GatewayProviders.Mellat.MellatGateway.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.GatewayProviders.Mellat.MellatGateway.RefundAsync(Parbad.VerifyContext,Parbad.Money,System.Threading.CancellationToken)">
+        <member name="M:Parbad.GatewayProviders.Mellat.MellatGateway.RefundAsync(Parbad.InvoiceContext,Parbad.Money,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
         <member name="P:Parbad.GatewayProviders.Mellat.MellatGatewayAccount.IsTestTerminal">
@@ -629,10 +645,10 @@
         <member name="M:Parbad.GatewayProviders.Melli.MelliGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.GatewayProviders.Melli.MelliGateway.VerifyAsync(Parbad.VerifyContext,System.Threading.CancellationToken)">
+        <member name="M:Parbad.GatewayProviders.Melli.MelliGateway.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.GatewayProviders.Melli.MelliGateway.RefundAsync(Parbad.VerifyContext,Parbad.Money,System.Threading.CancellationToken)">
+        <member name="M:Parbad.GatewayProviders.Melli.MelliGateway.RefundAsync(Parbad.InvoiceContext,Parbad.Money,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
         <member name="T:Parbad.GatewayProviders.Melli.MelliGatewayAccount">
@@ -937,10 +953,10 @@
         <member name="M:Parbad.GatewayProviders.ParbadVirtual.ParbadVirtualGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.GatewayProviders.ParbadVirtual.ParbadVirtualGateway.VerifyAsync(Parbad.VerifyContext,System.Threading.CancellationToken)">
+        <member name="M:Parbad.GatewayProviders.ParbadVirtual.ParbadVirtualGateway.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.GatewayProviders.ParbadVirtual.ParbadVirtualGateway.RefundAsync(Parbad.VerifyContext,Parbad.Money,System.Threading.CancellationToken)">
+        <member name="M:Parbad.GatewayProviders.ParbadVirtual.ParbadVirtualGateway.RefundAsync(Parbad.InvoiceContext,Parbad.Money,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
         <member name="P:Parbad.GatewayProviders.ParbadVirtual.ParbadVirtualGatewayOptions.GatewayPath">
@@ -956,10 +972,10 @@
         <member name="M:Parbad.GatewayProviders.Parsian.ParsianGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.GatewayProviders.Parsian.ParsianGateway.VerifyAsync(Parbad.VerifyContext,System.Threading.CancellationToken)">
+        <member name="M:Parbad.GatewayProviders.Parsian.ParsianGateway.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.GatewayProviders.Parsian.ParsianGateway.RefundAsync(Parbad.VerifyContext,Parbad.Money,System.Threading.CancellationToken)">
+        <member name="M:Parbad.GatewayProviders.Parsian.ParsianGateway.RefundAsync(Parbad.InvoiceContext,Parbad.Money,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
         <member name="P:Parbad.GatewayProviders.Pasargad.Models.PasargadCallbackResult.InvoiceNumber">
@@ -970,19 +986,19 @@
         <member name="M:Parbad.GatewayProviders.Pasargad.PasargadGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.GatewayProviders.Pasargad.PasargadGateway.VerifyAsync(Parbad.VerifyContext,System.Threading.CancellationToken)">
+        <member name="M:Parbad.GatewayProviders.Pasargad.PasargadGateway.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.GatewayProviders.Pasargad.PasargadGateway.RefundAsync(Parbad.VerifyContext,Parbad.Money,System.Threading.CancellationToken)">
+        <member name="M:Parbad.GatewayProviders.Pasargad.PasargadGateway.RefundAsync(Parbad.InvoiceContext,Parbad.Money,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
         <member name="M:Parbad.GatewayProviders.Saman.SamanGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.GatewayProviders.Saman.SamanGateway.VerifyAsync(Parbad.VerifyContext,System.Threading.CancellationToken)">
+        <member name="M:Parbad.GatewayProviders.Saman.SamanGateway.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.GatewayProviders.Saman.SamanGateway.RefundAsync(Parbad.VerifyContext,Parbad.Money,System.Threading.CancellationToken)">
+        <member name="M:Parbad.GatewayProviders.Saman.SamanGateway.RefundAsync(Parbad.InvoiceContext,Parbad.Money,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
         <member name="M:Parbad.AsanPardakhtGatewayInvoiceBuilderExtensions.AsanPardakht(Parbad.InvoiceBuilder.IInvoiceBuilder)">
@@ -1066,7 +1082,7 @@
         <member name="P:Parbad.Internal.DefaultInvoiceBuilder.CallbackUrl">
             <inheritdoc />
         </member>
-        <member name="P:Parbad.Internal.DefaultInvoiceBuilder.GatewayType">
+        <member name="P:Parbad.Internal.DefaultInvoiceBuilder.GatewayName">
             <inheritdoc />
         </member>
         <member name="P:Parbad.Internal.DefaultInvoiceBuilder.AdditionalData">
@@ -1084,10 +1100,10 @@
         <member name="M:Parbad.Internal.DefaultInvoiceBuilder.SetCallbackUrl(Parbad.CallbackUrl)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.Internal.DefaultInvoiceBuilder.AddAdditionalData(System.String,System.Object)">
+        <member name="M:Parbad.Internal.DefaultInvoiceBuilder.UseGateway(System.String)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.Internal.DefaultInvoiceBuilder.SetGatewayType(System.Type)">
+        <member name="M:Parbad.Internal.DefaultInvoiceBuilder.AddAdditionalData(System.String,System.Object)">
             <inheritdoc />
         </member>
         <member name="M:Parbad.Internal.DefaultInvoiceBuilder.BuildAsync(System.Threading.CancellationToken)">
@@ -1152,33 +1168,24 @@
             <exception cref="T:Parbad.Exceptions.InvalidGatewayTypeException"></exception>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
-        <member name="M:Parbad.Internal.GatewayHelper.FindGatewayTypeByName(System.String,System.Boolean)">
-            <summary>
-            </summary>
-            <param name="gatewayName"></param>
-            <param name="throwException"></param>
-            <exception cref="T:Parbad.Exceptions.GatewayNotFoundException"></exception>
-        </member>
         <member name="M:Parbad.Internal.GatewayPost.#ctor(Microsoft.AspNetCore.Http.IHttpContextAccessor,System.String,System.Collections.Generic.IDictionary{System.String,System.String})">
             <inheritdoc />
         </member>
         <member name="M:Parbad.Internal.GatewayPost.TransportAsync(System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="T:Parbad.Internal.GatewayProvider">
+        <member name="T:Parbad.Internal.DefaultGatewayProvider">
             <exception cref="T:Parbad.Exceptions.GatewayNotFoundException"></exception>
             <inheritdoc />
         </member>
-        <member name="M:Parbad.Internal.GatewayProvider.Provide(System.Type)">
-            <inheritdoc />
-        </member>
-        <member name="M:Parbad.Internal.GatewayProviderExtensions.Provide(Parbad.Abstraction.IGatewayProvider,System.String)">
+        <member name="M:Parbad.Internal.DefaultGatewayProvider.#ctor(System.IServiceProvider)">
             <summary>
+            Initializes an instance of <see cref="T:Parbad.Internal.DefaultGatewayProvider"/>.
             </summary>
-            <param name="gatewayProvider"></param>
-            <param name="gatewayName"></param>
-            <exception cref="T:Parbad.Exceptions.GatewayNotFoundException"></exception>
-            <exception cref="T:System.ArgumentNullException"></exception>
+            <param name="services"></param>
+        </member>
+        <member name="M:Parbad.Internal.DefaultGatewayProvider.Provide(System.String)">
+            <inheritdoc />
         </member>
         <member name="T:Parbad.Internal.InMemoryGatewayAccountSource`1">
             <inheritdoc />
@@ -1259,12 +1266,12 @@
         </member>
         <member name="P:Parbad.InvoiceBuilder.IInvoiceBuilder.TrackingNumber">
             <summary>
-            Tracking number of invoice.
+            Gets or sets the tracking number of invoice.
             </summary>
         </member>
         <member name="P:Parbad.InvoiceBuilder.IInvoiceBuilder.Amount">
             <summary>
-            The amount of the invoice.
+            Gets os sets the amount of the invoice.
             <para>Note: You can also enter long and decimal numbers.</para>
             </summary>
         </member>
@@ -1275,9 +1282,9 @@
             <para>Note: A complete URL would be like: "http://www.mywebsite.com/foo/bar/"</para>
             </summary>
         </member>
-        <member name="P:Parbad.InvoiceBuilder.IInvoiceBuilder.GatewayType">
+        <member name="P:Parbad.InvoiceBuilder.IInvoiceBuilder.GatewayName">
             <summary>
-            The type of the gateway which the invoice must be paid in.
+            Gets or sets the type of the gateway which the invoice must be paid in.
             </summary>
         </member>
         <member name="P:Parbad.InvoiceBuilder.IInvoiceBuilder.AdditionalData">
@@ -1315,12 +1322,12 @@
             <para>Note: A complete URL would be like: "http://www.mywebsite.com/foo/bar/"</para>
             </param>
         </member>
-        <member name="M:Parbad.InvoiceBuilder.IInvoiceBuilder.SetGatewayType(System.Type)">
+        <member name="M:Parbad.InvoiceBuilder.IInvoiceBuilder.UseGateway(System.String)">
             <summary>
-            Sets the type of the gateway which the invoice must be paid in.
+            Sets the gateway name.
             </summary>
-            <param name="gatewayType">Type of the gateway</param>
-            <exception cref="T:Parbad.Exceptions.InvalidGatewayTypeException"></exception>
+            <param name="gatewayName"></param>
+            <exception cref="T:Parbad.Exceptions.GatewayNotFoundException"></exception>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
         <member name="M:Parbad.InvoiceBuilder.IInvoiceBuilder.AddAdditionalData(System.String,System.Object)">
@@ -1356,30 +1363,34 @@
             </param>
             <returns></returns>
         </member>
-        <member name="M:Parbad.InvoiceBuilderExtensions.SetGatewayType``1(Parbad.InvoiceBuilder.IInvoiceBuilder)">
-            <summary>
-            Sets the type of the gateway which the invoice must be paid in.
-            </summary>
-            <typeparam name="TGateway">Type of the gateway.</typeparam>
-            <param name="builder"></param>
-            <exception cref="T:Parbad.Exceptions.InvalidGatewayTypeException"></exception>
-        </member>
-        <member name="M:Parbad.InvoiceBuilderExtensions.UseGateway(Parbad.InvoiceBuilder.IInvoiceBuilder,System.String)">
-            <summary>
-            Sets the gateway using the given name. The given name must match the values of
-            <see cref="!:Gateway"/> enum.
-            </summary>
-            <param name="builder"></param>
-            <param name="gatewayName"></param>
-            <exception cref="T:Parbad.Exceptions.GatewayNotFoundException"></exception>
-            <exception cref="T:System.ArgumentNullException"></exception>
-        </member>
         <member name="M:Parbad.InvoiceBuilderExtensions.AddAdditionalData(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Collections.Generic.IDictionary{System.String,System.Object})">
             <summary>
             Appends the given dictionary to the additional data of the invoice.
             </summary>
             <param name="builder"></param>
             <param name="additionalData"></param>
+        </member>
+        <member name="T:Parbad.InvoiceContext">
+            <summary>
+            Describes the payment and transactions of a specific invoice.
+            </summary>
+        </member>
+        <member name="M:Parbad.InvoiceContext.#ctor(Parbad.Storage.Abstractions.Payment,System.Collections.Generic.IEnumerable{Parbad.Storage.Abstractions.Transaction})">
+            <summary>
+            Initializes an instance of <see cref="T:Parbad.InvoiceContext"/>.
+            </summary>
+            <param name="payment"></param>
+            <param name="transactions"></param>
+        </member>
+        <member name="P:Parbad.InvoiceContext.Payment">
+            <summary>
+            Contains the payment information.
+            </summary>
+        </member>
+        <member name="P:Parbad.InvoiceContext.Transactions">
+            <summary>
+            Contains the transactions of this invoice.
+            </summary>
         </member>
         <member name="T:Parbad.IOnlinePayment">
             <summary>

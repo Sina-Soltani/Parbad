@@ -89,7 +89,7 @@ namespace Parbad.Internal
                 throw new PaymentTokenProviderException(message);
             }
 
-            var gateway = _gatewayProvider.Provide(invoice.GatewayType);
+            var gateway = _gatewayProvider.Provide(invoice.GatewayName);
 
             var newPayment = new Payment
             {

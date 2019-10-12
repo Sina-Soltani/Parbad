@@ -15,7 +15,6 @@ namespace Parbad.Internal
     public class DefaultInvoiceBuilder : IInvoiceBuilder
     {
         private ITrackingNumberProvider _trackingNumberProvider;
-        private Type _gatewayType;
 
         /// <summary>
         /// Initializes an instance of <see cref="DefaultInvoiceBuilder"/> class.
@@ -38,16 +37,7 @@ namespace Parbad.Internal
         public CallbackUrl CallbackUrl { get; set; }
 
         /// <inheritdoc />
-        public Type GatewayType
-        {
-            get => _gatewayType;
-            set
-            {
-                GatewayHelper.IsGateway(value, throwException: true);
-
-                _gatewayType = value;
-            }
-        }
+        public string GatewayName { get; set; }
 
         /// <inheritdoc />
         public IDictionary<string, object> AdditionalData { get; set; }
@@ -58,7 +48,7 @@ namespace Parbad.Internal
         /// <inheritdoc />
         public virtual IInvoiceBuilder SetTrackingNumberProvider(ITrackingNumberProvider provider)
         {
-            _trackingNumberProvider = provider;
+            _trackingNumberProvider = provider ?? throw new ArgumentNullException(nameof(provider));
 
             return this;
         }
@@ -66,7 +56,7 @@ namespace Parbad.Internal
         /// <inheritdoc />
         public virtual IInvoiceBuilder SetAmount(Money amount)
         {
-            Amount = amount;
+            Amount = amount ?? throw new ArgumentNullException(nameof(amount));
 
             return this;
         }
@@ -74,7 +64,15 @@ namespace Parbad.Internal
         /// <inheritdoc />
         public virtual IInvoiceBuilder SetCallbackUrl(CallbackUrl callbackUrl)
         {
-            CallbackUrl = callbackUrl;
+            CallbackUrl = callbackUrl ?? throw new ArgumentNullException(nameof(callbackUrl));
+
+            return this;
+        }
+
+        /// <inheritdoc />
+        public IInvoiceBuilder UseGateway(string gatewayName)
+        {
+            GatewayName = gatewayName ?? throw new ArgumentNullException(nameof(gatewayName));
 
             return this;
         }
@@ -83,14 +81,6 @@ namespace Parbad.Internal
         public virtual IInvoiceBuilder AddAdditionalData(string key, object value)
         {
             AdditionalData.Add(key, value);
-
-            return this;
-        }
-
-        /// <inheritdoc />
-        public virtual IInvoiceBuilder SetGatewayType(Type gatewayType)
-        {
-            GatewayType = gatewayType;
 
             return this;
         }
@@ -107,7 +97,7 @@ namespace Parbad.Internal
                 TrackingNumber,
                 Amount,
                 CallbackUrl,
-                _gatewayType,
+                GatewayName,
                 AdditionalData
             );
         }
