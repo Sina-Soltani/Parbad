@@ -79,7 +79,7 @@ namespace Parbad.GatewayProviders.IranKish
         }
 
         public static IranKishCallbackResult CreateCallbackResult(
-            VerifyContext context,
+            InvoiceContext context,
             IranKishGatewayAccount account,
             HttpRequest httpRequest,
             MessagesOptions messagesOptions)
@@ -155,7 +155,7 @@ namespace Parbad.GatewayProviders.IranKish
 
         public static PaymentVerifyResult CreateVerifyResult(
             string webServiceResponse,
-            VerifyContext context,
+            InvoiceContext context,
             IranKishCallbackResult callbackResult,
             MessagesOptions messagesOptions)
         {

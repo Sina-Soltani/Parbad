@@ -76,7 +76,7 @@ namespace Parbad.GatewayProviders.Parsian
             return result;
         }
 
-        public static ParsianCallbackResult CreateCallbackResult(HttpRequest httpRequest, VerifyContext context, MessagesOptions messagesOptions)
+        public static ParsianCallbackResult CreateCallbackResult(HttpRequest httpRequest, InvoiceContext context, MessagesOptions messagesOptions)
         {
             httpRequest.Form.TryGetValue("token", out var token);
             httpRequest.Form.TryGetValue("status", out var status);
@@ -194,7 +194,7 @@ namespace Parbad.GatewayProviders.Parsian
             return result;
         }
 
-        public static string CreateRefundData(ParsianGatewayAccount account, VerifyContext context, Money amount)
+        public static string CreateRefundData(ParsianGatewayAccount account, InvoiceContext context, Money amount)
         {
             var transaction = context.Transactions.SingleOrDefault(item => item.Type == TransactionType.Verify);
 

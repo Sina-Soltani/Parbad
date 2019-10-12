@@ -62,7 +62,7 @@ namespace Parbad.GatewayProviders.ParbadVirtual
         }
 
         /// <inheritdoc />
-        public override Task<IPaymentVerifyResult> VerifyAsync(VerifyContext context, CancellationToken cancellationToken = default)
+        public override Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default)
         {
             if (!_httpContextAccessor.HttpContext.Request.TryGetParam("Result", out var result))
             {
@@ -84,7 +84,7 @@ namespace Parbad.GatewayProviders.ParbadVirtual
         }
 
         /// <inheritdoc />
-        public override Task<IPaymentRefundResult> RefundAsync(VerifyContext context, Money amount, CancellationToken cancellationToken = default)
+        public override Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default)
         {
             return PaymentRefundResult.Succeed().ToInterfaceAsync();
         }

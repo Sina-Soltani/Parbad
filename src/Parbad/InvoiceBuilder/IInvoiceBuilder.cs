@@ -17,12 +17,12 @@ namespace Parbad.InvoiceBuilder
     public interface IInvoiceBuilder
     {
         /// <summary>
-        /// Tracking number of invoice.
+        /// Gets or sets the tracking number of invoice.
         /// </summary>
         long TrackingNumber { get; set; }
 
         /// <summary>
-        /// The amount of the invoice.
+        /// Gets os sets the amount of the invoice.
         /// <para>Note: You can also enter long and decimal numbers.</para>
         /// </summary>
         Money Amount { get; set; }
@@ -35,9 +35,9 @@ namespace Parbad.InvoiceBuilder
         CallbackUrl CallbackUrl { get; set; }
 
         /// <summary>
-        /// The type of the gateway which the invoice must be paid in.
+        /// Gets or sets the type of the gateway which the invoice must be paid in.
         /// </summary>
-        Type GatewayType { get; set; }
+        string GatewayName { get; set; }
 
         /// <summary>
         /// Additional data for this invoice.
@@ -75,12 +75,12 @@ namespace Parbad.InvoiceBuilder
         IInvoiceBuilder SetCallbackUrl(CallbackUrl url);
 
         /// <summary>
-        /// Sets the type of the gateway which the invoice must be paid in.
+        /// Sets the gateway name.
         /// </summary>
-        /// <param name="gatewayType">Type of the gateway</param>
-        /// <exception cref="InvalidGatewayTypeException"></exception>
+        /// <param name="gatewayName"></param>
+        /// <exception cref="GatewayNotFoundException"></exception>
         /// <exception cref="ArgumentNullException"></exception>
-        IInvoiceBuilder SetGatewayType(Type gatewayType);
+        IInvoiceBuilder UseGateway(string gatewayName);
 
         /// <summary>
         /// Adds additional data to the invoice.

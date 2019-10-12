@@ -69,7 +69,7 @@ namespace Parbad.GatewayProviders.Melli
             return PaymentRequestResult.Succeed(new GatewayRedirect(httpContextAccessor, paymentPageUrl), account.Name);
         }
 
-        public static MelliCallbackResult CreateCallbackResult(VerifyContext context, HttpRequest httpRequest, MelliGatewayAccount account, MessagesOptions messagesOptions)
+        public static MelliCallbackResult CreateCallbackResult(InvoiceContext context, HttpRequest httpRequest, MelliGatewayAccount account, MessagesOptions messagesOptions)
         {
             httpRequest.TryGetParamAs<int>("ResCode", out var apiResponseCode);
 

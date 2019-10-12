@@ -2,8 +2,6 @@
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using Parbad.Abstraction;
 using Parbad.Exceptions;
@@ -36,19 +34,6 @@ namespace Parbad.Internal
             return result;
         }
 
-        public static IEnumerable<Type> FindAllGatewaysFromAssemblyContaining<TAssembly>() where TAssembly : class
-        {
-            return typeof(TAssembly)
-                .Assembly
-                .GetTypes()
-                .Where(type => IsGateway(type));
-        }
-
-        public static IEnumerable<Type> FindAllGatewaysTypes()
-        {
-            return FindAllGatewaysFromAssemblyContaining<IGateway>();
-        }
-
         public static string GetCompleteGatewayName(this IGateway gateway)
         {
             if (gateway == null) throw new ArgumentNullException(nameof(gateway));
@@ -65,16 +50,12 @@ namespace Parbad.Internal
         {
             if (gatewayType == null) throw new ArgumentNullException(nameof(gatewayType));
 
-            IsGateway(gatewayType, throwException: true);
-
             return gatewayType.Name;
         }
 
         public static string GetRoutingGatewayName(Type gatewayType)
         {
             if (gatewayType == null) throw new ArgumentNullException(nameof(gatewayType));
-
-            IsGateway(gatewayType, throwException: true);
 
             if (gatewayType.HasAttribute<GatewayAttribute>())
             {
@@ -101,32 +82,6 @@ namespace Parbad.Internal
             if (gatewayName == null) throw new ArgumentNullException(nameof(gatewayName));
 
             return string.Equals(gatewayName, GetRoutingGatewayName(gatewayType), StringComparison.OrdinalIgnoreCase);
-        }
-
-        /// <summary>
-        /// </summary>
-        /// <param name="gatewayName"></param>
-        /// <param name="throwException"></param>
-        /// <exception cref="GatewayNotFoundException"></exception>
-        public static Type FindGatewayTypeByName(string gatewayName, bool throwException = false)
-        {
-            if (gatewayName == null) throw new ArgumentNullException(nameof(gatewayName));
-
-            var gateways = FindAllGatewaysTypes().Where(type => CompareName(type, gatewayName)).ToList();
-
-            if (gateways.Count == 0)
-            {
-                if (throwException) throw new GatewayNotFoundException(gatewayName);
-
-                return null;
-            }
-
-            if (gateways.Count > 1)
-            {
-                throw new InvalidOperationException($"More than one gateway exist with the name {gatewayName}");
-            }
-
-            return gateways[0];
         }
     }
 }

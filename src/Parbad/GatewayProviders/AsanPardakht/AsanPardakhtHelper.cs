@@ -82,7 +82,7 @@ namespace Parbad.GatewayProviders.AsanPardakht
         }
 
         public static AsanPardakhtCallbackResult CreateCallbackResult(
-            VerifyContext context,
+            InvoiceContext context,
             AsanPardakhtGatewayAccount account,
             HttpRequest httpRequest,
             MessagesOptions messagesOptions)

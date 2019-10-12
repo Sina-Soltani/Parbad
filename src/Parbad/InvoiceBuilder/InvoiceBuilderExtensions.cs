@@ -3,10 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using Parbad.Abstraction;
-using Parbad.Exceptions;
-using Parbad.Internal;
 using Parbad.InvoiceBuilder;
 
 namespace Parbad
@@ -38,37 +34,6 @@ namespace Parbad
         public static IInvoiceBuilder SetCallbackUrl(this IInvoiceBuilder builder, string callbackUrl)
         {
             return builder.SetCallbackUrl(new CallbackUrl(callbackUrl));
-        }
-
-        /// <summary>
-        /// Sets the type of the gateway which the invoice must be paid in.
-        /// </summary>
-        /// <typeparam name="TGateway">Type of the gateway.</typeparam>
-        /// <param name="builder"></param>
-        /// <exception cref="InvalidGatewayTypeException"></exception>
-        public static IInvoiceBuilder SetGatewayType<TGateway>(this IInvoiceBuilder builder) where TGateway : IGateway
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-
-            return builder.SetGatewayType(typeof(TGateway));
-        }
-
-        /// <summary>
-        /// Sets the gateway using the given name. The given name must match the values of
-        /// <see cref="Gateway"/> enum.
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="gatewayName"></param>
-        /// <exception cref="GatewayNotFoundException"></exception>
-        /// <exception cref="ArgumentNullException"></exception>
-        public static IInvoiceBuilder UseGateway(this IInvoiceBuilder builder, string gatewayName)
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-            if (gatewayName == null) throw new ArgumentNullException(nameof(gatewayName));
-
-            var gatewayType = GatewayHelper.FindGatewayTypeByName(gatewayName, throwException: true);
-
-            return builder.SetGatewayType(gatewayType);
         }
 
         /// <summary>
