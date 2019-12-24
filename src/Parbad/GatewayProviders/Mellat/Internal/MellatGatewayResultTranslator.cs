@@ -3,7 +3,7 @@
 
 using Parbad.Options;
 
-namespace Parbad.GatewayProviders.Mellat
+namespace Parbad.GatewayProviders.Mellat.Internal
 {
     internal static class MellatGatewayResultTranslator
     {

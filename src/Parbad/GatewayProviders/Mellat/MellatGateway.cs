@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Parbad.Abstraction;
 using Parbad.GatewayBuilders;
+using Parbad.GatewayProviders.Mellat.Internal;
 using Parbad.Internal;
 using Parbad.Net;
 using Parbad.Options;

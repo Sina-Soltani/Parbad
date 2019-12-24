@@ -4,6 +4,7 @@
 using System;
 using Parbad.GatewayBuilders;
 using Parbad.GatewayProviders.Mellat;
+using Parbad.GatewayProviders.Mellat.Internal;
 
 namespace Parbad.Builder
 {

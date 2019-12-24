@@ -6,13 +6,13 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Parbad.Abstraction;
-using Parbad.GatewayProviders.Mellat.Models;
+using Parbad.GatewayProviders.Mellat.Internal.Models;
 using Parbad.Http;
-using Parbad.Utilities;
 using Parbad.Internal;
 using Parbad.Options;
+using Parbad.Utilities;
 
-namespace Parbad.GatewayProviders.Mellat
+namespace Parbad.GatewayProviders.Mellat.Internal
 {
     internal static class MellatHelper
     {
