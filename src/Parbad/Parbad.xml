@@ -548,12 +548,11 @@
             Specifies the contract for a collection of service descriptors.
             </summary>
         </member>
-        <member name="M:Parbad.GatewayBuilders.IGatewayBuilder.AddGateway``1(System.Uri,Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+        <member name="M:Parbad.GatewayBuilders.IGatewayBuilder.AddGateway``1(Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
             <summary>
             Adds the specified gateway to Parbad services.
             </summary>
             <typeparam name="TGateway">Type of gateway.</typeparam>
-            <param name="baseServiceUrl">Base service address of <typeparamref name="TGateway"/>.</param>
             <param name="serviceLifetime">Lifetime of <typeparamref name="TGateway"/>.</param>
         </member>
         <member name="T:Parbad.GatewayBuilders.IGatewayConfigurationBuilder`1">
@@ -1168,7 +1167,7 @@
         <member name="P:Parbad.Internal.GatewayBuilder.Services">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.Internal.GatewayBuilder.AddGateway``1(System.Uri,Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+        <member name="M:Parbad.Internal.GatewayBuilder.AddGateway``1(Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
             <inheritdoc />
         </member>
         <member name="M:Parbad.Internal.GatewayHelper.IsGateway(System.Type,System.Boolean)">
@@ -1613,6 +1612,20 @@
             <summary>
             Manages the <see cref="T:System.Net.Http.HttpClient"/> for a specific gateway.
             </summary>
+        </member>
+        <member name="M:Parbad.Net.GatewayHttpClientExtensions.AddHttpClientForGateway``1(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Adds a named <see cref="T:System.Net.Http.HttpClient"/> for the specified gateway.
+            </summary>
+            <typeparam name="TGateway"></typeparam>
+            <param name="services"></param>
+        </member>
+        <member name="M:Parbad.Net.GatewayHttpClientExtensions.CreateClient(System.Net.Http.IHttpClientFactory,Parbad.Abstraction.IGateway)">
+            <summary>
+            Creates a <see cref="T:System.Net.Http.HttpClient"/> for the specified gateway.
+            </summary>
+            <param name="factory"></param>
+            <param name="gateway"></param>
         </member>
         <member name="M:Parbad.OnlinePaymentExtensions.Request(Parbad.IOnlinePayment,System.String,System.Int64,System.Decimal,System.String)">
             <summary>

@@ -13,7 +13,7 @@ namespace Parbad.Gateway.ZarinPal.Internal
 {
     internal static class ZarinPalHelper
     {
-        public const string WebServiceUrl = "https://#.zarinpal.com/pg/services/WebGate/wsdl";
+        public const string WebServiceUrl = "https://#.zarinpal.com/pg/services/WebGate/service";
         public const string PaymentPageUrl = "https://#.zarinpal.com/pg/StartPay/";
         public const string OkResult = "100";
 
@@ -42,8 +42,8 @@ namespace Parbad.Gateway.ZarinPal.Internal
             IHttpContextAccessor httpContextAccessor,
             ZarinPalGatewayAccount account)
         {
-            var status = XmlHelper.GetNodeValueFromXml(response, "Status");
-            var authority = XmlHelper.GetNodeValueFromXml(response, "Authority");
+            var status = XmlHelper.GetNodeValueFromXml(response, "Status", "http://zarinpal.com/");
+            var authority = XmlHelper.GetNodeValueFromXml(response, "Authority", "http://zarinpal.com/");
 
             var isSucceed = string.Equals(status, OkResult, StringComparison.InvariantCultureIgnoreCase);
 
@@ -100,8 +100,8 @@ namespace Parbad.Gateway.ZarinPal.Internal
 
         public static PaymentVerifyResult CreateVerifyResult(string response, MessagesOptions messagesOptions)
         {
-            var status = XmlHelper.GetNodeValueFromXml(response, "Status");
-            var refId = XmlHelper.GetNodeValueFromXml(response, "RefID");
+            var status = XmlHelper.GetNodeValueFromXml(response, "Status", "http://zarinpal.com/");
+            var refId = XmlHelper.GetNodeValueFromXml(response, "RefID", "http://zarinpal.com/");
 
             var isSucceed = string.Equals(status, OkResult, StringComparison.InvariantCultureIgnoreCase);
 
