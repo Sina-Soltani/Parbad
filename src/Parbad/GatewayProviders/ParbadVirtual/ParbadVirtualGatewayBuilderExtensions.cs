@@ -4,7 +4,6 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Parbad.Abstraction;
 using Parbad.GatewayBuilders;
 using Parbad.GatewayProviders.ParbadVirtual;
 using Parbad.GatewayProviders.ParbadVirtual.MiddlewareInvoker;
@@ -22,20 +21,11 @@ namespace Parbad.Builder
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            builder.Services.AddSingleton(new GatewayDescriptor(typeof(ParbadVirtualGateway)));
-            builder.Services.TryAddTransient<ParbadVirtualGateway>();
-
             builder.Services.TryAddTransient<IParbadVirtualGatewayMiddlewareInvoker, ParbadVirtualGatewayMiddlewareInvoker>();
 
-            var gatewayConfigurationBuilder = new GatewayConfigurationBuilder<ParbadVirtualGateway>(builder.Services);
-            gatewayConfigurationBuilder
-                .WithAccounts(accounts =>
-                {
-                    accounts
-                        .AddInMemory(account => { });
-                });
-
-            return gatewayConfigurationBuilder;
+            return builder
+                .AddGateway<ParbadVirtualGateway>()
+                .WithAccounts(accounts => accounts.AddInMemory(account => { }));
         }
 
         /// <summary>

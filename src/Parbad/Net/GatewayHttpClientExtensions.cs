@@ -12,8 +12,13 @@ namespace Parbad.Net
     /// <summary>
     /// Manages the <see cref="HttpClient"/> for a specific gateway.
     /// </summary>
-    internal static class GatewayHttpClientExtensions
+    public static class GatewayHttpClientExtensions
     {
+        /// <summary>
+        /// Adds a named <see cref="HttpClient"/> for the specified gateway.
+        /// </summary>
+        /// <typeparam name="TGateway"></typeparam>
+        /// <param name="services"></param>
         public static IHttpClientBuilder AddHttpClientForGateway<TGateway>(this IServiceCollection services) where TGateway : class, IGateway
         {
             if (services == null) throw new ArgumentNullException(nameof(services));
@@ -21,6 +26,11 @@ namespace Parbad.Net
             return services.AddHttpClient(GatewayHelper.GetCompleteGatewayName<TGateway>());
         }
 
+        /// <summary>
+        /// Creates a <see cref="HttpClient"/> for the specified gateway.
+        /// </summary>
+        /// <param name="factory"></param>
+        /// <param name="gateway"></param>
         public static HttpClient CreateClient(this IHttpClientFactory factory, IGateway gateway)
         {
             if (factory == null) throw new ArgumentNullException(nameof(factory));
