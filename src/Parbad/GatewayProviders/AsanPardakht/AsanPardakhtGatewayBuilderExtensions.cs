@@ -2,11 +2,9 @@
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
 using System;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Parbad.GatewayBuilders;
 using Parbad.GatewayProviders.AsanPardakht;
-using Parbad.Options;
 
 namespace Parbad.Builder
 {
@@ -20,7 +18,9 @@ namespace Parbad.Builder
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            return builder.AddGateway<AsanPardakhtGateway>(new Uri(AsanPardakhtHelper.BaseServiceUrl));
+            return builder.AddGateway<AsanPardakhtGateway>()
+                .WithHttpClient(clientBuilder => clientBuilder.ConfigureHttpClient(client =>
+                    client.BaseAddress = new Uri(AsanPardakhtHelper.BaseServiceUrl)));
         }
 
         /// <summary>

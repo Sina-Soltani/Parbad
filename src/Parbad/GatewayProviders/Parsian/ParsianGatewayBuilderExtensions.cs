@@ -2,6 +2,7 @@
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
 using System;
+using Microsoft.Extensions.DependencyInjection;
 using Parbad.GatewayBuilders;
 using Parbad.GatewayProviders.Parsian;
 
@@ -17,7 +18,9 @@ namespace Parbad.Builder
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            return builder.AddGateway<ParsianGateway>(new Uri(ParsianHelper.BaseServiceUrl));
+            return builder.AddGateway<ParsianGateway>()
+                .WithHttpClient(clientBuilder => clientBuilder.ConfigureHttpClient(client =>
+                    client.BaseAddress = new Uri(ParsianHelper.BaseServiceUrl)));
         }
 
         /// <summary>

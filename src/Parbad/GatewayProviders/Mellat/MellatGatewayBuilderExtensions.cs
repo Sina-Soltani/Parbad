@@ -2,6 +2,7 @@
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
 using System;
+using Microsoft.Extensions.DependencyInjection;
 using Parbad.GatewayBuilders;
 using Parbad.GatewayProviders.Mellat;
 using Parbad.GatewayProviders.Mellat.Internal;
@@ -18,7 +19,9 @@ namespace Parbad.Builder
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            return builder.AddGateway<MellatGateway>(new Uri(MellatHelper.BaseServiceUrl));
+            return builder.AddGateway<MellatGateway>()
+                .WithHttpClient(clientBuilder => clientBuilder.ConfigureHttpClient(client =>
+                    client.BaseAddress = new Uri(MellatHelper.BaseServiceUrl)));
         }
 
         /// <summary>
