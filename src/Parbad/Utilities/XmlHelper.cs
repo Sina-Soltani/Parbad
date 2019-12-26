@@ -10,7 +10,7 @@ using System.Xml.Serialization;
 
 namespace Parbad.Utilities
 {
-    internal static class XmlHelper
+    public static class XmlHelper
     {
         public static string GetNodeValueFromXml(string xml, string nodeName, string nameSpace = "")
         {

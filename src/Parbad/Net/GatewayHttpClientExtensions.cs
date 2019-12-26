@@ -12,7 +12,7 @@ namespace Parbad.Net
     /// <summary>
     /// Manages the <see cref="HttpClient"/> for a specific gateway.
     /// </summary>
-    internal static class GatewayHttpClientExtensions
+    public static class GatewayHttpClientExtensions
     {
         public static IHttpClientBuilder AddHttpClientForGateway<TGateway>(this IServiceCollection services) where TGateway : class, IGateway
         {

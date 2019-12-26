@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 
 namespace Parbad.Net
 {
-    internal static class HttpClientExtensions
+    public static class HttpClientExtensions
     {
         public static Task<HttpResponseMessage> PostXmlAsync(this HttpClient httpClient, string requestUri, string xml, CancellationToken cancellationToken = default)
         {

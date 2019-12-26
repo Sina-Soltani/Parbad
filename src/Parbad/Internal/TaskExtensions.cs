@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Parbad.Internal
 {
-    internal static class TaskExtensions
+    public static class TaskExtensions
     {
         public static ConfiguredTaskAwaitable ConfigureAwaitFalse(this Task task)
         {

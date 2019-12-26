@@ -7,7 +7,7 @@ using Microsoft.Extensions.Primitives;
 
 namespace Parbad.Http
 {
-    internal static class HttpRequestExtensions
+    public static class HttpRequestExtensions
     {
         public static bool TryGetParam(this HttpRequest httpRequest, string key, out StringValues value)
         {

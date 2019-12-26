@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Parbad.Internal
 {
-    internal static class TaskHelper
+    public static class TaskHelper
     {
         public static Task<IPaymentRequestResult> ToInterfaceAsync(this PaymentRequestResult requestResult)
         {

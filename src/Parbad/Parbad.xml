@@ -614,6 +614,11 @@
             IranKish gateway account.
             </summary>
         </member>
+        <member name="T:Parbad.GatewayProviders.Mellat.IMellatGatewayInvoiceBuilder">
+            <summary>
+            A builder which helps to build the extra functions of Mellat Gateway.
+            </summary>
+        </member>
         <member name="M:Parbad.GatewayProviders.Mellat.MellatGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
@@ -1018,6 +1023,13 @@
             The invoice will be sent to Mellat gateway.
             </summary>
             <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.MellatGatewayInvoiceBuilderExtensions.UseMellat(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Action{Parbad.GatewayProviders.Mellat.IMellatGatewayInvoiceBuilder})">
+            <summary>
+            Contains extra functions for Mellat Gateway.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureMellatInvoiceBuilder">Helps to build the extra functions of Mellat Gateway.</param>
         </member>
         <member name="M:Parbad.MelliGatewayInvoiceBuilderExtensions.UseMelli(Parbad.InvoiceBuilder.IInvoiceBuilder)">
             <summary>
