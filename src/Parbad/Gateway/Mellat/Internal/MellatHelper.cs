@@ -59,7 +59,7 @@ namespace Parbad.Gateway.Mellat.Internal
                     ? messagesOptions.DuplicateTrackingNumber
                     : MellatGatewayResultTranslator.Translate(resCode, messagesOptions);
 
-                return PaymentRequestResult.Failed(message);
+                return PaymentRequestResult.Failed(message, account.Name);
             }
 
             var transporter = new GatewayPost(

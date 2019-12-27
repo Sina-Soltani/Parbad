@@ -17,12 +17,13 @@ namespace Parbad.Internal
             };
         }
 
-        public static PaymentRequestResult Failed(string message)
+        public static PaymentRequestResult Failed(string message, string gatewayAccountName = null)
         {
             return new PaymentRequestResult
             {
                 IsSucceed = false,
                 Message = message,
+                GatewayAccountName = gatewayAccountName,
                 GatewayTransporter = new NullGatewayTransporter()
             };
         }

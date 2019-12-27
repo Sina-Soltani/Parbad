@@ -61,7 +61,7 @@ namespace Parbad.Gateway.Melli
                         : MelliRequestResultTranslator.Translate(result.ResCode, messagesOptions);
                 }
 
-                return PaymentRequestResult.Failed(message);
+                return PaymentRequestResult.Failed(message, account.Name);
             }
 
             var paymentPageUrl = $"{PaymentPageUrl}/Index?token={result.Token}";

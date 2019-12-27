@@ -64,7 +64,7 @@ namespace Parbad.Gateway.Parsian
                     message = messagesOptions.PaymentFailed;
                 }
 
-                return PaymentRequestResult.Failed(message);
+                return PaymentRequestResult.Failed(message, account.Name);
             }
 
             var paymentPageUrl = $"{PaymentPageUrl}?Token={token}";

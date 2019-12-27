@@ -51,7 +51,7 @@ namespace Parbad.Gateway.ZarinPal.Internal
             {
                 var message = $"Error {status}";
 
-                return PaymentRequestResult.Failed(message);
+                return PaymentRequestResult.Failed(message, account.Name);
             }
 
             var paymentPageUrl = GetWebPageUrl(account.IsSandbox) + authority;

@@ -67,7 +67,7 @@ namespace Parbad.Gateway.AsanPardakht
             {
                 message = AsanPardakhtResultTranslator.TranslateRequest(splitedResult[0], messagesOptions);
 
-                return PaymentRequestResult.Failed(message);
+                return PaymentRequestResult.Failed(message, account.Name);
             }
 
             var transporter = new GatewayPost(

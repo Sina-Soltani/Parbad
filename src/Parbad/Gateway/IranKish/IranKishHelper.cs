@@ -63,7 +63,7 @@ namespace Parbad.Gateway.IranKish
                     message = messagesOptions.InvalidDataReceivedFromGateway;
                 }
 
-                return PaymentRequestResult.Failed(message);
+                return PaymentRequestResult.Failed(message, account.Name);
             }
 
             var transporter = new GatewayPost(
