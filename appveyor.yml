@@ -1,6 +1,6 @@
 version: 3.1.1.{build}
 platform: Any CPU
-image: Visual Studio 2017
+image: Visual Studio 2019
 configuration: Release
 before_build:
   - appveyor-retry dotnet restore -v Minimal
