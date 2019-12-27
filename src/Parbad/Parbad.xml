@@ -1111,7 +1111,7 @@
         <member name="M:Parbad.Internal.DefaultInvoiceBuilder.SetCallbackUrl(Parbad.CallbackUrl)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.Internal.DefaultInvoiceBuilder.UseGateway(System.String)">
+        <member name="M:Parbad.Internal.DefaultInvoiceBuilder.SetGateway(System.String)">
             <inheritdoc />
         </member>
         <member name="M:Parbad.Internal.DefaultInvoiceBuilder.AddAdditionalData(System.String,System.Object)">
@@ -1333,7 +1333,7 @@
             <para>Note: A complete URL would be like: "http://www.mywebsite.com/foo/bar/"</para>
             </param>
         </member>
-        <member name="M:Parbad.InvoiceBuilder.IInvoiceBuilder.UseGateway(System.String)">
+        <member name="M:Parbad.InvoiceBuilder.IInvoiceBuilder.SetGateway(System.String)">
             <summary>
             Sets the gateway name.
             </summary>
