@@ -17,7 +17,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Parbad\Parbad.csproj" />
+    <ProjectReference Include="..\..\..\Parbad\Parbad.csproj" />
   </ItemGroup>
 
 </Project>
