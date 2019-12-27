@@ -1,4 +1,4 @@
-﻿// Copyright (c) Parbad. All rights reserved.
+// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
 using System;
@@ -8,32 +8,32 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Parbad.Abstraction;
-using Parbad.Gateway.ZarinPal.Internal;
 using Parbad.GatewayBuilders;
 using Parbad.Internal;
 using Parbad.Net;
 using Parbad.Options;
+using Parbad.Properties;
 
-namespace Parbad.Gateway.ZarinPal
+namespace Parbad.Gateway.IranKish
 {
     [Gateway(Name)]
-    public class ZarinPalGateway : GatewayBase<ZarinPalGatewayAccount>
+    public class IranKishGateway : GatewayBase<IranKishGatewayAccount>
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
-        private readonly IOptions<MessagesOptions> _messagesOptions;
+        private readonly IOptions<MessagesOptions> _messageOptions;
 
-        public const string Name = "ZarinPal";
+        public const string Name = "IranKish";
 
-        public ZarinPalGateway(
-            IGatewayAccountProvider<ZarinPalGatewayAccount> accountProvider,
+        public IranKishGateway(
             IHttpContextAccessor httpContextAccessor,
             IHttpClientFactory httpClientFactory,
-            IOptions<MessagesOptions> messagesOptions) : base(accountProvider)
+            IGatewayAccountProvider<IranKishGatewayAccount> accountProvider,
+            IOptions<MessagesOptions> messageOptions) : base(accountProvider)
         {
             _httpContextAccessor = httpContextAccessor;
             _httpClient = httpClientFactory.CreateClient(this);
-            _messagesOptions = messagesOptions;
+            _messageOptions = messageOptions;
         }
 
         /// <inheritdoc />
@@ -43,15 +43,18 @@ namespace Parbad.Gateway.ZarinPal
 
             var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
 
-            var data = ZarinPalHelper.CreateRequestData(account, invoice);
+            var data = IranKishHelper.CreateRequestData(invoice, account);
+
+            _httpClient.DefaultRequestHeaders.Clear();
+            _httpClient.DefaultRequestHeaders.Add(IranKishHelper.HttpRequestHeader.Key, IranKishHelper.HttpRequestHeader.Value);
 
             var responseMessage = await _httpClient
-                .PostXmlAsync(ZarinPalHelper.GetWebServiceUrl(account.IsSandbox), data, cancellationToken)
+                .PostXmlAsync(IranKishHelper.TokenWebServiceUrl, data, cancellationToken)
                 .ConfigureAwaitFalse();
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
-            return ZarinPalHelper.CreateRequestResult(response, _httpContextAccessor, account);
+            return IranKishHelper.CreateRequestResult(response, invoice, account, _httpContextAccessor, _messageOptions.Value);
         }
 
         /// <inheritdoc />
@@ -59,30 +62,37 @@ namespace Parbad.Gateway.ZarinPal
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
-            var callbackResult = ZarinPalHelper.CreateCallbackResult(_httpContextAccessor.HttpContext.Request);
+            var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
+
+            var callbackResult = IranKishHelper.CreateCallbackResult(
+                context,
+                account,
+                _httpContextAccessor.HttpContext.Request,
+                _messageOptions.Value);
 
             if (!callbackResult.IsSucceed)
             {
                 return callbackResult.Result;
             }
 
-            var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
+            var data = IranKishHelper.CreateVerifyData(callbackResult, account);
 
-            var data = ZarinPalHelper.CreateVerifyData(account, callbackResult, context.Payment.Amount);
+            _httpClient.DefaultRequestHeaders.Clear();
+            _httpClient.DefaultRequestHeaders.Add(IranKishHelper.HttpVerifyHeader.Key, IranKishHelper.HttpVerifyHeader.Value);
 
             var responseMessage = await _httpClient
-                .PostXmlAsync(ZarinPalHelper.GetWebServiceUrl(account.IsSandbox), data, cancellationToken)
+                .PostXmlAsync(IranKishHelper.VerifyWebServiceUrl, data, cancellationToken)
                 .ConfigureAwaitFalse();
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
-            return ZarinPalHelper.CreateVerifyResult(response, _messagesOptions.Value);
+            return IranKishHelper.CreateVerifyResult(response, context, callbackResult, _messageOptions.Value);
         }
 
         /// <inheritdoc />
         public override Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default)
         {
-            return PaymentRefundResult.Failed("The Refund operation is not supported by this gateway.").ToInterfaceAsync();
+            return PaymentRefundResult.Failed(Resources.RefundNotSupports).ToInterfaceAsync();
         }
     }
 }

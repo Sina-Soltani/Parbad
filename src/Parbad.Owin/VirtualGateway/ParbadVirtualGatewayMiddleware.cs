@@ -5,7 +5,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Owin;
-using Parbad.GatewayProviders.ParbadVirtual.MiddlewareInvoker;
+using Parbad.Gateway.ParbadVirtual.MiddlewareInvoker;
 
 namespace Parbad.Owin.VirtualGateway
 {

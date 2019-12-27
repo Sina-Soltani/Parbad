@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
+using Parbad.Gateway.Mellat;
 using Parbad.GatewayBuilders;
-using Parbad.GatewayProviders.Mellat;
 
 namespace Parbad.Sample.WebForm.Services
 {

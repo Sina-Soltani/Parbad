@@ -5,7 +5,7 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Owin;
-using Parbad.GatewayProviders.ParbadVirtual;
+using Parbad.Gateway.ParbadVirtual;
 using Parbad.Owin.VirtualGateway;
 
 namespace Parbad.Builder

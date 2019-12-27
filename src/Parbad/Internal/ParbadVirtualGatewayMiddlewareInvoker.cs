@@ -5,8 +5,8 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using Parbad.GatewayProviders.ParbadVirtual;
-using Parbad.GatewayProviders.ParbadVirtual.MiddlewareInvoker;
+using Parbad.Gateway.ParbadVirtual;
+using Parbad.Gateway.ParbadVirtual.MiddlewareInvoker;
 
 namespace Parbad.Internal
 {

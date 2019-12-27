@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Parbad.AspNetCore.VirtualGateway;
-using Parbad.GatewayProviders.ParbadVirtual;
+using Parbad.Gateway.ParbadVirtual;
 
 namespace Microsoft.AspNetCore.Builder
 {

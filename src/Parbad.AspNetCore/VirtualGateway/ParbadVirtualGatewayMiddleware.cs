@@ -3,7 +3,7 @@
 
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Parbad.GatewayProviders.ParbadVirtual.MiddlewareInvoker;
+using Parbad.Gateway.ParbadVirtual.MiddlewareInvoker;
 
 namespace Parbad.AspNetCore.VirtualGateway
 {
