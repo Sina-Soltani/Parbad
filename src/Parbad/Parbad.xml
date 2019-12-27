@@ -4,18 +4,6 @@
         <name>Parbad</name>
     </assembly>
     <members>
-        <member name="T:Parbad.Abstraction.Gateway`1">
-            <inheritdoc />
-        </member>
-        <member name="M:Parbad.Abstraction.Gateway`1.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
-            <inheritdoc />
-        </member>
-        <member name="M:Parbad.Abstraction.Gateway`1.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
-            <inheritdoc />
-        </member>
-        <member name="M:Parbad.Abstraction.Gateway`1.RefundAsync(Parbad.InvoiceContext,Parbad.Money,System.Threading.CancellationToken)">
-            <inheritdoc />
-        </member>
         <member name="T:Parbad.Abstraction.GatewayAccount">
             <summary>
             Describes a gateway account.
@@ -26,6 +14,18 @@
             Gets or sets the name of this account. The default value is "Default".
             <para>Note: Make sure that accounts have different names. Otherwise a <see cref="T:Parbad.Exceptions.DuplicateAccountException"/> will throw.</para>
             </summary>
+        </member>
+        <member name="T:Parbad.Abstraction.GatewayBase`1">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Abstraction.GatewayBase`1.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Abstraction.GatewayBase`1.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Abstraction.GatewayBase`1.RefundAsync(Parbad.InvoiceContext,Parbad.Money,System.Threading.CancellationToken)">
+            <inheritdoc />
         </member>
         <member name="T:Parbad.Abstraction.GatewayDescriptor">
             <summary>

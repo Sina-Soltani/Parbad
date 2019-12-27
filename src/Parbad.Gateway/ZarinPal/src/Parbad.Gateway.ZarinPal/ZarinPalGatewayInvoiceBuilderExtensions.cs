@@ -17,7 +17,7 @@ namespace Parbad
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            return builder.UseGateway(ZarinPalGateway.Name);
+            return builder.SetGateway(ZarinPalGateway.Name);
         }
     }
 }

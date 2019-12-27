@@ -80,7 +80,7 @@ namespace Parbad.InvoiceBuilder
         /// <param name="gatewayName"></param>
         /// <exception cref="GatewayNotFoundException"></exception>
         /// <exception cref="ArgumentNullException"></exception>
-        IInvoiceBuilder UseGateway(string gatewayName);
+        IInvoiceBuilder SetGateway(string gatewayName);
 
         /// <summary>
         /// Adds additional data to the invoice.

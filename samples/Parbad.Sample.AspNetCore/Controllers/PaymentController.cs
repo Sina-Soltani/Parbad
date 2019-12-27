@@ -31,7 +31,7 @@ namespace Parbad.Sample.AspNetCore.Controllers
                     .UseAutoIncrementTrackingNumber()
                     .SetAmount(viewModel.Amount)
                     .SetCallbackUrl(verifyUrl)
-                    .UseGateway(viewModel.SelectedGateway.ToString());
+                    .SetGateway(viewModel.SelectedGateway.ToString());
             });
 
             if (result.IsSucceed)

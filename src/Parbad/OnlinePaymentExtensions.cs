@@ -87,7 +87,7 @@ namespace Parbad
                     .SetTrackingNumber(trackingNumber)
                     .SetAmount(amount)
                     .SetCallbackUrl(callbackUrl)
-                    .UseGateway(gatewayName);
+                    .SetGateway(gatewayName);
             }, cancellationToken);
         }
 

@@ -27,7 +27,7 @@ namespace Parbad.Sample.WebForm
                     .UseAutoIncrementTrackingNumber()
                     .SetAmount(long.Parse(TxtAmount.Text))
                     .SetCallbackUrl(verifyUrl)
-                    .UseGateway(gateway.ToString());
+                    .SetGateway(gateway.ToString());
             });
 
             if (result.IsSucceed)

@@ -70,7 +70,7 @@ namespace Parbad.Internal
         }
 
         /// <inheritdoc />
-        public IInvoiceBuilder UseGateway(string gatewayName)
+        public IInvoiceBuilder SetGateway(string gatewayName)
         {
             GatewayName = gatewayName ?? throw new ArgumentNullException(nameof(gatewayName));
 
