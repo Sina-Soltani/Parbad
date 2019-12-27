@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Parbad.Builder;
 
 namespace Parbad.Sample.AspNetCore
@@ -18,7 +18,7 @@ namespace Parbad.Sample.AspNetCore
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            services.AddControllersWithViews();
 
             services.AddParbad()
                 .ConfigureGateways(gateways =>
@@ -43,7 +43,7 @@ namespace Parbad.Sample.AspNetCore
                 .ConfigureStorage(builder => builder.UseMemoryCache());
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -54,14 +54,11 @@ namespace Parbad.Sample.AspNetCore
                 app.UseExceptionHandler("/Home/Error");
             }
 
+            app.UseRouting();
+
             app.UseStaticFiles();
 
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
-            });
+            app.UseEndpoints(builder => builder.MapDefaultControllerRoute());
 
             app.UseParbadVirtualGatewayIfDevelopment();
         }
