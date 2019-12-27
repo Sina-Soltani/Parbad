@@ -4,6 +4,7 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using Parbad.Gateway.Saman;
+using Parbad.Gateway.Saman.Internal;
 using Parbad.GatewayBuilders;
 
 namespace Parbad.Builder

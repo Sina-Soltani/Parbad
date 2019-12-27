@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Parbad.Abstraction;
+using Parbad.Gateway.Saman.Internal;
 using Parbad.GatewayBuilders;
 using Parbad.Internal;
 using Parbad.Net;

@@ -4,6 +4,7 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using Parbad.Gateway.IranKish;
+using Parbad.Gateway.IranKish.Internal;
 using Parbad.GatewayBuilders;
 
 namespace Parbad.Builder

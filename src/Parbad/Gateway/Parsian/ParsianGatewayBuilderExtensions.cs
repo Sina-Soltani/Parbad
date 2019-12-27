@@ -4,6 +4,7 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using Parbad.Gateway.Parsian;
+using Parbad.Gateway.Parsian.Internal;
 using Parbad.GatewayBuilders;
 
 namespace Parbad.Builder

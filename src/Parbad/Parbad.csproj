@@ -56,4 +56,8 @@ House Cleaning. Reduce Code Duplication. Code clean up.</PackageReleaseNotes>
     </EmbeddedResource>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Gateway\Parsian\Models\" />
+  </ItemGroup>
+
 </Project>

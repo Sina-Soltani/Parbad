@@ -594,12 +594,12 @@
         <member name="M:Parbad.Gateway.AsanPardakht.AsanPardakhtGateway.RefundAsync(Parbad.InvoiceContext,Parbad.Money,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="P:Parbad.Gateway.IranKish.IranKishCallbackResult.InvoiceNumber">
+        <member name="P:Parbad.Gateway.IranKish.Internal.IranKishCallbackResult.InvoiceNumber">
             <summary>
             Equals to TrackingNumber in Parbad system.
             </summary>
         </member>
-        <member name="P:Parbad.Gateway.IranKish.IranKishCallbackResult.ReferenceId">
+        <member name="P:Parbad.Gateway.IranKish.Internal.IranKishCallbackResult.ReferenceId">
             <summary>
             Equals to TransactionCode in Parbad system.
             </summary>
@@ -636,6 +636,289 @@
             <summary>
             The requests will be sent to the test terminal of Mellat Gateway.
             </summary>
+        </member>
+        <member name="T:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code0">
+            <summary>
+              Looks up a localized string similar to تراکنش موفق.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1000">
+            <summary>
+              Looks up a localized string similar to ترتیب پارامترهای ارسالی اشتباه می باشد، لطفا مسئول فنی پذيرنده با بانک تماس حاصل فرمايند.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1001">
+            <summary>
+              Looks up a localized string similar to لطفا مسئول فنی پذيرنده با بانک تماس حاصل فرمايند،پارامترهای پرداخت اشتباه می باشد.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1002">
+            <summary>
+              Looks up a localized string similar to خطا در سیستم- تراکنش ناموفق.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1003">
+            <summary>
+              Looks up a localized string similar to IP پذيرنده اشتباه است.لطفا مسئول فنی پذيرنده با بانک تماس حاصل فرمايند.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1004">
+            <summary>
+              Looks up a localized string similar to لطفا مسئول فنی پذيرنده با بانک تماس حاصل فرمايند،شماره پذيرنده اشتباه است.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1005">
+            <summary>
+              Looks up a localized string similar to خطای دسترسی:لطفا بعدا تلاش فرمايید.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1006">
+            <summary>
+              Looks up a localized string similar to خطا در سیستم.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1011">
+            <summary>
+              Looks up a localized string similar to درخواست تکراری- شماره سفارش تکراری می باشد.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1012">
+            <summary>
+              Looks up a localized string similar to اطلاعات پذيرنده صحیح نیست،يکی از موارد تاريخ،زمان يا کلید تراکنش اشتباه است.لطفا مسئول فنی پذيرنده با بانک تماس حاصل فرمايند.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1015">
+            <summary>
+              Looks up a localized string similar to پاسخ خطای نامشخص از سمت مرکز.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1017">
+            <summary>
+              Looks up a localized string similar to مبلغ درخواستی شما جهت پرداخت از حد مجاز تعريف شده برای اين پذيرنده بیشتر است.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1018">
+            <summary>
+              Looks up a localized string similar to اشکال در تاريخ و زمان سیستم. لطفا تاريخ و زمان سرور خود را با بانک هماهنگ نمايید.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1019">
+            <summary>
+              Looks up a localized string similar to امکان پرداخت از طريق سیستم شتاب برای اين پذيرنده امکان پذير نیست.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1020">
+            <summary>
+              Looks up a localized string similar to پذيرنده غیرفعال شده است.لطفا جهت فعال سازی با بانک تماس بگیريد.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1023">
+            <summary>
+              Looks up a localized string similar to آدرس بازگشت پذيرنده نامعتبر است.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1024">
+            <summary>
+              Looks up a localized string similar to مهر زمانی پذيرنده نامعتبر است.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1025">
+            <summary>
+              Looks up a localized string similar to امضا تراکنش نامعتبر است.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1026">
+            <summary>
+              Looks up a localized string similar to شماره سفارش تراکنش نامعتبر است.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1027">
+            <summary>
+              Looks up a localized string similar to شماره پذيرنده نامعتبر است.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1028">
+            <summary>
+              Looks up a localized string similar to شماره ترمینال پذيرنده نامعتبر است.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1029">
+             <summary>
+               Looks up a localized string similar to آدرس IP پرداخت در محدوده آدرس های معتبر اعلام شده توسط پذيرنده
+            نیست .لطفا مسئول فنی پذيرنده با بانک تماس حاصل فرمايند.
+             </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1030">
+             <summary>
+               Looks up a localized string similar to آدرس Domain پرداخت در محدوده آدرس های معتبر اعلام شده توسط
+            پذيرنده نیست .لطفا مسئول فنی پذيرنده با بانک تماس حاصل فرمايند.
+             </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1031">
+             <summary>
+               Looks up a localized string similar to مهلت زمانی شما جهت پرداخت به پايان رسیده است.لطفا مجددا سعی
+            بفرمايید.
+             </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1032">
+             <summary>
+               Looks up a localized string similar to پرداخت با اين کارت . برای پذيرنده مورد نظر شما امکان پذير نیست.لطفا از
+            کارتهای مجاز که توسط پذيرنده معرفی شده است . استفاده نمايید.
+             </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1033">
+             <summary>
+               Looks up a localized string similar to به علت مشکل در سايت پذيرنده. پرداخت برای اين پذيرنده غیرفعال شده
+            است.لطفا مسوول فنی سايت پذيرنده با بانک تماس حاصل فرمايند.
+             </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1036">
+            <summary>
+              Looks up a localized string similar to اطلاعات اضافی ارسال نشده يا دارای اشکال است.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1037">
+            <summary>
+              Looks up a localized string similar to شماره پذيرنده يا شماره ترمینال پذيرنده صحیح نمیباشد.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1053">
+             <summary>
+               Looks up a localized string similar to خطا: درخواست معتبر، از سمت پذيرنده صورت نگرفته است لطفا اطلاعات
+            پذيرنده خود را چک کنید.
+             </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1055">
+            <summary>
+              Looks up a localized string similar to مقدار غیرمجاز در ورود اطلاعات.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1056">
+            <summary>
+              Looks up a localized string similar to سیستم موقتا قطع میباشد.لطفا بعدا تلاش فرمايید..
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1058">
+             <summary>
+               Looks up a localized string similar to سرويس پرداخت اينترنتی خارج از سرويس می باشد.لطفا بعدا سعی
+            بفرمايید..
+             </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1061">
+             <summary>
+               Looks up a localized string similar to اشکال در تولید کد يکتا. لطفا مرورگر خود را بسته و با اجرای مجدد مرورگر
+            « عملیات پرداخت را انجام دهید )احتمال استفاده از دکمه Back »
+            مرورگر(.
+             </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1064">
+            <summary>
+              Looks up a localized string similar to لطفا مجددا سعی بفرمايید.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1065">
+            <summary>
+              Looks up a localized string similar to ارتباط ناموفق .لطفا چند لحظه ديگر مجددا سعی کنید.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1066">
+            <summary>
+              Looks up a localized string similar to سیستم سرويس دهی پرداخت موقتا غیر فعال شده است.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1068">
+            <summary>
+              Looks up a localized string similar to با عرض پوزش به علت بروزرسانی . سیستم موقتا قطع میباشد..
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1072">
+            <summary>
+              Looks up a localized string similar to خطا در پردازش پارامترهای اختیاری پذيرنده.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1101">
+            <summary>
+              Looks up a localized string similar to مبلغ تراکنش نامعتبر است.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1103">
+            <summary>
+              Looks up a localized string similar to توکن ارسالی نامعتبر است.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code1104">
+            <summary>
+              Looks up a localized string similar to اطلاعات تسهیم صحیح نیست.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code23">
+            <summary>
+              Looks up a localized string similar to Inactive Merchant. پذيرنده کارت فعال نیست لطفا با بخش امور پذيرندگان، تماس حاصل فرمائید.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code3">
+            <summary>
+              Looks up a localized string similar to Invalid Merchant. پذيرنده کارت فعال نیست لطفا با بخش امور پذيرندگان، تماس حاصل فرمائید.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code58">
+            <summary>
+              Looks up a localized string similar to انجام تراکنش مربوطه توسط پايانه ی انجام دهنده مجاز نمی باشد..
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes.Code61">
+            <summary>
+              Looks up a localized string similar to مبلغ تراکنش از حد مجاز بالاتر است.
+            </summary>
+        </member>
+        <member name="T:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliVerifyResponseCodes">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliVerifyResponseCodes.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliVerifyResponseCodes.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliVerifyResponseCodes.Code0">
+            <summary>
+              Looks up a localized string similar to نتیجه تراکنش موفق است.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliVerifyResponseCodes.Code101">
+             <summary>
+               Looks up a localized string similar to مهلت ارسال تراکنش به پايان رسیده
+            است.
+             </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliVerifyResponseCodes.CodeMinus1">
+             <summary>
+               Looks up a localized string similar to پارامترهای ارسالی صحیح نیست و يا
+            تراکنش در سیستم وجود ندارد..
+             </summary>
         </member>
         <member name="T:Parbad.Gateway.Melli.MelliGateway">
             <summary>
@@ -676,289 +959,6 @@
             </summary>
             <param name="mainException">The main Exception object.</param>
         </member>
-        <member name="T:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes">
-            <summary>
-              A strongly-typed resource class, for looking up localized strings, etc.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.ResourceManager">
-            <summary>
-              Returns the cached ResourceManager instance used by this class.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Culture">
-            <summary>
-              Overrides the current thread's CurrentUICulture property for all
-              resource lookups using this strongly typed resource class.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code0">
-            <summary>
-              Looks up a localized string similar to تراکنش موفق.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1000">
-            <summary>
-              Looks up a localized string similar to ترتیب پارامترهای ارسالی اشتباه می باشد، لطفا مسئول فنی پذيرنده با بانک تماس حاصل فرمايند.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1001">
-            <summary>
-              Looks up a localized string similar to لطفا مسئول فنی پذيرنده با بانک تماس حاصل فرمايند،پارامترهای پرداخت اشتباه می باشد.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1002">
-            <summary>
-              Looks up a localized string similar to خطا در سیستم- تراکنش ناموفق.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1003">
-            <summary>
-              Looks up a localized string similar to IP پذيرنده اشتباه است.لطفا مسئول فنی پذيرنده با بانک تماس حاصل فرمايند.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1004">
-            <summary>
-              Looks up a localized string similar to لطفا مسئول فنی پذيرنده با بانک تماس حاصل فرمايند،شماره پذيرنده اشتباه است.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1005">
-            <summary>
-              Looks up a localized string similar to خطای دسترسی:لطفا بعدا تلاش فرمايید.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1006">
-            <summary>
-              Looks up a localized string similar to خطا در سیستم.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1011">
-            <summary>
-              Looks up a localized string similar to درخواست تکراری- شماره سفارش تکراری می باشد.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1012">
-            <summary>
-              Looks up a localized string similar to اطلاعات پذيرنده صحیح نیست،يکی از موارد تاريخ،زمان يا کلید تراکنش اشتباه است.لطفا مسئول فنی پذيرنده با بانک تماس حاصل فرمايند.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1015">
-            <summary>
-              Looks up a localized string similar to پاسخ خطای نامشخص از سمت مرکز.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1017">
-            <summary>
-              Looks up a localized string similar to مبلغ درخواستی شما جهت پرداخت از حد مجاز تعريف شده برای اين پذيرنده بیشتر است.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1018">
-            <summary>
-              Looks up a localized string similar to اشکال در تاريخ و زمان سیستم. لطفا تاريخ و زمان سرور خود را با بانک هماهنگ نمايید.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1019">
-            <summary>
-              Looks up a localized string similar to امکان پرداخت از طريق سیستم شتاب برای اين پذيرنده امکان پذير نیست.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1020">
-            <summary>
-              Looks up a localized string similar to پذيرنده غیرفعال شده است.لطفا جهت فعال سازی با بانک تماس بگیريد.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1023">
-            <summary>
-              Looks up a localized string similar to آدرس بازگشت پذيرنده نامعتبر است.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1024">
-            <summary>
-              Looks up a localized string similar to مهر زمانی پذيرنده نامعتبر است.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1025">
-            <summary>
-              Looks up a localized string similar to امضا تراکنش نامعتبر است.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1026">
-            <summary>
-              Looks up a localized string similar to شماره سفارش تراکنش نامعتبر است.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1027">
-            <summary>
-              Looks up a localized string similar to شماره پذيرنده نامعتبر است.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1028">
-            <summary>
-              Looks up a localized string similar to شماره ترمینال پذيرنده نامعتبر است.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1029">
-             <summary>
-               Looks up a localized string similar to آدرس IP پرداخت در محدوده آدرس های معتبر اعلام شده توسط پذيرنده
-            نیست .لطفا مسئول فنی پذيرنده با بانک تماس حاصل فرمايند.
-             </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1030">
-             <summary>
-               Looks up a localized string similar to آدرس Domain پرداخت در محدوده آدرس های معتبر اعلام شده توسط
-            پذيرنده نیست .لطفا مسئول فنی پذيرنده با بانک تماس حاصل فرمايند.
-             </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1031">
-             <summary>
-               Looks up a localized string similar to مهلت زمانی شما جهت پرداخت به پايان رسیده است.لطفا مجددا سعی
-            بفرمايید.
-             </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1032">
-             <summary>
-               Looks up a localized string similar to پرداخت با اين کارت . برای پذيرنده مورد نظر شما امکان پذير نیست.لطفا از
-            کارتهای مجاز که توسط پذيرنده معرفی شده است . استفاده نمايید.
-             </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1033">
-             <summary>
-               Looks up a localized string similar to به علت مشکل در سايت پذيرنده. پرداخت برای اين پذيرنده غیرفعال شده
-            است.لطفا مسوول فنی سايت پذيرنده با بانک تماس حاصل فرمايند.
-             </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1036">
-            <summary>
-              Looks up a localized string similar to اطلاعات اضافی ارسال نشده يا دارای اشکال است.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1037">
-            <summary>
-              Looks up a localized string similar to شماره پذيرنده يا شماره ترمینال پذيرنده صحیح نمیباشد.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1053">
-             <summary>
-               Looks up a localized string similar to خطا: درخواست معتبر، از سمت پذيرنده صورت نگرفته است لطفا اطلاعات
-            پذيرنده خود را چک کنید.
-             </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1055">
-            <summary>
-              Looks up a localized string similar to مقدار غیرمجاز در ورود اطلاعات.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1056">
-            <summary>
-              Looks up a localized string similar to سیستم موقتا قطع میباشد.لطفا بعدا تلاش فرمايید..
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1058">
-             <summary>
-               Looks up a localized string similar to سرويس پرداخت اينترنتی خارج از سرويس می باشد.لطفا بعدا سعی
-            بفرمايید..
-             </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1061">
-             <summary>
-               Looks up a localized string similar to اشکال در تولید کد يکتا. لطفا مرورگر خود را بسته و با اجرای مجدد مرورگر
-            « عملیات پرداخت را انجام دهید )احتمال استفاده از دکمه Back »
-            مرورگر(.
-             </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1064">
-            <summary>
-              Looks up a localized string similar to لطفا مجددا سعی بفرمايید.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1065">
-            <summary>
-              Looks up a localized string similar to ارتباط ناموفق .لطفا چند لحظه ديگر مجددا سعی کنید.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1066">
-            <summary>
-              Looks up a localized string similar to سیستم سرويس دهی پرداخت موقتا غیر فعال شده است.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1068">
-            <summary>
-              Looks up a localized string similar to با عرض پوزش به علت بروزرسانی . سیستم موقتا قطع میباشد..
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1072">
-            <summary>
-              Looks up a localized string similar to خطا در پردازش پارامترهای اختیاری پذيرنده.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1101">
-            <summary>
-              Looks up a localized string similar to مبلغ تراکنش نامعتبر است.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1103">
-            <summary>
-              Looks up a localized string similar to توکن ارسالی نامعتبر است.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code1104">
-            <summary>
-              Looks up a localized string similar to اطلاعات تسهیم صحیح نیست.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code23">
-            <summary>
-              Looks up a localized string similar to Inactive Merchant. پذيرنده کارت فعال نیست لطفا با بخش امور پذيرندگان، تماس حاصل فرمائید.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code3">
-            <summary>
-              Looks up a localized string similar to Invalid Merchant. پذيرنده کارت فعال نیست لطفا با بخش امور پذيرندگان، تماس حاصل فرمائید.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code58">
-            <summary>
-              Looks up a localized string similar to انجام تراکنش مربوطه توسط پايانه ی انجام دهنده مجاز نمی باشد..
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliRequestResponseCodes.Code61">
-            <summary>
-              Looks up a localized string similar to مبلغ تراکنش از حد مجاز بالاتر است.
-            </summary>
-        </member>
-        <member name="T:Parbad.Gateway.Melli.ResultTranslator.MelliVerifyResponseCodes">
-            <summary>
-              A strongly-typed resource class, for looking up localized strings, etc.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliVerifyResponseCodes.ResourceManager">
-            <summary>
-              Returns the cached ResourceManager instance used by this class.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliVerifyResponseCodes.Culture">
-            <summary>
-              Overrides the current thread's CurrentUICulture property for all
-              resource lookups using this strongly typed resource class.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliVerifyResponseCodes.Code0">
-            <summary>
-              Looks up a localized string similar to نتیجه تراکنش موفق است.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliVerifyResponseCodes.Code101">
-             <summary>
-               Looks up a localized string similar to مهلت ارسال تراکنش به پايان رسیده
-            است.
-             </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.ResultTranslator.MelliVerifyResponseCodes.CodeMinus1">
-             <summary>
-               Looks up a localized string similar to پارامترهای ارسالی صحیح نیست و يا
-            تراکنش در سیستم وجود ندارد..
-             </summary>
-        </member>
         <member name="M:Parbad.Gateway.ParbadVirtual.ParbadVirtualGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
@@ -973,7 +973,7 @@
             Path of Virtual Gateway. It would be like: /MyParbadGateway
             </summary>
         </member>
-        <member name="P:Parbad.Gateway.Parsian.Models.ParsianCallbackResult.RRN">
+        <member name="P:Parbad.Gateway.Parsian.Internal.Models.ParsianCallbackResult.RRN">
             <summary>
             Equals to TransactionCode in Parbad system.
             </summary>
@@ -987,7 +987,7 @@
         <member name="M:Parbad.Gateway.Parsian.ParsianGateway.RefundAsync(Parbad.InvoiceContext,Parbad.Money,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="P:Parbad.Gateway.Pasargad.Models.PasargadCallbackResult.InvoiceNumber">
+        <member name="P:Parbad.Gateway.Pasargad.Internal.Models.PasargadCallbackResult.InvoiceNumber">
             <summary>
             Equals to ReferenceID in Parbad system.
             </summary>
