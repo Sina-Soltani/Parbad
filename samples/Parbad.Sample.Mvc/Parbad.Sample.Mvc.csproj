@@ -316,7 +316,7 @@
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Payment\Verify.cshtml" />
-    <Content Include="Views\Payment\PayRequest.cshtml" />
+    <Content Include="Views\Payment\Pay.cshtml" />
     <Content Include="Views\Payment\Refund.cshtml" />
     <Content Include="Views\Payment\RefundResult.cshtml" />
     <Content Include="Views\Payment\PayRequestError.cshtml" />
@@ -329,6 +329,10 @@
     <Content Include="Scripts\jquery-3.3.1.min.map" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Parbad.Gateway\ZarinPal\src\Parbad.Gateway.ZarinPal.csproj">
+      <Project>{0f2cd6c7-3d9a-4d9d-9132-afbcbda3f47c}</Project>
+      <Name>Parbad.Gateway.ZarinPal</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Parbad.Mvc\Parbad.Mvc.csproj">
       <Project>{19fbd363-c6f1-4dfc-a311-da8485b6f8a4}</Project>
       <Name>Parbad.Mvc</Name>

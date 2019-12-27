@@ -355,6 +355,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Parbad.Gateway\ZarinPal\src\Parbad.Gateway.ZarinPal.csproj">
+      <Project>{0f2cd6c7-3d9a-4d9d-9132-afbcbda3f47c}</Project>
+      <Name>Parbad.Gateway.ZarinPal</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Parbad.Owin\Parbad.Owin.csproj">
       <Project>{a1815d72-31a8-45bf-95b5-2a1f1008e0f8}</Project>
       <Name>Parbad.Owin</Name>

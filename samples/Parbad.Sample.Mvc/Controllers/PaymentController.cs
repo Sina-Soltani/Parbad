@@ -15,13 +15,13 @@ namespace Parbad.Sample.Mvc.Controllers
         }
 
         [HttpGet]
-        public ActionResult PayRequest()
+        public ActionResult Pay()
         {
             return View();
         }
 
         [HttpPost]
-        public async Task<ActionResult> PayRequest(RequestViewModel payViewModel)
+        public async Task<ActionResult> Pay(RequestViewModel payViewModel)
         {
             if (!ModelState.IsValid)
             {
