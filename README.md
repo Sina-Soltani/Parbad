@@ -12,7 +12,7 @@ Parbad is a free and open-source integrated online payment library which helps d
 * Free and open-source
 * Easy installation using Nuget
 * No need to add any web services or have any online payment systems knowledges
-* Supports most known online payment providers (Banks) such as **Mellat**, **Melli**, **Saman**, **Pasargad**, **Parsian**, **Iran Kish**, **Asan Pardakht**
+* Supports most known online payment providers (Banks) such as **Mellat**, **Melli**, **Saman**, **Pasargad**, **Parsian**, **Iran Kish**, **Asan Pardakht**, **ZarinPal**
 * Virtual gateway for testing and developing your application.
 * Using Proxy
 * Created with modern and standard technologies
