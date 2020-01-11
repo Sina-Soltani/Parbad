@@ -21,7 +21,7 @@ Parbad is a free and open-source integrated online payment library which helps d
 # How it works?
 ![image](https://raw.githubusercontent.com/Sina-Soltani/Parbad/master/images/How-it-works.png)
 
-# Topics
+# Tutorials
 
 * [Installation](https://github.com/Sina-Soltani/Parbad/wiki/Installation)
 * [Configuration](https://github.com/Sina-Soltani/Parbad/wiki/Configuration)
