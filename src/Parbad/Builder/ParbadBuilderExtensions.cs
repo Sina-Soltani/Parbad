@@ -22,6 +22,8 @@ namespace Microsoft.Extensions.DependencyInjection
 
             builder.Services.AddOptions();
 
+            builder.Services.AddHttpClient();
+
             builder.Services.TryAddTransient<IOnlinePayment, DefaultOnlinePayment>();
             builder.Services.TryAddSingleton<IOnlinePaymentAccessor, OnlinePaymentAccessor>();
 
