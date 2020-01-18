@@ -60,7 +60,7 @@ namespace Parbad.Sample.AspNetCore
 
             app.UseEndpoints(builder => builder.MapDefaultControllerRoute());
 
-            app.UseParbadVirtualGatewayIfDevelopment();
+            app.UseParbadVirtualGatewayWhenDeveloping();
         }
     }
 }
