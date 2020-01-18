@@ -13,7 +13,7 @@ namespace Parbad
         /// The invoice will be sent to Pay.ir gateway.
         /// </summary>
         /// <param name="builder"></param>
-        public static IInvoiceBuilder UseZarinPal(this IInvoiceBuilder builder)
+        public static IInvoiceBuilder UsePayIr(this IInvoiceBuilder builder)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
