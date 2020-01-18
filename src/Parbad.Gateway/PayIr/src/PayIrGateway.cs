@@ -8,6 +8,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using Parbad.Abstraction;
 using Parbad.Gateway.PayIr.Internal;
 using Parbad.GatewayBuilders;
@@ -24,6 +26,11 @@ namespace Parbad.Gateway.PayIr
         private readonly IOptions<MessagesOptions> _messagesOptions;
 
         public const string Name = "PayIr";
+
+        private JsonSerializerSettings DefaultSerializerSettings => new JsonSerializerSettings
+        {
+            ContractResolver = new CamelCasePropertyNamesContractResolver()
+        };
 
         public PayIrGateway(
             IGatewayAccountProvider<PayIrGatewayAccount> accountProvider,
@@ -50,7 +57,7 @@ namespace Parbad.Gateway.PayIr
             var data = PayIrHelper.CreateRequestData(account, invoice);
 
             var responseMessage = await _httpClient
-                .PostAsync(PayIrHelper.WebServiceRequestUrl, new StringContent(data, Encoding.UTF8, "application/json"), cancellationToken)
+                .PostJsonAsync(PayIrHelper.WebServiceRequestUrl, data, DefaultSerializerSettings, cancellationToken)
                 .ConfigureAwaitFalse();
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
@@ -75,7 +82,7 @@ namespace Parbad.Gateway.PayIr
             var data = PayIrHelper.CreateVerifyData(account, callbackResult);
 
             var responseMessage = await _httpClient
-                .PostAsync(PayIrHelper.WebServiceVerifyUrl, new StringContent(data, Encoding.UTF8, "application/json"), cancellationToken)
+                .PostJsonAsync(PayIrHelper.WebServiceVerifyUrl, data, DefaultSerializerSettings, cancellationToken)
                 .ConfigureAwaitFalse();
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
