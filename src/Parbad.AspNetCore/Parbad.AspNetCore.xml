@@ -29,6 +29,13 @@
             </summary>
             <param name="builder"></param>
         </member>
+        <member name="M:Microsoft.AspNetCore.Builder.ParbadVirtualGatewayMiddlewareExtensions.UseParbadVirtualGatewayWhenDeveloping(Microsoft.AspNetCore.Builder.IApplicationBuilder)">
+            <summary>
+            Adds the Parbad Virtual Gateway middleware to the pipeline if the current
+            hosting environment name is <see cref="F:Microsoft.AspNetCore.Hosting.EnvironmentName.Development"/>.
+            </summary>
+            <param name="builder"></param>
+        </member>
         <member name="M:Microsoft.AspNetCore.Builder.ParbadVirtualGatewayMiddlewareExtensions.UseParbadVirtualGatewayIfDevelopment(Microsoft.AspNetCore.Builder.IApplicationBuilder)">
             <summary>
             Adds the Parbad Virtual Gateway middleware to the pipeline if the current

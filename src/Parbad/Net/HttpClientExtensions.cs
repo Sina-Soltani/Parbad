@@ -29,6 +29,15 @@ namespace Parbad.Net
             return httpClient.PostAsync(requestUri, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken);
         }
 
+        public static Task<HttpResponseMessage> PostJsonAsync(this HttpClient httpClient, string requestUri, object data, JsonSerializerSettings serializerSettings, CancellationToken cancellationToken = default)
+        {
+            if (httpClient == null) throw new ArgumentNullException(nameof(httpClient));
+
+            var json = JsonConvert.SerializeObject(data, serializerSettings);
+
+            return httpClient.PostAsync(requestUri, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken);
+        }
+
         public static Task<HttpResponseMessage> PostFormAsync(this HttpClient httpClient, string requestUri, IEnumerable<KeyValuePair<string, string>> data, CancellationToken cancellationToken = default)
         {
             if (httpClient == null) throw new ArgumentNullException(nameof(httpClient));
