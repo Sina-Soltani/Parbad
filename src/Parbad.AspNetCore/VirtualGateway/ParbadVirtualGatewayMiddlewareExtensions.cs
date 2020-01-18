@@ -18,6 +18,21 @@ namespace Microsoft.AspNetCore.Builder
         /// hosting environment name is <see cref="EnvironmentName.Development"/>.
         /// </summary>
         /// <param name="builder"></param>
+        public static IApplicationBuilder UseParbadVirtualGatewayWhenDeveloping(this IApplicationBuilder builder)
+        {
+            if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+            var hostingEnvironment = builder.ApplicationServices.GetRequiredService<IHostingEnvironment>();
+
+            return builder.UseParbadVirtualGatewayWhen(context => hostingEnvironment.IsDevelopment());
+        }
+
+        /// <summary>
+        /// Adds the Parbad Virtual Gateway middleware to the pipeline if the current
+        /// hosting environment name is <see cref="EnvironmentName.Development"/>.
+        /// </summary>
+        /// <param name="builder"></param>
+        [Obsolete("This method is obsolete and will be removed in a future version. The recommended alternative is UseParbadVirtualGatewayWhenDeveloping.", false)]
         public static IApplicationBuilder UseParbadVirtualGatewayIfDevelopment(this IApplicationBuilder builder)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
