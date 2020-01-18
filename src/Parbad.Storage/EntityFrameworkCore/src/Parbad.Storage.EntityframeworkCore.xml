@@ -6,7 +6,7 @@
     <members>
         <member name="M:Parbad.Builder.EntityFrameworkStorageBuilderExtensions.UseEntityFrameworkCore(Parbad.Storage.Builder.IStorageBuilder,System.Action{Microsoft.EntityFrameworkCore.DbContextOptionsBuilder})">
             <summary>
-            Uses the Entityframework Core as a storage for saving and loading data.
+            Uses the EntityFramework Core as a storage for saving and loading data.
             <para>
             Note: It means Parbad can save and load the data in different database providers
             such as SQL Server, MySql, Sqlite, PostgreSQL, Oracle, InMemory, etc.
@@ -166,6 +166,41 @@
             <inheritdoc />
         </member>
         <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorage.DeleteTransactionAsync(Parbad.Storage.Abstractions.Transaction,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorageManager">
+            <summary>
+            EntityFramework Core implementation of <see cref="T:Parbad.Storage.Abstractions.IStorageManager"/>.
+            </summary>
+        </member>
+        <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorageManager.#ctor(Parbad.Storage.Abstractions.IStorage)">
+            <summary>
+            Initializes an instance of <see cref="T:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorageManager"/>.
+            </summary>
+            <param name="storage"></param>
+        </member>
+        <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorageManager.CreatePaymentAsync(Parbad.Storage.Abstractions.Payment,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorageManager.UpdatePaymentAsync(Parbad.Storage.Abstractions.Payment,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorageManager.CreateTransactionAsync(Parbad.Storage.Abstractions.Transaction,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorageManager.GetPaymentByTrackingNumberAsync(System.Int64,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorageManager.GetPaymentByTokenAsync(System.String,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorageManager.DoesPaymentExistAsync(System.Int64,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorageManager.DoesPaymentExistAsync(System.String,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorageManager.GetTransactionsAsync(Parbad.Storage.Abstractions.Payment,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
         <member name="T:Parbad.Storage.EntityFrameworkCore.Initializers.IDatabaseInitializer">

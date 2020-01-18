@@ -16,7 +16,7 @@ namespace Parbad.Builder
     public static class EntityFrameworkStorageBuilderExtensions
     {
         /// <summary>
-        /// Uses the Entityframework Core as a storage for saving and loading data.
+        /// Uses the EntityFramework Core as a storage for saving and loading data.
         /// <para>
         /// Note: It means Parbad can save and load the data in different database providers
         /// such as SQL Server, MySql, Sqlite, PostgreSQL, Oracle, InMemory, etc.
@@ -38,6 +38,8 @@ namespace Parbad.Builder
             builder.Services.AddDbContext<ParbadDataContext>(configureDatabaseBuilder);
 
             builder.AddStorage<EntityFrameworkCoreStorage>(ServiceLifetime.Transient);
+
+            builder.AddStorageManager<EntityFrameworkCoreStorageManager>(ServiceLifetime.Transient);
 
             return new EntityFrameworkCoreStorageBuilder(builder.Services);
         }
