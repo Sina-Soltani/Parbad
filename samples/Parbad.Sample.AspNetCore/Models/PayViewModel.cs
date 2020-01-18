@@ -12,6 +12,7 @@ namespace Parbad.Sample.AspNetCore.Models
         Melli,
         AsanPardakht,
         ZarinPal,
+        PayIr,
         ParbadVirtual
     }
 

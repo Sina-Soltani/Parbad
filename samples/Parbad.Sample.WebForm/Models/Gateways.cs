@@ -10,6 +10,7 @@
         Melli,
         AsanPardakht,
         ZarinPal,
+        PayIr,
         ParbadVirtual
     }
 }
