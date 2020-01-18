@@ -8,5 +8,7 @@ namespace Parbad.Gateway.PayIr
     public class PayIrGatewayAccount : GatewayAccount
     {
         public string Api { get; set; }
+
+        public bool IsTestAccount { get; set; }
     }
 }

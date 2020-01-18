@@ -22,9 +22,11 @@ namespace Parbad.Gateway.PayIr.Internal
 
         public static string CreateRequestData(PayIrGatewayAccount account, Invoice invoice)
         {
+            var api = account.IsTestAccount ? "test" : account.Api;
+
             return JsonConvert.SerializeObject(new PayIrRequestModel
             {
-                Api = account.Api,
+                Api = api,
                 Amount = invoice.Amount,
                 Redirect = invoice.CallbackUrl
             }, new JsonSerializerSettings
@@ -73,9 +75,11 @@ namespace Parbad.Gateway.PayIr.Internal
 
         public static string CreateVerifyData(PayIrGatewayAccount account, PayIrCallbackResult callbackResult)
         {
+            var api = account.IsTestAccount ? "test" : account.Api;
+
             return JsonConvert.SerializeObject(new PayIrVerifyModel
             {
-                Api = account.Api,
+                Api = api,
                 Token = callbackResult.Token
             }, new JsonSerializerSettings
             {
