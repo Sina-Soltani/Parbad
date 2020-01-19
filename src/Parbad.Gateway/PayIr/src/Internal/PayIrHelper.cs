@@ -4,7 +4,6 @@
 using System;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using Parbad.Abstraction;
 using Parbad.Http;
 using Parbad.Internal;
@@ -20,19 +19,16 @@ namespace Parbad.Gateway.PayIr.Internal
         public const string PaymentPageUrl = WebServiceUrl + "/pg/";
         public const string OkResult = "1";
 
-        public static string CreateRequestData(PayIrGatewayAccount account, Invoice invoice)
+        public static PayIrRequestModel CreateRequestData(PayIrGatewayAccount account, Invoice invoice)
         {
             var api = account.IsTestAccount ? "test" : account.Api;
 
-            return JsonConvert.SerializeObject(new PayIrRequestModel
+            return new PayIrRequestModel
             {
                 Api = api,
                 Amount = invoice.Amount,
                 Redirect = invoice.CallbackUrl
-            }, new JsonSerializerSettings
-            {
-                ContractResolver = new CamelCasePropertyNamesContractResolver()
-            });
+            };
         }
 
         public static PaymentRequestResult CreateRequestResult(string response, IHttpContextAccessor httpContextAccessor, PayIrGatewayAccount account)
@@ -73,18 +69,15 @@ namespace Parbad.Gateway.PayIr.Internal
             };
         }
 
-        public static string CreateVerifyData(PayIrGatewayAccount account, PayIrCallbackResult callbackResult)
+        public static PayIrVerifyModel CreateVerifyData(PayIrGatewayAccount account, PayIrCallbackResult callbackResult)
         {
             var api = account.IsTestAccount ? "test" : account.Api;
 
-            return JsonConvert.SerializeObject(new PayIrVerifyModel
+            return new PayIrVerifyModel
             {
                 Api = api,
                 Token = callbackResult.Token
-            }, new JsonSerializerSettings
-            {
-                ContractResolver = new CamelCasePropertyNamesContractResolver()
-            });
+            };
         }
 
         public static PaymentVerifyResult CreateVerifyResult(string response, MessagesOptions messagesOptions)
