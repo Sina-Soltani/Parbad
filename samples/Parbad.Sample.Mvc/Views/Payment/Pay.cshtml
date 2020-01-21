@@ -2,7 +2,7 @@
 
 <h1>Request</h1>
 
-@using (Html.BeginForm("PayRequest", "Payment", FormMethod.Post))
+@using (Html.BeginForm("Pay", "Payment", FormMethod.Post))
 {
     <div class="form-group">
         @Html.LabelFor(model => model.Amount, new { @class = "control-label" })
