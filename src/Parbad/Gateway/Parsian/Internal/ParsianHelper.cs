@@ -32,7 +32,7 @@ namespace Parbad.Gateway.Parsian.Internal
                 "<!--Optional:-->" +
                 "<sal:requestData>" +
                 "<!--Optional:-->" +
-                $"<sal:LoginAccount>{account.LoginAccount}</sal:LoginAccount>" +
+                $"<sal:LoginAccount>{XmlHelper.EncodeXmlValue(account.LoginAccount)}</sal:LoginAccount>" +
                 $"<sal:Amount>{(long)invoice.Amount}</sal:Amount>" +
                 $"<sal:OrderId>{invoice.TrackingNumber}</sal:OrderId>" +
                 "<!--Optional:-->" +
@@ -160,8 +160,8 @@ namespace Parbad.Gateway.Parsian.Internal
                 "<!--Optional:-->" +
                 "<con:requestData>" +
                 "<!--Optional:-->" +
-                $"<con:LoginAccount>{account.LoginAccount}</con:LoginAccount>" +
-                $"<con:Token>{callbackResult.Token}</con:Token>" +
+                $"<con:LoginAccount>{XmlHelper.EncodeXmlValue(account.LoginAccount)}</con:LoginAccount>" +
+                $"<con:Token>{XmlHelper.EncodeXmlValue(callbackResult.Token)}</con:Token>" +
                 "</con:requestData>" +
                 "</con:ConfirmPayment>" +
                 "</soapenv:Body>" +
@@ -213,8 +213,8 @@ namespace Parbad.Gateway.Parsian.Internal
                 "<!--Optional:-->" +
                 "<rev:requestData>" +
                 "<!--Optional:-->" +
-                $"<rev:LoginAccount>{account.LoginAccount}</rev:LoginAccount>" +
-                $"<rev:Token>{token}</rev:Token>" +
+                $"<rev:LoginAccount>{XmlHelper.EncodeXmlValue(account.LoginAccount)}</rev:LoginAccount>" +
+                $"<rev:Token>{XmlHelper.EncodeXmlValue(token)}</rev:Token>" +
                 "</rev:requestData>" +
                 "</rev:ReversalRequest>" +
                 "</soap:Body>" +
