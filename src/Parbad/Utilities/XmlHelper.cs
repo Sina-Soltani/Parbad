@@ -93,6 +93,11 @@ namespace Parbad.Utilities
 
         public static string EncodeXmlValue(string value)
         {
+            if (value.IsNullOrEmpty())
+            {
+                return value;
+            }
+
             return new XElement("t", value).LastNode.ToString();
         }
     }
