@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using System.Text;
 using System.Xml;
+using System.Xml.Linq;
 using System.Xml.Serialization;
 
 namespace Parbad.Utilities
@@ -21,7 +22,18 @@ namespace Parbad.Utilities
 
             var document = new XmlDocument();
 
-            document.LoadXml(xml);
+            try
+            {
+                document.LoadXml(xml);
+            }
+            catch (XmlException exception)
+            {
+                throw new InvalidOperationException($"XML loading exception. {exception.Message}");
+            }
+            catch (Exception exception)
+            {
+                throw new InvalidOperationException($"XML exception. {exception.Message}");
+            }
 
             if (string.IsNullOrEmpty(nameSpace))
             {
@@ -77,6 +89,11 @@ namespace Parbad.Utilities
                 obj = default(T);
                 return false;
             }
+        }
+
+        public static string EncodeXmlValue(string value)
+        {
+            return new XElement("t", value).LastNode.ToString();
         }
     }
 }
