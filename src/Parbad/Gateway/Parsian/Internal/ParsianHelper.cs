@@ -36,7 +36,7 @@ namespace Parbad.Gateway.Parsian.Internal
                 $"<sal:Amount>{(long)invoice.Amount}</sal:Amount>" +
                 $"<sal:OrderId>{invoice.TrackingNumber}</sal:OrderId>" +
                 "<!--Optional:-->" +
-                $"<sal:CallBackUrl>{invoice.CallbackUrl}</sal:CallBackUrl>" +
+                $"<sal:CallBackUrl>{XmlHelper.EncodeXmlValue(invoice.CallbackUrl)}</sal:CallBackUrl>" +
                 "<!--Optional:-->" +
                 "<sal:AdditionalData></sal:AdditionalData>" +
                 "<!--Optional:-->" +
