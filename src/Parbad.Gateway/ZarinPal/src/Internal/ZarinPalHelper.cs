@@ -31,7 +31,7 @@ namespace Parbad.Gateway.ZarinPal.Internal
                 "<zar:Email></zar:Email>" +
                 "<!--Optional:-->" +
                 "<zar:Mobile></zar:Mobile>" +
-                $"<zar:CallbackURL>{invoice.CallbackUrl}</zar:CallbackURL>" +
+                $"<zar:CallbackURL>{XmlHelper.EncodeXmlValue(invoice.CallbackUrl)}</zar:CallbackURL>" +
                 "</zar:PaymentRequest>" +
                 "</soapenv:Body>" +
                 "</soapenv:Envelope>";

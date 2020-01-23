@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netcoreapp3.0</TargetFrameworks>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <LangVersion>latest</LangVersion>
     <Authors>Sina Soltani</Authors>
     <Copyright>Copyright © Sina Soltani 2016</Copyright>
@@ -14,7 +14,7 @@
     <PackageTags>parbad Payment Gateway Bank Iran Shetab zarinpal پرداخت درگاه بانک ایران شتاب زرین پال</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Description>ZarinPal Gateway for Parbad project.</Description>
-    <PackageReleaseNotes>Targeting .NETCORE 3.x is added.</PackageReleaseNotes>
+    <PackageReleaseNotes>Bug is fixed.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
