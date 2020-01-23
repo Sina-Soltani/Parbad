@@ -256,7 +256,7 @@ namespace Parbad.Gateway.Mellat.Internal
                 "<!--Optional:-->" +
                 "<additionalData></additionalData>" +
                 "<!--Optional:-->" +
-                $"<callBackUrl>{invoice.CallbackUrl}</callBackUrl>" +
+                $"<callBackUrl>{XmlHelper.EncodeXmlValue(invoice.CallbackUrl)}</callBackUrl>" +
                 "<payerId>0</payerId>" +
                 "'</int:bpPayRequest>" +
                 "</soapenv:Body>" +
@@ -302,7 +302,7 @@ namespace Parbad.Gateway.Mellat.Internal
                 "<!--Optional:-->" +
                 $"<additionalData>{additionalData}</additionalData>" +
                 "<!--Optional:-->" +
-                $"<callBackUrl>{invoice.CallbackUrl}</callBackUrl>" +
+                $"<callBackUrl>{XmlHelper.EncodeXmlValue(invoice.CallbackUrl)}</callBackUrl>" +
                 "</int:bpCumulativeDynamicPayRequest>" +
                 "</soapenv:Body>" +
                 "</soapenv:Envelope>";

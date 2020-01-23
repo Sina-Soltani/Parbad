@@ -36,7 +36,7 @@ namespace Parbad.Gateway.IranKish.Internal
                 $"<tem:invoiceNo>{invoice.TrackingNumber}</tem:invoiceNo>" +
                 "<tem:paymentId></tem:paymentId>" +
                 "<tem:specialPaymentId></tem:specialPaymentId>" +
-                $"<tem:revertURL>{invoice.CallbackUrl}</tem:revertURL>" +
+                $"<tem:revertURL>{XmlHelper.EncodeXmlValue(invoice.CallbackUrl)}</tem:revertURL>" +
                 "<tem:description></tem:description>" +
                 "</tem:MakeToken>" +
                 "</soapenv:Body>" +
@@ -144,7 +144,7 @@ namespace Parbad.Gateway.IranKish.Internal
                 "<soapenv:Header/>" +
                 "<soapenv:Body>" +
                 "<tem:KicccPaymentsVerification>" +
-                $"<tem:token>{callbackResult.Token}</tem:token>" +
+                $"<tem:token>{XmlHelper.EncodeXmlValue(callbackResult.Token)}</tem:token>" +
                 $"<tem:merchantId>{account.MerchantId}</tem:merchantId>" +
                 $"<tem:referenceNumber>{callbackResult.ReferenceId}</tem:referenceNumber>" +
                 "<tem:sha1Key></tem:sha1Key>" +

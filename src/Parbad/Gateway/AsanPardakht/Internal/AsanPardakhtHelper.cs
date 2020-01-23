@@ -43,7 +43,7 @@ namespace Parbad.Gateway.AsanPardakht.Internal
                 "<tem:RequestOperation>" +
                 $"<tem:merchantConfigurationID>{account.MerchantConfigurationId}</tem:merchantConfigurationID>" +
                 "<!--Optional:-->" +
-                $"<tem:encryptedRequest>{encryptedRequest}</tem:encryptedRequest>" +
+                $"<tem:encryptedRequest>{XmlHelper.EncodeXmlValue(encryptedRequest)}</tem:encryptedRequest>" +
                 "</tem:RequestOperation>" +
                 "</soapenv:Body>" +
                 "</soapenv:Envelope>";
@@ -179,7 +179,7 @@ namespace Parbad.Gateway.AsanPardakht.Internal
                 "<tem:RequestVerification>" +
                 $"<tem:merchantConfigurationID>{account.MerchantConfigurationId}</tem:merchantConfigurationID>" +
                 "<!--Optional:-->" +
-                $"<tem:encryptedCredentials>{encryptedRequest}</tem:encryptedCredentials>" +
+                $"<tem:encryptedCredentials>{XmlHelper.EncodeXmlValue(encryptedRequest)}</tem:encryptedCredentials>" +
                 $"<tem:payGateTranID>{callbackResult.PayGateTranId}</tem:payGateTranID>" +
                 "</tem:RequestVerification>" +
                 "</soapenv:Body>" +
@@ -224,7 +224,7 @@ namespace Parbad.Gateway.AsanPardakht.Internal
                 "<tem:RequestReconciliation>" +
                 $"<tem:merchantConfigurationID>{account.MerchantConfigurationId}</tem:merchantConfigurationID>" +
                 "<!--Optional:-->" +
-                $"<tem:encryptedCredentials>{encryptedRequest}</tem:encryptedCredentials>" +
+                $"<tem:encryptedCredentials>{XmlHelper.EncodeXmlValue(encryptedRequest)}</tem:encryptedCredentials>" +
                 $"<tem:payGateTranID>{callbackResult.PayGateTranId}</tem:payGateTranID>" +
                 "</tem:RequestReconciliation>" +
                 "</soapenv:Body>" +
