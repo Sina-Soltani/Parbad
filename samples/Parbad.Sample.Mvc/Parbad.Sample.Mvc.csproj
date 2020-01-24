@@ -267,6 +267,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\PaymentController.cs" />
+    <Compile Include="Models\Gateways.cs" />
     <Compile Include="Models\RequestViewModel.cs" />
     <Compile Include="Models\RefundViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

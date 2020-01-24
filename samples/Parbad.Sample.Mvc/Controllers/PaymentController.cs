@@ -17,15 +17,15 @@ namespace Parbad.Sample.Mvc.Controllers
         [HttpGet]
         public ActionResult Pay()
         {
-            return View();
+            return View(new RequestViewModel());
         }
 
         [HttpPost]
-        public async Task<ActionResult> Pay(RequestViewModel payViewModel)
+        public async Task<ActionResult> Pay(RequestViewModel viewModel)
         {
             if (!ModelState.IsValid)
             {
-                return View(payViewModel);
+                return View(viewModel);
             }
 
             var verifyUrl = Url.Action("Verify", "Payment", null, Request.Url.Scheme);
@@ -33,10 +33,18 @@ namespace Parbad.Sample.Mvc.Controllers
             var result = await _onlinePayment.RequestAsync(invoice =>
             {
                 invoice
-                    .UseAutoIncrementTrackingNumber()
-                    .SetAmount(payViewModel.Amount)
+                    .SetAmount(viewModel.Amount)
                     .SetCallbackUrl(verifyUrl)
-                    .SetGateway(payViewModel.Gateway.ToString());
+                    .SetGateway(viewModel.Gateway.ToString());
+
+                if (viewModel.GenerateTrackingNumberAutomatically)
+                {
+                    invoice.UseAutoIncrementTrackingNumber();
+                }
+                else
+                {
+                    invoice.SetTrackingNumber(viewModel.TrackingNumber);
+                }
             });
 
             if (result.IsSucceed)
