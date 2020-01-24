@@ -2,22 +2,14 @@
 
 namespace Parbad.Sample.AspNetCore.Models
 {
-    public enum Gateways
-    {
-        Saman,
-        Mellat,
-        Parsian,
-        Pasargad,
-        IranKish,
-        Melli,
-        AsanPardakht,
-        ZarinPal,
-        PayIr,
-        ParbadVirtual
-    }
-
     public class PayViewModel
     {
+        [Display(Name = "Tracking number")]
+        public long TrackingNumber { get; set; }
+
+        [Display(Name = "Generate the Tracking number automatically?")]
+        public bool GenerateTrackingNumberAutomatically { get; set; } = true;
+
         public long Amount { get; set; }
 
         [Display(Name = "Gateway")]

@@ -17,7 +17,7 @@ namespace Parbad.Sample.AspNetCore.Controllers
         [HttpGet]
         public IActionResult Pay()
         {
-            return View();
+            return View(new PayViewModel());
         }
 
         [HttpPost]
@@ -28,10 +28,18 @@ namespace Parbad.Sample.AspNetCore.Controllers
             var result = await _onlinePayment.RequestAsync(invoice =>
             {
                 invoice
-                    .UseAutoIncrementTrackingNumber()
                     .SetAmount(viewModel.Amount)
                     .SetCallbackUrl(verifyUrl)
                     .SetGateway(viewModel.SelectedGateway.ToString());
+
+                if (viewModel.GenerateTrackingNumberAutomatically)
+                {
+                    invoice.UseAutoIncrementTrackingNumber();
+                }
+                else
+                {
+                    invoice.SetTrackingNumber(viewModel.TrackingNumber);
+                }
             });
 
             if (result.IsSucceed)
