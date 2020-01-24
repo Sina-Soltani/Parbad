@@ -11,6 +11,7 @@
         AsanPardakht,
         ZarinPal,
         PayIr,
+        IdPay,
         ParbadVirtual
     }
 }

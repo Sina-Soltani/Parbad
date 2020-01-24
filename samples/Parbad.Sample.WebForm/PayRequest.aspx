@@ -2,7 +2,15 @@
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
     <h1>Request</h1>
-
+    
+    <div class="form-group">
+        <asp:Label ID="Label1" runat="server" Text="Tracking number" CssClass="control-label"></asp:Label>
+        <asp:TextBox ID="TxtTrackingNumber" runat="server" CssClass="form-control"></asp:TextBox>
+    </div>
+    <div class="form-group form-check">
+        <asp:CheckBox ID="GenerateTrackingNumberAutomatically" runat="server" CssClass="form-check-input" />
+        <asp:Label ID="Label4" runat="server" Text="Generate the Tracking number automatically?" CssClass="control-label"></asp:Label>
+    </div>
     <div class="form-group">
         <asp:Label ID="Label2" runat="server" Text="Amount" CssClass="control-label"></asp:Label>
         <asp:TextBox ID="TxtAmount" runat="server" CssClass="form-control"></asp:TextBox>

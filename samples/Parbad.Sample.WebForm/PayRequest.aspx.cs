@@ -24,10 +24,18 @@ namespace Parbad.Sample.WebForm
             var result = StaticOnlinePayment.Instance.Request(invoice =>
             {
                 invoice
-                    .UseAutoIncrementTrackingNumber()
                     .SetAmount(long.Parse(TxtAmount.Text))
                     .SetCallbackUrl(verifyUrl)
                     .SetGateway(gateway.ToString());
+
+                if (GenerateTrackingNumberAutomatically.Checked)
+                {
+                    invoice.UseAutoIncrementTrackingNumber();
+                }
+                else
+                {
+                    invoice.SetTrackingNumber(long.Parse(TxtTrackingNumber.Text));
+                }
             });
 
             if (result.IsSucceed)
