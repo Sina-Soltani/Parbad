@@ -106,7 +106,7 @@ namespace Parbad.Gateway.IdPay.Internal
                 return PaymentVerifyResult.Failed(messagesOptions.InvalidDataReceivedFromGateway);
             }
 
-            if (string.IsNullOrEmpty(result.Status) || string.IsNullOrEmpty(result.TrackId))
+            if (result.Status.IsNullOrEmpty() || result.TrackId.IsNullOrEmpty())
             {
                 return PaymentVerifyResult.Failed(messagesOptions.InvalidDataReceivedFromGateway);
             }
@@ -144,7 +144,7 @@ namespace Parbad.Gateway.IdPay.Internal
             InvoiceContext context,
             MessagesOptions messagesOptions)
         {
-            if (string.IsNullOrEmpty(status))
+            if (status.IsNullOrEmpty())
             {
                 return (false, messagesOptions.InvalidDataReceivedFromGateway);
             }
@@ -154,10 +154,10 @@ namespace Parbad.Gateway.IdPay.Internal
                 return (false, IdPayResultTranslator.TranslateStatus(status, messagesOptions));
             }
 
-            if (string.IsNullOrEmpty(orderId) ||
-                string.IsNullOrEmpty(id) ||
-                string.IsNullOrEmpty(trackId) ||
-                string.IsNullOrEmpty(amount))
+            if (orderId.IsNullOrEmpty() ||
+                id.IsNullOrEmpty() ||
+                trackId.IsNullOrEmpty() ||
+                amount.IsNullOrEmpty())
             {
                 return (false, messagesOptions.InvalidDataReceivedFromGateway);
             }
