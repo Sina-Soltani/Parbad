@@ -3,7 +3,6 @@
 
 using System;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -91,21 +90,6 @@ namespace Parbad.Gateway.IdPay
         public override Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default)
         {
             return PaymentRefundResult.Failed("The Refund operation is not supported by this gateway.").ToInterfaceAsync();
-        }
-    }
-
-    public static class Ext
-    {
-        public static void AddOrUpdate(this HttpRequestHeaders headers, string name, string value)
-        {
-            if (headers == null) throw new ArgumentNullException(nameof(headers));
-
-            if (headers.Contains(name))
-            {
-                headers.Remove(name);
-            }
-
-            headers.Add(name, value);
         }
     }
 }

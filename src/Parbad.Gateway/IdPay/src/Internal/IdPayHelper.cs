@@ -10,6 +10,7 @@ using Parbad.Abstraction;
 using Parbad.Internal;
 using Parbad.Options;
 using Parbad.Http;
+using Parbad.Net;
 
 namespace Parbad.Gateway.IdPay.Internal
 {
