@@ -21,6 +21,9 @@ namespace Parbad.Gateway.IdPay.Internal
         public const string VerifyUrl = "payment/verify";
         public const string ApiKey = "X-API-KEY";
         public const string SandBoxKey = "X-SANDBOX";
+        public const string SandBoxApiKey = "6a7f99eb-7c20-4412-a972-6dfb7cd253a4";
+        public const string Succeed = "100";
+        public const string ReadyForVerifying = "10";
 
         public static object CreateRequestData(Invoice invoice)
         {
@@ -108,7 +111,7 @@ namespace Parbad.Gateway.IdPay.Internal
                 return PaymentVerifyResult.Failed(messagesOptions.InvalidDataReceivedFromGateway);
             }
 
-            if (result.Status != "100")
+            if (result.Status != Succeed)
             {
                 return PaymentVerifyResult.Failed($"Verification failed. Status: {result.Status}");
             }
@@ -118,7 +121,9 @@ namespace Parbad.Gateway.IdPay.Internal
 
         public static void AssignHeaders(HttpRequestHeaders headers, IdPayGatewayAccount account)
         {
-            headers.AddOrUpdate(ApiKey, account.Api);
+            var api = account.IsTestAccount ? SandBoxApiKey : account.Api;
+
+            headers.AddOrUpdate(ApiKey, api);
 
             if (account.IsTestAccount)
             {
@@ -127,7 +132,6 @@ namespace Parbad.Gateway.IdPay.Internal
             else if (headers.Contains(SandBoxKey))
             {
                 headers.Remove(SandBoxKey);
-
             }
         }
 
@@ -145,9 +149,9 @@ namespace Parbad.Gateway.IdPay.Internal
                 return (false, messagesOptions.InvalidDataReceivedFromGateway);
             }
 
-            if (status != "100")
+            if (status != ReadyForVerifying)
             {
-                return (false, messagesOptions.PaymentFailed);
+                return (false, IdPayResultTranslator.TranslateStatus(status, messagesOptions));
             }
 
             if (string.IsNullOrEmpty(orderId) ||
