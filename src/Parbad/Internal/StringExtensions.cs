@@ -6,7 +6,7 @@ using Microsoft.Extensions.Primitives;
 
 namespace Parbad.Internal
 {
-    internal static class StringExtensions
+    public static class StringExtensions
     {
         public static bool IsNullOrEmpty(this string value)
         {

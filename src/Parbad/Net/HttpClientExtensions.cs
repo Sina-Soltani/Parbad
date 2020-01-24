@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -43,6 +44,18 @@ namespace Parbad.Net
             if (httpClient == null) throw new ArgumentNullException(nameof(httpClient));
 
             return httpClient.PostAsync(requestUri, new FormUrlEncodedContent(data), cancellationToken);
+        }
+
+        public static void AddOrUpdate(this HttpRequestHeaders headers, string name, string value)
+        {
+            if (headers == null) throw new ArgumentNullException(nameof(headers));
+
+            if (headers.Contains(name))
+            {
+                headers.Remove(name);
+            }
+
+            headers.Add(name, value);
         }
     }
 }
