@@ -13,7 +13,7 @@
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageTags>parbad Payment Gateway Bank Iran Shetab idpay پرداخت درگاه بانک ایران شتاب</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Description>IDPay Gateway for Parbad project.</Description>
+    <Description>IDPay.ir Gateway for Parbad project.</Description>
   </PropertyGroup>
 
   <ItemGroup>
