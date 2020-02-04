@@ -17,8 +17,12 @@ namespace Parbad.Gateway.ZarinPal.Internal
         public const string PaymentPageUrl = "https://#.zarinpal.com/pg/StartPay/";
         public const string OkResult = "100";
 
+        public static string ZarinPalRequestAdditionalKeyName => "ZarinPalRequest";
+
         public static string CreateRequestData(ZarinPalGatewayAccount account, Invoice invoice)
         {
+            var zarinPalInvoice = (ZarinPalInvoice)invoice.AdditionalData[ZarinPalRequestAdditionalKeyName];
+
             return
                 "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:zar=\"http://zarinpal.com/\">" +
                 "<soapenv:Header/>" +
@@ -26,11 +30,11 @@ namespace Parbad.Gateway.ZarinPal.Internal
                 "<zar:PaymentRequest>" +
                 $"<zar:MerchantID>{account.MerchantId}</zar:MerchantID>" +
                 $"<zar:Amount>{(long)invoice.Amount}</zar:Amount>" +
-                "<zar:Description></zar:Description>" +
+                $"<zar:Description>{XmlHelper.EncodeXmlValue(zarinPalInvoice.Description)}</zar:Description>" +
                 "<!--Optional:-->" +
-                "<zar:Email></zar:Email>" +
+                $"<zar:Email>{XmlHelper.EncodeXmlValue(zarinPalInvoice.Email)}</zar:Email>" +
                 "<!--Optional:-->" +
-                "<zar:Mobile></zar:Mobile>" +
+                $"<zar:Mobile>{XmlHelper.EncodeXmlValue(zarinPalInvoice.Mobile)}</zar:Mobile>" +
                 $"<zar:CallbackURL>{XmlHelper.EncodeXmlValue(invoice.CallbackUrl)}</zar:CallbackURL>" +
                 "</zar:PaymentRequest>" +
                 "</soapenv:Body>" +

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netcoreapp3.0</TargetFrameworks>
-    <Version>1.0.2</Version>
+    <Version>1.0.3-beta1</Version>
     <LangVersion>latest</LangVersion>
     <Authors>Sina Soltani</Authors>
     <Copyright>Copyright © Sina Soltani 2016</Copyright>
@@ -13,8 +13,9 @@
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageTags>parbad Payment Gateway Bank Iran Shetab zarinpal پرداخت درگاه بانک ایران شتاب زرین پال</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Description>ZarinPal Gateway for Parbad project.</Description>
-    <PackageReleaseNotes>Bug is fixed.</PackageReleaseNotes>
+    <Description>ZarinPal Gateway for Parbad project.
+For more information see: https://github.com/Sina-Soltani/Parbad</Description>
+    <PackageReleaseNotes>The bug for ticket #62 is fixed.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

@@ -3,6 +3,7 @@
 
 using System;
 using Parbad.Gateway.ZarinPal;
+using Parbad.Gateway.ZarinPal.Internal;
 using Parbad.InvoiceBuilder;
 
 namespace Parbad
@@ -13,11 +14,42 @@ namespace Parbad
         /// The invoice will be sent to ZarinPal gateway.
         /// </summary>
         /// <param name="builder"></param>
-        public static IInvoiceBuilder UseZarinPal(this IInvoiceBuilder builder)
+        /// <param name="zarinPalInvoice">Describes an invoice for ZarinPal gateway.</param>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static IInvoiceBuilder UseZarinPal(this IInvoiceBuilder builder, ZarinPalInvoice zarinPalInvoice)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
+            if (builder.AdditionalData.ContainsKey(ZarinPalHelper.ZarinPalRequestAdditionalKeyName))
+            {
+                builder.AdditionalData[ZarinPalHelper.ZarinPalRequestAdditionalKeyName] = zarinPalInvoice;
+            }
+            else
+            {
+                builder.AddAdditionalData(ZarinPalHelper.ZarinPalRequestAdditionalKeyName, zarinPalInvoice);
+            }
+
             return builder.SetGateway(ZarinPalGateway.Name);
         }
+
+        /// <summary>
+        /// The invoice will be sent to ZarinPal gateway.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="description">A short description for this invoice which is required by ZarinPal gateway.</param>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static IInvoiceBuilder UseZarinPal(this IInvoiceBuilder builder, string description)
+            => UseZarinPal(builder, new ZarinPalInvoice(description));
+
+        /// <summary>
+        /// The invoice will be sent to ZarinPal gateway.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="description">A short description for this invoice which is required by ZarinPal gateway.</param>
+        /// <param name="email">Buyer's email.</param>
+        /// <param name="mobile">Buyer's mobile.</param>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static IInvoiceBuilder UseZarinPal(this IInvoiceBuilder builder, string description, string email, string mobile)
+            => UseZarinPal(builder, new ZarinPalInvoice(description, email, mobile));
     }
 }
