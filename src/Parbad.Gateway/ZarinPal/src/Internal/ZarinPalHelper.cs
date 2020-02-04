@@ -44,10 +44,10 @@ namespace Parbad.Gateway.ZarinPal.Internal
                 "</soapenv:Envelope>";
         }
 
-        public static PaymentRequestResult CreateRequestResult(
-            string response,
+        public static PaymentRequestResult CreateRequestResult(string response,
             IHttpContextAccessor httpContextAccessor,
-            ZarinPalGatewayAccount account)
+            ZarinPalGatewayAccount account,
+            MessagesOptions messagesOptions)
         {
             var status = XmlHelper.GetNodeValueFromXml(response, "Status", "http://zarinpal.com/");
             var authority = XmlHelper.GetNodeValueFromXml(response, "Authority", "http://zarinpal.com/");
@@ -56,7 +56,7 @@ namespace Parbad.Gateway.ZarinPal.Internal
 
             if (!isSucceed)
             {
-                var message = $"Error {status}";
+                var message = ZarinPalStatusTranslator.Translate(status, messagesOptions);
 
                 return PaymentRequestResult.Failed(message, account.Name);
             }
