@@ -23,6 +23,9 @@ namespace Parbad.Gateway.ZarinPal.Internal
         {
             var zarinPalInvoice = (ZarinPalInvoice)invoice.AdditionalData[ZarinPalRequestAdditionalKeyName];
 
+            var email = zarinPalInvoice.Email.IsNullOrEmpty() ? null : XmlHelper.EncodeXmlValue(zarinPalInvoice.Email);
+            var mobile = zarinPalInvoice.Mobile.IsNullOrEmpty() ? null : XmlHelper.EncodeXmlValue(zarinPalInvoice.Mobile);
+
             return
                 "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:zar=\"http://zarinpal.com/\">" +
                 "<soapenv:Header/>" +
@@ -32,9 +35,9 @@ namespace Parbad.Gateway.ZarinPal.Internal
                 $"<zar:Amount>{(long)invoice.Amount}</zar:Amount>" +
                 $"<zar:Description>{XmlHelper.EncodeXmlValue(zarinPalInvoice.Description)}</zar:Description>" +
                 "<!--Optional:-->" +
-                $"<zar:Email>{XmlHelper.EncodeXmlValue(zarinPalInvoice.Email)}</zar:Email>" +
+                $"<zar:Email>{email}</zar:Email>" +
                 "<!--Optional:-->" +
-                $"<zar:Mobile>{XmlHelper.EncodeXmlValue(zarinPalInvoice.Mobile)}</zar:Mobile>" +
+                $"<zar:Mobile>{mobile}</zar:Mobile>" +
                 $"<zar:CallbackURL>{XmlHelper.EncodeXmlValue(invoice.CallbackUrl)}</zar:CallbackURL>" +
                 "</zar:PaymentRequest>" +
                 "</soapenv:Body>" +
