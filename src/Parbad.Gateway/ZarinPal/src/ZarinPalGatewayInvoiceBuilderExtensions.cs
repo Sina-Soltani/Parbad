@@ -36,20 +36,11 @@ namespace Parbad
         /// The invoice will be sent to ZarinPal gateway.
         /// </summary>
         /// <param name="builder"></param>
-        /// <param name="description">A short description for this invoice which is required by ZarinPal gateway.</param>
-        /// <exception cref="ArgumentNullException"></exception>
-        public static IInvoiceBuilder UseZarinPal(this IInvoiceBuilder builder, string description)
-            => UseZarinPal(builder, new ZarinPalInvoice(description));
-
-        /// <summary>
-        /// The invoice will be sent to ZarinPal gateway.
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="description">A short description for this invoice which is required by ZarinPal gateway.</param>
+        /// <param name="description">A short description about this invoice which is required by ZarinPal gateway.</param>
         /// <param name="email">Buyer's email.</param>
         /// <param name="mobile">Buyer's mobile.</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public static IInvoiceBuilder UseZarinPal(this IInvoiceBuilder builder, string description, string email, string mobile)
+        public static IInvoiceBuilder UseZarinPal(this IInvoiceBuilder builder, string description, string email = null, string mobile = null)
             => UseZarinPal(builder, new ZarinPalInvoice(description, email, mobile));
     }
 }

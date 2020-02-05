@@ -52,7 +52,7 @@ namespace Parbad.Gateway.ZarinPal.Internal
                 case 101:
                     return "عمليات پرداخت موفق بوده و قبلا تراكنش انجام شده است.";
                 default:
-                    return messagesOptions.DuplicateTrackingNumber;
+                    return messagesOptions.UnexpectedErrorText;
             }
         }
     }

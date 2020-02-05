@@ -15,7 +15,9 @@ namespace Parbad.Gateway.ZarinPal.Internal
     {
         public const string WebServiceUrl = "https://#.zarinpal.com/pg/services/WebGate/service";
         public const string PaymentPageUrl = "https://#.zarinpal.com/pg/StartPay/";
-        public const string OkResult = "100";
+        public const string NumericOkResult = "100";
+        public const string StringOkResult = "OK";
+        public const string NumericAlreadyOkResult = "101";
 
         public static string ZarinPalRequestAdditionalKeyName => "ZarinPalRequest";
 
@@ -56,7 +58,7 @@ namespace Parbad.Gateway.ZarinPal.Internal
             var status = XmlHelper.GetNodeValueFromXml(response, "Status", "http://zarinpal.com/");
             var authority = XmlHelper.GetNodeValueFromXml(response, "Authority", "http://zarinpal.com/");
 
-            var isSucceed = string.Equals(status, OkResult, StringComparison.InvariantCultureIgnoreCase);
+            var isSucceed = string.Equals(status, NumericOkResult, StringComparison.InvariantCultureIgnoreCase);
 
             if (!isSucceed)
             {
@@ -77,7 +79,7 @@ namespace Parbad.Gateway.ZarinPal.Internal
 
             IPaymentVerifyResult verifyResult = null;
 
-            var isSucceed = string.Equals(status, OkResult, StringComparison.InvariantCultureIgnoreCase);
+            var isSucceed = string.Equals(status, StringOkResult, StringComparison.InvariantCultureIgnoreCase);
 
             if (!isSucceed)
             {
@@ -114,13 +116,21 @@ namespace Parbad.Gateway.ZarinPal.Internal
             var status = XmlHelper.GetNodeValueFromXml(response, "Status", "http://zarinpal.com/");
             var refId = XmlHelper.GetNodeValueFromXml(response, "RefID", "http://zarinpal.com/");
 
-            var isSucceed = string.Equals(status, OkResult, StringComparison.InvariantCultureIgnoreCase);
+            var isSucceed = string.Equals(status, NumericOkResult, StringComparison.OrdinalIgnoreCase);
 
             if (!isSucceed)
             {
-                var message = $"Error {status}";
+                var message = ZarinPalStatusTranslator.Translate(status, messagesOptions);
 
-                return PaymentVerifyResult.Failed(message);
+                var verifyResultStatus = string.Equals(status, NumericAlreadyOkResult, StringComparison.OrdinalIgnoreCase)
+                        ? PaymentVerifyResultStatus.AlreadyVerified
+                        : PaymentVerifyResultStatus.Failed;
+
+                return new PaymentVerifyResult
+                {
+                    Status = verifyResultStatus,
+                    Message = message
+                };
             }
 
             return PaymentVerifyResult.Succeed(refId, messagesOptions.PaymentSucceed);

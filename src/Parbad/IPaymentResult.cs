@@ -24,7 +24,7 @@ namespace Parbad
         Money Amount { get; }
 
         /// <summary>
-        /// Determines weather the payment was successful or not.
+        /// Determines whether the payment was successful or not.
         /// </summary>
         bool IsSucceed { get; }
 

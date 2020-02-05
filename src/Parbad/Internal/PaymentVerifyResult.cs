@@ -7,11 +7,15 @@ namespace Parbad.Internal
     {
         public string TransactionCode { get; set; }
 
+        public PaymentVerifyResultStatus Status { get; set; }
+
+        public override bool IsSucceed => Status == PaymentVerifyResultStatus.Succeed;
+
         public static PaymentVerifyResult Succeed(string transactionCode, string message)
         {
             return new PaymentVerifyResult
             {
-                IsSucceed = true,
+                Status = PaymentVerifyResultStatus.Succeed,
                 TransactionCode = transactionCode,
                 Message = message
             };
@@ -21,7 +25,7 @@ namespace Parbad.Internal
         {
             return new PaymentVerifyResult
             {
-                IsSucceed = false,
+                Status = PaymentVerifyResultStatus.Failed,
                 Message = message
             };
         }

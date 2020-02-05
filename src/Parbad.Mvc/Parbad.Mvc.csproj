@@ -3,9 +3,9 @@
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <LangVersion>latest</LangVersion>
-    <Version>2.0.2</Version>
+    <Version>2.0.3</Version>
     <Authors>Sina Soltani</Authors>
-    <Description>ASP.NET MVC 4, 5 integration for Parbad project.
+    <Description>ASP.NET MVC 4 and 5 integration for Parbad project.
 
 For more information see: https://www.nuget.org/packages/Parbad/</Description>
     <Copyright>Copyright © Sina Soltani 2016</Copyright>
@@ -40,6 +40,10 @@ For more information see: https://www.nuget.org/packages/Parbad/</Description>
 
   <ItemGroup>
     <Reference Include="System.Web" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="readme.txt" pack="true" PackagePath="." />
   </ItemGroup>
 
 </Project>

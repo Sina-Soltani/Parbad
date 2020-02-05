@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netcoreapp3.0</TargetFrameworks>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <LangVersion>latest</LangVersion>
     <Authors>Sina Soltani</Authors>
     <Copyright>Copyright © Sina Soltani 2016</Copyright>
@@ -13,7 +13,10 @@
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageTags>parbad Payment Gateway Bank Iran Shetab idpay پرداخت درگاه بانک ایران شتاب</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Description>IDPay.ir Gateway for Parbad project.</Description>
+    <Description>IDPay.ir Gateway for Parbad project.
+
+For more information see: https://www.nuget.org/packages/Parbad/</Description>
+    <PackageReleaseNotes>Newtonsoft.Json is upgraded to version 11.0.1.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.1" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
@@ -33,6 +36,10 @@
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.0' ">
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="readme.txt" pack="true" PackagePath="." />
   </ItemGroup>
 
 </Project>

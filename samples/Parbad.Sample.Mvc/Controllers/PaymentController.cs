@@ -59,23 +59,30 @@ namespace Parbad.Sample.Mvc.Controllers
         }
 
         // It's better to set no HttpMethods(HttpGet, HttpPost, etc.) for the Verify action,
-        // because the banks send their information with different http methods
-        // درگاه‌های بانکی، اطلاعات خود را با متد‌های مختلفی ارسال میکنند
-        // بنابراین بهتر است هیچگونه خصوصیتی برای این اکشن متد در نظر گرفته نشود
+        // because the banks send their information with different HTTP methods
         public async Task<ActionResult> Verify()
         {
             var invoice = await _onlinePayment.FetchAsync();
 
-            if (Is_There_Still_Product_In_Shop(invoice.TrackingNumber))
+            // Check if the invoice is new or it's already processed before.
+            if (invoice.Status == PaymentFetchResultStatus.AlreadyProcessed)
             {
-                var verifyResult = await _onlinePayment.VerifyAsync(invoice);
-
-                return View(verifyResult);
+                // You can also see if the invoice is already verified before.
+                var isAlreadyVerified = invoice.IsAlreadyVerified;
+                return Content("The payment is already processed before.");
             }
 
-            var cancelResult = await _onlinePayment.CancelAsync(invoice, cancellationReason: "Sorry, We have no more products to sell.");
+            // An example of checking the invoice in your website.
+            if (!Is_There_Still_Product_In_Shop(invoice.TrackingNumber))
+            {
+                var cancelResult = await _onlinePayment.CancelAsync(invoice, cancellationReason: "Sorry, We have no more products to sell.");
 
-            return View("CancelResult", cancelResult);
+                return View("CancelResult", cancelResult);
+            }
+
+            var verifyResult = await _onlinePayment.VerifyAsync(invoice);
+
+            return View(verifyResult);
         }
 
         [HttpGet]

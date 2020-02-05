@@ -5,15 +5,21 @@ namespace Parbad.Internal
 {
     public class PaymentRequestResult : PaymentResult, IPaymentRequestResult
     {
+        /// <inheritdoc />
+        public PaymentRequestResultStatus Status { get; set; }
+
+        /// <inheritdoc />
         public IGatewayTransporter GatewayTransporter { get; set; }
+
+        public override bool IsSucceed => Status == PaymentRequestResultStatus.Succeed;
 
         public static PaymentRequestResult Succeed(IGatewayTransporter gatewayTransporter, string gatewayAccountName)
         {
             return new PaymentRequestResult
             {
-                IsSucceed = true,
                 GatewayAccountName = gatewayAccountName,
-                GatewayTransporter = gatewayTransporter
+                GatewayTransporter = gatewayTransporter,
+                Status = PaymentRequestResultStatus.Succeed
             };
         }
 
@@ -21,7 +27,7 @@ namespace Parbad.Internal
         {
             return new PaymentRequestResult
             {
-                IsSucceed = false,
+                Status = PaymentRequestResultStatus.Failed,
                 Message = message,
                 GatewayAccountName = gatewayAccountName,
                 GatewayTransporter = new NullGatewayTransporter()

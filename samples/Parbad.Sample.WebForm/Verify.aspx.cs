@@ -8,6 +8,7 @@ namespace Parbad.Sample.WebForm
         {
             IPaymentResult result;
             var transactionCode = "";
+            var status = "";
 
             var invoice = StaticOnlinePayment.Instance.Fetch();
 
@@ -16,6 +17,7 @@ namespace Parbad.Sample.WebForm
                 var verifyResult = StaticOnlinePayment.Instance.Verify(invoice);
                 result = verifyResult;
                 transactionCode = verifyResult.TransactionCode;
+                status = verifyResult.Status.ToString();
             }
             else
             {
@@ -28,6 +30,7 @@ namespace Parbad.Sample.WebForm
             LblGatewayAccountName.Text = result.GatewayAccountName;
             LblTransactionCode.Text = transactionCode;
             LblIsSucceed.Text = result.IsSucceed.ToString();
+            LblStatus.Text = status;
             LblMessage.Text = result.Message;
         }
 

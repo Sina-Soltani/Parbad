@@ -49,7 +49,7 @@ namespace Parbad
         /// Cancels the given invoice. No Verifying request will be sent to the gateway.
         /// </summary>
         /// <param name="trackingNumber">The tracking number of the invoice which must be verified.</param>
-        /// <param name="cancellationReason">The reason for cancelling the operation. It will be saved in Message field in database.</param>
+        /// <param name="cancellationReason">The reason for canceling the operation. It will be saved in Message field in database.</param>
         /// <param name="cancellationToken"></param>
         /// <exception cref="InvoiceNotFoundException"></exception>
         Task<IPaymentCancelResult> CancelAsync(long trackingNumber, string cancellationReason = null, CancellationToken cancellationToken = default);
@@ -61,13 +61,5 @@ namespace Parbad
         /// <param name="cancellationToken"></param>
         /// <exception cref="InvoiceNotFoundException"></exception>
         Task<IPaymentRefundResult> RefundAsync(RefundInvoice invoice, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Verifies the requested payment to check whether or not the invoice has was paid in the gateway by the client.
-        /// </summary>
-        /// <param name="context">Describes the information of requested payment.</param>
-        /// <param name="cancellationToken"></param>
-        [Obsolete("This method is obsolete and will be removed in a future version. The recommended alternative is Verify(long trackingNumber).", error: false)]
-        Task<IPaymentVerifyResult> VerifyAsync(Action<IPaymentVerifyingContext> context, CancellationToken cancellationToken = default);
     }
 }
