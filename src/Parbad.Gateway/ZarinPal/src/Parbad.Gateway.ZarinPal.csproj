@@ -14,6 +14,7 @@
     <PackageTags>parbad Payment Gateway Bank Iran Shetab zarinpal پرداخت درگاه بانک ایران شتاب زرین پال</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Description>ZarinPal Gateway for Parbad project.
+
 For more information see: https://github.com/Sina-Soltani/Parbad</Description>
     <PackageReleaseNotes>The bug for ticket #62 is fixed.</PackageReleaseNotes>
   </PropertyGroup>
