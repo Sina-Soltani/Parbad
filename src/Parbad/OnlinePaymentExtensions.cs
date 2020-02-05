@@ -212,19 +212,6 @@ namespace Parbad
         }
 
         /// <summary>
-        /// Verifies the requested payment to check whether or not the invoice has was paid in the gateway by the client.
-        /// </summary>
-        /// <param name="onlinePayment"></param>
-        /// <param name="paymentVerifyingContext">Describes the information of requested payment.</param>
-        [Obsolete("This method is obsolete and will be removed in a future version. The recommended alternative is Verify(long trackingNumber).", error: false)]
-        public static IPaymentVerifyResult Verify(
-            this IOnlinePayment onlinePayment,
-            Action<IPaymentVerifyingContext> paymentVerifyingContext)
-            => onlinePayment.VerifyAsync(paymentVerifyingContext)
-                .GetAwaiter()
-                .GetResult();
-
-        /// <summary>
         /// Performs a refund request for the given invoice.
         /// </summary>
         /// <param name="onlinePayment"></param>
