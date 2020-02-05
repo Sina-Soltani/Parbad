@@ -40,4 +40,8 @@ For more information see: https://www.nuget.org/packages/Parbad/</Description>
     <ProjectReference Include="..\Parbad\Parbad.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="readme.txt" pack="true" PackagePath="." />
+  </ItemGroup>
+
 </Project>
