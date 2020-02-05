@@ -2,7 +2,6 @@
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
 using System;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -15,32 +14,33 @@ namespace Microsoft.AspNetCore.Builder
     {
         /// <summary>
         /// Adds the Parbad Virtual Gateway middleware to the pipeline if the current
-        /// hosting environment name is <see cref="EnvironmentName.Development"/>.
+        /// hosting environment name is <see cref="Hosting.EnvironmentName.Development"/>.
         /// </summary>
         /// <param name="builder"></param>
         public static IApplicationBuilder UseParbadVirtualGatewayWhenDeveloping(this IApplicationBuilder builder)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            var hostingEnvironment = builder.ApplicationServices.GetRequiredService<IHostingEnvironment>();
-
-            return builder.UseParbadVirtualGatewayWhen(context => hostingEnvironment.IsDevelopment());
+#if NETCOREAPP3_0
+            var hostEnvironment = builder.ApplicationServices.GetRequiredService<Hosting.IWebHostEnvironment>();
+            var isDevelopment = Microsoft.Extensions.Hosting.HostEnvironmentEnvExtensions.IsDevelopment(hostEnvironment);
+#else
+            var hostEnvironment = builder.ApplicationServices.GetRequiredService<Hosting.IHostingEnvironment>();
+            var isDevelopment = Hosting.HostingEnvironmentExtensions.IsDevelopment(hostEnvironment);
+#endif
+            return builder.UseParbadVirtualGatewayWhen(context => isDevelopment);
         }
 
         /// <summary>
         /// Adds the Parbad Virtual Gateway middleware to the pipeline if the current
-        /// hosting environment name is <see cref="EnvironmentName.Development"/>.
+        /// hosting environment name is <see cref="Hosting.EnvironmentName.Development"/>.
         /// </summary>
         /// <param name="builder"></param>
-        [Obsolete("This method is obsolete and will be removed in a future version. The recommended alternative is UseParbadVirtualGatewayWhenDeveloping.", false)]
+        [Obsolete(
+            "This method is obsolete and will be removed in a future version. The recommended alternative is UseParbadVirtualGatewayWhenDeveloping.",
+            false)]
         public static IApplicationBuilder UseParbadVirtualGatewayIfDevelopment(this IApplicationBuilder builder)
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-
-            var hostingEnvironment = builder.ApplicationServices.GetRequiredService<IHostingEnvironment>();
-
-            return builder.UseParbadVirtualGatewayWhen(context => hostingEnvironment.IsDevelopment());
-        }
+            => UseParbadVirtualGatewayWhenDeveloping(builder);
 
         /// <summary>
         /// Adds the Parbad Virtual Gateway middleware to the pipeline.
