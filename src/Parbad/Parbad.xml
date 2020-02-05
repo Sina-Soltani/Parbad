@@ -1443,7 +1443,7 @@
             Cancels the given invoice. No Verifying request will be sent to the gateway.
             </summary>
             <param name="trackingNumber">The tracking number of the invoice which must be verified.</param>
-            <param name="cancellationReason">The reason for cancelling the operation. It will be saved in Message field in database.</param>
+            <param name="cancellationReason">The reason for canceling the operation. It will be saved in Message field in database.</param>
             <param name="cancellationToken"></param>
             <exception cref="T:Parbad.Exceptions.InvoiceNotFoundException"></exception>
         </member>
@@ -1524,7 +1524,7 @@
         </member>
         <member name="P:Parbad.IPaymentResult.IsSucceed">
             <summary>
-            Determines weather the payment was successful or not.
+            Determines whether the payment was successful or not.
             </summary>
         </member>
         <member name="P:Parbad.IPaymentResult.GatewayName">
@@ -1721,7 +1721,7 @@
             </summary>
             <param name="onlinePayment"></param>
             <param name="trackingNumber">The tracking number of the invoice which must be verified.</param>
-            <param name="cancellationReason">The reason for cancelling the operation. It will be saved in Message field in database.</param>
+            <param name="cancellationReason">The reason for canceling the operation. It will be saved in Message field in database.</param>
             <exception cref="T:Parbad.Exceptions.InvoiceNotFoundException"></exception>
         </member>
         <member name="M:Parbad.OnlinePaymentExtensions.CancelAsync(Parbad.IOnlinePayment,Parbad.IPaymentFetchResult,System.String,System.Threading.CancellationToken)">
@@ -1730,7 +1730,7 @@
             </summary>
             <param name="onlinePayment"></param>
             <param name="invoice"></param>
-            <param name="cancellationReason">The reason for cancelling the operation. It will be saved in Message field in database.</param>
+            <param name="cancellationReason">The reason for canceling the operation. It will be saved in Message field in database.</param>
             <param name="cancellationToken"></param>
             <exception cref="T:Parbad.Exceptions.InvoiceNotFoundException"></exception>
         </member>
@@ -1740,7 +1740,7 @@
             </summary>
             <param name="onlinePayment"></param>
             <param name="invoice"></param>
-            <param name="cancellationReason">The reason for cancelling the operation. It will be saved in Message field in database.</param>
+            <param name="cancellationReason">The reason for canceling the operation. It will be saved in Message field in database.</param>
             <exception cref="T:Parbad.Exceptions.InvoiceNotFoundException"></exception>
         </member>
         <member name="M:Parbad.OnlinePaymentExtensions.Verify(Parbad.IOnlinePayment,System.Action{Parbad.IPaymentVerifyingContext})">
