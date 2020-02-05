@@ -54,9 +54,7 @@ namespace Parbad.Sample.AspNetCore.Controllers
         }
 
         // It's better to set no HttpMethods(HttpGet, HttpPost, etc.) for the Verify action,
-        // because the banks send their information with different http methods
-        // درگاه‌های بانکی، اطلاعات خود را با متد‌های مختلفی ارسال میکنند
-        // بنابراین بهتر است هیچگونه خصوصیتی برای این اکشن متد در نظر گرفته نشود
+        // because the banks send their information with different HTTP methods
         public async Task<IActionResult> Verify()
         {
             var invoice = await _onlinePayment.FetchAsync();
