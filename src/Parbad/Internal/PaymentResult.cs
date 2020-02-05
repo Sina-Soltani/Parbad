@@ -24,7 +24,7 @@ namespace Parbad.Internal
         public Money Amount { get; set; }
 
         /// <inheritdoc />
-        public bool IsSucceed { get; set; }
+        public virtual bool IsSucceed { get; set; }
 
         /// <inheritdoc />
         public string GatewayName { get; set; }

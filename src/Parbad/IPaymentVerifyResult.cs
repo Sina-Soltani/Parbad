@@ -4,6 +4,27 @@
 namespace Parbad
 {
     /// <summary>
+    /// Describes the status of the Verify operation.
+    /// </summary>
+    public enum PaymentVerifyResultStatus
+    {
+        /// <summary>
+        /// The Verify operation was successful.
+        /// </summary>
+        Succeed,
+
+        /// <summary>
+        /// The Verify operation is failed.
+        /// </summary>
+        Failed,
+
+        /// <summary>
+        /// The invoice is already verified before.
+        /// </summary>
+        AlreadyVerified
+    }
+
+    /// <summary>
     /// Describes the result of the Verify operation.
     /// </summary>
     public interface IPaymentVerifyResult : IPaymentResult
@@ -12,5 +33,10 @@ namespace Parbad
         /// Gets the transaction code from the gateway.
         /// </summary>
         string TransactionCode { get; }
+
+        /// <summary>
+        /// Gets the status of the Verify operation.
+        /// </summary>
+        PaymentVerifyResultStatus Status { get; }
     }
 }

@@ -61,13 +61,5 @@ namespace Parbad
         /// <param name="cancellationToken"></param>
         /// <exception cref="InvoiceNotFoundException"></exception>
         Task<IPaymentRefundResult> RefundAsync(RefundInvoice invoice, CancellationToken cancellationToken = default);
-
-        /// <summary>
-        /// Verifies the requested payment to check whether or not the invoice has was paid in the gateway by the client.
-        /// </summary>
-        /// <param name="context">Describes the information of requested payment.</param>
-        /// <param name="cancellationToken"></param>
-        [Obsolete("This method is obsolete and will be removed in a future version. The recommended alternative is Verify(long trackingNumber).", error: false)]
-        Task<IPaymentVerifyResult> VerifyAsync(Action<IPaymentVerifyingContext> context, CancellationToken cancellationToken = default);
     }
 }

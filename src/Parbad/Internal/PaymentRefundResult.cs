@@ -5,11 +5,15 @@ namespace Parbad.Internal
 {
     public class PaymentRefundResult : PaymentResult, IPaymentRefundResult
     {
+        public PaymentRefundResultStatus Status { get; set; }
+
+        public override bool IsSucceed => Status == PaymentRefundResultStatus.Succeed;
+
         public static PaymentRefundResult Succeed(string message = null)
         {
             return new PaymentRefundResult
             {
-                IsSucceed = true,
+                Status = PaymentRefundResultStatus.Succeed,
                 Message = message ?? string.Empty
             };
         }
@@ -18,7 +22,7 @@ namespace Parbad.Internal
         {
             return new PaymentRefundResult
             {
-                IsSucceed = false,
+                Status = PaymentRefundResultStatus.Failed,
                 Message = message ?? string.Empty
             };
         }

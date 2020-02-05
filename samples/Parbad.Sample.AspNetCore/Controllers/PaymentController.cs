@@ -59,16 +59,25 @@ namespace Parbad.Sample.AspNetCore.Controllers
         {
             var invoice = await _onlinePayment.FetchAsync();
 
-            if (Is_There_Still_Product_In_Shop(invoice.TrackingNumber))
+            // Check if the invoice is new or it's already processed before.
+            if (invoice.Status == PaymentFetchResultStatus.AlreadyProcessed)
             {
-                var verifyResult = await _onlinePayment.VerifyAsync(invoice);
-
-                return View(verifyResult);
+                // You can also see if the invoice is already verified before.
+                var isAlreadyVerified = invoice.IsAlreadyVerified;
+                return Content("The payment is already processed before.");
             }
 
-            var cancelResult = await _onlinePayment.CancelAsync(invoice, cancellationReason: "Sorry, We have no more products to sell.");
+            // An example of checking the invoice in your website.
+            if (!Is_There_Still_Product_In_Shop(invoice.TrackingNumber))
+            {
+                var cancelResult = await _onlinePayment.CancelAsync(invoice, cancellationReason: "Sorry, We have no more products to sell.");
 
-            return View("CancelResult", cancelResult);
+                return View("CancelResult", cancelResult);
+            }
+
+            var verifyResult = await _onlinePayment.VerifyAsync(invoice);
+
+            return View(verifyResult);
         }
 
         [HttpGet]

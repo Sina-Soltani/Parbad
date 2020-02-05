@@ -5,5 +5,10 @@ namespace Parbad.Internal
 {
     public class PaymentFetchResult : PaymentResult, IPaymentFetchResult
     {
+        public PaymentFetchResultStatus Status { get; set; }
+
+        public bool IsAlreadyVerified { get; set; }
+
+        public override bool IsSucceed => Status == PaymentFetchResultStatus.ReadyForVerifying;
     }
 }
