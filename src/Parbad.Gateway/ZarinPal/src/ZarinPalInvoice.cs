@@ -14,7 +14,7 @@ namespace Parbad.Gateway.ZarinPal
         /// <summary>
         /// Initializes an instance of <see cref="ZarinPalInvoice"/>.
         /// </summary>
-        /// <param name="description">A short description for this invoice which is required by ZarinPal gateway.</param>
+        /// <param name="description">A short description about this invoice which is required by ZarinPal gateway.</param>
         public ZarinPalInvoice(string description)
             : this(description, null, null)
         {
@@ -23,7 +23,7 @@ namespace Parbad.Gateway.ZarinPal
         /// <summary>
         /// Initializes an instance of <see cref="ZarinPalInvoice"/>.
         /// </summary>
-        /// <param name="description">A short description for this invoice which is required by ZarinPal gateway.</param>
+        /// <param name="description">A short description about this invoice which is required by ZarinPal gateway.</param>
         /// <param name="email">Buyer's email.</param>
         /// <param name="mobile">Buyer's mobile.</param>
         public ZarinPalInvoice(string description, string email, string mobile)
@@ -39,7 +39,7 @@ namespace Parbad.Gateway.ZarinPal
         }
 
         /// <summary>
-        /// A short description for this invoice which is required by ZarinPal gateway.
+        /// A short description about this invoice which is required by ZarinPal gateway.
         /// </summary>
         public string Description { get; }
 
