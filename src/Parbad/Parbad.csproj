@@ -61,4 +61,8 @@ Newtonsoft.Json is upgraded to version 11.0.1.</PackageReleaseNotes>
     </EmbeddedResource>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="readme.txt" pack="true" PackagePath="." />
+  </ItemGroup>
+
 </Project>
