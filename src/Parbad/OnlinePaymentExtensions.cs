@@ -167,7 +167,7 @@ namespace Parbad
         /// </summary>
         /// <param name="onlinePayment"></param>
         /// <param name="trackingNumber">The tracking number of the invoice which must be verified.</param>
-        /// <param name="cancellationReason">The reason for cancelling the operation. It will be saved in Message field in database.</param>
+        /// <param name="cancellationReason">The reason for canceling the operation. It will be saved in Message field in database.</param>
         /// <exception cref="InvoiceNotFoundException"></exception>
         public static IPaymentCancelResult Cancel(
             this IOnlinePayment onlinePayment,
@@ -180,7 +180,7 @@ namespace Parbad
         /// </summary>
         /// <param name="onlinePayment"></param>
         /// <param name="invoice"></param>
-        /// <param name="cancellationReason">The reason for cancelling the operation. It will be saved in Message field in database.</param>
+        /// <param name="cancellationReason">The reason for canceling the operation. It will be saved in Message field in database.</param>
         /// <param name="cancellationToken"></param>
         /// <exception cref="InvoiceNotFoundException"></exception>
         public static Task<IPaymentCancelResult> CancelAsync(
@@ -199,7 +199,7 @@ namespace Parbad
         /// </summary>
         /// <param name="onlinePayment"></param>
         /// <param name="invoice"></param>
-        /// <param name="cancellationReason">The reason for cancelling the operation. It will be saved in Message field in database.</param>
+        /// <param name="cancellationReason">The reason for canceling the operation. It will be saved in Message field in database.</param>
         /// <exception cref="InvoiceNotFoundException"></exception>
         public static IPaymentCancelResult Cancel(
             this IOnlinePayment onlinePayment,

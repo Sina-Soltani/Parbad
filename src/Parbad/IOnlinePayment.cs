@@ -49,7 +49,7 @@ namespace Parbad
         /// Cancels the given invoice. No Verifying request will be sent to the gateway.
         /// </summary>
         /// <param name="trackingNumber">The tracking number of the invoice which must be verified.</param>
-        /// <param name="cancellationReason">The reason for cancelling the operation. It will be saved in Message field in database.</param>
+        /// <param name="cancellationReason">The reason for canceling the operation. It will be saved in Message field in database.</param>
         /// <param name="cancellationToken"></param>
         /// <exception cref="InvoiceNotFoundException"></exception>
         Task<IPaymentCancelResult> CancelAsync(long trackingNumber, string cancellationReason = null, CancellationToken cancellationToken = default);
