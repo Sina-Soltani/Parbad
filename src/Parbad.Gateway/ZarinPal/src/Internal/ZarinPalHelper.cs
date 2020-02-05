@@ -17,6 +17,7 @@ namespace Parbad.Gateway.ZarinPal.Internal
         public const string PaymentPageUrl = "https://#.zarinpal.com/pg/StartPay/";
         public const string NumericOkResult = "100";
         public const string StringOkResult = "OK";
+        public const string NumericAlreadyOkResult = "101";
 
         public static string ZarinPalRequestAdditionalKeyName => "ZarinPalRequest";
 
@@ -119,9 +120,17 @@ namespace Parbad.Gateway.ZarinPal.Internal
 
             if (!isSucceed)
             {
-                var message = $"Error {status}";
+                var message = ZarinPalStatusTranslator.Translate(status, messagesOptions);
 
-                return PaymentVerifyResult.Failed(message);
+                var verifyResultStatus = string.Equals(status, NumericAlreadyOkResult, StringComparison.OrdinalIgnoreCase)
+                        ? PaymentVerifyResultStatus.AlreadyVerified
+                        : PaymentVerifyResultStatus.Failed;
+
+                return new PaymentVerifyResult
+                {
+                    Status = verifyResultStatus,
+                    Message = message
+                };
             }
 
             return PaymentVerifyResult.Succeed(refId, messagesOptions.PaymentSucceed);
