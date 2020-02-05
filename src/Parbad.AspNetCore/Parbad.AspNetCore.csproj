@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netcoreapp3.0</TargetFrameworks>
     <LangVersion>latest</LangVersion>
-    <Version>1.0.3</Version>
+    <Version>1.0.4</Version>
     <Authors>Sina Soltani</Authors>
     <Copyright>Copyright © Sina Soltani 2016</Copyright>
     <PackageLicenseUrl></PackageLicenseUrl>
@@ -18,7 +18,7 @@ For more information see: https://www.nuget.org/packages/Parbad/</Description>
     <PackageTags>parbad aspnetcore Payment Gateway Bank Iran Shetab IranKish Mellat Melli Sadad Parsian Pasargad Saman Asan-Pardakht پرداخت درگاه بانک ایران شتاب ایران-کیش ملت ملی سداد پارسیان پاسارگاد سامان آسان-پرداخت</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
-    <PackageReleaseNotes>Targeting .NET CORE 3.x is added.</PackageReleaseNotes>
+    <PackageReleaseNotes>Code improvement.</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
