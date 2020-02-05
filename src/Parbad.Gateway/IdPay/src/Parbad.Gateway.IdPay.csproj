@@ -14,6 +14,7 @@
     <PackageTags>parbad Payment Gateway Bank Iran Shetab idpay پرداخت درگاه بانک ایران شتاب</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Description>IDPay.ir Gateway for Parbad project.</Description>
+    <PackageReleaseNotes>Newtonsoft.Json is upgraded to version 11.0.1.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
