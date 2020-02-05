@@ -1146,9 +1146,6 @@
         <member name="M:Parbad.Internal.DefaultOnlinePayment.VerifyAsync(System.Int64,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.Internal.DefaultOnlinePayment.VerifyAsync(System.Action{Parbad.IPaymentVerifyingContext},System.Threading.CancellationToken)">
-            <inheritdoc />
-        </member>
         <member name="M:Parbad.Internal.DefaultOnlinePayment.CancelAsync(System.Int64,System.String,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
@@ -1461,13 +1458,6 @@
             <param name="cancellationToken"></param>
             <exception cref="T:Parbad.Exceptions.InvoiceNotFoundException"></exception>
         </member>
-        <member name="M:Parbad.IOnlinePayment.VerifyAsync(System.Action{Parbad.IPaymentVerifyingContext},System.Threading.CancellationToken)">
-            <summary>
-            Verifies the requested payment to check whether or not the invoice has was paid in the gateway by the client.
-            </summary>
-            <param name="context">Describes the information of requested payment.</param>
-            <param name="cancellationToken"></param>
-        </member>
         <member name="T:Parbad.IOnlinePaymentAccessor">
             <summary>
             Provides an instance of <see cref="T:Parbad.IOnlinePayment"/> from configured <see cref="T:System.IServiceProvider"/>.
@@ -1627,31 +1617,6 @@
             <summary>
             Includes some additional data.
             </summary>
-        </member>
-        <member name="T:Parbad.IPaymentVerifyingContext">
-            <summary>
-            Describes the invoice which sent by the gateway. You can compare its data with your
-            database and also cancel the payment operation if you need.
-            </summary>
-        </member>
-        <member name="P:Parbad.IPaymentVerifyingContext.TrackingNumber">
-            <summary>
-            Gets the TrackingNumber of requested payment.
-            </summary>
-        </member>
-        <member name="P:Parbad.IPaymentVerifyingContext.GatewayName">
-            <summary>
-            Gets the gateway's name of requested payment.
-            </summary>
-        </member>
-        <member name="M:Parbad.IPaymentVerifyingContext.CancelPayment(System.String)">
-            <summary>
-            Cancel the Verify operation. No Verifying request will be sent to the gateway.
-            In this case, the money will transferred back to the client's bank account after
-            about 15-60 minutes.
-            </summary>
-            <param name="reason">The reason for cancelling the operation. It will be saved in
-            Message field in database.</param>
         </member>
         <member name="T:Parbad.PaymentVerifyResultStatus">
             <summary>
@@ -1848,13 +1813,6 @@
             <param name="invoice"></param>
             <param name="cancellationReason">The reason for canceling the operation. It will be saved in Message field in database.</param>
             <exception cref="T:Parbad.Exceptions.InvoiceNotFoundException"></exception>
-        </member>
-        <member name="M:Parbad.OnlinePaymentExtensions.Verify(Parbad.IOnlinePayment,System.Action{Parbad.IPaymentVerifyingContext})">
-            <summary>
-            Verifies the requested payment to check whether or not the invoice has was paid in the gateway by the client.
-            </summary>
-            <param name="onlinePayment"></param>
-            <param name="paymentVerifyingContext">Describes the information of requested payment.</param>
         </member>
         <member name="M:Parbad.OnlinePaymentExtensions.Refund(Parbad.IOnlinePayment,Parbad.RefundInvoice)">
             <summary>
