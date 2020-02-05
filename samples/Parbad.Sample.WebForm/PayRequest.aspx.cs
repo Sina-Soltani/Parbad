@@ -54,6 +54,7 @@ namespace Parbad.Sample.WebForm
                 LblGateway.Text = result.GatewayName;
                 LblGatewayAccountName.Text = result.GatewayAccountName;
                 LblIsSucceed.Text = result.IsSucceed.ToString();
+                LblStatus.Text = result.Status.ToString();
                 LblMessage.Text = result.Message;
             }
         }

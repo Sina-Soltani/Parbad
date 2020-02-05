@@ -29,6 +29,10 @@
             <td><asp:Label ID="LblIsSucceed" runat="server" Text=""></asp:Label></td>
         </tr>
         <tr>
+            <td>Status</td>
+            <td><asp:Label ID="LblStatus" runat="server" Text=""></asp:Label></td>
+        </tr>
+        <tr>
             <td>Message</td>
             <td class="text-lg"><asp:Label ID="LblMessage" runat="server" Text=""></asp:Label></td>
         </tr>
