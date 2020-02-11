@@ -1,6 +1,6 @@
 ---
 name: Reporting a bug
-about: گزارش خطا در مورد چیزی که فکر می‌کنید به درستی کار نمی‌کند
+about: گزارش خطا
 title: ''
 labels: bug
 assignees: ''

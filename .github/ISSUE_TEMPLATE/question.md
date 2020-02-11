@@ -1,6 +1,6 @@
 ---
 name: Question
-about: پرسش در مورد پَرباد
+about: پرسش
 title: ''
 labels: question | suggestion
 assignees: ''
