@@ -62,7 +62,7 @@ More information: https://github.com/Sina-Soltani/Parbad
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="readme.txt" pack="true" PackagePath="." />
+    <None Include="readme.txt" pack="true" Visible="false" PackagePath="." />
     <None Include="icon.png" pack="true" Visible="false" PackagePath="" />
   </ItemGroup>
 
