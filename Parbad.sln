@@ -10,8 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		appveyor.yml = appveyor.yml
 		images\How-it-works.png = images\How-it-works.png
 		LICENSE.txt = LICENSE.txt
-		images\Parbad-Readme.png = images\Parbad-Readme.png
-		images\Parbad.png = images\Parbad.png
+		images\Parbad-256x256.png = images\Parbad-256x256.png
 		images\ParbadVirtualGateway.v2.png = images\ParbadVirtualGateway.v2.png
 		README.md = README.md
 	EndProjectSection
@@ -44,7 +43,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parbad.Gateway.ZarinPal", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parbad.Gateway.PayIr", "src\Parbad.Gateway\PayIr\src\Parbad.Gateway.PayIr.csproj", "{A2E36E0D-D40F-46F7-90DF-B7498D0BCE22}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parbad.Gateway.IdPay", "src\Parbad.Gateway\IdPay\src\Parbad.Gateway.IdPay.csproj", "{8089DAB8-CD14-4FFE-BC5F-F84EF9CDE60F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parbad.Gateway.IdPay", "src\Parbad.Gateway\IdPay\src\Parbad.Gateway.IdPay.csproj", "{8089DAB8-CD14-4FFE-BC5F-F84EF9CDE60F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
