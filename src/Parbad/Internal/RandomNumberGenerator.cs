@@ -10,16 +10,15 @@ namespace Parbad.Internal
     {
         public static long Next()
         {
-            using (var provider = new RNGCryptoServiceProvider())
-            {
-                var data = new byte[8];
+            using var provider = new RNGCryptoServiceProvider();
 
-                provider.GetBytes(data);
+            var data = new byte[8];
 
-                var randomNumber = BitConverter.ToInt64(data, 0);
+            provider.GetBytes(data);
 
-                return Math.Abs(randomNumber);
-            }
+            var randomNumber = BitConverter.ToInt64(data, 0);
+
+            return Math.Abs(randomNumber);
         }
     }
 }

@@ -27,19 +27,19 @@ namespace Parbad.TrackingNumberProviders
 
             var minimumValue = _options.MinimumValue;
 
-            var newNumber = minimumValue;
+            var newNumber = 0L;
 
-            if (trackingNumbers.Count > 0)
+            while (true)
             {
-                while (!cancellationToken.IsCancellationRequested)
-                {
-                    newNumber = RandomNumberGenerator.Next();
+                if (cancellationToken.IsCancellationRequested) break;
 
-                    if (newNumber >= minimumValue && !trackingNumbers.Contains(newNumber))
-                    {
-                        break;
-                    }
-                }
+                newNumber = RandomNumberGenerator.Next();
+
+                if (newNumber < minimumValue) continue;
+
+                if (trackingNumbers.Count > 0 && !trackingNumbers.Contains(newNumber)) break;
+
+                if (newNumber >= minimumValue) break;
             }
 
             return Task.FromResult(newNumber);
