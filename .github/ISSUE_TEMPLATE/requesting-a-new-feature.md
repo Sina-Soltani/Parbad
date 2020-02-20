@@ -1,6 +1,6 @@
 ---
 name: Requesting a new feature
-about: پیشنهاد یک ویژگی جدید
+about: درخواست یا پیشنهاد یک ویژگی جدید
 title: ''
 labels: feature
 assignees: ''
