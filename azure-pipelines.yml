@@ -26,7 +26,7 @@ steps:
   inputs:
     command: 'custom'
     projects: 'src/**/*.csproj'
-    custom: 'dotnet pack'
+    custom: 'pack'
     arguments: '-c $(buildConfiguration) --no-build --skip-duplicate'
 - task: DotNetCoreCLI@2
   inputs:
