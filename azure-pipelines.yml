@@ -10,7 +10,6 @@ pool:
 
 variables:
   buildConfiguration: 'Release'
-  buildPlatform: 'Any CPU'
 
 steps:
 - task: DotNetCoreCLI@2
@@ -27,10 +26,11 @@ steps:
     command: 'custom'
     projects: 'src/**/*.csproj'
     custom: 'pack'
-    arguments: '-c $(buildConfiguration) --no-build --skip-duplicate'
+    arguments: '-c $(buildConfiguration) --no-build'
 - task: DotNetCoreCLI@2
   inputs:
     command: 'push'
     packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
     nuGetFeedType: 'internal'
     publishVstsFeed: '69c14a16-aa9b-4eb1-b20b-f8084e16add5/80283fdf-ec52-4bc8-944d-14c8f4f6c49c'
+    arguments: '--skip-duplicate'
