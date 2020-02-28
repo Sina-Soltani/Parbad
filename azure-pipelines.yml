@@ -23,10 +23,6 @@ steps:
     projects: 'src/**/*.csproj'
 - task: DotNetCoreCLI@2
   inputs:
-    command: 'build'
-    projects: '**/*.Tests.csproj'
-- task: DotNetCoreCLI@2
-  inputs:
     command: 'pack'
     packagesToPack: 'src/**/*.csproj;!**/*.Tests.csproj'
     configuration: '$(buildConfiguration)'
