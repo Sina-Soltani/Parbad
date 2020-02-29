@@ -31,5 +31,5 @@ steps:
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(artifacts)'
-    ArtifactName: 'Parbad'
+    ArtifactName: 'Parbad_Source'
     publishLocation: 'Container'
