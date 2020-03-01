@@ -25,11 +25,8 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'custom'
-    projects: 'src/**/*.csproj'
+    projects: |
+      src/**/*.csproj;
+      !src/**/*.Tests.csproj
     custom: 'pack'
-    arguments: '-c $(buildConfiguration) --no-build -o $(artifacts)'
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(artifacts)'
-    ArtifactName: 'Parbad_Source'
-    publishLocation: 'Container'
+    arguments: '-c $(buildConfiguration) --no-build -o $(Build.ArtifactStagingDirectory)'
