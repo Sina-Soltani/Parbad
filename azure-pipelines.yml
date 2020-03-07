@@ -34,7 +34,7 @@ stages:
           command: 'custom'
           projects: 'src/**/*.csproj'
           custom: 'pack'
-          arguments: '-c $(buildConfiguration) --no-build --version-suffix "dev$(Build.BuildNumber)" -o $(Build.ArtifactStagingDirectory)/packages/prereleases'
+          arguments: '-c $(buildConfiguration) --no-build -o $(Build.ArtifactStagingDirectory)/packages/prereleases --version-suffix dev$(Build.BuildNumber) --skip-duplicate'
       - task: DotNetCoreCLI@2
         displayName: 'pushing'
         inputs:
