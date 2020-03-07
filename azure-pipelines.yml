@@ -35,14 +35,14 @@ stages:
           projects: 'src/**/*.csproj'
           custom: 'pack'
           arguments: '-c $(buildConfiguration) --no-build -o $(Build.ArtifactStagingDirectory)/packages/prereleases --version-suffix dev$(Build.BuildNumber)'
-      - task: DotNetCoreCLI@2
+      - task: NuGetCommand@2
         displayName: 'pushing'
         inputs:
           command: 'push'
-          packagesToPush: '$(Build.ArtifactStagingDirectory)/packages/prereleases/*.nupkg'
+          packagesToPush: '$(Build.ArtifactStagingDirectory)/packages/prereleases/*.nupkg;!$(Build.ArtifactStagingDirectory)/packages/prereleases/*.symbols.nupkg'
           nuGetFeedType: 'internal'
           publishVstsFeed: '279df34c-5022-41d4-b4c9-079b9ee673d2/079abce9-be4c-41d8-8897-5fcf6b8465d0'
-          arguments: '--skip-duplicate'
+          allowPackageConflicts: true
   - stage: Production
     condition: eq(variables['build.sourceBranch'], 'refs/heads/master')
     jobs:
@@ -66,11 +66,11 @@ stages:
           projects: 'src/**/*.csproj'
           custom: 'pack'
           arguments: '-c $(buildConfiguration) --no-build -o $(Build.ArtifactStagingDirectory)/packages/releases'
-      - task: DotNetCoreCLI@2
+      - task: NuGetCommand@2
         displayName: 'pushing'
         inputs:
           command: 'push'
-          packagesToPush: '$(Build.ArtifactStagingDirectory)/packages/releases/*.nupkg'
+          packagesToPush: '$(Build.ArtifactStagingDirectory)/packages/releases/*.nupkg;!$(Build.ArtifactStagingDirectory)/packages/releases/*.symbols.nupkg'
           nuGetFeedType: 'internal'
           publishVstsFeed: '279df34c-5022-41d4-b4c9-079b9ee673d2/079abce9-be4c-41d8-8897-5fcf6b8465d0'
-          arguments: '--skip-duplicate'
+          allowPackageConflicts: true
