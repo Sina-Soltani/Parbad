@@ -18,21 +18,25 @@ stages:
     - job: Initializing
       steps:
       - task: DotNetCoreCLI@2
+        displayName: 'restoring'
         inputs:
           command: 'restore'
           projects: '**/*.csproj'
       - task: DotNetCoreCLI@2
+        displayName: 'building'
         inputs:
           command: 'build'
           projects: '**/*.csproj'
           arguments: '-c $(buildConfiguration)'
       - task: DotNetCoreCLI@2
+        displayName: 'packing'
         inputs:
           command: 'custom'
           projects: 'src/**/*.csproj'
           custom: 'pack'
           arguments: '-c $(buildConfiguration) --no-build --version-suffix "dev$(Build.BuildNumber)" -o $(Build.ArtifactStagingDirectory)/packages/prereleases'
       - task: DotNetCoreCLI@2
+        displayName: 'pushing'
         inputs:
           command: 'push'
           packagesToPush: '$(Build.ArtifactStagingDirectory)/packages/prereleases/*.nupkg'
