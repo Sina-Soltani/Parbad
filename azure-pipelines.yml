@@ -34,7 +34,7 @@ stages:
           command: 'custom'
           projects: 'src/**/*.csproj'
           custom: 'pack'
-          arguments: '-c $(buildConfiguration) --no-build -o $(Build.ArtifactStagingDirectory)/packages/prereleases --version-suffix dev$(Build.BuildNumber) --skip-duplicate'
+          arguments: '-c $(buildConfiguration) --no-build -o $(Build.ArtifactStagingDirectory)/packages/prereleases --version-suffix dev$(Build.BuildNumber)'
       - task: DotNetCoreCLI@2
         displayName: 'pushing'
         inputs:
@@ -42,3 +42,4 @@ stages:
           packagesToPush: '$(Build.ArtifactStagingDirectory)/packages/prereleases/*.nupkg'
           nuGetFeedType: 'internal'
           publishVstsFeed: '279df34c-5022-41d4-b4c9-079b9ee673d2/079abce9-be4c-41d8-8897-5fcf6b8465d0'
+          arguments: '--skip-duplicate'
