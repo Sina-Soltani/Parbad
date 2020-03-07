@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
+    <VersionPrefix>2.0.3</VersionPrefix>
     <LangVersion>latest</LangVersion>
-    <Version>2.0.3</Version>
     <Authors>Sina Soltani</Authors>
     <Description>ASP.NET MVC 4 and 5 integration for Parbad project.
 

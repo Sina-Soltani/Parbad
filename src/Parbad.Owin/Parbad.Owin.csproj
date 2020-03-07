@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
+    <VersionPrefix>1.0.2</VersionPrefix>
     <LangVersion>latest</LangVersion>
-    <Version>1.0.2</Version>
     <Authors>Sina Soltani</Authors>
     <Description>Owin integration for Parbad project.
 

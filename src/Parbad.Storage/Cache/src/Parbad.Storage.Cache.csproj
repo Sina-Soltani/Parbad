@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Parbad.Storage.Cache</PackageId>
-    <Version>1.0.1</Version>
+    <VersionPrefix>1.0.1</VersionPrefix>
     <LangVersion>latest</LangVersion>
     <TargetFrameworks>netstandard2.0;netcoreapp3.0</TargetFrameworks>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
