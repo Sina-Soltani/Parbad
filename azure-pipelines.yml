@@ -38,7 +38,7 @@ stages:
       - task: PublishBuildArtifacts@1
         inputs:
           PathtoPublish: '$(Build.ArtifactStagingDirectory)/packages/prereleases'
-          ArtifactName: 'drop'
+          ArtifactName: 'prereleases'
           publishLocation: 'Container'
   - stage: Production
     condition: eq(variables['build.sourceBranch'], 'refs/heads/master')
@@ -66,5 +66,5 @@ stages:
       - task: PublishBuildArtifacts@1
         inputs:
           PathtoPublish: '$(Build.ArtifactStagingDirectory)/packages/releases'
-          ArtifactName: 'drop'
+          ArtifactName: 'releases'
           publishLocation: 'Container'
