@@ -74,3 +74,9 @@ stages:
           nuGetFeedType: 'internal'
           publishVstsFeed: '279df34c-5022-41d4-b4c9-079b9ee673d2/079abce9-be4c-41d8-8897-5fcf6b8465d0'
           allowPackageConflicts: true
+      - task: NuGetCommand@2
+        inputs:
+          command: 'push'
+          packagesToPush: '$(Build.ArtifactStagingDirectory)/packages/releases/*.nupkg;!$(Build.ArtifactStagingDirectory)/packages/releases/*.symbols.nupkg'
+          nuGetFeedType: 'external'
+          publishFeedCredentials: 'Nuget'
