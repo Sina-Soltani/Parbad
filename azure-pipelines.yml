@@ -10,6 +10,8 @@ pool:
 
 variables:
   buildConfiguration: 'release'
+  artifactPrereleasePath: '$(Build.ArtifactStagingDirectory)/packages/prereleases'
+  artifactReleasePath: '$(Build.ArtifactStagingDirectory)/packages/releases'
 
 stages:
   - stage: Development
@@ -34,10 +36,10 @@ stages:
           command: 'custom'
           projects: 'src/**/*.csproj'
           custom: 'pack'
-          arguments: '-c $(buildConfiguration) --no-build -o $(Build.ArtifactStagingDirectory)/packages/prereleases --version-suffix dev$(Build.BuildNumber)'
+          arguments: '-c $(buildConfiguration) --no-build -o $(artifactPrereleasePath) --version-suffix dev$(Build.BuildNumber)'
       - task: PublishBuildArtifacts@1
         inputs:
-          PathtoPublish: '$(Build.ArtifactStagingDirectory)/packages/prereleases'
+          PathtoPublish: '$(artifactPrereleasePath)'
           ArtifactName: 'prereleases'
           publishLocation: 'Container'
   - stage: Production
@@ -62,9 +64,5 @@ stages:
           command: 'custom'
           projects: 'src/**/*.csproj'
           custom: 'pack'
-          arguments: '-c $(buildConfiguration) --no-build -o $(Build.ArtifactStagingDirectory)/packages/releases'
-      - task: NuGetToolInstaller@1
-        inputs:
-          versionSpec: '>=4.x'
-          checkLatest: true
-      - script: nuget push -ApiKey $(ApiKey) -Source "https://api.nuget.org/v3/index.json" $(Build.ArtifactStagingDirectory)/packages/releases/*.nupkg
+          arguments: '-c $(buildConfiguration) --no-build -o $(artifactReleasePath)'
+      - script: dotnet nuget push -k $(ApiKey) -s "https://api.nuget.org/v3/index.json" $(artifactReleasePath)\*.nupkg
