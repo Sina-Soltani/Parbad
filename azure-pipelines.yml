@@ -63,8 +63,8 @@ stages:
           projects: 'src/**/*.csproj'
           custom: 'pack'
           arguments: '-c $(buildConfiguration) --no-build -o $(Build.ArtifactStagingDirectory)/packages/releases'
-      - task: PublishBuildArtifacts@1
+      - task: NuGetToolInstaller@1
         inputs:
-          PathtoPublish: '$(Build.ArtifactStagingDirectory)/packages/releases'
-          ArtifactName: 'releases'
-          publishLocation: 'Container'
+          versionSpec: '>=4.x'
+          checkLatest: true
+      - script: nuget push -ApiKey $(ApiKey) -Source "https://api.nuget.org/v3/index.json" $(Build.ArtifactStagingDirectory)/packages/releases/*.nupkg
