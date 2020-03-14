@@ -65,4 +65,3 @@ stages:
           projects: 'src/**/*.csproj'
           custom: 'pack'
           arguments: '-c $(buildConfiguration) --no-build -o $(artifactReleasePath)'
-      - script: dotnet nuget push $(artifactReleasePath)\*.nupkg -k $(ApiKey) -s "https://api.nuget.org/v3/index.json"
