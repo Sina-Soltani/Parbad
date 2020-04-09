@@ -20,5 +20,13 @@ namespace Parbad.Gateway.PayIr.Internal
         public string ErrorMessage { get; set; }
 
         public bool IsSucceed => string.Equals(Status, "1", StringComparison.InvariantCultureIgnoreCase);
+
+        public string FactorNumber { get; set; }
+
+        public string Mobile { get; set; }
+
+        public string Description { get; set; }
+
+        public string CardNumber { get; set; }
     }
 }
