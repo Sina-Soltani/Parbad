@@ -1,5 +1,4 @@
 ### Pull Requests
-We welcome contributions!
 
 - Create a new branch from the `master` branch. Direct changes on master branch are not acceptable.
 - Name of the branch must be started with `feature` or `bug` and then the name of feature or bug.
