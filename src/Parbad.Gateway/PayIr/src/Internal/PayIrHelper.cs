@@ -91,7 +91,13 @@ namespace Parbad.Gateway.PayIr.Internal
                 return PaymentVerifyResult.Failed(message);
             }
 
-            return PaymentVerifyResult.Succeed(result.TransId, messagesOptions.PaymentSucceed);
+            var res = PaymentVerifyResult.Succeed(result.TransId, messagesOptions.PaymentSucceed);
+            res.AdditionalData.Add("FactorNumber", result.FactorNumber);
+            res.AdditionalData.Add("Mobile", result.Mobile);
+            res.AdditionalData.Add("Description", result.Description);
+            res.AdditionalData.Add("CardNumber", result.CardNumber);
+
+            return res;
         }
     }
 }
