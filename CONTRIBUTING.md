@@ -8,3 +8,4 @@
   - C# Naming Convention
 - Codes (Interfaces, Classes, Methods, Properties, etc.) that are `public` MUST have a summary.
 - Don't use 3rd party libraries which are not popular.
+- Let people know how your feature works by writing a nice and understandable Wiki guidline. This will be added in [Wiki](https://github.com/Sina-Soltani/Parbad/wiki) page.
