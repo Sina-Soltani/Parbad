@@ -3,7 +3,7 @@ name: Reporting a bug
 about: گزارش خطا
 title: ''
 labels: bug
-assignees: ''
+assignees: Sina-Soltani
 
 ---
 

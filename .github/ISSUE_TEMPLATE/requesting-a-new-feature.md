@@ -3,7 +3,7 @@ name: Requesting a new feature
 about: درخواست یا پیشنهاد یک ویژگی جدید
 title: ''
 labels: feature
-assignees: ''
+assignees: Sina-Soltani
 
 ---
 

@@ -3,7 +3,7 @@ name: Question
 about: پرسش
 title: ''
 labels: question
-assignees: ''
+assignees: Sina-Soltani
 
 ---
 
