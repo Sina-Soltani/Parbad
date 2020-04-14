@@ -77,7 +77,7 @@ namespace Parbad.Gateway.ParbadVirtual
 
             return new PaymentVerifyResult
             {
-                IsSucceed = isSucceed,
+                Status = isSucceed ? PaymentVerifyResultStatus.Succeed : PaymentVerifyResultStatus.Failed,
                 TransactionCode = transactionCode,
                 Message = message
             }.ToInterfaceAsync();

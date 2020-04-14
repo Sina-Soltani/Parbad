@@ -187,7 +187,7 @@ namespace Parbad.Gateway.Mellat.Internal
 
             return new PaymentVerifyResult
             {
-                IsSucceed = isSuccess,
+                Status = isSuccess ? PaymentVerifyResultStatus.Succeed : PaymentVerifyResultStatus.Failed,
                 TransactionCode = callbackResult.SaleReferenceId,
                 Message = message,
             };
@@ -223,7 +223,7 @@ namespace Parbad.Gateway.Mellat.Internal
 
             return new PaymentRefundResult
             {
-                IsSucceed = isSuccess,
+                Status = isSuccess ? PaymentRefundResultStatus.Succeed : PaymentRefundResultStatus.Failed,
                 Message = message
             };
         }

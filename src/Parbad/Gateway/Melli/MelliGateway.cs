@@ -83,7 +83,7 @@ namespace Parbad.Gateway.Melli
 
             var result = await PostJsonAsync<MelliApiVerifyResult>(MelliHelper.ServiceVerifyUrl, data.JsonDataToVerify, cancellationToken).ConfigureAwaitFalse();
 
-            return MelliHelper.CreateVerifyResult(data.Token, result, _messageOptions.Value);
+            return MelliHelper.CreateVerifyResult(result, _messageOptions.Value);
         }
 
         /// <inheritdoc />

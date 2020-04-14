@@ -149,7 +149,7 @@ namespace Parbad.Gateway.AsanPardakht.Internal
                 {
                     verifyResult = new PaymentVerifyResult
                     {
-                        IsSucceed = false,
+                        Status = PaymentVerifyResultStatus.Failed,
                         TrackingNumber = context.Payment.TrackingNumber,
                         TransactionCode = rrn,
                         Message = message
@@ -253,7 +253,7 @@ namespace Parbad.Gateway.AsanPardakht.Internal
 
             var verifyResult = new PaymentVerifyResult
             {
-                IsSucceed = isSucceed,
+                Status = isSucceed ? PaymentVerifyResultStatus.Succeed : PaymentVerifyResultStatus.Failed,
                 TransactionCode = callbackResult.Rrn,
                 Message = message
             };

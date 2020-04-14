@@ -185,7 +185,7 @@ namespace Parbad.Gateway.Pasargad.Internal
 
             return new PaymentVerifyResult
             {
-                IsSucceed = isSucceed,
+                Status = isSucceed ? PaymentVerifyResultStatus.Succeed : PaymentVerifyResultStatus.Failed,
                 TransactionCode = callbackResult.TransactionId,
                 Message = message
             };
@@ -243,7 +243,7 @@ namespace Parbad.Gateway.Pasargad.Internal
 
             return new PaymentRefundResult
             {
-                IsSucceed = isSucceed,
+                Status = isSucceed ? PaymentRefundResultStatus.Succeed : PaymentRefundResultStatus.Failed,
                 Message = message
             };
         }
