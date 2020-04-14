@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Parbad.Storage.EntityFrameworkCore</PackageId>
-    <VersionPrefix>1.0.3</VersionPrefix>
+    <VersionPrefix>1.0.4</VersionPrefix>
     <LangVersion>latest</LangVersion>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
@@ -17,7 +17,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Authors>Sina Soltani</Authors>
     <Product>Parbad.Storage.EntityframeworkCore</Product>
-    <PackageReleaseNotes>EF CORE implementation of StorageManager is added.</PackageReleaseNotes>
+    <PackageReleaseNotes>Bug Ticket #71 is fixed.</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

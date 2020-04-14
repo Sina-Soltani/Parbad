@@ -107,7 +107,7 @@ namespace Parbad.Gateway.Melli.Internal
             };
         }
 
-        public static PaymentVerifyResult CreateVerifyResult(string token, MelliApiVerifyResult result, MessagesOptions messagesOptions)
+        public static PaymentVerifyResult CreateVerifyResult(MelliApiVerifyResult result, MessagesOptions messagesOptions)
         {
             if (result == null)
             {
@@ -125,9 +125,13 @@ namespace Parbad.Gateway.Melli.Internal
                 message = MelliVerifyResultTranslator.Translate(result.ResCode, messagesOptions);
             }
 
+            var status = result.ResCode == SuccessCode
+                ? PaymentVerifyResultStatus.Succeed
+                : PaymentVerifyResultStatus.Failed;
+
             return new PaymentVerifyResult
             {
-                IsSucceed = result.ResCode == SuccessCode,
+                Status = status,
                 TransactionCode = result.RetrivalRefNo,
                 Message = message
             };

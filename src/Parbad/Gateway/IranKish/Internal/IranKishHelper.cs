@@ -121,7 +121,7 @@ namespace Parbad.Gateway.IranKish.Internal
                     {
                         TrackingNumber = invoiceNumber,
                         TransactionCode = referenceId,
-                        IsSucceed = false,
+                        Status = PaymentVerifyResultStatus.Failed,
                         Message = translatedMessage
                     };
                 }
@@ -168,7 +168,7 @@ namespace Parbad.Gateway.IranKish.Internal
                 {
                     TrackingNumber = callbackResult.InvoiceNumber,
                     TransactionCode = callbackResult.ReferenceId,
-                    IsSucceed = false,
+                    Status = PaymentVerifyResultStatus.Failed,
                     Message = messagesOptions.InvalidDataReceivedFromGateway
                 };
             }
@@ -183,7 +183,7 @@ namespace Parbad.Gateway.IranKish.Internal
             {
                 TrackingNumber = callbackResult.InvoiceNumber,
                 TransactionCode = callbackResult.ReferenceId,
-                IsSucceed = true,
+                Status = PaymentVerifyResultStatus.Succeed,
                 Message = translatedMessage
             };
         }

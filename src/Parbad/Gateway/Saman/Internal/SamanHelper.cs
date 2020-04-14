@@ -105,7 +105,7 @@ namespace Parbad.Gateway.Saman.Internal
 
             return new PaymentVerifyResult
             {
-                IsSucceed = isSuccess,
+                Status = isSuccess ? PaymentVerifyResultStatus.Succeed : PaymentVerifyResultStatus.Failed,
                 TransactionCode = callbackResult.TransactionId,
                 Message = message
             };
@@ -139,7 +139,7 @@ namespace Parbad.Gateway.Saman.Internal
 
             return new PaymentRefundResult
             {
-                IsSucceed = isSucceed,
+                Status = isSucceed ? PaymentRefundResultStatus.Succeed : PaymentRefundResultStatus.Failed,
                 Message = message
             };
         }

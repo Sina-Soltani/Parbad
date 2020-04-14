@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Parbad.Storage.Cache</PackageId>
-    <VersionPrefix>1.0.1</VersionPrefix>
+    <VersionPrefix>1.0.2</VersionPrefix>
     <LangVersion>latest</LangVersion>
     <TargetFrameworks>netstandard2.0;netcoreapp3.0</TargetFrameworks>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
@@ -17,7 +17,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Authors>Sina Soltani</Authors>
     <Product>Parbad.Storage.Cache</Product>
-    <PackageReleaseNotes>Targeting .NETCORE3.x is added.</PackageReleaseNotes>
+    <PackageReleaseNotes>Bug Ticket #71 is fixed.</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

@@ -184,7 +184,7 @@ namespace Parbad.Gateway.Parsian.Internal
 
             var result = new PaymentVerifyResult
             {
-                IsSucceed = isSucceed,
+                Status = isSucceed ? PaymentVerifyResultStatus.Succeed : PaymentVerifyResultStatus.Failed,
                 TransactionCode = rrn,
                 Message = message
             };
@@ -234,7 +234,7 @@ namespace Parbad.Gateway.Parsian.Internal
 
             var result = new PaymentRefundResult
             {
-                IsSucceed = status == "0",
+                Status = status == "0" ? PaymentRefundResultStatus.Succeed : PaymentRefundResultStatus.Failed,
                 Message = message
             };
 
