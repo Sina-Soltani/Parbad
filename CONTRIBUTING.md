@@ -1,6 +1,6 @@
 ### Pull Requests
 
-  You would like to join the Parbad development and send a Pull Request? Then please read the bellow instrcutions:
+  You would like to join the Parbad development and send a Pull Request? Then please read the bellow instructions:
 
 - First create an [issue](https://github.com/Sina-Soltani/Parbad/issues/new/choose) and explain what your Pull Request is for. Maybe you don't need to do anything at all! If everything goes right after the discussion then continue the following steps.
 - Create a new branch from the `master` branch.
