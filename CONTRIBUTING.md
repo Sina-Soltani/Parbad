@@ -1,10 +1,13 @@
 ### Pull Requests
 
-- Create a new branch from the `master` branch. Direct changes on master branch are not acceptable.
-- Name of the branch must be started with `feature` or `bug` and then the name of feature or bug.
-  - Examples: `feature/AddingSomething`, `bug/FixingSomething`
-- Codes MUST be human readable. If you don't know how:
-  - Search for Clean Code
+  You would like to join the Parbad development and send a Pull Request? Then please read the bellow instrcutions:
+
+- First create an [issue](https://github.com/Sina-Soltani/Parbad/issues/new/choose) and explain what your Pull Request is for. Maybe you don't need to do anything at all! If everything goes right after the discussion then continue the following steps.
+- Create a new branch from the `master` branch.
+  - Branch name pattern: `[feature|bug]/[issue number]_[name]`
+  - Branch name examples: `feature/70_AddingSomething`, `bug/80_FixingSomething`
+- Codes MUST be human readable. If you don't know how search for:
+  - Clean Code
   - C# Naming Convention
 - Codes (Interfaces, Classes, Methods, Properties, etc.) that are `public` MUST have a summary.
 - Don't use 3rd party libraries which are not popular.
