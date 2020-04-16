@@ -32,25 +32,15 @@ namespace Parbad.Gateway.Mellat.Internal
         public IMellatGatewayInvoiceBuilder AddMellatCumulativeAccounts(IList<MellatCumulativeDynamicAccount> accounts)
         {
             if (accounts == null) throw new ArgumentNullException(nameof(accounts));
-            if (accounts.Count == 0) throw new ArgumentException("accounts cannot be an empty collection.", nameof(accounts));
+            if (accounts.Count == 0) throw new ArgumentException("Accounts cannot be an empty collection.", nameof(accounts));
 
-            IList<MellatCumulativeDynamicAccount> existingAccounts;
-
-            if (InvoiceBuilder.AdditionalData.ContainsKey(MellatHelper.CumulativeAccountsKey))
-            {
-                existingAccounts = (IList<MellatCumulativeDynamicAccount>)InvoiceBuilder.AdditionalData[MellatHelper.CumulativeAccountsKey];
-            }
-            else
-            {
-                existingAccounts = new List<MellatCumulativeDynamicAccount>();
-            }
+            IList<MellatCumulativeDynamicAccount> existingAccounts = new List<MellatCumulativeDynamicAccount>();
 
             foreach (var account in accounts)
             {
                 existingAccounts.Add(account);
             }
 
-            InvoiceBuilder.AdditionalData.Remove(MellatHelper.CumulativeAccountsKey);
             InvoiceBuilder.AddAdditionalData(MellatHelper.CumulativeAccountsKey, existingAccounts);
 
             return this;
