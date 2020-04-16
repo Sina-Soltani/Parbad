@@ -25,11 +25,6 @@ namespace Parbad
             if (builder == null) throw new ArgumentNullException(nameof(builder));
             if (accountName.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(accountName));
 
-            if (builder.AdditionalData.ContainsKey(GatewayAccountKeyName))
-            {
-                builder.AdditionalData.Remove(GatewayAccountKeyName);
-            }
-
             builder.AddAdditionalData(GatewayAccountKeyName, accountName);
 
             return builder;

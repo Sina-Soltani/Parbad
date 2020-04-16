@@ -3,8 +3,8 @@
 
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Parbad;
+using Parbad.Abstraction;
 using Parbad.Builder;
-using Parbad.GatewayBuilders;
 using Parbad.Internal;
 using Parbad.InvoiceBuilder;
 using Parbad.TrackingNumberProviders;
@@ -32,20 +32,11 @@ namespace Microsoft.Extensions.DependencyInjection
             builder.Services.TryAddTransient<AutoIncrementTrackingNumber>();
             builder.Services.TryAddTransient<AutoRandomTrackingNumber>();
 
+            builder.Services.TryAddTransient<IGatewayProvider, DefaultGatewayProvider>();
+
             builder.ConfigureMessages(options => { });
 
             builder.ConfigurePaymentToken(tokenBuilder => tokenBuilder.UseGuidQueryStringPaymentTokenProvider());
-
-            builder.ConfigureGatewayFactory(factoryBuilder => factoryBuilder.Add(provider =>
-            {
-                var providers = new IGatewayFactory[]
-                {
-                    new DefaultGatewayFactory(provider),
-                    new RuntimeGatewayFactory(provider),
-                };
-
-                return new CompositeGatewayFactory(providers);
-            }));
 
             return builder;
         }

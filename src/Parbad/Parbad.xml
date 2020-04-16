@@ -86,28 +86,19 @@
             Describes an invoice which must be requested.
             </summary>
         </member>
-        <member name="M:Parbad.Abstraction.Invoice.#ctor(System.Int64,Parbad.Money,Parbad.CallbackUrl,System.String,System.Collections.Generic.IDictionary{System.String,System.Object})">
+        <member name="M:Parbad.Abstraction.Invoice.#ctor">
             <summary>
-            Initializes an instance of <see cref="T:Parbad.Abstraction.Invoice"/>.
+            Describes an invoice which must be requested.
             </summary>
-            <param name="trackingNumber">Tracking number of invoice.</param>
-            <param name="amount">The amount of invoice.
-            <para>Note: You can also enter long and decimal numbers.</para>
-            </param>
-            <param name="callbackUrl">A complete URL of your website. It will be used by the gateway for redirecting the client again to your website.
-            <para>Note: A complete URL would be like: "http://www.mywebsite.com/foo/bar/"</para>
-            </param>
-            <param name="gatewayName">Name of the gateway which the invoice must be paid in.</param>
-            <param name="additionalData">Additional data for this invoice.</param>
         </member>
         <member name="P:Parbad.Abstraction.Invoice.TrackingNumber">
             <summary>
-            Gets the Tracking number of the invoice.
+            Gets or sets the Tracking number of the invoice.
             </summary>
         </member>
         <member name="P:Parbad.Abstraction.Invoice.Amount">
             <summary>
-            Gets the amount of the invoice.
+            Gets or sets the amount of the invoice.
             <para>Note: You can also enter long and decimal numbers. It can also be parsed to long and decimal.</para>
             <para>Examples:</para>
             <para>long a = invoice.Amount;</para>
@@ -123,12 +114,12 @@
         </member>
         <member name="P:Parbad.Abstraction.Invoice.GatewayName">
             <summary>
-            Gets the name of the gateway which the invoice must be paid in.
+            Gets or sets the name of the gateway which the invoice must be paid in.
             </summary>
         </member>
         <member name="P:Parbad.Abstraction.Invoice.AdditionalData">
             <summary>
-            Gets the additional data of the invoice.
+            Gets or sets the additional data of the invoice.
             </summary>
         </member>
         <member name="T:Parbad.Builder.IParbadBuilder">
@@ -445,6 +436,11 @@
             </param>
             <exception cref="T:Parbad.Exceptions.CallbackUrlFormatException"></exception>
             <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="P:Parbad.CallbackUrl.Url">
+            <summary>
+            Gets the URL.
+            </summary>
         </member>
         <member name="M:Parbad.CallbackUrl.AddQueryString(System.String,System.String)">
             <summary>
@@ -1080,41 +1076,13 @@
         </member>
         <member name="M:Parbad.Internal.DefaultInvoiceBuilder.#ctor(System.IServiceProvider)">
             <summary>
-            Initializes an instance of <see cref="T:Parbad.Internal.DefaultInvoiceBuilder"/> class.
+            Initializes an instance of <see cref="T:Parbad.Internal.DefaultInvoiceBuilder"/>.
             </summary>
-            <param name="services"></param>
         </member>
-        <member name="P:Parbad.Internal.DefaultInvoiceBuilder.TrackingNumber">
+        <member name="M:Parbad.Internal.DefaultInvoiceBuilder.AddFormatter(Parbad.InvoiceBuilder.IInvoiceFormatter)">
             <inheritdoc />
         </member>
-        <member name="P:Parbad.Internal.DefaultInvoiceBuilder.Amount">
-            <inheritdoc />
-        </member>
-        <member name="P:Parbad.Internal.DefaultInvoiceBuilder.CallbackUrl">
-            <inheritdoc />
-        </member>
-        <member name="P:Parbad.Internal.DefaultInvoiceBuilder.GatewayName">
-            <inheritdoc />
-        </member>
-        <member name="P:Parbad.Internal.DefaultInvoiceBuilder.AdditionalData">
-            <inheritdoc />
-        </member>
-        <member name="P:Parbad.Internal.DefaultInvoiceBuilder.Services">
-            <inheritdoc />
-        </member>
-        <member name="M:Parbad.Internal.DefaultInvoiceBuilder.SetTrackingNumberProvider(Parbad.TrackingNumberProviders.ITrackingNumberProvider)">
-            <inheritdoc />
-        </member>
-        <member name="M:Parbad.Internal.DefaultInvoiceBuilder.SetAmount(Parbad.Money)">
-            <inheritdoc />
-        </member>
-        <member name="M:Parbad.Internal.DefaultInvoiceBuilder.SetCallbackUrl(Parbad.CallbackUrl)">
-            <inheritdoc />
-        </member>
-        <member name="M:Parbad.Internal.DefaultInvoiceBuilder.SetGateway(System.String)">
-            <inheritdoc />
-        </member>
-        <member name="M:Parbad.Internal.DefaultInvoiceBuilder.AddAdditionalData(System.String,System.Object)">
+        <member name="M:Parbad.Internal.DefaultInvoiceBuilder.AddFormatter``1">
             <inheritdoc />
         </member>
         <member name="M:Parbad.Internal.DefaultInvoiceBuilder.BuildAsync(System.Threading.CancellationToken)">
@@ -1259,106 +1227,92 @@
         <member name="P:Parbad.Internal.PaymentResult.AdditionalData">
             <inheritdoc />
         </member>
-        <member name="T:Parbad.Internal.UserInputTrackingNumberProvider">
+        <member name="T:Parbad.InvoiceBuilder.DefaultInvoiceFormatter">
             <summary>
-            Gets the tracking number direct from the user.
+            Default implementation of <see cref="T:Parbad.InvoiceBuilder.IInvoiceFormatter"/>.
             </summary>
-            <exception cref="T:Parbad.Exceptions.InvalidTrackingNumberException"></exception>
         </member>
-        <member name="M:Parbad.Internal.UserInputTrackingNumberProvider.#ctor(System.Int64)">
+        <member name="M:Parbad.InvoiceBuilder.DefaultInvoiceFormatter.#ctor(System.Action{Parbad.Abstraction.Invoice})">
             <summary>
-            Initializes an instance of <see cref="T:Parbad.Internal.UserInputTrackingNumberProvider"/> with the
-            given <paramref name="trackingNumber"/>.
+            Initializes an instance of <see cref="T:Parbad.InvoiceBuilder.DefaultInvoiceFormatter"/>.
             </summary>
-            <param name="trackingNumber"></param>
-            <exception cref="T:Parbad.Exceptions.InvalidTrackingNumberException"></exception>
+            <param name="formatInvoice">Format the given invoice.</param>
+        </member>
+        <member name="M:Parbad.InvoiceBuilder.DefaultInvoiceFormatter.#ctor(System.Func{Parbad.Abstraction.Invoice,System.Threading.Tasks.Task})">
+            <summary>
+            Initializes an instance of <see cref="T:Parbad.InvoiceBuilder.DefaultInvoiceFormatter"/>.
+            </summary>
+            <param name="formatInvoiceAsync">Format the given invoice asynchronously.</param>
+        </member>
+        <member name="M:Parbad.InvoiceBuilder.DefaultInvoiceFormatter.FormatAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
+            <inheritdoc />
         </member>
         <member name="T:Parbad.InvoiceBuilder.IInvoiceBuilder">
             <summary>
             A builder which helps to build an invoice.
             </summary>
         </member>
-        <member name="P:Parbad.InvoiceBuilder.IInvoiceBuilder.TrackingNumber">
+        <member name="M:Parbad.InvoiceBuilder.IInvoiceBuilder.AddFormatter(Parbad.InvoiceBuilder.IInvoiceFormatter)">
             <summary>
-            Gets or sets the tracking number of invoice.
+            Adds the given <paramref name="formatter"/> to the list of formatters.
             </summary>
+            <param name="formatter"></param>
         </member>
-        <member name="P:Parbad.InvoiceBuilder.IInvoiceBuilder.Amount">
+        <member name="M:Parbad.InvoiceBuilder.IInvoiceBuilder.AddFormatter``1">
             <summary>
-            Gets os sets the amount of the invoice.
-            <para>Note: You can also enter long and decimal numbers.</para>
+            Adds the given formatter to the list of formatters.
             </summary>
-        </member>
-        <member name="P:Parbad.InvoiceBuilder.IInvoiceBuilder.CallbackUrl">
-            <summary>
-            A complete URL of your website. It will be used by the gateway for redirecting
-            the client again to your website.
-            <para>Note: A complete URL would be like: "http://www.mywebsite.com/foo/bar/"</para>
-            </summary>
-        </member>
-        <member name="P:Parbad.InvoiceBuilder.IInvoiceBuilder.GatewayName">
-            <summary>
-            Gets or sets the type of the gateway which the invoice must be paid in.
-            </summary>
-        </member>
-        <member name="P:Parbad.InvoiceBuilder.IInvoiceBuilder.AdditionalData">
-            <summary>
-            Additional data for this invoice.
-            </summary>
-        </member>
-        <member name="P:Parbad.InvoiceBuilder.IInvoiceBuilder.Services">
-            <summary>
-            Defines a mechanism for retrieving a service object; that is, an object that
-            provides custom support to other objects.
-            </summary>
-        </member>
-        <member name="M:Parbad.InvoiceBuilder.IInvoiceBuilder.SetTrackingNumberProvider(Parbad.TrackingNumberProviders.ITrackingNumberProvider)">
-            <summary>
-            Sets an <see cref="T:Parbad.TrackingNumberProviders.ITrackingNumberProvider"/> which generates a new tracking numbers for each payment requests.
-            </summary>
-            <param name="provider">An implementation of <see cref="T:Parbad.TrackingNumberProviders.ITrackingNumberProvider"/>.</param>
-            <exception cref="T:System.ArgumentNullException"></exception>
-        </member>
-        <member name="M:Parbad.InvoiceBuilder.IInvoiceBuilder.SetAmount(Parbad.Money)">
-            <summary>
-            Sets the amount of the invoice.
-            </summary>
-            <param name="amount">The amount of invoice.</param>
-        </member>
-        <member name="M:Parbad.InvoiceBuilder.IInvoiceBuilder.SetCallbackUrl(Parbad.CallbackUrl)">
-            <summary>
-            Sets the callback URL. It will be used by the gateway for redirecting the client
-            again to your website.
-            </summary>
-            <param name="url">
-            A complete URL of your website. It will be used by the gateway for redirecting the
-            client again to your website.
-            <para>Note: A complete URL would be like: "http://www.mywebsite.com/foo/bar/"</para>
-            </param>
-        </member>
-        <member name="M:Parbad.InvoiceBuilder.IInvoiceBuilder.SetGateway(System.String)">
-            <summary>
-            Sets the gateway name.
-            </summary>
-            <param name="gatewayName"></param>
-            <exception cref="T:Parbad.Exceptions.GatewayNotFoundException"></exception>
-            <exception cref="T:System.ArgumentNullException"></exception>
-        </member>
-        <member name="M:Parbad.InvoiceBuilder.IInvoiceBuilder.AddAdditionalData(System.String,System.Object)">
-            <summary>
-            Adds additional data to the invoice.
-            </summary>
-            <param name="key">Key of the data</param>
-            <param name="value">Value of the data</param>
+            <typeparam name="T">Type of the formatter.</typeparam>
         </member>
         <member name="M:Parbad.InvoiceBuilder.IInvoiceBuilder.BuildAsync(System.Threading.CancellationToken)">
             <summary>
             Builds an invoice with the given data.
             </summary>
         </member>
+        <member name="T:Parbad.InvoiceBuilder.IInvoiceFormatter">
+            <summary>
+            A formatter that can change an invoice.
+            </summary>
+        </member>
+        <member name="M:Parbad.InvoiceBuilder.IInvoiceFormatter.FormatAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
+            <summary>
+            Formats the given <paramref name="invoice"/>.
+            </summary>
+            <param name="invoice"></param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="T:Parbad.InvoiceBuilderExtensions">
+            <summary>
+            Extension methods for <see cref="T:Parbad.InvoiceBuilder.IInvoiceBuilder"/>.
+            </summary>
+        </member>
+        <member name="M:Parbad.InvoiceBuilderExtensions.SetTrackingNumber(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Int64)">
+            <summary>
+            Sets the tracking number of invoice.
+            </summary>
+            <param name="builder"></param>
+            <param name="trackingNumber">
+            The tracking number of invoice.
+            <para>Note: It must be unique for each payment requests.</para>
+            </param>
+        </member>
         <member name="M:Parbad.InvoiceBuilderExtensions.SetAmount(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Decimal)">
             <summary>
             Sets amount of the invoice.
+            </summary>
+            <param name="builder"></param>
+            <param name="amount">The amount of invoice.</param>
+        </member>
+        <member name="M:Parbad.InvoiceBuilderExtensions.SetAmount(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Int64)">
+            <summary>
+            Sets amount of the invoice.
+            </summary>
+            <param name="builder"></param>
+            <param name="amount">The amount of invoice.</param>
+        </member>
+        <member name="M:Parbad.InvoiceBuilderExtensions.SetAmount(Parbad.InvoiceBuilder.IInvoiceBuilder,Parbad.Money)">
+            <summary>
+            Sets the amount of the invoice.
             </summary>
             <param name="builder"></param>
             <param name="amount">The amount of invoice.</param>
@@ -1375,7 +1329,36 @@
             client again to your website.
             <para>Note: A complete URL would be like: "http://www.mywebsite.com/foo/bar/"</para>
             </param>
-            <returns></returns>
+        </member>
+        <member name="M:Parbad.InvoiceBuilderExtensions.SetCallbackUrl(Parbad.InvoiceBuilder.IInvoiceBuilder,Parbad.CallbackUrl)">
+            <summary>
+            Sets the callback URL. It will be used by the gateway for redirecting the
+            client again to your website.
+            <para>Note: A complete URL would be like: "http://www.mywebsite.com/foo/bar/"</para>
+            </summary>
+            <param name="builder"></param>
+            <param name="callbackUrl">
+            A complete URL of your website. It will be used by the gateway for redirecting the
+            client again to your website.
+            <para>Note: A complete URL would be like: "http://www.mywebsite.com/foo/bar/"</para>
+            </param>
+        </member>
+        <member name="M:Parbad.InvoiceBuilderExtensions.SetGateway(Parbad.InvoiceBuilder.IInvoiceBuilder,System.String)">
+            <summary>
+            Sets the gateway name.
+            </summary>
+            <param name="builder"></param>
+            <param name="gatewayName"></param>
+            <exception cref="T:Parbad.Exceptions.GatewayNotFoundException"></exception>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="M:Parbad.InvoiceBuilderExtensions.AddAdditionalData(Parbad.InvoiceBuilder.IInvoiceBuilder,System.String,System.Object)">
+            <summary>
+            Adds the given key and value to the invoice.
+            </summary>
+            <param name="builder"></param>
+            <param name="key">Key of the data</param>
+            <param name="value">Value of the data</param>
         </member>
         <member name="M:Parbad.InvoiceBuilderExtensions.AddAdditionalData(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Collections.Generic.IDictionary{System.String,System.Object})">
             <summary>
@@ -1383,6 +1366,20 @@
             </summary>
             <param name="builder"></param>
             <param name="additionalData"></param>
+        </member>
+        <member name="M:Parbad.InvoiceBuilderExtensions.AddFormatter(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Action{Parbad.Abstraction.Invoice})">
+            <summary>
+            Adds the given formatter to the list of formatters.
+            </summary>
+            <param name="builder"></param>
+            <param name="formatInvoice"></param>
+        </member>
+        <member name="M:Parbad.InvoiceBuilderExtensions.AddFormatter(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Func{Parbad.Abstraction.Invoice,System.Threading.Tasks.Task})">
+            <summary>
+            Adds the given formatter to the list of formatters.
+            </summary>
+            <param name="builder"></param>
+            <param name="formatInvoice"></param>
         </member>
         <member name="T:Parbad.InvoiceContext">
             <summary>
@@ -2250,50 +2247,6 @@
             The specific key for <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/>
             </summary>
         </member>
-        <member name="T:Parbad.TrackingNumberProviders.ITrackingNumberProvider">
-            <summary>
-            Defines a mechanism for generating a tracking number for each payment requests.
-            </summary>
-        </member>
-        <member name="M:Parbad.TrackingNumberProviders.ITrackingNumberProvider.ProvideAsync(System.Threading.CancellationToken)">
-            <summary>
-            Provides a new tracking number.
-            </summary>
-            <param name="cancellationToken"></param>
-        </member>
-        <member name="M:Parbad.TrackingNumberProviderExtensions.SetTrackingNumber(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Int64)">
-            <summary>
-            Sets the tracking number of invoice.
-            </summary>
-            <param name="builder"></param>
-            <param name="trackingNumber">
-            The tracking number of invoice.
-            <para>Note: It must be unique for each payment requests.</para>
-            </param>
-            <exception cref="T:System.ArgumentNullException"></exception>
-            <exception cref="T:System.ArgumentOutOfRangeException"></exception>
-        </member>
-        <member name="M:Parbad.TrackingNumberProviderExtensions.SetTrackingNumberProvider``1(Parbad.InvoiceBuilder.IInvoiceBuilder)">
-            <summary>
-            Sets a provider which generates unique tracking numbers for each payment requests.
-            </summary>
-            <typeparam name="TProvider">Type of provider.</typeparam>
-            <param name="builder"></param>
-        </member>
-        <member name="M:Parbad.TrackingNumberProviderExtensions.SetTrackingNumberProvider(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Func{System.IServiceProvider,Parbad.TrackingNumberProviders.ITrackingNumberProvider})">
-            <summary>
-            Sets a provider which generates unique tracking numbers for each payment requests.
-            </summary>
-            <param name="builder"></param>
-            <param name="factory"></param>
-            <exception cref="T:System.ArgumentNullException"></exception>
-        </member>
-        <member name="M:Parbad.TrackingNumberProviderExtensions.UseAutoIncrementTrackingNumber(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Int64)">
-            <summary>
-            Generates automatically a new tracking number which is greater than the latest number.
-            <para>Note: You can also set a starting number by configuring the AutoTrackingNumberOptions.</para>
-            </summary>
-        </member>
         <member name="M:Parbad.TrackingNumberProviderExtensions.UseAutoIncrementTrackingNumber(Parbad.InvoiceBuilder.IInvoiceBuilder)">
             <summary>
             Generates automatically a new tracking number which is greater than the latest number.
@@ -2301,11 +2254,6 @@
             </summary>
         </member>
         <member name="M:Parbad.TrackingNumberProviderExtensions.UseAutoRandomTrackingNumber(Parbad.InvoiceBuilder.IInvoiceBuilder)">
-            <summary>
-            Generates a new tracking number randomly in <see cref="T:System.Int64"/> range.
-            </summary>
-        </member>
-        <member name="M:Parbad.TrackingNumberProviderExtensions.UseAutoRandomTrackingNumber(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Int64)">
             <summary>
             Generates a new tracking number randomly in <see cref="T:System.Int64"/> range.
             </summary>
