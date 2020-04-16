@@ -20,14 +20,15 @@ namespace Parbad
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            if (builder.AdditionalData.ContainsKey(ZarinPalHelper.ZarinPalRequestAdditionalKeyName))
+            builder.AddFormatter(invoice =>
             {
-                builder.AdditionalData[ZarinPalHelper.ZarinPalRequestAdditionalKeyName] = zarinPalInvoice;
-            }
-            else
-            {
-                builder.AddAdditionalData(ZarinPalHelper.ZarinPalRequestAdditionalKeyName, zarinPalInvoice);
-            }
+                if (invoice.AdditionalData.ContainsKey(ZarinPalHelper.ZarinPalRequestAdditionalKeyName))
+                {
+                    invoice.AdditionalData.Remove(ZarinPalHelper.ZarinPalRequestAdditionalKeyName);
+                }
+
+                invoice.AdditionalData.Add(ZarinPalHelper.ZarinPalRequestAdditionalKeyName, zarinPalInvoice);
+            });
 
             return builder.SetGateway(ZarinPalGateway.Name);
         }
