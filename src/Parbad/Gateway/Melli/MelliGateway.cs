@@ -60,7 +60,7 @@ namespace Parbad.Gateway.Melli
 
             var result = await PostJsonAsync<MelliApiRequestResult>(MelliHelper.ServiceRequestUrl, data, cancellationToken).ConfigureAwaitFalse();
 
-            return MelliHelper.CreateRequestResult(result, _httpContextAccessor, account, _messageOptions.Value);
+            return MelliHelper.CreateRequestResult(result, _httpContextAccessor.HttpContext, account, _messageOptions.Value);
         }
 
         /// <inheritdoc />

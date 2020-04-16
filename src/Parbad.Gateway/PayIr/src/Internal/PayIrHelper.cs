@@ -33,7 +33,7 @@ namespace Parbad.Gateway.PayIr.Internal
             };
         }
 
-        public static PaymentRequestResult CreateRequestResult(string response, IHttpContextAccessor httpContextAccessor, PayIrGatewayAccount account)
+        public static PaymentRequestResult CreateRequestResult(string response, HttpContext httpContext, PayIrGatewayAccount account)
         {
             var result = JsonConvert.DeserializeObject<PayIrRequestResponseModel>(response);
 
@@ -44,7 +44,7 @@ namespace Parbad.Gateway.PayIr.Internal
 
             var paymentPageUrl = $"{PaymentPageUrl}{result.Token}";
 
-            return PaymentRequestResult.Succeed(new GatewayRedirect(httpContextAccessor, paymentPageUrl), account.Name);
+            return PaymentRequestResult.Succeed(new GatewayRedirect(httpContext, paymentPageUrl), account.Name);
         }
 
         public static async Task<PayIrCallbackResult> CreateCallbackResultAsync(HttpRequest httpRequest, CancellationToken cancellationToken)

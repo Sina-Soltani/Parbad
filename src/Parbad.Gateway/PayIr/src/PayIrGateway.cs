@@ -58,7 +58,7 @@ namespace Parbad.Gateway.PayIr
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
-            return PayIrHelper.CreateRequestResult(response, _httpContextAccessor, account);
+            return PayIrHelper.CreateRequestResult(response, _httpContextAccessor.HttpContext, account);
         }
 
         /// <inheritdoc />

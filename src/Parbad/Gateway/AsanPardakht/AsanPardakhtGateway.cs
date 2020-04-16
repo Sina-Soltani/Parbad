@@ -52,7 +52,7 @@ namespace Parbad.Gateway.AsanPardakht
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
-            return AsanPardakhtHelper.CreateRequestResult(response, invoice, account, _httpContextAccessor, _messageOptions.Value);
+            return AsanPardakhtHelper.CreateRequestResult(response, invoice, account, _httpContextAccessor.HttpContext, _messageOptions.Value);
         }
 
         /// <inheritdoc />

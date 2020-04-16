@@ -49,7 +49,7 @@ namespace Parbad.Gateway.IranKish.Internal
             string webServiceResponse,
             Invoice invoice,
             IranKishGatewayAccount account,
-            IHttpContextAccessor httpContextAccessor,
+            HttpContext httpContext,
             MessagesOptions messagesOptions)
         {
             var result = XmlHelper.GetNodeValueFromXml(webServiceResponse, "result", "http://schemas.datacontract.org/2004/07/Token");
@@ -69,7 +69,7 @@ namespace Parbad.Gateway.IranKish.Internal
             }
 
             var transporter = new GatewayPost(
-                httpContextAccessor,
+                httpContext,
                 PaymentPageUrl,
                 new Dictionary<string, string>
                 {

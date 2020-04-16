@@ -58,7 +58,7 @@ namespace Parbad.Gateway.IdPay
                 .PostJsonAsync(IdPayHelper.RequestUrl, data, DefaultSerializerSettings, cancellationToken)
                 .ConfigureAwaitFalse();
 
-            return await IdPayHelper.CreateRequestResult(responseMessage, _httpContextAccessor, account);
+            return await IdPayHelper.CreateRequestResult(responseMessage, _httpContextAccessor.HttpContext, account);
         }
 
         /// <inheritdoc />

@@ -38,17 +38,17 @@ namespace Parbad.Gateway.ParbadVirtual
         /// <inheritdoc />
         public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
         {
-            var request = _httpContextAccessor.HttpContext.Request;
+            var httpContext = _httpContextAccessor.HttpContext;
 
             var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
 
-            var url = $"{request.Scheme}" +
+            var url = $"{httpContext.Request.Scheme}" +
                       "://" +
-                      $"{request.Host.ToUriComponent()}" +
+                      $"{httpContext.Request.Host.ToUriComponent()}" +
                       $"{_options.Value.GatewayPath}";
 
             var transporter = new GatewayPost(
-                _httpContextAccessor,
+                httpContext,
                 url,
                 new Dictionary<string, string>
                 {

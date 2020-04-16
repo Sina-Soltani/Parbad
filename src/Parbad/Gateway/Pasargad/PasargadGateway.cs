@@ -43,7 +43,7 @@ namespace Parbad.Gateway.Pasargad
 
             var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
 
-            return PasargadHelper.CreateRequestResult(invoice, _httpContextAccessor, account);
+            return PasargadHelper.CreateRequestResult(invoice, _httpContextAccessor.HttpContext, account);
         }
 
         /// <inheritdoc />

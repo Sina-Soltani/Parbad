@@ -23,10 +23,10 @@ namespace Parbad.Gateway.Saman.Internal
         public const string BaseServiceUrl = "https://sep.shaparak.ir/";
         public const string WebServiceUrl = "/payments/referencepayment.asmx";
 
-        public static PaymentRequestResult CreateRequestResult(Invoice invoice, IHttpContextAccessor httpContextAccessor, SamanGatewayAccount account)
+        public static PaymentRequestResult CreateRequestResult(Invoice invoice, HttpContext httpContext, SamanGatewayAccount account)
         {
             var transporter = new GatewayPost(
-                httpContextAccessor,
+                httpContext,
                 PaymentPageUrl,
                 new Dictionary<string, string>
                 {

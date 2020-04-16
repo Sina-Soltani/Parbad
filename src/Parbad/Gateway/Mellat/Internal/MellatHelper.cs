@@ -42,7 +42,7 @@ namespace Parbad.Gateway.Mellat.Internal
 
         public static PaymentRequestResult CreateRequestResult(
             string webServiceResponse,
-            IHttpContextAccessor httpContextAccessor,
+            HttpContext httpContext,
             MessagesOptions messagesOptions,
             GatewayAccount account)
         {
@@ -65,7 +65,7 @@ namespace Parbad.Gateway.Mellat.Internal
             }
 
             var transporter = new GatewayPost(
-                httpContextAccessor,
+                httpContext,
                 PaymentPageUrl,
                 new Dictionary<string, string>
                 {

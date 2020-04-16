@@ -1144,7 +1144,7 @@
             <exception cref="T:Parbad.Exceptions.InvalidGatewayTypeException"></exception>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
-        <member name="M:Parbad.Internal.GatewayPost.#ctor(Microsoft.AspNetCore.Http.IHttpContextAccessor,System.String,System.Collections.Generic.IDictionary{System.String,System.String})">
+        <member name="M:Parbad.Internal.GatewayPost.#ctor(Microsoft.AspNetCore.Http.HttpContext,System.String,System.Collections.Generic.IDictionary{System.String,System.String})">
             <inheritdoc />
         </member>
         <member name="M:Parbad.Internal.GatewayPost.TransportAsync(System.Threading.CancellationToken)">

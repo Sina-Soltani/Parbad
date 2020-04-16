@@ -30,7 +30,7 @@ namespace Parbad.Gateway.Pasargad.Internal
         private const string ActionNumber = "1003";
         private const string RefundNumber = "1004";
 
-        public static PaymentRequestResult CreateRequestResult(Invoice invoice, IHttpContextAccessor httpContextAccessor, PasargadGatewayAccount account)
+        public static PaymentRequestResult CreateRequestResult(Invoice invoice, HttpContext httpContext, PasargadGatewayAccount account)
         {
             var invoiceDate = GetTimeStamp(DateTime.Now);
 
@@ -49,7 +49,7 @@ namespace Parbad.Gateway.Pasargad.Internal
             var signedData = SignData(account.PrivateKey, dataToSign);
 
             var transporter = new GatewayPost(
-                httpContextAccessor,
+                httpContext,
                 PaymentPageUrl,
                 new Dictionary<string, string>
                 {

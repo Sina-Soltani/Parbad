@@ -43,7 +43,7 @@ namespace Parbad.Gateway.Saman
 
             var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
 
-            return SamanHelper.CreateRequestResult(invoice, _httpContextAccessor, account);
+            return SamanHelper.CreateRequestResult(invoice, _httpContextAccessor.HttpContext, account);
         }
 
         /// <inheritdoc />

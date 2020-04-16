@@ -51,7 +51,7 @@ namespace Parbad.Gateway.ZarinPal
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
-            return ZarinPalHelper.CreateRequestResult(response, _httpContextAccessor, account, _messagesOptions.Value);
+            return ZarinPalHelper.CreateRequestResult(response, _httpContextAccessor.HttpContext, account, _messagesOptions.Value);
         }
 
         /// <inheritdoc />

@@ -11,14 +11,14 @@ namespace Parbad.Internal
 {
     public class GatewayPost : IGatewayTransporter
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly HttpContext _httpContext;
         private readonly string _url;
         private readonly IDictionary<string, string> _formData;
 
         /// <inheritdoc />
-        public GatewayPost(IHttpContextAccessor httpContextAccessor, string url, IDictionary<string, string> formData)
+        public GatewayPost(HttpContext httpContext, string url, IDictionary<string, string> formData)
         {
-            _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
+            _httpContext = httpContext ?? throw new ArgumentNullException(nameof(httpContext));
             _url = url ?? throw new ArgumentNullException(nameof(url));
             _formData = formData ?? throw new ArgumentNullException(nameof(formData));
         }
@@ -26,11 +26,11 @@ namespace Parbad.Internal
         /// <inheritdoc />
         public Task TransportAsync(CancellationToken cancellationToken = default)
         {
-            HttpResponseUtilities.AddNecessaryContents(_httpContextAccessor.HttpContext, "text/html");
+            HttpResponseUtilities.AddNecessaryContents(_httpContext, "text/html");
 
             var form = HtmlFormBuilder.CreateForm(_url, _formData);
 
-            return _httpContextAccessor.HttpContext.Response.WriteAsync(form, cancellationToken);
+            return _httpContext.Response.WriteAsync(form, cancellationToken);
         }
     }
 }

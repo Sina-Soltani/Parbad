@@ -53,7 +53,7 @@ namespace Parbad.Gateway.AsanPardakht.Internal
             string response,
             Invoice invoice,
             AsanPardakhtGatewayAccount account,
-            IHttpContextAccessor httpContextAccessor,
+            HttpContext httpContext,
             MessagesOptions messagesOptions)
         {
             var result = XmlHelper.GetNodeValueFromXml(response, "RequestOperationResult", "http://tempuri.org/");
@@ -71,7 +71,7 @@ namespace Parbad.Gateway.AsanPardakht.Internal
             }
 
             var transporter = new GatewayPost(
-                httpContextAccessor,
+                httpContext,
                 PaymentPageUrl,
                 new Dictionary<string, string>
                 {
