@@ -1,4 +1,4 @@
-﻿<%@ Page Title="Request" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="PayRequest.aspx.cs" Inherits="Parbad.Sample.WebForm.PayRequest" %>
+﻿<%@ Page Async="true" Title="Request" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="PayRequest.aspx.cs" Inherits="Parbad.Sample.WebForm.PayRequest" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
     <h1>Request</h1>

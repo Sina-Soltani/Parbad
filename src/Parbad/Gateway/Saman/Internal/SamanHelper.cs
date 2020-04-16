@@ -3,6 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Parbad.Abstraction;
@@ -37,30 +39,35 @@ namespace Parbad.Gateway.Saman.Internal
             return PaymentRequestResult.Succeed(transporter, account.Name);
         }
 
-        public static SamanCallbackResult CreateCallbackResult(HttpRequest httpRequest, MessagesOptions messagesOptions)
+        public static async Task<SamanCallbackResult> CreateCallbackResultAsync(
+            HttpRequest httpRequest,
+            MessagesOptions messagesOptions,
+            CancellationToken cancellationToken)
         {
             var isSuccess = false;
             PaymentVerifyResult verifyResult = null;
             StringValues referenceId;
             StringValues transactionId;
 
-            httpRequest.TryGetParam("state", out var state);
+            var state = await httpRequest.TryGetParamAsync("state", cancellationToken).ConfigureAwaitFalse();
 
-            if (state.IsNullOrEmpty())
+            if (!state.Exists || state.Value.IsNullOrEmpty())
             {
                 verifyResult = PaymentVerifyResult.Failed(messagesOptions.InvalidDataReceivedFromGateway);
             }
             else
             {
-                httpRequest.TryGetParam("ResNum", out referenceId);
+                var referenceIdResult = await httpRequest.TryGetParamAsync("ResNum", cancellationToken).ConfigureAwaitFalse();
+                if (referenceIdResult.Exists) referenceId = referenceIdResult.Value;
 
-                httpRequest.TryGetParam("RefNum", out transactionId);
+                var transactionIdResult = await httpRequest.TryGetParamAsync("RefNum", cancellationToken).ConfigureAwaitFalse();
+                if (transactionIdResult.Exists) transactionId = transactionIdResult.Value;
 
-                isSuccess = state.Equals("OK", StringComparison.OrdinalIgnoreCase);
+                isSuccess = state.Value.Equals("OK", StringComparison.OrdinalIgnoreCase);
 
                 if (!isSuccess)
                 {
-                    var message = SamanStateTranslator.Translate(state, messagesOptions);
+                    var message = SamanStateTranslator.Translate(state.Value, messagesOptions);
 
                     verifyResult = PaymentVerifyResult.Failed(message);
                 }

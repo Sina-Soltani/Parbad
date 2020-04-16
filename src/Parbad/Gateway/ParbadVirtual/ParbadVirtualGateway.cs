@@ -62,25 +62,29 @@ namespace Parbad.Gateway.ParbadVirtual
         }
 
         /// <inheritdoc />
-        public override Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default)
+        public override async Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default)
         {
-            if (!_httpContextAccessor.HttpContext.Request.TryGetParam("Result", out var result))
+            var request = _httpContextAccessor.HttpContext.Request;
+
+            var result = await request.TryGetParamAsync("result", cancellationToken);
+
+            if (!result.Exists)
             {
-                return PaymentVerifyResult.Failed(_messageOptions.Value.InvalidDataReceivedFromGateway).ToInterfaceAsync();
+                return PaymentVerifyResult.Failed(_messageOptions.Value.InvalidDataReceivedFromGateway);
             }
 
-            _httpContextAccessor.HttpContext.Request.TryGetParam("TransactionCode", out var transactionCode);
+            var transactionCode = await request.TryGetParamAsync("TransactionCode", cancellationToken).ConfigureAwaitFalse();
 
-            var isSucceed = result.Equals("true", StringComparison.OrdinalIgnoreCase);
+            var isSucceed = result.Value.Equals("true", StringComparison.OrdinalIgnoreCase);
 
             var message = isSucceed ? _messageOptions.Value.PaymentSucceed : _messageOptions.Value.PaymentFailed;
 
             return new PaymentVerifyResult
             {
                 Status = isSucceed ? PaymentVerifyResultStatus.Succeed : PaymentVerifyResultStatus.Failed,
-                TransactionCode = transactionCode,
+                TransactionCode = transactionCode.Value,
                 Message = message
-            }.ToInterfaceAsync();
+            };
         }
 
         /// <inheritdoc />

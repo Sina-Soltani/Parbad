@@ -4,6 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Parbad.Abstraction;
 using Parbad.Gateway.Mellat.Internal.Models;
@@ -73,11 +75,13 @@ namespace Parbad.Gateway.Mellat.Internal
             return PaymentRequestResult.Succeed(transporter, account.Name);
         }
 
-        public static MellatCallbackResult CrateCallbackResult(HttpRequest httpRequest, MessagesOptions messagesOptions)
+        public static async Task<MellatCallbackResult> CrateCallbackResultAsync(HttpRequest httpRequest,
+            MessagesOptions messagesOptions,
+            CancellationToken cancellationToken)
         {
-            httpRequest.TryGetParam("ResCode", out var resCode);
+            var resCode = await httpRequest.TryGetParamAsync("ResCode", cancellationToken).ConfigureAwaitFalse();
 
-            if (resCode.IsNullOrEmpty())
+            if (!resCode.Exists || resCode.Value.IsNullOrEmpty())
             {
                 return new MellatCallbackResult
                 {
@@ -87,18 +91,18 @@ namespace Parbad.Gateway.Mellat.Internal
             }
 
             //  Reference ID
-            httpRequest.TryGetParam("RefId", out var refId);
+            var refId = await httpRequest.TryGetParamAsync("RefId", cancellationToken).ConfigureAwaitFalse();
 
             //  Transaction Code
-            httpRequest.TryGetParam("SaleReferenceId", out var saleReferenceId);
+            var saleReferenceId = await httpRequest.TryGetParamAsync("SaleReferenceId", cancellationToken).ConfigureAwaitFalse();
 
-            var isSucceed = resCode == OkResult;
+            var isSucceed = resCode.Value == OkResult;
 
             PaymentVerifyResult result = null;
 
             if (!isSucceed)
             {
-                var message = MellatGatewayResultTranslator.Translate(resCode, messagesOptions);
+                var message = MellatGatewayResultTranslator.Translate(resCode.Value, messagesOptions);
 
                 result = PaymentVerifyResult.Failed(message);
             }
@@ -107,8 +111,8 @@ namespace Parbad.Gateway.Mellat.Internal
             return new MellatCallbackResult
             {
                 IsSucceed = isSucceed,
-                RefId = refId,
-                SaleReferenceId = saleReferenceId,
+                RefId = refId.Value,
+                SaleReferenceId = saleReferenceId.Value,
                 Result = result
             };
         }

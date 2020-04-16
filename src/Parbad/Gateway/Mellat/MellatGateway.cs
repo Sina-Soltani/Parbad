@@ -59,7 +59,9 @@ namespace Parbad.Gateway.Mellat
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
-            var callbackResult = MellatHelper.CrateCallbackResult(_httpContextAccessor.HttpContext.Request, _messagesOptions.Value);
+            var callbackResult = await MellatHelper
+                .CrateCallbackResultAsync(_httpContextAccessor.HttpContext.Request, _messagesOptions.Value, cancellationToken)
+                .ConfigureAwaitFalse();
 
             if (!callbackResult.IsSucceed)
             {

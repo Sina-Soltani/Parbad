@@ -2,6 +2,8 @@
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Parbad.Abstraction;
 using Parbad.Http;
@@ -72,14 +74,15 @@ namespace Parbad.Gateway.ZarinPal.Internal
             return PaymentRequestResult.Succeed(new GatewayRedirect(httpContextAccessor, paymentPageUrl), account.Name);
         }
 
-        public static ZarinPalCallbackResult CreateCallbackResult(HttpRequest httpRequest)
+        public static async Task<ZarinPalCallbackResult> CreateCallbackResultAsync(HttpRequest httpRequest,
+            CancellationToken cancellationToken)
         {
-            httpRequest.TryGetParam("Authority", out var authority);
-            httpRequest.TryGetParam("Status", out var status);
+            var authority = await httpRequest.TryGetParamAsync("Authority", cancellationToken).ConfigureAwaitFalse();
+            var status = await httpRequest.TryGetParamAsync("Status", cancellationToken).ConfigureAwaitFalse();
 
             IPaymentVerifyResult verifyResult = null;
 
-            var isSucceed = string.Equals(status, StringOkResult, StringComparison.InvariantCultureIgnoreCase);
+            var isSucceed = status.Exists && string.Equals(status.Value, StringOkResult, StringComparison.InvariantCultureIgnoreCase);
 
             if (!isSucceed)
             {
@@ -90,7 +93,7 @@ namespace Parbad.Gateway.ZarinPal.Internal
 
             return new ZarinPalCallbackResult
             {
-                Authority = authority,
+                Authority = authority.Value,
                 IsSucceed = isSucceed,
                 Result = verifyResult
             };

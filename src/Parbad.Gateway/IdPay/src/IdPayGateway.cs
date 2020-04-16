@@ -66,7 +66,12 @@ namespace Parbad.Gateway.IdPay
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
-            var callbackResult = IdPayHelper.CreateCallbackResult(context, _httpContextAccessor.HttpContext.Request, _messagesOptions.Value);
+            var callbackResult = await IdPayHelper.CreateCallbackResultAsync(
+                    context,
+                    _httpContextAccessor.HttpContext.Request,
+                    _messagesOptions.Value,
+                    cancellationToken)
+                .ConfigureAwaitFalse();
 
             if (!callbackResult.IsSucceed)
             {

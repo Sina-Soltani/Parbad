@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Parbad.Abstraction;
 using Parbad.Gateway.Pasargad.Internal.Models;
@@ -69,37 +71,40 @@ namespace Parbad.Gateway.Pasargad.Internal
             return result;
         }
 
-        public static PasargadCallbackResult CreateCallbackResult(HttpRequest httpRequest, MessagesOptions messagesOptions)
+        public static async Task<PasargadCallbackResult> CreateCallbackResult(
+            HttpRequest httpRequest,
+            MessagesOptions messagesOptions,
+            CancellationToken cancellationToken)
         {
             //  Reference ID
-            httpRequest.TryGetParam("iN", out var invoiceNumber);
+            var invoiceNumber = await httpRequest.TryGetParamAsync("iN", cancellationToken).ConfigureAwaitFalse();
 
             //  Invoice Date
-            httpRequest.TryGetParam("iD", out var invoiceDate);
+            var invoiceDate = await httpRequest.TryGetParamAsync("iD", cancellationToken).ConfigureAwaitFalse();
 
             //  Transaction Code
-            httpRequest.TryGetParam("tref", out var transactionId);
+            var transactionId = await httpRequest.TryGetParamAsync("tref", cancellationToken).ConfigureAwaitFalse();
 
             var isSucceed = true;
             PaymentVerifyResult verifyResult = null;
 
-            if (string.IsNullOrWhiteSpace(invoiceNumber) ||
-                string.IsNullOrWhiteSpace(invoiceDate) ||
-                string.IsNullOrWhiteSpace(transactionId))
+            if (string.IsNullOrWhiteSpace(invoiceNumber.Value) ||
+                string.IsNullOrWhiteSpace(invoiceDate.Value) ||
+                string.IsNullOrWhiteSpace(transactionId.Value))
             {
                 isSucceed = false;
 
                 verifyResult = PaymentVerifyResult.Failed(messagesOptions.InvalidDataReceivedFromGateway);
             }
 
-            var data = new[] { new KeyValuePair<string, string>("invoiceUID", transactionId) };
+            var data = new[] { new KeyValuePair<string, string>("invoiceUID", transactionId.Value) };
 
             return new PasargadCallbackResult
             {
                 IsSucceed = isSucceed,
-                InvoiceNumber = invoiceNumber,
-                InvoiceDate = invoiceDate,
-                TransactionId = transactionId,
+                InvoiceNumber = invoiceNumber.Value,
+                InvoiceDate = invoiceDate.Value,
+                TransactionId = transactionId.Value,
                 CallbackCheckData = data,
                 Result = verifyResult
             };

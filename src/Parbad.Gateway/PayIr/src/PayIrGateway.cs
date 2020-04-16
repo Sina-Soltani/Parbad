@@ -70,7 +70,7 @@ namespace Parbad.Gateway.PayIr
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
-            var callbackResult = PayIrHelper.CreateCallbackResult(_httpContextAccessor.HttpContext.Request);
+            var callbackResult = await PayIrHelper.CreateCallbackResultAsync(_httpContextAccessor.HttpContext.Request, cancellationToken).ConfigureAwaitFalse();
 
             if (!callbackResult.IsSucceed)
             {
