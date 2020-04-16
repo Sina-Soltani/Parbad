@@ -3,18 +3,20 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using Parbad.Abstraction;
 
-namespace Parbad.TrackingNumberProviders
+namespace Parbad.InvoiceBuilder
 {
     /// <summary>
-    /// Defines a mechanism for generating a tracking number for each payment requests.
+    /// A formatter that can change an invoice.
     /// </summary>
-    public interface ITrackingNumberProvider
+    public interface IInvoiceFormatter
     {
         /// <summary>
-        /// Provides a new tracking number.
+        /// Formats the given <paramref name="invoice"/>.
         /// </summary>
+        /// <param name="invoice"></param>
         /// <param name="cancellationToken"></param>
-        Task<long> ProvideAsync(CancellationToken cancellationToken = default);
+        Task FormatAsync(Invoice invoice, CancellationToken cancellationToken = default);
     }
 }

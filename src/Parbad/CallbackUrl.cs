@@ -13,10 +13,8 @@ namespace Parbad
     /// <para>Note: A complete URL would be like: "http://www.mywebsite.com/foo/bar/"</para>
     /// </summary>
     /// <exception cref="CallbackUrlFormatException"></exception>
-    public class CallbackUrl : IComparable<CallbackUrl>
+    public readonly struct CallbackUrl : IComparable<CallbackUrl>
     {
-        private string _url;
-
         /// <summary>
         /// Initializes an instance of <see cref="CallbackUrl"/> class.
         /// </summary>
@@ -36,27 +34,34 @@ namespace Parbad
                 throw new CallbackUrlFormatException(url);
             }
 
-            _url = url;
+            Url = url;
         }
+
+        /// <summary>
+        /// Gets the URL.
+        /// </summary>
+        public string Url { get; }
 
         /// <summary>
         /// Adds a query string to the current URL.
         /// </summary>
         /// <param name="name"></param>
         /// <param name="value"></param>
-        public void AddQueryString(string name, string value)
+        public CallbackUrl AddQueryString(string name, string value)
         {
-            _url = ParbadUrlHelper.AddQueryString(_url, name, value);
+            var url = ParbadUrlHelper.AddQueryString(Url, name, value);
+
+            return new CallbackUrl(url);
         }
 
         public int CompareTo(CallbackUrl other)
         {
-            return string.Compare(_url, other?._url, StringComparison.OrdinalIgnoreCase);
+            return string.Compare(Url, other.Url, StringComparison.OrdinalIgnoreCase);
         }
 
         public bool Equals(CallbackUrl other)
         {
-            return string.Equals(_url, other?._url, StringComparison.OrdinalIgnoreCase);
+            return string.Equals(Url, other.Url, StringComparison.OrdinalIgnoreCase);
         }
 
         public override bool Equals(object obj)
@@ -67,12 +72,28 @@ namespace Parbad
 
         public override int GetHashCode()
         {
-            return _url.GetHashCode();
+            return Url.GetHashCode();
         }
 
         public override string ToString()
         {
-            return _url;
+            return Url;
+        }
+
+        public static CallbackUrl Parse(string url) => new CallbackUrl(url);
+
+        public static bool TryParse(string url, out CallbackUrl callbackUrl)
+        {
+            try
+            {
+                callbackUrl = new CallbackUrl(url);
+                return true;
+            }
+            catch
+            {
+                callbackUrl = default;
+                return false;
+            }
         }
 
         public static implicit operator string(CallbackUrl callbackUrl)
