@@ -43,10 +43,6 @@ namespace Parbad.Gateway.PayIr
             _messagesOptions = messagesOptions;
         }
 
-        public PayIrGateway(IGatewayAccountProvider<PayIrGatewayAccount> accountProvider) : base(accountProvider)
-        {
-        }
-
         /// <inheritdoc />
         public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
         {
