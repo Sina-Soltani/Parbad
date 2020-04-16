@@ -43,10 +43,6 @@ namespace Parbad.Gateway.PayIr
             _messagesOptions = messagesOptions;
         }
 
-        public PayIrGateway(IGatewayAccountProvider<PayIrGatewayAccount> accountProvider) : base(accountProvider)
-        {
-        }
-
         /// <inheritdoc />
         public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
         {
@@ -70,7 +66,7 @@ namespace Parbad.Gateway.PayIr
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
-            var callbackResult = PayIrHelper.CreateCallbackResult(_httpContextAccessor.HttpContext.Request);
+            var callbackResult = await PayIrHelper.CreateCallbackResultAsync(_httpContextAccessor.HttpContext.Request, cancellationToken).ConfigureAwaitFalse();
 
             if (!callbackResult.IsSucceed)
             {

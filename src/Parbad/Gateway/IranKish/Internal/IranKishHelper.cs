@@ -3,6 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Parbad.Abstraction;
 using Parbad.Http;
@@ -78,49 +80,50 @@ namespace Parbad.Gateway.IranKish.Internal
             return PaymentRequestResult.Succeed(transporter, account.Name);
         }
 
-        public static IranKishCallbackResult CreateCallbackResult(
-            InvoiceContext context,
+        public static async Task<IranKishCallbackResult> CreateCallbackResultAsync(InvoiceContext context,
             IranKishGatewayAccount account,
             HttpRequest httpRequest,
-            MessagesOptions messagesOptions)
+            MessagesOptions messagesOptions,
+            CancellationToken cancellationToken)
         {
-            httpRequest.TryGetParam("ResultCode", out var resultCode);
-            httpRequest.Form.TryGetValue("Token", out var token);
-            httpRequest.TryGetParam("MerchantId", out var merchantId);
+            var resultCode = await httpRequest.TryGetParamAsync("ResultCode", cancellationToken).ConfigureAwaitFalse();
+            var token = await httpRequest.TryGetParamAsync("Token", cancellationToken).ConfigureAwaitFalse();
+            var merchantId = await httpRequest.TryGetParamAsync("MerchantId", cancellationToken).ConfigureAwaitFalse();
 
             // Equals to TrackingNumber in Parbad system.
-            httpRequest.TryGetParamAs<long>("InvoiceNumber", out var invoiceNumber);
+            var invoiceNumber = await httpRequest.TryGetParamAsAsync<long>("InvoiceNumber", cancellationToken).ConfigureAwaitFalse();
 
             // Equals to TransactionCode in Parbad system.
-            httpRequest.TryGetParam("ReferenceId", out var referenceId);
+            var referenceId = await httpRequest.TryGetParamAsync("ReferenceId", cancellationToken).ConfigureAwaitFalse();
 
             var isSucceed = false;
             PaymentVerifyResult verifyResult = null;
 
-            if (merchantId != account.MerchantId ||
-                invoiceNumber != context.Payment.TrackingNumber ||
-                token.IsNullOrEmpty())
+            if (merchantId.Value != account.MerchantId ||
+                invoiceNumber.Value != context.Payment.TrackingNumber ||
+                !token.Exists ||
+                token.Value.IsNullOrEmpty())
             {
                 verifyResult = new PaymentVerifyResult
                 {
-                    TrackingNumber = invoiceNumber,
-                    TransactionCode = referenceId,
+                    TrackingNumber = invoiceNumber.Value,
+                    TransactionCode = referenceId.Value,
                     IsSucceed = false,
                     Message = messagesOptions.InvalidDataReceivedFromGateway
                 };
             }
             else
             {
-                var translatedMessage = IranKishGatewayResultTranslator.Translate(resultCode, messagesOptions);
+                var translatedMessage = IranKishGatewayResultTranslator.Translate(resultCode.Value, messagesOptions);
 
-                isSucceed = resultCode == OkResult;
+                isSucceed = resultCode.Value == OkResult;
 
                 if (!isSucceed)
                 {
                     verifyResult = new PaymentVerifyResult
                     {
-                        TrackingNumber = invoiceNumber,
-                        TransactionCode = referenceId,
+                        TrackingNumber = invoiceNumber.Value,
+                        TransactionCode = referenceId.Value,
                         Status = PaymentVerifyResultStatus.Failed,
                         Message = translatedMessage
                     };
@@ -130,9 +133,9 @@ namespace Parbad.Gateway.IranKish.Internal
             return new IranKishCallbackResult
             {
                 IsSucceed = isSucceed,
-                Token = token,
-                InvoiceNumber = invoiceNumber,
-                ReferenceId = referenceId,
+                Token = token.Value,
+                InvoiceNumber = invoiceNumber.Value,
+                ReferenceId = referenceId.Value,
                 Result = verifyResult
             };
         }

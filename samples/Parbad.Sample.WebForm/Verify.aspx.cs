@@ -4,24 +4,24 @@ namespace Parbad.Sample.WebForm
 {
     public partial class Verify : System.Web.UI.Page
     {
-        protected void Page_Load(object sender, EventArgs e)
+        protected async void Page_Load(object sender, EventArgs e)
         {
             IPaymentResult result;
             var transactionCode = "";
             var status = "";
 
-            var invoice = StaticOnlinePayment.Instance.Fetch();
+            var invoice = await StaticOnlinePayment.Instance.FetchAsync();
 
             if (Is_There_Still_Product_In_Shop(invoice.TrackingNumber))
             {
-                var verifyResult = StaticOnlinePayment.Instance.Verify(invoice);
+                var verifyResult = await StaticOnlinePayment.Instance.VerifyAsync(invoice);
                 result = verifyResult;
                 transactionCode = verifyResult.TransactionCode;
                 status = verifyResult.Status.ToString();
             }
             else
             {
-                result = StaticOnlinePayment.Instance.Cancel(invoice, cancellationReason: "Sorry, We have no more products to sell.");
+                result = await StaticOnlinePayment.Instance.CancelAsync(invoice, cancellationReason: "Sorry, We have no more products to sell.");
             }
 
             LblTrackingNumber.Text = result.TrackingNumber.ToString();

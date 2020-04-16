@@ -15,13 +15,13 @@ namespace Parbad.Sample.WebForm
             }
         }
 
-        protected void BtnPay_Click(object sender, EventArgs e)
+        protected async void BtnPay_Click(object sender, EventArgs e)
         {
             var verifyUrl = $"{Request.Url.Scheme}://{Request.Url.Authority}/Verify";
 
             var gateway = (Gateways)long.Parse(DropGateway.SelectedValue);
 
-            var result = StaticOnlinePayment.Instance.Request(invoice =>
+            var result = await StaticOnlinePayment.Instance.RequestAsync(invoice =>
             {
                 invoice
                     .SetAmount(long.Parse(TxtAmount.Text))
@@ -40,7 +40,7 @@ namespace Parbad.Sample.WebForm
 
             if (result.IsSucceed)
             {
-                result.GatewayTransporter.Transport();
+                await result.GatewayTransporter.TransportAsync();
             }
             else
             {

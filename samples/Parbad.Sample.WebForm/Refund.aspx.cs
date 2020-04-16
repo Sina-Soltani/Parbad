@@ -9,11 +9,11 @@ namespace Parbad.Sample.WebForm
 
         }
 
-        protected void BtnRefund_Click(object sender, EventArgs e)
+        protected async void BtnRefund_Click(object sender, EventArgs e)
         {
             var trackingNumber = long.Parse(TxtTrackingNumber.Text);
 
-            var result = StaticOnlinePayment.Instance.RefundCompletely(trackingNumber);
+            var result = await StaticOnlinePayment.Instance.RefundCompletelyAsync(trackingNumber);
 
             // Note: This is just for development and testing.
             // Don't show the actual result object to clients in production environment.

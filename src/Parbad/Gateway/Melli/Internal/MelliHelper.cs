@@ -4,6 +4,8 @@
 using System;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Parbad.Abstraction;
 using Parbad.Gateway.Melli.Internal.Models;
@@ -69,11 +71,16 @@ namespace Parbad.Gateway.Melli.Internal
             return PaymentRequestResult.Succeed(new GatewayRedirect(httpContextAccessor, paymentPageUrl), account.Name);
         }
 
-        public static MelliCallbackResult CreateCallbackResult(InvoiceContext context, HttpRequest httpRequest, MelliGatewayAccount account, MessagesOptions messagesOptions)
+        public static async Task<MelliCallbackResult> CreateCallbackResultAsync(
+            InvoiceContext context,
+            HttpRequest httpRequest,
+            MelliGatewayAccount account,
+            MessagesOptions messagesOptions,
+            CancellationToken cancellationToken)
         {
-            httpRequest.TryGetParamAs<int>("ResCode", out var apiResponseCode);
+            var apiResponseCode = await httpRequest.TryGetParamAsAsync<int>("ResCode", cancellationToken).ConfigureAwaitFalse();
 
-            if (apiResponseCode != SuccessCode)
+            if (!apiResponseCode.Exists || apiResponseCode.Value != SuccessCode)
             {
                 return new MelliCallbackResult
                 {
@@ -82,27 +89,27 @@ namespace Parbad.Gateway.Melli.Internal
                 };
             }
 
-            httpRequest.TryGetParam("Token", out var apiToken);
-            httpRequest.TryGetParamAs<long>("OrderId", out var apiOrderId);
+            var apiToken = await httpRequest.TryGetParamAsync("Token", cancellationToken).ConfigureAwaitFalse();
+            var apiOrderId = await httpRequest.TryGetParamAsAsync<long>("OrderId", cancellationToken).ConfigureAwaitFalse();
 
-            if (apiOrderId != context.Payment.TrackingNumber)
+            if (!apiOrderId.Exists || apiOrderId.Value != context.Payment.TrackingNumber)
             {
                 return new MelliCallbackResult
                 {
                     IsSucceed = false,
-                    Token = apiToken,
+                    Token = apiToken.Value,
                     Result = PaymentVerifyResult.Failed(messagesOptions.InvalidDataReceivedFromGateway)
                 };
             }
 
-            var signedData = SignVerifyData(account.TerminalKey, apiToken);
+            var signedData = SignVerifyData(account.TerminalKey, apiToken.Value);
 
-            var dataToVerify = CreateVerifyObject(apiToken, signedData);
+            var dataToVerify = CreateVerifyObject(apiToken.Value, signedData);
 
             return new MelliCallbackResult
             {
                 IsSucceed = true,
-                Token = apiToken,
+                Token = apiToken.Value,
                 JsonDataToVerify = dataToVerify
             };
         }

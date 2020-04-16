@@ -2,6 +2,8 @@
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Parbad.Abstraction;
@@ -45,14 +47,14 @@ namespace Parbad.Gateway.PayIr.Internal
             return PaymentRequestResult.Succeed(new GatewayRedirect(httpContextAccessor, paymentPageUrl), account.Name);
         }
 
-        public static PayIrCallbackResult CreateCallbackResult(HttpRequest httpRequest)
+        public static async Task<PayIrCallbackResult> CreateCallbackResultAsync(HttpRequest httpRequest, CancellationToken cancellationToken)
         {
-            httpRequest.TryGetParam("Token", out var token);
-            httpRequest.TryGetParam("Status", out var status);
+            var token = await httpRequest.TryGetParamAsync("Token", cancellationToken).ConfigureAwaitFalse();
+            var status = await httpRequest.TryGetParamAsync("Status", cancellationToken).ConfigureAwaitFalse();
 
             IPaymentVerifyResult verifyResult = null;
 
-            var isSucceed = string.Equals(status, OkResult, StringComparison.InvariantCultureIgnoreCase);
+            var isSucceed = status.Exists && string.Equals(status.Value, OkResult, StringComparison.InvariantCultureIgnoreCase);
 
             if (!isSucceed)
             {
@@ -63,7 +65,7 @@ namespace Parbad.Gateway.PayIr.Internal
 
             return new PayIrCallbackResult
             {
-                Token = token,
+                Token = token.Value,
                 IsSucceed = isSucceed,
                 Result = verifyResult
             };

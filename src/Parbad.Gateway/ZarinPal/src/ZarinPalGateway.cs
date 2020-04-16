@@ -59,7 +59,7 @@ namespace Parbad.Gateway.ZarinPal
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
-            var callbackResult = ZarinPalHelper.CreateCallbackResult(_httpContextAccessor.HttpContext.Request);
+            var callbackResult = await ZarinPalHelper.CreateCallbackResultAsync(_httpContextAccessor.HttpContext.Request, cancellationToken).ConfigureAwaitFalse();
 
             if (!callbackResult.IsSucceed)
             {

@@ -3,6 +3,7 @@
 
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
@@ -54,15 +55,19 @@ namespace Parbad.Gateway.IdPay.Internal
             return PaymentRequestResult.Succeed(new GatewayRedirect(httpContextAccessor, result.Link), account.Name);
         }
 
-        public static IdPayCallbackResult CreateCallbackResult(InvoiceContext context, HttpRequest httpRequest, MessagesOptions messagesOptions)
+        public static async Task<IdPayCallbackResult> CreateCallbackResultAsync(
+            InvoiceContext context,
+            HttpRequest httpRequest,
+            MessagesOptions messagesOptions,
+            CancellationToken cancellationToken)
         {
-            httpRequest.TryGetParam("status", out var status);
-            httpRequest.TryGetParam("id", out var id);
-            httpRequest.TryGetParam("track_id", out var trackId);
-            httpRequest.TryGetParam("order_id", out var orderId);
-            httpRequest.TryGetParam("amount", out var amount);
+            var status = await httpRequest.TryGetParamAsync("status", cancellationToken).ConfigureAwaitFalse();
+            var id = await httpRequest.TryGetParamAsync("id", cancellationToken).ConfigureAwaitFalse();
+            var trackId = await httpRequest.TryGetParamAsync("track_id", cancellationToken).ConfigureAwaitFalse();
+            var orderId = await httpRequest.TryGetParamAsync("order_id", cancellationToken).ConfigureAwaitFalse();
+            var amount = await httpRequest.TryGetParamAsync("amount", cancellationToken).ConfigureAwaitFalse();
 
-            var (isSucceed, message) = CheckCallback(status, orderId, id, trackId, amount, context, messagesOptions);
+            var (isSucceed, message) = CheckCallback(status.Value, orderId.Value, id.Value, trackId.Value, amount.Value, context, messagesOptions);
 
             IPaymentVerifyResult verifyResult = null;
 
@@ -73,7 +78,7 @@ namespace Parbad.Gateway.IdPay.Internal
 
             return new IdPayCallbackResult
             {
-                Id = id,
+                Id = id.Value,
                 IsSucceed = isSucceed,
                 Result = verifyResult
             };

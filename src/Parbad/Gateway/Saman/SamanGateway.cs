@@ -51,7 +51,11 @@ namespace Parbad.Gateway.Saman
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
-            var callbackResult = SamanHelper.CreateCallbackResult(_httpContextAccessor.HttpContext.Request, _messageOptions.Value);
+            var callbackResult = await SamanHelper.CreateCallbackResultAsync(
+                    _httpContextAccessor.HttpContext.Request,
+                    _messageOptions.Value,
+                    cancellationToken)
+                .ConfigureAwaitFalse();
 
             if (!callbackResult.IsSucceed)
             {

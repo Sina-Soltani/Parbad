@@ -70,11 +70,12 @@ namespace Parbad.Gateway.Melli
 
             var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 
-            var data = MelliHelper.CreateCallbackResult(
+            var data = await MelliHelper.CreateCallbackResultAsync(
                 context,
                 _httpContextAccessor.HttpContext.Request,
                 account,
-                _messageOptions.Value);
+                _messageOptions.Value,
+                cancellationToken);
 
             if (!data.IsSucceed)
             {

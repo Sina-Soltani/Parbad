@@ -65,11 +65,12 @@ namespace Parbad.Gateway.IranKish
 
             var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 
-            var callbackResult = IranKishHelper.CreateCallbackResult(
+            var callbackResult = await IranKishHelper.CreateCallbackResultAsync(
                 context,
                 account,
                 _httpContextAccessor.HttpContext.Request,
-                _messageOptions.Value);
+                _messageOptions.Value,
+                cancellationToken);
 
             if (!callbackResult.IsSucceed)
             {
