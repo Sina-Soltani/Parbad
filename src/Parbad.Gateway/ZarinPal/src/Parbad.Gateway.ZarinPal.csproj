@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netcoreapp3.0</TargetFrameworks>
-    <VersionPrefix>1.0.5</VersionPrefix>
+    <VersionPrefix>1.0.4</VersionPrefix>
     <LangVersion>latest</LangVersion>
     <Authors>Sina Soltani</Authors>
     <Copyright>Copyright © Sina Soltani 2016</Copyright>
