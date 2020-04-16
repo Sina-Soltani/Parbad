@@ -100,7 +100,6 @@ namespace Parbad.Gateway.Mellat
         public override async Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
-            if (amount == null) throw new ArgumentNullException(nameof(amount));
 
             var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 

@@ -44,7 +44,7 @@ namespace Parbad
 
         public bool Equals(Money other)
         {
-            return other != null && Amount == other.Amount;
+            return Amount == other.Amount;
         }
 
         public override bool Equals(object obj)
@@ -60,8 +60,6 @@ namespace Parbad
 
         public int CompareTo(Money other)
         {
-            if (other == null) throw new ArgumentNullException(nameof(other));
-
             return Amount.CompareTo(other.Amount);
         }
 
@@ -110,15 +108,11 @@ namespace Parbad
 
         public static implicit operator decimal(Money money)
         {
-            if (money == null) throw new ArgumentNullException(nameof(money));
-
             return money.Amount;
         }
 
         public static implicit operator long(Money money)
         {
-            if (money == null) throw new ArgumentNullException(nameof(money));
-
             return (long)money.Amount;
         }
 
@@ -128,9 +122,6 @@ namespace Parbad
 
         public static bool operator >(Money left, Money right)
         {
-            if (left == null) throw new ArgumentNullException(nameof(left));
-            if (right == null) throw new ArgumentNullException(nameof(right));
-
             return left.Amount > right.Amount;
         }
 
@@ -141,49 +132,31 @@ namespace Parbad
 
         public static bool operator >=(Money left, Money right)
         {
-            if (left == null) throw new ArgumentNullException(nameof(left));
-            if (right == null) throw new ArgumentNullException(nameof(right));
-
             return left.Amount >= right.Amount;
         }
 
         public static bool operator <=(Money left, Money right)
         {
-            if (left == null) throw new ArgumentNullException(nameof(left));
-            if (right == null) throw new ArgumentNullException(nameof(right));
-
             return left.Amount <= right.Amount;
         }
 
         public static Money operator +(Money left, Money right)
         {
-            if (left == null) throw new ArgumentNullException(nameof(left));
-            if (right == null) throw new ArgumentNullException(nameof(right));
-
             return new Money(left.Amount + right.Amount);
         }
 
         public static Money operator -(Money left, Money right)
         {
-            if (left == null) throw new ArgumentNullException(nameof(left));
-            if (right == null) throw new ArgumentNullException(nameof(right));
-
             return new Money(left.Amount - right.Amount);
         }
 
         public static Money operator *(Money left, Money right)
         {
-            if (left == null) throw new ArgumentNullException(nameof(left));
-            if (right == null) throw new ArgumentNullException(nameof(right));
-
             return new Money(left.Amount * right.Amount);
         }
 
         public static Money operator /(Money left, Money right)
         {
-            if (left == null) throw new ArgumentNullException(nameof(left));
-            if (right == null) throw new ArgumentNullException(nameof(right));
-
             return new Money(left.Amount / right.Amount);
         }
     }
