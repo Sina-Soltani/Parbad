@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
-    <VersionPrefix>2.0.4</VersionPrefix>
+    <TargetFramework>net462</TargetFramework>
+    <VersionPrefix>2.0.5</VersionPrefix>
     <LangVersion>latest</LangVersion>
     <Authors>Sina Soltani</Authors>
     <Description>ASP.NET MVC 4 and 5 integration for Parbad project.
@@ -20,7 +20,7 @@ For more information see: https://www.nuget.org/packages/Parbad/</Description>
     <PackageTags>parbad mvc Payment Gateway Bank Iran Shetab IranKish Mellat Melli Sadad Parsian Pasargad Saman Asan-Pardakht پرداخت درگاه بانک ایران شتاب ایران-کیش ملت ملی سداد پارسیان پاسارگاد سامان آسان-پرداخت</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
-    <PackageReleaseNotes>Bug Ticket #71 is fixed.</PackageReleaseNotes>
+    <PackageReleaseNotes>Code Improvement.</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
