@@ -79,6 +79,11 @@ namespace Parbad.Internal
                 .ProvideTokenAsync(invoice, cancellationToken)
                 .ConfigureAwaitFalse();
 
+            if (paymentToken.IsNullOrEmpty())
+            {
+                throw new PaymentTokenProviderException("Payment Token Provider didn't provide any token.");
+            }
+
             //  Check the created payment token
             if (await _storageManager.DoesPaymentExistAsync(paymentToken, cancellationToken).ConfigureAwaitFalse())
             {

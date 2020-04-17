@@ -82,6 +82,7 @@ namespace Parbad
 
         public static Money Parse(long amount) => new Money(amount);
 
+        /// <exception cref="Exception"></exception>
         public static Money Parse(string amount)
         {
             if (!decimal.TryParse(amount, out var testValue))

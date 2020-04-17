@@ -98,8 +98,6 @@ namespace Parbad
 
         public static implicit operator string(CallbackUrl callbackUrl)
         {
-            if (callbackUrl == null) throw new ArgumentNullException(nameof(callbackUrl));
-
             return callbackUrl.ToString();
         }
     }
