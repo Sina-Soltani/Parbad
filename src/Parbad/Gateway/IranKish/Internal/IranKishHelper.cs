@@ -68,14 +68,15 @@ namespace Parbad.Gateway.IranKish.Internal
                 return PaymentRequestResult.Failed(message, account.Name);
             }
 
-            var transporter = new GatewayPost(
-                httpContext,
+            var transporterDescriptor = GatewayTransporterDescriptor.CreatePost(
                 PaymentPageUrl,
                 new Dictionary<string, string>
                 {
                     {"merchantid", account.MerchantId},
                     {"token", token}
                 });
+
+            var transporter = new DefaultGatewayTransporter(httpContext, transporterDescriptor);
 
             return PaymentRequestResult.Succeed(transporter, account.Name);
         }

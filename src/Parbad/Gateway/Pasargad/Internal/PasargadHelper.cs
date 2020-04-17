@@ -48,21 +48,22 @@ namespace Parbad.Gateway.Pasargad.Internal
 
             var signedData = SignData(account.PrivateKey, dataToSign);
 
-            var transporter = new GatewayPost(
-                httpContext,
+            var transporterDescriptor = GatewayTransporterDescriptor.CreatePost(
                 PaymentPageUrl,
                 new Dictionary<string, string>
                 {
-                    {"merchantCode", account.MerchantCode },
-                    {"terminalCode",  account.TerminalCode},
-                    {"invoiceNumber",  invoice.TrackingNumber.ToString()},
-                    {"invoiceDate", invoiceDate },
-                    {"amount",  invoice.Amount.ToLongString()},
+                    {"merchantCode", account.MerchantCode},
+                    {"terminalCode", account.TerminalCode},
+                    {"invoiceNumber", invoice.TrackingNumber.ToString()},
+                    {"invoiceDate", invoiceDate},
+                    {"amount", invoice.Amount.ToLongString()},
                     {"redirectAddress", invoice.CallbackUrl},
-                    {"action",  ActionNumber},
-                    {"timeStamp", timeStamp },
-                    {"sign",  signedData}
+                    {"action", ActionNumber},
+                    {"timeStamp", timeStamp},
+                    {"sign", signedData}
                 });
+
+            var transporter = new DefaultGatewayTransporter(httpContext, transporterDescriptor);
 
             var result = PaymentRequestResult.Succeed(transporter, account.Name);
 

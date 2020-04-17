@@ -25,8 +25,7 @@ namespace Parbad.Gateway.Saman.Internal
 
         public static PaymentRequestResult CreateRequestResult(Invoice invoice, HttpContext httpContext, SamanGatewayAccount account)
         {
-            var transporter = new GatewayPost(
-                httpContext,
+            var transporterDescriptor = GatewayTransporterDescriptor.CreatePost(
                 PaymentPageUrl,
                 new Dictionary<string, string>
                 {
@@ -35,6 +34,8 @@ namespace Parbad.Gateway.Saman.Internal
                     {"ResNum", invoice.TrackingNumber.ToString()},
                     {"RedirectURL", invoice.CallbackUrl}
                 });
+
+            var transporter = new DefaultGatewayTransporter(httpContext, transporterDescriptor);
 
             return PaymentRequestResult.Succeed(transporter, account.Name);
         }

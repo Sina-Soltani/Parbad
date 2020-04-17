@@ -69,7 +69,11 @@ namespace Parbad.Gateway.Parsian.Internal
 
             var paymentPageUrl = $"{PaymentPageUrl}?Token={token}";
 
-            var result = PaymentRequestResult.Succeed(new GatewayRedirect(httpContext, paymentPageUrl), account.Name);
+            var transporterDescriptor = GatewayTransporterDescriptor.CreateRedirect(paymentPageUrl);
+
+            var transporter = new DefaultGatewayTransporter(httpContext, transporterDescriptor);
+
+            var result = PaymentRequestResult.Succeed(transporter, account.Name);
 
             result.DatabaseAdditionalData.Add("token", token);
 

@@ -576,6 +576,11 @@
             </summary>
             <param name="configureHttpClient">HttpClient configuration.</param>
         </member>
+        <member name="T:Parbad.GatewayTransporterDescriptor">
+            <summary>
+            Describes a gateway transporter.
+            </summary>
+        </member>
         <member name="M:Parbad.GatewayTransporterExtensions.Transport(Parbad.IGatewayTransporter)">
             <summary>
             Transports the client to the specified gateway.
@@ -1066,10 +1071,31 @@
             Defines a mechanism for transporting the client to a gateway.
             </summary>
         </member>
+        <member name="P:Parbad.IGatewayTransporter.Descriptor">
+            <summary>
+            Describes a gateway transporter.
+            </summary>
+        </member>
         <member name="M:Parbad.IGatewayTransporter.TransportAsync(System.Threading.CancellationToken)">
             <summary>
             Transports the client to the specified gateway.
             </summary>
+        </member>
+        <member name="T:Parbad.Internal.DefaultGatewayTransporter">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Internal.DefaultGatewayTransporter.#ctor(Microsoft.AspNetCore.Http.HttpContext,Parbad.GatewayTransporterDescriptor)">
+            <summary>
+            Initializes an instance of <see cref="T:Parbad.Internal.DefaultGatewayTransporter"/>.
+            </summary>
+            <param name="httpContext"></param>
+            <param name="descriptor"></param>
+        </member>
+        <member name="P:Parbad.Internal.DefaultGatewayTransporter.Descriptor">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Internal.DefaultGatewayTransporter.TransportAsync(System.Threading.CancellationToken)">
+            <inheritdoc />
         </member>
         <member name="T:Parbad.Internal.DefaultInvoiceBuilder">
             <inheritdoc />
@@ -1143,12 +1169,6 @@
             <param name="throwException"></param>
             <exception cref="T:Parbad.Exceptions.InvalidGatewayTypeException"></exception>
             <exception cref="T:System.ArgumentNullException"></exception>
-        </member>
-        <member name="M:Parbad.Internal.GatewayPost.#ctor(Microsoft.AspNetCore.Http.HttpContext,System.String,System.Collections.Generic.IDictionary{System.String,System.String})">
-            <inheritdoc />
-        </member>
-        <member name="M:Parbad.Internal.GatewayPost.TransportAsync(System.Threading.CancellationToken)">
-            <inheritdoc />
         </member>
         <member name="T:Parbad.Internal.DefaultGatewayProvider">
             <exception cref="T:Parbad.Exceptions.GatewayNotFoundException"></exception>

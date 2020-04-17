@@ -47,16 +47,17 @@ namespace Parbad.Gateway.ParbadVirtual
                       $"{httpContext.Request.Host.ToUriComponent()}" +
                       $"{_options.Value.GatewayPath}";
 
-            var transporter = new GatewayPost(
-                httpContext,
+            var transporterDescriptor = GatewayTransporterDescriptor.CreatePost(
                 url,
                 new Dictionary<string, string>
                 {
-                    {"CommandType",  "request"},
-                    {"trackingNumber", invoice.TrackingNumber.ToString() },
-                    {"amount",  ((long)invoice.Amount).ToString()},
-                    {"redirectUrl", invoice.CallbackUrl }
+                    {"CommandType", "request"},
+                    {"trackingNumber", invoice.TrackingNumber.ToString()},
+                    {"amount", ((long) invoice.Amount).ToString()},
+                    {"redirectUrl", invoice.CallbackUrl}
                 });
+
+            var transporter = new DefaultGatewayTransporter(httpContext, transporterDescriptor);
 
             return PaymentRequestResult.Succeed(transporter, account.Name);
         }
