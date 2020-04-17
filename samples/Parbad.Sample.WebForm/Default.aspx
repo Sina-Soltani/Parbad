@@ -6,7 +6,7 @@
         <h1>Parbad Demo</h1>
     </div>
 
-    <p><a runat="server" href="~/PayRequest">Request</a></p>
-    <p><a runat="server" href="~/Refund">Refund</a></p>
+    <a runat="server" href="~/PayRequest" class="btn btn-primary btn-lg">Make a payment</a>
+    <a runat="server" href="~/Refund" class="btn btn-primary btn-lg">Refund a payment</a>
 
 </asp:Content>
