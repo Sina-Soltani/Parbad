@@ -330,6 +330,18 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Parbad.Gateway\IdPay\src\Parbad.Gateway.IdPay.csproj">
+      <Project>{8089dab8-cd14-4ffe-bc5f-f84ef9cde60f}</Project>
+      <Name>Parbad.Gateway.IdPay</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Parbad.Gateway\PayIr\src\Parbad.Gateway.PayIr.csproj">
+      <Project>{a2e36e0d-d40f-46f7-90df-b7498d0bce22}</Project>
+      <Name>Parbad.Gateway.PayIr</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Parbad.Gateway\ZarinPal\src\Parbad.Gateway.ZarinPal.csproj">
+      <Project>{0f2cd6c7-3d9a-4d9d-9132-afbcbda3f47c}</Project>
+      <Name>Parbad.Gateway.ZarinPal</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Parbad.Owin\Parbad.Owin.csproj">
       <Project>{a1815d72-31a8-45bf-95b5-2a1f1008e0f8}</Project>
       <Name>Parbad.Owin</Name>
