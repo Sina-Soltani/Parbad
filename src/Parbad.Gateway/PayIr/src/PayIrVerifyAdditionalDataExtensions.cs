@@ -1,37 +1,29 @@
 ﻿// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
-using Parbad.Gateway.PayIr.Internal;
+using System;
 
 namespace Parbad.Gateway.PayIr
 {
     public static class PayIrVerifyAdditionalDataExtensions
     {
+        private const string AdditionalDataKey = "PayIrVerificationAdditionalData";
+
         public static PayIrVerifyAdditionalData GetPayIrAdditionalData(this IPaymentVerifyResult result)
         {
-            var additionalData = new PayIrVerifyAdditionalData();
+            if (result == null) throw new ArgumentNullException(nameof(result));
 
-            if (result.AdditionalData.TryGetValue(nameof(PayIrVerifyResponseModel.CardNumber), out var cardNumber))
-            {
-                additionalData.CardNumber = cardNumber;
-            }
+            result.AdditionalData.TryGetValue(AdditionalDataKey, out var additionalData);
 
-            if (result.AdditionalData.TryGetValue(nameof(PayIrVerifyResponseModel.Description), out var description))
-            {
-                additionalData.Description = description;
-            }
+            return additionalData as PayIrVerifyAdditionalData;
+        }
 
-            if (result.AdditionalData.TryGetValue(nameof(PayIrVerifyResponseModel.FactorNumber), out var factorNumber))
-            {
-                additionalData.FactorNumber = factorNumber;
-            }
+        internal static void SetPayIrAdditionalData(this IPaymentVerifyResult result, PayIrVerifyAdditionalData additionalData)
+        {
+            if (result == null) throw new ArgumentNullException(nameof(result));
+            if (additionalData == null) throw new ArgumentNullException(nameof(additionalData));
 
-            if (result.AdditionalData.TryGetValue(nameof(PayIrVerifyResponseModel.Mobile), out var mobile))
-            {
-                additionalData.Mobile = mobile;
-            }
-
-            return additionalData;
+            result.AdditionalData.Add(AdditionalDataKey, additionalData);
         }
     }
 }

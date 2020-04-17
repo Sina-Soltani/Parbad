@@ -93,11 +93,17 @@ namespace Parbad.Gateway.PayIr.Internal
                 return PaymentVerifyResult.Failed(message);
             }
 
+            var additionalData = new PayIrVerifyAdditionalData
+            {
+                CardNumber = result.FactorNumber,
+                FactorNumber = result.FactorNumber,
+                Description = result.Description,
+                Mobile = result.Mobile
+            };
+
             var verifyResult = PaymentVerifyResult.Succeed(result.TransId, messagesOptions.PaymentSucceed);
-            verifyResult.AdditionalData.Add(nameof(result.FactorNumber), result.FactorNumber);
-            verifyResult.AdditionalData.Add(nameof(result.Mobile), result.Mobile);
-            verifyResult.AdditionalData.Add(nameof(result.Description), result.Description);
-            verifyResult.AdditionalData.Add(nameof(result.CardNumber), result.CardNumber);
+
+            verifyResult.SetPayIrAdditionalData(additionalData);
 
             return verifyResult;
         }
