@@ -16,11 +16,14 @@
     <Description>ZarinPal Gateway for Parbad project.
 
 For more information see: https://github.com/Sina-Soltani/Parbad</Description>
-    <PackageReleaseNotes>The bug on ASP.NET WebForms apps is fixed.</PackageReleaseNotes>
+    <PackageReleaseNotes>The bug on ASP.NET WebForms apps is fixed.
+Code improvement.</PackageReleaseNotes>
+    <Version>1.0.5</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
     <NoWarn>1701;1702;1591</NoWarn>
+    <DocumentationFile>Parbad.Gateway.ZarinPal.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -40,6 +43,7 @@ For more information see: https://github.com/Sina-Soltani/Parbad</Description>
 
   <ItemGroup>
     <None Include="readme.txt" pack="true" PackagePath="." />
+    <None Include="Parbad.Gateway.ZarinPal.xml" pack="true" Visible="false" PackagePath=""/>
   </ItemGroup>
 
 </Project>

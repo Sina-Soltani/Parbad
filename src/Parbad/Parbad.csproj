@@ -3,14 +3,16 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netcoreapp3.0</TargetFrameworks>
     <LangVersion>latest</LangVersion>
-    <VersionPrefix>3.3.3</VersionPrefix>
+    <VersionPrefix>3.4.0</VersionPrefix>
     <Authors>Parbad Sina Soltani</Authors>
-    <Description>Parbad is a free and open-source integrated online payment library which helps developers and site owners to add the online payment ability to their websites. It provides an easy solution to perform payment request, verify a payment and refund a paid payment.
-It supports the most known online payment providers in Iran such as Mellat, Melli, Parsian, Tejarat, Saman, Pasargad and Asan Pardakht.
+    <Description>Parbad is a free, open-source, integrated and extensible library which
+connects your web applications to online payment gateways. Gateways can be added or developed by you.
+The Virtual Gateway also simulates the online payment process, which helps the application development.
 
 More information: https://github.com/Sina-Soltani/Parbad
 
-پَرباد یک کتابخانه رایگان و اوپن سورس است که امکان افزودن پرداخت آنلاین را به وب اپلیکیشن‌ها محیا میکند</Description>
+پَرباد یک کتابخانه رایگان و اوپن سورس است که امکان افزودن پرداخت آنلاین را به وب اپلیکیشن‌ها محیا میکند.
+درگاه‌های شبکه شتاب: ملت، ملی، سامان، پارسیان، پاسارگاد، آسان پرداخت و ایران کیش</Description>
     <Copyright>Copyright © Sina Soltani 2016</Copyright>
     <PackageProjectUrl>https://github.com/Sina-Soltani/Parbad</PackageProjectUrl>
     <PackageIcon>icon.png</PackageIcon>
@@ -20,7 +22,9 @@ More information: https://github.com/Sina-Soltani/Parbad
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageTags>parbad Payment Gateway virtual virtual-gateway Bank Iran Shetab IranKish Mellat Melli Sadad Parsian Pasargad Saman Asan-Pardakht پرداخت درگاه بانک ایران شتاب ایران-کیش ملت ملی سداد پارسیان پاسارگاد سامان آسان-پرداخت</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <PackageReleaseNotes>The bug on ASP.NET WebForms apps is fixed.</PackageReleaseNotes>
+    <PackageReleaseNotes>The bug on ASP.NET WebForms apps is fixed.
+Code Improvement.</PackageReleaseNotes>
+    <Version>3.4.0</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -67,6 +71,7 @@ More information: https://github.com/Sina-Soltani/Parbad
   <ItemGroup>
     <None Include="readme.txt" pack="true" Visible="false" PackagePath="." />
     <None Include="icon.png" pack="true" Visible="false" PackagePath="" />
+    <None Include="Parbad.xml" pack="true" Visible="false" PackagePath=""/>
   </ItemGroup>
 
 </Project>

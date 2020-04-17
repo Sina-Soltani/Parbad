@@ -16,11 +16,14 @@
     <Description>Pay.ir Gateway for Parbad project.
 
 For more information see: https://www.nuget.org/packages/Parbad/</Description>
-    <PackageReleaseNotes>The bug on ASP.NET WebForms apps is fixed.</PackageReleaseNotes>
+    <PackageReleaseNotes>The bug on ASP.NET WebForms apps is fixed.
+Code improvement.</PackageReleaseNotes>
+    <Version>1.1.2</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
     <NoWarn>1701;1702;1591</NoWarn>
+    <DocumentationFile>Parbad.Gateway.PayIr.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Parbad\Parbad.csproj" />
@@ -39,6 +42,7 @@ For more information see: https://www.nuget.org/packages/Parbad/</Description>
 
   <ItemGroup>
     <None Include="readme.txt" pack="true" PackagePath="." />
+    <None Include="Parbad.Gateway.PayIr.xml" pack="true" Visible="false" PackagePath="" />
   </ItemGroup>
 
 </Project>

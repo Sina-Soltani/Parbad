@@ -18,6 +18,7 @@
     <Authors>Sina Soltani</Authors>
     <Product>Parbad.Storage.EntityframeworkCore</Product>
     <PackageReleaseNotes>Code improvement.</PackageReleaseNotes>
+    <Version>1.0.6</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -34,6 +35,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Parbad\Parbad.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Parbad.Storage.EntityFrameworkCore.xml" pack="true" Visible="false" PackagePath=""/>
   </ItemGroup>
 
 </Project>

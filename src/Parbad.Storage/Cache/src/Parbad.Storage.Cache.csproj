@@ -39,4 +39,8 @@
     <ProjectReference Include="..\..\..\Parbad\Parbad.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="Parbad.Storage.Cache.xml" pack="true" Visible="false" PackagePath=""/>
+  </ItemGroup>
+
 </Project>

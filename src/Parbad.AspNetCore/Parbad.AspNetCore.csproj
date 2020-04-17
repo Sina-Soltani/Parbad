@@ -42,6 +42,8 @@ For more information see: https://www.nuget.org/packages/Parbad/</Description>
 
   <ItemGroup>
     <None Include="readme.txt" pack="true" PackagePath="." />
+    <None Include="icon.png" pack="true" Visible="false" PackagePath="" />
+    <None Include="Parbad.AspNetCore.xml" pack="true" Visible="false" PackagePath=""/>
   </ItemGroup>
 
 </Project>
