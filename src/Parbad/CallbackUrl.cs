@@ -2,6 +2,7 @@
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
 using System;
+using Microsoft.AspNetCore.WebUtilities;
 using Parbad.Exceptions;
 using Parbad.Utilities;
 
@@ -49,7 +50,7 @@ namespace Parbad
         /// <param name="value"></param>
         public CallbackUrl AddQueryString(string name, string value)
         {
-            var url = ParbadUrlHelper.AddQueryString(Url, name, value);
+            var url = QueryHelpers.AddQueryString(Url, name, value);
 
             return new CallbackUrl(url);
         }

@@ -1693,7 +1693,7 @@
             as <see cref="T:System.Int64"/> by Parbad.
             </para>
             </summary>
-            <param name="amount">The amount of money.</param>
+            <param name="value">The amount of money.</param>
             <exception cref="T:System.ArgumentOutOfRangeException"></exception>
         </member>
         <member name="M:Parbad.Money.Parse(System.String)">
