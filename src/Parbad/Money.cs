@@ -28,23 +28,23 @@ namespace Parbad
         /// as <see cref="Int64"/> by Parbad.
         /// </para>
         /// </summary>
-        /// <param name="amount">The amount of money.</param>
+        /// <param name="value">The amount of money.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
-        public Money(decimal amount)
+        public Money(decimal value)
         {
-            Amount = amount;
+            Value = value;
         }
 
-        public decimal Amount { get; }
+        public decimal Value { get; }
 
         public Money AddAmount(decimal amount)
         {
-            return new Money(Amount + amount);
+            return new Money(Value + amount);
         }
 
         public bool Equals(Money other)
         {
-            return Amount == other.Amount;
+            return Value == other.Value;
         }
 
         public override bool Equals(object obj)
@@ -55,12 +55,12 @@ namespace Parbad
 
         public override int GetHashCode()
         {
-            return Amount.GetHashCode();
+            return Value.GetHashCode();
         }
 
         public int CompareTo(Money other)
         {
-            return Amount.CompareTo(other.Amount);
+            return Value.CompareTo(other.Value);
         }
 
         public override string ToString()
@@ -70,12 +70,12 @@ namespace Parbad
 
         public string ToString(IFormatProvider format)
         {
-            return Amount.ToString(format);
+            return Value.ToString(format);
         }
 
         public string ToString(string format)
         {
-            return Amount.ToString(format);
+            return Value.ToString(format);
         }
 
         public static Money Parse(decimal amount) => new Money(amount);
@@ -109,12 +109,12 @@ namespace Parbad
 
         public static implicit operator decimal(Money money)
         {
-            return money.Amount;
+            return money.Value;
         }
 
         public static implicit operator long(Money money)
         {
-            return (long)money.Amount;
+            return (long)money.Value;
         }
 
         public static implicit operator Money(decimal amount) => Parse(amount);
@@ -123,7 +123,7 @@ namespace Parbad
 
         public static bool operator >(Money left, Money right)
         {
-            return left.Amount > right.Amount;
+            return left.Value > right.Value;
         }
 
         public static bool operator <(Money left, Money right)
@@ -133,32 +133,32 @@ namespace Parbad
 
         public static bool operator >=(Money left, Money right)
         {
-            return left.Amount >= right.Amount;
+            return left.Value >= right.Value;
         }
 
         public static bool operator <=(Money left, Money right)
         {
-            return left.Amount <= right.Amount;
+            return left.Value <= right.Value;
         }
 
         public static Money operator +(Money left, Money right)
         {
-            return new Money(left.Amount + right.Amount);
+            return new Money(left.Value + right.Value);
         }
 
         public static Money operator -(Money left, Money right)
         {
-            return new Money(left.Amount - right.Amount);
+            return new Money(left.Value - right.Value);
         }
 
         public static Money operator *(Money left, Money right)
         {
-            return new Money(left.Amount * right.Amount);
+            return new Money(left.Value * right.Value);
         }
 
         public static Money operator /(Money left, Money right)
         {
-            return new Money(left.Amount / right.Amount);
+            return new Money(left.Value / right.Value);
         }
     }
 }

@@ -1081,6 +1081,19 @@
             Transports the client to the specified gateway.
             </summary>
         </member>
+        <member name="T:Parbad.Internal.DefaultGatewayProvider">
+            <exception cref="T:Parbad.Exceptions.GatewayNotFoundException"></exception>
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Internal.DefaultGatewayProvider.#ctor(System.IServiceProvider)">
+            <summary>
+            Initializes an instance of <see cref="T:Parbad.Internal.DefaultGatewayProvider"/>.
+            </summary>
+            <param name="services"></param>
+        </member>
+        <member name="M:Parbad.Internal.DefaultGatewayProvider.Provide(System.String)">
+            <inheritdoc />
+        </member>
         <member name="T:Parbad.Internal.DefaultGatewayTransporter">
             <inheritdoc />
         </member>
@@ -1169,19 +1182,6 @@
             <param name="throwException"></param>
             <exception cref="T:Parbad.Exceptions.InvalidGatewayTypeException"></exception>
             <exception cref="T:System.ArgumentNullException"></exception>
-        </member>
-        <member name="T:Parbad.Internal.DefaultGatewayProvider">
-            <exception cref="T:Parbad.Exceptions.GatewayNotFoundException"></exception>
-            <inheritdoc />
-        </member>
-        <member name="M:Parbad.Internal.DefaultGatewayProvider.#ctor(System.IServiceProvider)">
-            <summary>
-            Initializes an instance of <see cref="T:Parbad.Internal.DefaultGatewayProvider"/>.
-            </summary>
-            <param name="services"></param>
-        </member>
-        <member name="M:Parbad.Internal.DefaultGatewayProvider.Provide(System.String)">
-            <inheritdoc />
         </member>
         <member name="T:Parbad.Internal.InMemoryGatewayAccountSource`1">
             <inheritdoc />
