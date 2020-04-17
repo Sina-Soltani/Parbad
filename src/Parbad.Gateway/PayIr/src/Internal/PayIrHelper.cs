@@ -33,7 +33,7 @@ namespace Parbad.Gateway.PayIr.Internal
             };
         }
 
-        public static PaymentRequestResult CreateRequestResult(string response, IHttpContextAccessor httpContextAccessor, PayIrGatewayAccount account)
+        public static PaymentRequestResult CreateRequestResult(string response, HttpContext httpContext, PayIrGatewayAccount account)
         {
             var result = JsonConvert.DeserializeObject<PayIrRequestResponseModel>(response);
 
@@ -44,7 +44,11 @@ namespace Parbad.Gateway.PayIr.Internal
 
             var paymentPageUrl = $"{PaymentPageUrl}{result.Token}";
 
-            return PaymentRequestResult.Succeed(new GatewayRedirect(httpContextAccessor, paymentPageUrl), account.Name);
+            var transporterDescriptor = GatewayTransporterDescriptor.CreateRedirect(paymentPageUrl);
+
+            var transporter = new DefaultGatewayTransporter(httpContext, transporterDescriptor);
+
+            return PaymentRequestResult.Succeed(transporter, account.Name);
         }
 
         public static async Task<PayIrCallbackResult> CreateCallbackResultAsync(HttpRequest httpRequest, CancellationToken cancellationToken)
@@ -93,11 +97,17 @@ namespace Parbad.Gateway.PayIr.Internal
                 return PaymentVerifyResult.Failed(message);
             }
 
+            var additionalData = new PayIrVerifyAdditionalData
+            {
+                CardNumber = result.FactorNumber,
+                FactorNumber = result.FactorNumber,
+                Description = result.Description,
+                Mobile = result.Mobile
+            };
+
             var verifyResult = PaymentVerifyResult.Succeed(result.TransId, messagesOptions.PaymentSucceed);
-            verifyResult.AdditionalData.Add(nameof(result.FactorNumber), result.FactorNumber);
-            verifyResult.AdditionalData.Add(nameof(result.Mobile), result.Mobile);
-            verifyResult.AdditionalData.Add(nameof(result.Description), result.Description);
-            verifyResult.AdditionalData.Add(nameof(result.CardNumber), result.CardNumber);
+
+            verifyResult.SetPayIrAdditionalData(additionalData);
 
             return verifyResult;
         }

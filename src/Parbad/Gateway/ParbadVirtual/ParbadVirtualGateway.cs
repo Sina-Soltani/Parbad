@@ -38,25 +38,26 @@ namespace Parbad.Gateway.ParbadVirtual
         /// <inheritdoc />
         public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
         {
-            var request = _httpContextAccessor.HttpContext.Request;
+            var httpContext = _httpContextAccessor.HttpContext;
 
             var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
 
-            var url = $"{request.Scheme}" +
+            var url = $"{httpContext.Request.Scheme}" +
                       "://" +
-                      $"{request.Host.ToUriComponent()}" +
+                      $"{httpContext.Request.Host.ToUriComponent()}" +
                       $"{_options.Value.GatewayPath}";
 
-            var transporter = new GatewayPost(
-                _httpContextAccessor,
+            var transporterDescriptor = GatewayTransporterDescriptor.CreatePost(
                 url,
                 new Dictionary<string, string>
                 {
-                    {"CommandType",  "request"},
-                    {"trackingNumber", invoice.TrackingNumber.ToString() },
-                    {"amount",  ((long)invoice.Amount).ToString()},
-                    {"redirectUrl", invoice.CallbackUrl }
+                    {"CommandType", "request"},
+                    {"trackingNumber", invoice.TrackingNumber.ToString()},
+                    {"amount", ((long) invoice.Amount).ToString()},
+                    {"redirectUrl", invoice.CallbackUrl}
                 });
+
+            var transporter = new DefaultGatewayTransporter(httpContext, transporterDescriptor);
 
             return PaymentRequestResult.Succeed(transporter, account.Name);
         }

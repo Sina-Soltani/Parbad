@@ -51,7 +51,7 @@ namespace Parbad.Gateway.Parsian
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
-            return ParsianHelper.CreateRequestResult(response, _httpContextAccessor, account, _messageOptions.Value);
+            return ParsianHelper.CreateRequestResult(response, _httpContextAccessor.HttpContext, account, _messageOptions.Value);
         }
 
         /// <inheritdoc />

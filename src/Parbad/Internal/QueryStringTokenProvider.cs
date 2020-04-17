@@ -34,7 +34,7 @@ namespace Parbad.Internal
                 throw new Exception();
             }
 
-            invoice.CallbackUrl.AddQueryString(GetQueryName(), token);
+            invoice.CallbackUrl = invoice.CallbackUrl.AddQueryString(GetQueryName(), token);
 
             return token;
         }

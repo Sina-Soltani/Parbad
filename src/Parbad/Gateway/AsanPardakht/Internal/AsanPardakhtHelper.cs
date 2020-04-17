@@ -53,7 +53,7 @@ namespace Parbad.Gateway.AsanPardakht.Internal
             string response,
             Invoice invoice,
             AsanPardakhtGatewayAccount account,
-            IHttpContextAccessor httpContextAccessor,
+            HttpContext httpContext,
             MessagesOptions messagesOptions)
         {
             var result = XmlHelper.GetNodeValueFromXml(response, "RequestOperationResult", "http://tempuri.org/");
@@ -61,22 +61,22 @@ namespace Parbad.Gateway.AsanPardakht.Internal
             var splitedResult = result.Split(',');
 
             var isSucceed = splitedResult.Length == 2 && splitedResult[0] == "0";
-            string message = null;
 
             if (!isSucceed)
             {
-                message = AsanPardakhtResultTranslator.TranslateRequest(splitedResult[0], messagesOptions);
+                var message = AsanPardakhtResultTranslator.TranslateRequest(splitedResult[0], messagesOptions);
 
                 return PaymentRequestResult.Failed(message, account.Name);
             }
 
-            var transporter = new GatewayPost(
-                httpContextAccessor,
+            var transporterDescriptor = GatewayTransporterDescriptor.CreatePost(
                 PaymentPageUrl,
                 new Dictionary<string, string>
                 {
                     {"RefId", splitedResult[1]}
                 });
+
+            var transporter = new DefaultGatewayTransporter(httpContext, transporterDescriptor);
 
             return PaymentRequestResult.Succeed(transporter, account.Name);
         }

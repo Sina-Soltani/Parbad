@@ -55,7 +55,7 @@ namespace Parbad.Gateway.IranKish
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
-            return IranKishHelper.CreateRequestResult(response, invoice, account, _httpContextAccessor, _messageOptions.Value);
+            return IranKishHelper.CreateRequestResult(response, invoice, account, _httpContextAccessor.HttpContext, _messageOptions.Value);
         }
 
         /// <inheritdoc />

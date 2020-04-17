@@ -42,7 +42,7 @@ namespace Parbad.Gateway.Mellat.Internal
 
         public static PaymentRequestResult CreateRequestResult(
             string webServiceResponse,
-            IHttpContextAccessor httpContextAccessor,
+            HttpContext httpContext,
             MessagesOptions messagesOptions,
             GatewayAccount account)
         {
@@ -64,13 +64,14 @@ namespace Parbad.Gateway.Mellat.Internal
                 return PaymentRequestResult.Failed(message, account.Name);
             }
 
-            var transporter = new GatewayPost(
-                httpContextAccessor,
+            var transporterDescriptor = GatewayTransporterDescriptor.CreatePost(
                 PaymentPageUrl,
                 new Dictionary<string, string>
                 {
                     {"RefId", refId}
                 });
+
+            var transporter = new DefaultGatewayTransporter(httpContext, transporterDescriptor);
 
             return PaymentRequestResult.Succeed(transporter, account.Name);
         }

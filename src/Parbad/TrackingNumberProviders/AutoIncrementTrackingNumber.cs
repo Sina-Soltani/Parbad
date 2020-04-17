@@ -5,22 +5,24 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
+using Parbad.Abstraction;
+using Parbad.InvoiceBuilder;
 using Parbad.Storage.Abstractions;
 
 namespace Parbad.TrackingNumberProviders
 {
-    public class AutoIncrementTrackingNumberProvider : ITrackingNumberProvider
+    public class AutoIncrementTrackingNumber : IInvoiceFormatter
     {
         private readonly IStorage _storage;
         private readonly AutoTrackingNumberOptions _options;
 
-        public AutoIncrementTrackingNumberProvider(IStorage storage, IOptions<AutoTrackingNumberOptions> options)
+        public AutoIncrementTrackingNumber(IStorage storage, IOptions<AutoTrackingNumberOptions> options)
         {
             _storage = storage;
             _options = options.Value;
         }
 
-        public virtual Task<long> ProvideAsync(CancellationToken cancellationToken = default)
+        public Task FormatAsync(Invoice invoice, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -46,7 +48,9 @@ namespace Parbad.TrackingNumberProviders
                 }
             }
 
-            return Task.FromResult(max);
+            invoice.TrackingNumber = max;
+
+            return Task.CompletedTask;
         }
     }
 }

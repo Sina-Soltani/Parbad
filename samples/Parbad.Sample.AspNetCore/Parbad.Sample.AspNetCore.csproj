@@ -7,6 +7,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Parbad.AspNetCore\Parbad.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\src\Parbad.Gateway\IdPay\src\Parbad.Gateway.IdPay.csproj" />
+    <ProjectReference Include="..\..\src\Parbad.Gateway\PayIr\src\Parbad.Gateway.PayIr.csproj" />
+    <ProjectReference Include="..\..\src\Parbad.Gateway\ZarinPal\src\Parbad.Gateway.ZarinPal.csproj" />
     <ProjectReference Include="..\..\src\Parbad.Storage\Cache\src\Parbad.Storage.Cache.csproj" />
     <ProjectReference Include="..\..\src\Parbad.Storage\EntityFrameworkCore\src\Parbad.Storage.EntityFrameworkCore.csproj" />
     <ProjectReference Include="..\..\src\Parbad\Parbad.csproj" />

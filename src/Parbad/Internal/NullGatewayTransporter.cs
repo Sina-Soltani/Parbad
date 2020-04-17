@@ -8,6 +8,13 @@ namespace Parbad.Internal
 {
     public class NullGatewayTransporter : IGatewayTransporter
     {
+        public NullGatewayTransporter()
+        {
+            Descriptor = null;
+        }
+
+        public GatewayTransporterDescriptor Descriptor { get; }
+
         public Task TransportAsync(CancellationToken cancellationToken = default)
         {
             return Task.CompletedTask;

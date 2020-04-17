@@ -51,7 +51,7 @@ namespace Parbad.Gateway.Mellat
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
-            return MellatHelper.CreateRequestResult(response, _httpContextAccessor, _messagesOptions.Value, account);
+            return MellatHelper.CreateRequestResult(response, _httpContextAccessor.HttpContext, _messagesOptions.Value, account);
         }
 
         /// <inheritdoc />
@@ -100,7 +100,6 @@ namespace Parbad.Gateway.Mellat
         public override async Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
-            if (amount == null) throw new ArgumentNullException(nameof(amount));
 
             var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 

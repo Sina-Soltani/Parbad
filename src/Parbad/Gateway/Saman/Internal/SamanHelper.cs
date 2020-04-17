@@ -23,10 +23,9 @@ namespace Parbad.Gateway.Saman.Internal
         public const string BaseServiceUrl = "https://sep.shaparak.ir/";
         public const string WebServiceUrl = "/payments/referencepayment.asmx";
 
-        public static PaymentRequestResult CreateRequestResult(Invoice invoice, IHttpContextAccessor httpContextAccessor, SamanGatewayAccount account)
+        public static PaymentRequestResult CreateRequestResult(Invoice invoice, HttpContext httpContext, SamanGatewayAccount account)
         {
-            var transporter = new GatewayPost(
-                httpContextAccessor,
+            var transporterDescriptor = GatewayTransporterDescriptor.CreatePost(
                 PaymentPageUrl,
                 new Dictionary<string, string>
                 {
@@ -35,6 +34,8 @@ namespace Parbad.Gateway.Saman.Internal
                     {"ResNum", invoice.TrackingNumber.ToString()},
                     {"RedirectURL", invoice.CallbackUrl}
                 });
+
+            var transporter = new DefaultGatewayTransporter(httpContext, transporterDescriptor);
 
             return PaymentRequestResult.Succeed(transporter, account.Name);
         }

@@ -13,7 +13,7 @@ namespace Parbad.Internal
         /// </summary>
         public PaymentResult()
         {
-            AdditionalData = new Dictionary<string, string>();
+            AdditionalData = new Dictionary<string, object>();
             DatabaseAdditionalData = new Dictionary<string, string>();
         }
 
@@ -36,7 +36,7 @@ namespace Parbad.Internal
         public string Message { get; set; }
 
         /// <inheritdoc />
-        public IDictionary<string, string> AdditionalData { get; protected set; }
+        public IDictionary<string, object> AdditionalData { get; protected set; }
 
         public IDictionary<string, string> DatabaseAdditionalData { get; protected set; }
     }

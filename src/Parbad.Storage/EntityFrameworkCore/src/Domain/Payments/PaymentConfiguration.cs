@@ -35,6 +35,7 @@ namespace Parbad.Storage.EntityFrameworkCore.Domain.Payments
 
             builder.Property(entity => entity.Amount)
                 .HasColumnName(nameof(PaymentEntity.Amount).ToLower())
+                .HasColumnType("decimal(18,2)")
                 .IsRequired(required: true);
 
             builder.Property(entity => entity.TransactionCode)

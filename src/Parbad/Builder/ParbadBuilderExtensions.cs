@@ -29,10 +29,10 @@ namespace Microsoft.Extensions.DependencyInjection
 
             builder.Services.TryAddTransient<IInvoiceBuilder, DefaultInvoiceBuilder>();
 
-            builder.Services.TryAddTransient<IGatewayProvider, DefaultGatewayProvider>();
+            builder.Services.TryAddTransient<AutoIncrementTrackingNumber>();
+            builder.Services.TryAddTransient<AutoRandomTrackingNumber>();
 
-            builder.Services.TryAddTransient<AutoIncrementTrackingNumberProvider>();
-            builder.Services.TryAddTransient<AutoRandomTrackingNumberProvider>();
+            builder.Services.TryAddTransient<IGatewayProvider, DefaultGatewayProvider>();
 
             builder.ConfigureMessages(options => { });
 

@@ -15,51 +15,60 @@ namespace Parbad.Storage.EntityFrameworkCore.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.4-servicing-10062")
+                .HasAnnotation("ProductVersion", "3.1.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn)
-                .HasAnnotation("Sqlite:Autoincrement", true);
+                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("Parbad.Storage.EntityFrameworkCore.Domain.Payments.PaymentEntity", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("payment_id")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn)
-                        .HasAnnotation("Sqlite:Autoincrement", true);
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<decimal>("Amount")
-                        .HasColumnName("amount");
+                        .HasColumnName("amount")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("CreatedOn")
-                        .HasColumnName("created_on");
+                        .HasColumnName("created_on")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("GatewayAccountName")
-                        .HasColumnName("gateway_account_name");
+                        .HasColumnName("gateway_account_name")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("GatewayName")
                         .IsRequired()
                         .HasColumnName("gateway_name")
+                        .HasColumnType("nvarchar(20)")
                         .HasMaxLength(20);
 
                     b.Property<bool>("IsCompleted")
-                        .HasColumnName("is_completed");
+                        .HasColumnName("is_completed")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsPaid")
-                        .HasColumnName("is_paid");
+                        .HasColumnName("is_paid")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Token")
                         .IsRequired()
-                        .HasColumnName("token");
+                        .HasColumnName("token")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<long>("TrackingNumber")
-                        .HasColumnName("tracking_number");
+                        .HasColumnName("tracking_number")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("TransactionCode")
-                        .HasColumnName("transaction_code");
+                        .HasColumnName("transaction_code")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedOn")
-                        .HasColumnName("updated_on");
+                        .HasColumnName("updated_on")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id")
                         .HasName("payment_id");
@@ -78,31 +87,39 @@ namespace Parbad.Storage.EntityFrameworkCore.Migrations
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("transaction_id")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn)
-                        .HasAnnotation("Sqlite:Autoincrement", true);
+                        .HasColumnType("bigint")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("AdditionalData")
-                        .HasColumnName("additional_data");
+                        .HasColumnName("additional_data")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Amount")
-                        .HasColumnName("amount");
+                        .HasColumnName("amount")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("CreatedOn")
-                        .HasColumnName("created_on");
+                        .HasColumnName("created_on")
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("IsSucceed")
-                        .HasColumnName("is_succeed");
+                        .HasColumnName("is_succeed")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Message")
-                        .HasColumnName("message");
+                        .HasColumnName("message")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<long>("PaymentId");
+                    b.Property<long>("PaymentId")
+                        .HasColumnType("bigint");
 
                     b.Property<byte>("Type")
-                        .HasColumnName("type");
+                        .HasColumnName("type")
+                        .HasColumnType("tinyint");
 
                     b.Property<DateTime?>("UpdatedOn")
-                        .HasColumnName("updated_on");
+                        .HasColumnName("updated_on")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id")
                         .HasName("transaction_id");
@@ -117,7 +134,8 @@ namespace Parbad.Storage.EntityFrameworkCore.Migrations
                     b.HasOne("Parbad.Storage.EntityFrameworkCore.Domain.Payments.PaymentEntity", "Payment")
                         .WithMany("Transactions")
                         .HasForeignKey("PaymentId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

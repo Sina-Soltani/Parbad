@@ -46,6 +46,6 @@ namespace Parbad
         /// <summary>
         /// Includes some additional data.
         /// </summary>
-        IDictionary<string, string> AdditionalData { get; }
+        IDictionary<string, object> AdditionalData { get; }
     }
 }

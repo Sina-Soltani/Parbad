@@ -53,7 +53,7 @@ namespace Parbad.Gateway.ZarinPal.Internal
         }
 
         public static PaymentRequestResult CreateRequestResult(string response,
-            IHttpContextAccessor httpContextAccessor,
+            HttpContext httpContext,
             ZarinPalGatewayAccount account,
             MessagesOptions messagesOptions)
         {
@@ -71,7 +71,11 @@ namespace Parbad.Gateway.ZarinPal.Internal
 
             var paymentPageUrl = GetWebPageUrl(account.IsSandbox) + authority;
 
-            return PaymentRequestResult.Succeed(new GatewayRedirect(httpContextAccessor, paymentPageUrl), account.Name);
+            var transporterDescriptor = GatewayTransporterDescriptor.CreateRedirect(paymentPageUrl);
+
+            var transporter = new DefaultGatewayTransporter(httpContext, transporterDescriptor);
+
+            return PaymentRequestResult.Succeed(transporter, account.Name);
         }
 
         public static async Task<ZarinPalCallbackResult> CreateCallbackResultAsync(HttpRequest httpRequest,

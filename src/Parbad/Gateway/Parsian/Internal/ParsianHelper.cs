@@ -47,7 +47,7 @@ namespace Parbad.Gateway.Parsian.Internal
                 "</soapenv:Envelope> ";
         }
 
-        public static PaymentRequestResult CreateRequestResult(string webServiceResponse, IHttpContextAccessor httpContextAccessor, ParsianGatewayAccount account, MessagesOptions messagesOptions)
+        public static PaymentRequestResult CreateRequestResult(string webServiceResponse, HttpContext httpContext, ParsianGatewayAccount account, MessagesOptions messagesOptions)
         {
             var token = XmlHelper.GetNodeValueFromXml(webServiceResponse, "Token", "https://pec.Shaparak.ir/NewIPGServices/Sale/SaleService");
             var status = XmlHelper.GetNodeValueFromXml(webServiceResponse, "Status", "https://pec.Shaparak.ir/NewIPGServices/Sale/SaleService");
@@ -69,7 +69,11 @@ namespace Parbad.Gateway.Parsian.Internal
 
             var paymentPageUrl = $"{PaymentPageUrl}?Token={token}";
 
-            var result = PaymentRequestResult.Succeed(new GatewayRedirect(httpContextAccessor, paymentPageUrl), account.Name);
+            var transporterDescriptor = GatewayTransporterDescriptor.CreateRedirect(paymentPageUrl);
+
+            var transporter = new DefaultGatewayTransporter(httpContext, transporterDescriptor);
+
+            var result = PaymentRequestResult.Succeed(transporter, account.Name);
 
             result.DatabaseAdditionalData.Add("token", token);
 

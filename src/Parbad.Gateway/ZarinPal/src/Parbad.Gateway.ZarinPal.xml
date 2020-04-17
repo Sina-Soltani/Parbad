@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Parbad.Gateway.ZarinPal</name>
+    </assembly>
+    <members>
+        <member name="M:Parbad.Gateway.ZarinPal.ZarinPalGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Gateway.ZarinPal.ZarinPalGateway.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Gateway.ZarinPal.ZarinPalGateway.RefundAsync(Parbad.InvoiceContext,Parbad.Money,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="T:Parbad.Gateway.ZarinPal.ZarinPalGatewayAccount">
+            <summary>
+            Describes an account for ZarinPal Gateway.
+            </summary>
+        </member>
+        <member name="T:Parbad.Gateway.ZarinPal.ZarinPalInvoice">
+            <summary>
+            Describes an invoice for ZarinPal gateway.
+            </summary>
+        </member>
+        <member name="M:Parbad.Gateway.ZarinPal.ZarinPalInvoice.#ctor(System.String)">
+            <summary>
+            Initializes an instance of <see cref="T:Parbad.Gateway.ZarinPal.ZarinPalInvoice"/>.
+            </summary>
+            <param name="description">A short description about this invoice which is required by ZarinPal gateway.</param>
+        </member>
+        <member name="M:Parbad.Gateway.ZarinPal.ZarinPalInvoice.#ctor(System.String,System.String,System.String)">
+            <summary>
+            Initializes an instance of <see cref="T:Parbad.Gateway.ZarinPal.ZarinPalInvoice"/>.
+            </summary>
+            <param name="description">A short description about this invoice which is required by ZarinPal gateway.</param>
+            <param name="email">Buyer's email.</param>
+            <param name="mobile">Buyer's mobile.</param>
+        </member>
+        <member name="P:Parbad.Gateway.ZarinPal.ZarinPalInvoice.Description">
+            <summary>
+            A short description about this invoice which is required by ZarinPal gateway.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.ZarinPal.ZarinPalInvoice.Email">
+            <summary>
+            Buyer's email.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.ZarinPal.ZarinPalInvoice.Mobile">
+            <summary>
+            Buyer's mobile.
+            </summary>
+        </member>
+        <member name="M:Parbad.Builder.ZarinPalGatewayBuilderExtensions.AddZarinPal(Parbad.GatewayBuilders.IGatewayBuilder)">
+            <summary>
+            Adds the ZarinPal gateway to Parbad services.
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.Builder.ZarinPalGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.ZarinPal.ZarinPalGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.Gateway.ZarinPal.ZarinPalGatewayAccount}})">
+            <summary>
+            Configures the accounts for <see cref="T:Parbad.Gateway.ZarinPal.ZarinPalGateway"/>.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureAccounts">Configures the accounts.</param>
+        </member>
+        <member name="M:Parbad.ZarinPalGatewayInvoiceBuilderExtensions.UseZarinPal(Parbad.InvoiceBuilder.IInvoiceBuilder,Parbad.Gateway.ZarinPal.ZarinPalInvoice)">
+            <summary>
+            The invoice will be sent to ZarinPal gateway.
+            </summary>
+            <param name="builder"></param>
+            <param name="zarinPalInvoice">Describes an invoice for ZarinPal gateway.</param>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="M:Parbad.ZarinPalGatewayInvoiceBuilderExtensions.UseZarinPal(Parbad.InvoiceBuilder.IInvoiceBuilder,System.String,System.String,System.String)">
+            <summary>
+            The invoice will be sent to ZarinPal gateway.
+            </summary>
+            <param name="builder"></param>
+            <param name="description">A short description about this invoice which is required by ZarinPal gateway.</param>
+            <param name="email">Buyer's email.</param>
+            <param name="mobile">Buyer's mobile.</param>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+    </members>
+</doc>

@@ -38,7 +38,7 @@ namespace Parbad.Gateway.IdPay.Internal
 
         public static async Task<PaymentRequestResult> CreateRequestResult(
             HttpResponseMessage responseMessage,
-            IHttpContextAccessor httpContextAccessor,
+            HttpContext httpContext,
             IdPayGatewayAccount account)
         {
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
@@ -52,7 +52,11 @@ namespace Parbad.Gateway.IdPay.Internal
 
             var result = JsonConvert.DeserializeObject<IdPayRequestResultModel>(response);
 
-            return PaymentRequestResult.Succeed(new GatewayRedirect(httpContextAccessor, result.Link), account.Name);
+            var transporterDescriptor = GatewayTransporterDescriptor.CreateRedirect(result.Link);
+
+            var transporter = new DefaultGatewayTransporter(httpContext, transporterDescriptor);
+
+            return PaymentRequestResult.Succeed(transporter, account.Name);
         }
 
         public static async Task<IdPayCallbackResult> CreateCallbackResultAsync(

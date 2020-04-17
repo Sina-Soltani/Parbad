@@ -1,17 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
-    <VersionPrefix>2.0.4</VersionPrefix>
+    <TargetFramework>net462</TargetFramework>
+    <VersionPrefix>2.0.5</VersionPrefix>
     <LangVersion>latest</LangVersion>
     <Authors>Sina Soltani</Authors>
     <Description>ASP.NET MVC 4 and 5 integration for Parbad project.
 
 For more information see: https://www.nuget.org/packages/Parbad/</Description>
     <Copyright>Copyright © Sina Soltani 2016</Copyright>
-    <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/Sina-Soltani/Parbad</PackageProjectUrl>
-    <PackageIconUrl>https://raw.githubusercontent.com/Sina-Soltani/Parbad/master/images/Parbad.png</PackageIconUrl>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageIconUrl>https://raw.githubusercontent.com/Sina-Soltani/Parbad/master/images/Parbad-128x128.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/Sina-Soltani/Parbad</RepositoryUrl>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
@@ -20,7 +20,8 @@ For more information see: https://www.nuget.org/packages/Parbad/</Description>
     <PackageTags>parbad mvc Payment Gateway Bank Iran Shetab IranKish Mellat Melli Sadad Parsian Pasargad Saman Asan-Pardakht پرداخت درگاه بانک ایران شتاب ایران-کیش ملت ملی سداد پارسیان پاسارگاد سامان آسان-پرداخت</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
-    <PackageReleaseNotes>Bug Ticket #71 is fixed.</PackageReleaseNotes>
+    <PackageReleaseNotes>.NET Framework is upgraded to 4.6.2</PackageReleaseNotes>
+    <Version>2.0.6</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -44,7 +45,9 @@ For more information see: https://www.nuget.org/packages/Parbad/</Description>
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="icon.png" pack="true" Visible="false" PackagePath="" />
     <None Include="readme.txt" pack="true" PackagePath="." />
+    <None Include="Parbad.Mvc.xml" pack="true" Visible="false" PackagePath=""/>
   </ItemGroup>
 
 </Project>

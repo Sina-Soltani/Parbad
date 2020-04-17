@@ -43,7 +43,7 @@ namespace Parbad.Gateway.Pasargad
 
             var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
 
-            return PasargadHelper.CreateRequestResult(invoice, _httpContextAccessor, account);
+            return PasargadHelper.CreateRequestResult(invoice, _httpContextAccessor.HttpContext, account);
         }
 
         /// <inheritdoc />
@@ -100,7 +100,6 @@ namespace Parbad.Gateway.Pasargad
         public override async Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
-            if (amount == null) throw new ArgumentNullException(nameof(amount));
 
             var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 

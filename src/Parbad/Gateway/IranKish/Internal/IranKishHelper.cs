@@ -49,7 +49,7 @@ namespace Parbad.Gateway.IranKish.Internal
             string webServiceResponse,
             Invoice invoice,
             IranKishGatewayAccount account,
-            IHttpContextAccessor httpContextAccessor,
+            HttpContext httpContext,
             MessagesOptions messagesOptions)
         {
             var result = XmlHelper.GetNodeValueFromXml(webServiceResponse, "result", "http://schemas.datacontract.org/2004/07/Token");
@@ -68,14 +68,15 @@ namespace Parbad.Gateway.IranKish.Internal
                 return PaymentRequestResult.Failed(message, account.Name);
             }
 
-            var transporter = new GatewayPost(
-                httpContextAccessor,
+            var transporterDescriptor = GatewayTransporterDescriptor.CreatePost(
                 PaymentPageUrl,
                 new Dictionary<string, string>
                 {
                     {"merchantid", account.MerchantId},
                     {"token", token}
                 });
+
+            var transporter = new DefaultGatewayTransporter(httpContext, transporterDescriptor);
 
             return PaymentRequestResult.Succeed(transporter, account.Name);
         }

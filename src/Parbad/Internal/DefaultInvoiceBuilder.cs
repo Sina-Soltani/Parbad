@@ -3,84 +3,46 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Parbad.Abstraction;
 using Parbad.InvoiceBuilder;
-using Parbad.TrackingNumberProviders;
 
 namespace Parbad.Internal
 {
     /// <inheritdoc />
     public class DefaultInvoiceBuilder : IInvoiceBuilder
     {
-        private ITrackingNumberProvider _trackingNumberProvider;
+        private readonly IServiceProvider _services;
+        private readonly List<IInvoiceFormatter> _formatters;
+        private readonly List<Type> _formatterTypes;
 
         /// <summary>
-        /// Initializes an instance of <see cref="DefaultInvoiceBuilder"/> class.
+        /// Initializes an instance of <see cref="DefaultInvoiceBuilder"/>.
         /// </summary>
-        /// <param name="services"></param>
         public DefaultInvoiceBuilder(IServiceProvider services)
         {
-            Services = services;
-
-            AdditionalData = new Dictionary<string, object>();
+            _services = services;
+            _formatters = new List<IInvoiceFormatter>();
+            _formatterTypes = new List<Type>();
         }
 
         /// <inheritdoc />
-        public long TrackingNumber { get; set; }
-
-        /// <inheritdoc />
-        public Money Amount { get; set; }
-
-        /// <inheritdoc />
-        public CallbackUrl CallbackUrl { get; set; }
-
-        /// <inheritdoc />
-        public string GatewayName { get; set; }
-
-        /// <inheritdoc />
-        public IDictionary<string, object> AdditionalData { get; set; }
-
-        /// <inheritdoc />
-        public IServiceProvider Services { get; }
-
-        /// <inheritdoc />
-        public virtual IInvoiceBuilder SetTrackingNumberProvider(ITrackingNumberProvider provider)
+        public IInvoiceBuilder AddFormatter(IInvoiceFormatter formatter)
         {
-            _trackingNumberProvider = provider ?? throw new ArgumentNullException(nameof(provider));
+            if (formatter == null) throw new ArgumentNullException(nameof(formatter));
+
+            _formatters.Add(formatter);
 
             return this;
         }
 
         /// <inheritdoc />
-        public virtual IInvoiceBuilder SetAmount(Money amount)
+        public IInvoiceBuilder AddFormatter<T>() where T : class, IInvoiceFormatter
         {
-            Amount = amount ?? throw new ArgumentNullException(nameof(amount));
-
-            return this;
-        }
-
-        /// <inheritdoc />
-        public virtual IInvoiceBuilder SetCallbackUrl(CallbackUrl callbackUrl)
-        {
-            CallbackUrl = callbackUrl ?? throw new ArgumentNullException(nameof(callbackUrl));
-
-            return this;
-        }
-
-        /// <inheritdoc />
-        public IInvoiceBuilder SetGateway(string gatewayName)
-        {
-            GatewayName = gatewayName ?? throw new ArgumentNullException(nameof(gatewayName));
-
-            return this;
-        }
-
-        /// <inheritdoc />
-        public virtual IInvoiceBuilder AddAdditionalData(string key, object value)
-        {
-            AdditionalData.Add(key, value);
+            _formatterTypes.Add(typeof(T));
 
             return this;
         }
@@ -88,18 +50,17 @@ namespace Parbad.Internal
         /// <inheritdoc />
         public virtual async Task<Invoice> BuildAsync(CancellationToken cancellationToken = default)
         {
-            if (_trackingNumberProvider != null)
+            var invoice = new Invoice();
+
+            var formatters = _formatters.ToList();
+            formatters.AddRange(_formatterTypes.Select(type => (IInvoiceFormatter)_services.GetRequiredService(type)));
+
+            foreach (var formatter in formatters)
             {
-                TrackingNumber = await _trackingNumberProvider.ProvideAsync(cancellationToken).ConfigureAwaitFalse();
+                await formatter.FormatAsync(invoice);
             }
 
-            return new Invoice(
-                TrackingNumber,
-                Amount,
-                CallbackUrl,
-                GatewayName,
-                AdditionalData
-            );
+            return invoice;
         }
     }
 }

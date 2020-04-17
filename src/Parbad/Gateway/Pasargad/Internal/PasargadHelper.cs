@@ -30,7 +30,7 @@ namespace Parbad.Gateway.Pasargad.Internal
         private const string ActionNumber = "1003";
         private const string RefundNumber = "1004";
 
-        public static PaymentRequestResult CreateRequestResult(Invoice invoice, IHttpContextAccessor httpContextAccessor, PasargadGatewayAccount account)
+        public static PaymentRequestResult CreateRequestResult(Invoice invoice, HttpContext httpContext, PasargadGatewayAccount account)
         {
             var invoiceDate = GetTimeStamp(DateTime.Now);
 
@@ -48,21 +48,22 @@ namespace Parbad.Gateway.Pasargad.Internal
 
             var signedData = SignData(account.PrivateKey, dataToSign);
 
-            var transporter = new GatewayPost(
-                httpContextAccessor,
+            var transporterDescriptor = GatewayTransporterDescriptor.CreatePost(
                 PaymentPageUrl,
                 new Dictionary<string, string>
                 {
-                    {"merchantCode", account.MerchantCode },
-                    {"terminalCode",  account.TerminalCode},
-                    {"invoiceNumber",  invoice.TrackingNumber.ToString()},
-                    {"invoiceDate", invoiceDate },
-                    {"amount",  invoice.Amount.ToLongString()},
+                    {"merchantCode", account.MerchantCode},
+                    {"terminalCode", account.TerminalCode},
+                    {"invoiceNumber", invoice.TrackingNumber.ToString()},
+                    {"invoiceDate", invoiceDate},
+                    {"amount", invoice.Amount.ToLongString()},
                     {"redirectAddress", invoice.CallbackUrl},
-                    {"action",  ActionNumber},
-                    {"timeStamp", timeStamp },
-                    {"sign",  signedData}
+                    {"action", ActionNumber},
+                    {"timeStamp", timeStamp},
+                    {"sign", signedData}
                 });
+
+            var transporter = new DefaultGatewayTransporter(httpContext, transporterDescriptor);
 
             var result = PaymentRequestResult.Succeed(transporter, account.Name);
 

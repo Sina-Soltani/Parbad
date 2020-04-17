@@ -94,5 +94,13 @@ namespace Microsoft.Extensions.DependencyInjection
                 .RemoveAll<TService>()
                 .Add(factory, lifetime);
         }
+
+        public static IServiceCollection AddOrUpdate<TService>(this IServiceCollection services, TService implementationInstance)
+            where TService : class
+        {
+            return services
+                .RemoveAll<TService>()
+                .AddSingleton(implementationInstance);
+        }
     }
 }

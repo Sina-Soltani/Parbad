@@ -3,7 +3,6 @@
 
 using System;
 using System.Globalization;
-using Parbad.Properties;
 
 namespace Parbad
 {
@@ -19,10 +18,8 @@ namespace Parbad
     /// <para>long a = Money</para>
     /// </para>
     /// </summary>
-    public class Money : IComparable<Money>
+    public readonly struct Money : IComparable<Money>
     {
-        private readonly decimal _amount;
-
         /// <summary>
         /// Defines money unit.
         /// <para>
@@ -31,18 +28,23 @@ namespace Parbad
         /// as <see cref="Int64"/> by Parbad.
         /// </para>
         /// </summary>
-        /// <param name="amount">The amount of money.</param>
+        /// <param name="value">The amount of money.</param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
-        public Money(decimal amount)
+        public Money(decimal value)
         {
-            if (amount <= 0) throw new ArgumentOutOfRangeException(nameof(amount), Resources.AmountCannotBeNegative);
+            Value = value;
+        }
 
-            _amount = amount;
+        public decimal Value { get; }
+
+        public Money AddAmount(decimal amount)
+        {
+            return new Money(Value + amount);
         }
 
         public bool Equals(Money other)
         {
-            return other != null && _amount == other._amount;
+            return Value == other.Value;
         }
 
         public override bool Equals(object obj)
@@ -53,14 +55,12 @@ namespace Parbad
 
         public override int GetHashCode()
         {
-            return _amount.GetHashCode();
+            return Value.GetHashCode();
         }
 
         public int CompareTo(Money other)
         {
-            if (other == null) throw new ArgumentNullException(nameof(other));
-
-            return _amount.CompareTo(other._amount);
+            return Value.CompareTo(other.Value);
         }
 
         public override string ToString()
@@ -70,18 +70,19 @@ namespace Parbad
 
         public string ToString(IFormatProvider format)
         {
-            return _amount.ToString(format);
+            return Value.ToString(format);
         }
 
         public string ToString(string format)
         {
-            return _amount.ToString(format);
+            return Value.ToString(format);
         }
 
         public static Money Parse(decimal amount) => new Money(amount);
 
         public static Money Parse(long amount) => new Money(amount);
 
+        /// <exception cref="Exception"></exception>
         public static Money Parse(string amount)
         {
             if (!decimal.TryParse(amount, out var testValue))
@@ -101,23 +102,19 @@ namespace Parbad
             }
             catch
             {
-                money = null;
+                money = default;
                 return false;
             }
         }
 
         public static implicit operator decimal(Money money)
         {
-            if (money == null) throw new ArgumentNullException(nameof(money));
-
-            return money._amount;
+            return money.Value;
         }
 
         public static implicit operator long(Money money)
         {
-            if (money == null) throw new ArgumentNullException(nameof(money));
-
-            return (long)money._amount;
+            return (long)money.Value;
         }
 
         public static implicit operator Money(decimal amount) => Parse(amount);
@@ -126,10 +123,7 @@ namespace Parbad
 
         public static bool operator >(Money left, Money right)
         {
-            if (left == null) throw new ArgumentNullException(nameof(left));
-            if (right == null) throw new ArgumentNullException(nameof(right));
-
-            return left._amount > right._amount;
+            return left.Value > right.Value;
         }
 
         public static bool operator <(Money left, Money right)
@@ -139,50 +133,32 @@ namespace Parbad
 
         public static bool operator >=(Money left, Money right)
         {
-            if (left == null) throw new ArgumentNullException(nameof(left));
-            if (right == null) throw new ArgumentNullException(nameof(right));
-
-            return left._amount >= right._amount;
+            return left.Value >= right.Value;
         }
 
         public static bool operator <=(Money left, Money right)
         {
-            if (left == null) throw new ArgumentNullException(nameof(left));
-            if (right == null) throw new ArgumentNullException(nameof(right));
-
-            return left._amount <= right._amount;
+            return left.Value <= right.Value;
         }
 
         public static Money operator +(Money left, Money right)
         {
-            if (left == null) throw new ArgumentNullException(nameof(left));
-            if (right == null) throw new ArgumentNullException(nameof(right));
-
-            return new Money(left._amount + right._amount);
+            return new Money(left.Value + right.Value);
         }
 
         public static Money operator -(Money left, Money right)
         {
-            if (left == null) throw new ArgumentNullException(nameof(left));
-            if (right == null) throw new ArgumentNullException(nameof(right));
-
-            return new Money(left._amount - right._amount);
+            return new Money(left.Value - right.Value);
         }
 
         public static Money operator *(Money left, Money right)
         {
-            if (left == null) throw new ArgumentNullException(nameof(left));
-            if (right == null) throw new ArgumentNullException(nameof(right));
-
-            return new Money(left._amount * right._amount);
+            return new Money(left.Value * right.Value);
         }
 
         public static Money operator /(Money left, Money right)
         {
-            if (left == null) throw new ArgumentNullException(nameof(left));
-            if (right == null) throw new ArgumentNullException(nameof(right));
-
-            return new Money(left._amount / right._amount);
+            return new Money(left.Value / right.Value);
         }
     }
 }

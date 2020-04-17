@@ -8,7 +8,7 @@ namespace Parbad.Internal
 {
     internal static class HtmlFormBuilder
     {
-        public static string CreateForm(string url, IDictionary<string, string> data)
+        public static string CreateForm(string url, IEnumerable<KeyValuePair<string, string>> data)
         {
             var fields = string.Join("", data.Select(item => CreateHiddenInput(item.Key, item.Value)));
 

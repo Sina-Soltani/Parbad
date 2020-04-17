@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Parbad.Gateway.IdPay</name>
+    </assembly>
+    <members>
+        <member name="M:Parbad.Gateway.IdPay.IdPayGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Gateway.IdPay.IdPayGateway.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Gateway.IdPay.IdPayGateway.RefundAsync(Parbad.InvoiceContext,Parbad.Money,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Builder.IdPayGatewayBuilderExtensions.AddIdPay(Parbad.GatewayBuilders.IGatewayBuilder)">
+            <summary>
+            Adds the IDPay.ir gateway to Parbad services.
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.Builder.IdPayGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.IdPay.IdPayGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.Gateway.IdPay.IdPayGatewayAccount}})">
+            <summary>
+            Configures the accounts for IDPay.ir.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureAccounts">Configures the accounts.</param>
+        </member>
+        <member name="M:Parbad.IdPayGatewayInvoiceBuilderExtensions.UseIdPay(Parbad.InvoiceBuilder.IInvoiceBuilder)">
+            <summary>
+            The invoice will be sent to IDPay.ir gateway.
+            </summary>
+            <param name="builder"></param>
+        </member>
+    </members>
+</doc>

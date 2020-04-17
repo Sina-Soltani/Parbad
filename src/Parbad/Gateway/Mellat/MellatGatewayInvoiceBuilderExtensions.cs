@@ -25,7 +25,9 @@ namespace Parbad
         /// <param name="configureMellatInvoiceBuilder">Helps to build the extra functions of Mellat Gateway.</param>
         public static IInvoiceBuilder UseMellat(this IInvoiceBuilder builder, Action<IMellatGatewayInvoiceBuilder> configureMellatInvoiceBuilder)
         {
-            builder.UseMellat();
+            if (configureMellatInvoiceBuilder == null) throw new ArgumentNullException(nameof(configureMellatInvoiceBuilder));
+
+            UseMellat(builder);
 
             configureMellatInvoiceBuilder(new MellatGatewayInvoiceBuilder(builder));
 
