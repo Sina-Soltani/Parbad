@@ -10,7 +10,8 @@
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
     <Description>Memory cache and distributed cache implementation of Parbad storage.</Description>
     <PackageProjectUrl>https://github.com/Sina-Soltani/Parbad</PackageProjectUrl>
-    <PackageIconUrl>https://raw.githubusercontent.com/Sina-Soltani/Parbad/master/images/Parbad.png</PackageIconUrl>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageIconUrl>https://raw.githubusercontent.com/Sina-Soltani/Parbad/master/images/Parbad-128x128.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/Sina-Soltani/Parbad</RepositoryUrl>
     <Copyright>Copyright © Sina Soltani 2016</Copyright>
     <PackageTags>parbad Payment Gateway Bank Iran Shetab IranKish Mellat Melli Sadad Parsian Pasargad Saman Asan-Pardakht Cache MemoryCache DistributedCache پرداخت درگاه بانک ایران شتاب ایران-کیش ملت ملی سداد پارسیان پاسارگاد سامان آسان-پرداخت</PackageTags>
@@ -40,6 +41,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="icon.png" pack="true" Visible="false" PackagePath="" />
     <None Include="Parbad.Storage.Cache.xml" pack="true" Visible="false" PackagePath=""/>
   </ItemGroup>
 
