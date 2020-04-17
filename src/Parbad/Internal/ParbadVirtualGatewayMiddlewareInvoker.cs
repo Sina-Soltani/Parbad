@@ -21,29 +21,33 @@ namespace Parbad.Internal
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public Task InvokeAsync()
+        public async Task InvokeAsync()
         {
             var httpContext = _httpContextAccessor.HttpContext;
 
             HttpResponseUtilities.AddNecessaryContents(httpContext, "text/html");
 
-            var commandDetails = GetCommandDetails(httpContext);
+            var commandDetails = await GetCommandDetails(httpContext);
 
             if (commandDetails == null)
             {
-                return httpContext.Response.WriteAsync("Command details are not valid.");
+                await httpContext.Response.WriteAsync("Command details are not valid.");
+                return;
             }
 
             switch (commandDetails.CommandType)
             {
                 case VirtualGatewayCommandType.Request:
-                    return HandleRequestCommand(httpContext, commandDetails);
+                    await HandleRequestCommand(httpContext, commandDetails);
+                    break;
 
                 case VirtualGatewayCommandType.Pay:
-                    return HandlePayCommand(httpContext, commandDetails);
+                    await HandlePayCommand(httpContext, commandDetails);
+                    break;
 
                 default:
-                    return httpContext.Response.WriteAsync("CommandType is not valid.");
+                    await httpContext.Response.WriteAsync("CommandType is not valid.");
+                    break;
             }
         }
 
@@ -81,9 +85,9 @@ namespace Parbad.Internal
             return httpContext.Response.WriteAsync(html);
         }
 
-        private static VirtualGatewayCommandDetails GetCommandDetails(HttpContext httpContext)
+        private static async Task<VirtualGatewayCommandDetails> GetCommandDetails(HttpContext httpContext)
         {
-            var form = httpContext.Request.Form;
+            var form = await httpContext.Request.ReadFormAsync();
 
             if (!Enum.TryParse(form["commandType"], out VirtualGatewayCommandType commandType))
             {

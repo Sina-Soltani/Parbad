@@ -32,18 +32,18 @@ namespace Parbad.Internal
         {
             if (Descriptor.Type == GatewayTransporterDescriptor.TransportType.Post)
             {
-                HttpResponseUtilities.AddNecessaryContents(_httpContext);
+                HttpResponseUtilities.AddNecessaryContents(_httpContext, "text/html");
 
-                _httpContext.Response.Redirect(Descriptor.Url);
+                var form = HtmlFormBuilder.CreateForm(Descriptor.Url, Descriptor.Form);
 
-                return Task.CompletedTask;
+                return _httpContext.Response.WriteAsync(form, cancellationToken);
             }
 
-            HttpResponseUtilities.AddNecessaryContents(_httpContext, "text/html");
+            HttpResponseUtilities.AddNecessaryContents(_httpContext);
 
-            var form = HtmlFormBuilder.CreateForm(Descriptor.Url, Descriptor.Form);
+            _httpContext.Response.Redirect(Descriptor.Url);
 
-            return _httpContext.Response.WriteAsync(form, cancellationToken);
+            return Task.CompletedTask;
         }
     }
 }
