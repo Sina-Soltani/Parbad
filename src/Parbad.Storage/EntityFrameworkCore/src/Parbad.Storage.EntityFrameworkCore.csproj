@@ -2,13 +2,13 @@
 
   <PropertyGroup>
     <PackageId>Parbad.Storage.EntityFrameworkCore</PackageId>
-    <VersionPrefix>1.0.4</VersionPrefix>
+    <VersionPrefix>1.0.5</VersionPrefix>
     <LangVersion>latest</LangVersion>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
-    <Description>Entityframework Core implementation of Parbad storage.</Description>
+    <Description>Entity Framework Core implementation of Parbad storage.</Description>
     <PackageProjectUrl>https://github.com/Sina-Soltani/Parbad</PackageProjectUrl>
     <PackageIconUrl>https://raw.githubusercontent.com/Sina-Soltani/Parbad/master/images/Parbad.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/Sina-Soltani/Parbad</RepositoryUrl>
@@ -17,7 +17,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Authors>Sina Soltani</Authors>
     <Product>Parbad.Storage.EntityframeworkCore</Product>
-    <PackageReleaseNotes>Bug Ticket #71 is fixed.</PackageReleaseNotes>
+    <PackageReleaseNotes>Code improvement.</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
