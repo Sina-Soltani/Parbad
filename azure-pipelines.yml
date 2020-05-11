@@ -65,3 +65,4 @@ stages:
           projects: 'src/**/*.csproj'
           custom: 'pack'
           arguments: '-c $(buildConfiguration) --no-build -o $(artifactReleasePath)'
+      - script: dotnet nuget push $(artifactReleasePath)/Parbad.nupkg -k $(ApiKey) --skip-duplicate
