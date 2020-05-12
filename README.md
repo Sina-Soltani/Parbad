@@ -23,7 +23,7 @@ Parbad is a free and open-source integrated online payment library which helps d
   * [ZarinPal](https://www.nuget.org/packages/Parbad.Gateway.ZarinPal/)
   * [Pay.ir](https://www.nuget.org/packages/Parbad.Gateway.PayIr/)
   * [IDPay.ir](https://www.nuget.org/packages/Parbad.Gateway.IdPay/)
-* Virtual gateway for testing and developing your application.
+* Virtual gateway for developing and testing your application.
 * Using Proxy
 * Created with modern and standard technologies
 * Supports ASP.NET CORE, ASP.NET MVC and ASP.NET WebForms
