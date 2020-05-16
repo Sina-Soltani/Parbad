@@ -24,7 +24,6 @@ More information: https://github.com/Sina-Soltani/Parbad
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageReleaseNotes>The bug on ASP.NET WebForms apps is fixed.
 Code Improvement.</PackageReleaseNotes>
-    <Version>3.4.0</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

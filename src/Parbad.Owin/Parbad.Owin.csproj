@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
-    <VersionPrefix>1.0.3</VersionPrefix>
+    <VersionPrefix>1.0.4</VersionPrefix>
     <LangVersion>latest</LangVersion>
     <Authors>Sina Soltani</Authors>
     <Description>Owin integration for Parbad project.
@@ -19,7 +19,6 @@ For more information see: https://www.nuget.org/packages/Parbad/</Description>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
     <PackageReleaseNotes>.NET Framework is upgraded to 4.6.2</PackageReleaseNotes>
-    <Version>1.0.4</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
