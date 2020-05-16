@@ -32,9 +32,6 @@ steps:
     projects: $(projects)
     custom: 'pack'
     arguments: '-c $(buildConfiguration) --no-build -o $(Build.ArtifactStagingDirectory) --version-suffix dev$(Build.BuildNumber)'
-- powershell: $ArtifactName = "prerelease"
-  displayName: Set Artifact
-  condition: eq(variables['build.sourceBranch'], 'refs/heads/dev')
 - task: DotNetCoreCLI@2
   displayName: 'packing'
   condition: eq(variables['build.sourceBranch'], 'refs/heads/master')
@@ -43,11 +40,8 @@ steps:
     projects: $(projects)
     custom: 'pack'
     arguments: '-c $(buildConfiguration) --no-build -o $(Build.ArtifactStagingDirectory)'
-- powershell: $ArtifactName = "prerelease"
-  displayName: Set Artifact
-  condition: eq(variables['build.sourceBranch'], 'refs/heads/master')
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: $(ArtifactName)
+    ArtifactName: 'packages'
     publishLocation: 'Container'
