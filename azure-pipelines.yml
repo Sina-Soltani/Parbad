@@ -13,25 +13,23 @@ variables:
   projects: 'src/**/*.csproj'
 
 stages:
-  - stage: Default
-    jobs:
-      - job: initializing
-        steps:
-          - task: DotNetCoreCLI@2
-            displayName: 'restoring'
-            inputs:
-              command: 'restore'
-              projects: '**/*.csproj'
-          - task: DotNetCoreCLI@2
-            displayName: 'building'
-            inputs:
-              command: 'build'
-              projects: $(projects)
-              arguments: '-c $(buildConfiguration)'
-  - stage: Development
-    condition: eq(variables['build.sourceBranch'], 'refs/heads/dev')
+  - stage: Preparing
     jobs:
     - job: Initializing
+      steps:
+      - task: DotNetCoreCLI@2
+        displayName: 'restoring'
+        inputs:
+          command: 'restore'
+          projects: '**/*.csproj'
+      - task: DotNetCoreCLI@2
+        displayName: 'building'
+        inputs:
+          command: 'build'
+          projects: $(projects)
+          arguments: '-c $(buildConfiguration)'
+    - job: Development
+      condition: eq(variables['build.sourceBranch'], 'refs/heads/dev')
       steps:
       - task: DotNetCoreCLI@2
         displayName: 'packing'
@@ -41,10 +39,8 @@ stages:
           custom: 'pack'
           arguments: '-c $(buildConfiguration) --no-build -o $(Build.ArtifactStagingDirectory) --version-suffix dev$(Build.BuildNumber)'
       - script: $ArtifactName = prerelease
-  - stage: Production
-    condition: eq(variables['build.sourceBranch'], 'refs/heads/master')
-    jobs:
     - job: Initializing
+      condition: eq(variables['build.sourceBranch'], 'refs/heads/dev')
       steps:
       - task: DotNetCoreCLI@2
         displayName: 'packing'
@@ -54,8 +50,6 @@ stages:
           custom: 'pack'
           arguments: '-c $(buildConfiguration) --no-build -o $(Build.ArtifactStagingDirectory)'
       - script: $ArtifactName = release
-  - stage: Publishing
-    jobs:
     - job: Publish
       steps:
       - task: PublishBuildArtifacts@1
