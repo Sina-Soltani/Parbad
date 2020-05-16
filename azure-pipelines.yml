@@ -10,61 +10,57 @@ pool:
 
 variables:
   buildConfiguration: 'release'
-  artifactPrereleasePath: '$(Build.ArtifactStagingDirectory)\packages\prereleases'
-  artifactReleasePath: '$(Build.ArtifactStagingDirectory)\packages\releases'
   projects: 'src/**/*.csproj'
 
 stages:
+  - stage: Default
+    jobs:
+      - job: initializing
+        steps:
+          - task: DotNetCoreCLI@2
+            displayName: 'restoring'
+            inputs:
+              command: 'restore'
+              projects: '**/*.csproj'
+          - task: DotNetCoreCLI@2
+            displayName: 'building'
+            inputs:
+              command: 'build'
+              projects: $(projects)
+              arguments: '-c $(buildConfiguration)'
   - stage: Development
     condition: eq(variables['build.sourceBranch'], 'refs/heads/dev')
     jobs:
     - job: Initializing
       steps:
       - task: DotNetCoreCLI@2
-        displayName: 'restoring'
-        inputs:
-          command: 'restore'
-          projects: '**/*.csproj'
-      - task: DotNetCoreCLI@2
-        displayName: 'building'
-        inputs:
-          command: 'build'
-          projects: $(projects)
-          arguments: '-c $(buildConfiguration)'
-      - task: DotNetCoreCLI@2
         displayName: 'packing'
         inputs:
           command: 'custom'
           projects: $(projects)
           custom: 'pack'
-          arguments: '-c $(buildConfiguration) --no-build -o $(artifactPrereleasePath) --version-suffix dev$(Build.BuildNumber)'
-      - task: PublishBuildArtifacts@1
-        inputs:
-          PathtoPublish: '$(artifactPrereleasePath)'
-          ArtifactName: 'prereleases'
-          publishLocation: 'Container'
+          arguments: '-c $(buildConfiguration) --no-build -o $(Build.ArtifactStagingDirectory) --version-suffix dev$(Build.BuildNumber)'
+      - script: $ArtifactName = prerelease
   - stage: Production
     condition: eq(variables['build.sourceBranch'], 'refs/heads/master')
     jobs:
     - job: Initializing
       steps:
       - task: DotNetCoreCLI@2
-        displayName: 'restoring'
-        inputs:
-          command: 'restore'
-          projects: '**/*.csproj'
-      - task: DotNetCoreCLI@2
-        displayName: 'building'
-        inputs:
-          command: 'build'
-          projects: $(projects)
-          arguments: '-c $(buildConfiguration)'
-      - task: DotNetCoreCLI@2
         displayName: 'packing'
         inputs:
           command: 'custom'
           projects: $(projects)
           custom: 'pack'
-          arguments: '-c $(buildConfiguration) --no-build -o $(artifactReleasePath)'
-      - script: dotnet nuget push $(artifactReleasePath)\*.nupkg -k $(ApiKey) -s $(NugetSource) --skip-duplicate -n true
-        displayName: publishing
+          arguments: '-c $(buildConfiguration) --no-build -o $(Build.ArtifactStagingDirectory)'
+      - script: $ArtifactName = release
+  - stage: Publishing
+    jobs:
+    - job: Publish
+      steps:
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          ArtifactName: '$(ArtifactName)'
+          publishLocation: 'Container'
+          
