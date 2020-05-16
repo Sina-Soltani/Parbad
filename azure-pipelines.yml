@@ -27,6 +27,7 @@ jobs:
       projects: $(projects)
       arguments: '-c $(buildConfiguration)'
 - job: Development
+  dependsOn: Initializing
   condition: eq(variables['build.sourceBranch'], 'refs/heads/dev')
   steps:
   - task: DotNetCoreCLI@2
@@ -38,6 +39,7 @@ jobs:
       arguments: '-c $(buildConfiguration) --no-build -o $(Build.ArtifactStagingDirectory) --version-suffix dev$(Build.BuildNumber)'
   - script: $ArtifactName = prerelease
 - job: Production
+  dependsOn: Initializing
   condition: eq(variables['build.sourceBranch'], 'refs/heads/master')
   steps:
   - task: DotNetCoreCLI@2
@@ -49,6 +51,7 @@ jobs:
       arguments: '-c $(buildConfiguration) --no-build -o $(Build.ArtifactStagingDirectory)'
   - script: $ArtifactName = release
 - job: Publish
+  dependsOn: Development | Production
   steps:
   - task: PublishBuildArtifacts@1
     inputs:
