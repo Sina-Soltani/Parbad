@@ -12,6 +12,7 @@ variables:
   buildConfiguration: 'release'
   artifactPrereleasePath: '$(Build.ArtifactStagingDirectory)\packages\prereleases'
   artifactReleasePath: '$(Build.ArtifactStagingDirectory)\packages\releases'
+  projects: 'src/**/*.csproj'
 
 stages:
   - stage: Development
@@ -28,13 +29,13 @@ stages:
         displayName: 'building'
         inputs:
           command: 'build'
-          projects: 'src/**/*.csproj'
+          projects: $(projects)
           arguments: '-c $(buildConfiguration)'
       - task: DotNetCoreCLI@2
         displayName: 'packing'
         inputs:
           command: 'custom'
-          projects: 'src/**/*.csproj'
+          projects: $(projects)
           custom: 'pack'
           arguments: '-c $(buildConfiguration) --no-build -o $(artifactPrereleasePath) --version-suffix dev$(Build.BuildNumber)'
       - task: PublishBuildArtifacts@1
@@ -56,13 +57,13 @@ stages:
         displayName: 'building'
         inputs:
           command: 'build'
-          projects: 'src/**/*.csproj'
+          projects: $(projects)
           arguments: '-c $(buildConfiguration)'
       - task: DotNetCoreCLI@2
         displayName: 'packing'
         inputs:
           command: 'custom'
-          projects: 'src/**/*.csproj'
+          projects: $(projects)
           custom: 'pack'
           arguments: '-c $(buildConfiguration) --no-build -o $(artifactReleasePath)'
       - script: dotnet nuget push $(artifactReleasePath)\*.nupkg -k $(ApiKey) -s $(NugetSource) --skip-duplicate -n true
