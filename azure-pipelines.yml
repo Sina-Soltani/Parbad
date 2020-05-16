@@ -45,7 +45,7 @@ steps:
     arguments: '-c $(buildConfiguration) --no-build -o $(Build.ArtifactStagingDirectory)'
 - script: $ArtifactName = release
   displayName: Set Artifact
-  condition: eq(variables['build.sourceBranch'], 'refs/heads/dev')
+  condition: eq(variables['build.sourceBranch'], 'refs/heads/master')
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
