@@ -32,7 +32,7 @@ steps:
     projects: $(projects)
     custom: 'pack'
     arguments: '-c $(buildConfiguration) --no-build -o $(Build.ArtifactStagingDirectory) --version-suffix dev$(Build.BuildNumber)'
-- script: $ArtifactName = prerelease
+- script: Set-Variable -Name $ArtifactName -Value prerelease
   displayName: Set Artifact
   condition: eq(variables['build.sourceBranch'], 'refs/heads/dev')
 - task: DotNetCoreCLI@2
@@ -43,7 +43,7 @@ steps:
     projects: $(projects)
     custom: 'pack'
     arguments: '-c $(buildConfiguration) --no-build -o $(Build.ArtifactStagingDirectory)'
-- script: $ArtifactName = release
+- script: Set-Variable -Name $ArtifactName -Value prerelease
   displayName: Set Artifact
   condition: eq(variables['build.sourceBranch'], 'refs/heads/master')
 - task: PublishBuildArtifacts@1
