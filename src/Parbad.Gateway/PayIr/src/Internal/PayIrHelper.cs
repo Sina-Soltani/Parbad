@@ -90,22 +90,26 @@ namespace Parbad.Gateway.PayIr.Internal
         {
             var result = JsonConvert.DeserializeObject<PayIrVerifyResponseModel>(response);
 
-            if (!result.IsSucceed)
+            PaymentVerifyResult verifyResult;
+
+            if (result.IsSucceed)
+            {
+                verifyResult = PaymentVerifyResult.Succeed(result.TransId, messagesOptions.PaymentSucceed);
+            }
+            else
             {
                 var message = $"ErrorCode: {result.ErrorCode}, ErrorMessage: {result.ErrorMessage}";
 
-                return PaymentVerifyResult.Failed(message);
+                verifyResult = PaymentVerifyResult.Failed(message);
             }
 
             var additionalData = new PayIrVerifyAdditionalData
             {
-                CardNumber = result.FactorNumber,
+                CardNumber = result.CardNumber,
                 FactorNumber = result.FactorNumber,
                 Description = result.Description,
                 Mobile = result.Mobile
             };
-
-            var verifyResult = PaymentVerifyResult.Succeed(result.TransId, messagesOptions.PaymentSucceed);
 
             verifyResult.SetPayIrAdditionalData(additionalData);
 
