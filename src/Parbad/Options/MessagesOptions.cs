@@ -3,6 +3,9 @@
 
 namespace Parbad.Options
 {
+    /// <summary>
+    /// Provides configuration for Parbad messages.
+    /// </summary>
     public class MessagesOptions
     {
         public string PaymentSucceed { get; set; } = "Payment is successful.";
