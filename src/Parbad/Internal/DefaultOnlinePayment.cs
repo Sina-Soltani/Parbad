@@ -175,7 +175,7 @@ namespace Parbad.Internal
 
             if (payment.IsCompleted)
             {
-                message = _messagesOptions.Value.PaymentIsAlreadyProcessedBefore;
+                message = _options.Messages.PaymentIsAlreadyProcessedBefore;
             }
 
             return new PaymentFetchResult
@@ -218,7 +218,7 @@ namespace Parbad.Internal
                     GatewayAccountName = payment.GatewayAccountName,
                     TransactionCode = payment.TransactionCode,
                     Status = payment.IsPaid ? PaymentVerifyResultStatus.AlreadyVerified : PaymentVerifyResultStatus.Failed,
-                    Message = _messagesOptions.Value.PaymentIsAlreadyProcessedBefore
+                    Message = _options.Messages.PaymentIsAlreadyProcessedBefore
                 };
             }
 
@@ -296,11 +296,11 @@ namespace Parbad.Internal
                     GatewayName = payment.GatewayName,
                     GatewayAccountName = payment.GatewayAccountName,
                     IsSucceed = false,
-                    Message = _messagesOptions.Value.PaymentIsAlreadyProcessedBefore
+                    Message = _options.Messages.PaymentIsAlreadyProcessedBefore
                 };
             }
 
-            var message = cancellationReason ?? _messagesOptions.Value.PaymentCanceledProgrammatically;
+            var message = cancellationReason ?? _options.Messages.PaymentCanceledProgrammatically;
 
             Log(logger => logger.LogInformation(LoggingEvents.CancelPayment, message));
 
@@ -351,7 +351,7 @@ namespace Parbad.Internal
 
             if (!payment.IsCompleted)
             {
-                var message = $"{_messagesOptions.Value.OnlyCompletedPaymentCanBeRefunded} Tracking number: {invoice.TrackingNumber}.";
+                var message = $"{_options.Messages.OnlyCompletedPaymentCanBeRefunded} Tracking number: {invoice.TrackingNumber}.";
 
                 Log(logger => logger.LogInformation(LoggingEvents.RefundPayment, $"Refunding the invoice {invoice.TrackingNumber} is finished. {message}"));
 
