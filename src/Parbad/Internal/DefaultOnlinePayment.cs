@@ -10,7 +10,6 @@ using Parbad.Abstraction;
 using Parbad.Exceptions;
 using Parbad.Options;
 using Parbad.PaymentTokenProviders;
-using Parbad.Properties;
 using Parbad.Storage.Abstractions;
 
 namespace Parbad.Internal
@@ -75,7 +74,7 @@ namespace Parbad.Internal
 
             if (paymentToken.IsNullOrEmpty())
             {
-                throw new PaymentTokenProviderException("Payment Token Provider didn't provide any token.");
+                throw new PaymentTokenProviderException($"The Payment Token Provider '{_tokenProvider.GetType().Name}' didn't provide any token.");
             }
 
             //  Check the created payment token
@@ -176,7 +175,7 @@ namespace Parbad.Internal
 
             if (payment.IsCompleted)
             {
-                message = "The requested payment is already processed before.";
+                message = _messagesOptions.Value.PaymentIsAlreadyProcessedBefore;
             }
 
             return new PaymentFetchResult
@@ -219,7 +218,7 @@ namespace Parbad.Internal
                     GatewayAccountName = payment.GatewayAccountName,
                     TransactionCode = payment.TransactionCode,
                     Status = payment.IsPaid ? PaymentVerifyResultStatus.AlreadyVerified : PaymentVerifyResultStatus.Failed,
-                    Message = "The requested payment is already processed before."
+                    Message = _messagesOptions.Value.PaymentIsAlreadyProcessedBefore
                 };
             }
 
@@ -297,11 +296,11 @@ namespace Parbad.Internal
                     GatewayName = payment.GatewayName,
                     GatewayAccountName = payment.GatewayAccountName,
                     IsSucceed = false,
-                    Message = "The requested payment is already processed before."
+                    Message = _messagesOptions.Value.PaymentIsAlreadyProcessedBefore
                 };
             }
 
-            var message = cancellationReason ?? Resources.PaymentCanceledProgrammatically;
+            var message = cancellationReason ?? _messagesOptions.Value.PaymentCanceledProgrammatically;
 
             Log(logger => logger.LogInformation(LoggingEvents.CancelPayment, message));
 
@@ -352,7 +351,7 @@ namespace Parbad.Internal
 
             if (!payment.IsCompleted)
             {
-                var message = $"The payment with the tracking number {invoice.TrackingNumber} is not completed yet. Only a completed payment can be refund.";
+                var message = $"{_messagesOptions.Value.OnlyCompletedPaymentCanBeRefunded} Tracking number: {invoice.TrackingNumber}.";
 
                 Log(logger => logger.LogInformation(LoggingEvents.RefundPayment, $"Refunding the invoice {invoice.TrackingNumber} is finished. {message}"));
 

@@ -97,15 +97,6 @@ namespace Parbad.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Verifing failed. Payment is canceled programmatically..
-        /// </summary>
-        internal static string PaymentCanceledProgrammatically {
-            get {
-                return ResourceManager.GetString("PaymentCanceledProgrammatically", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The Refund operation is not supported by this gateway..
         /// </summary>
         internal static string RefundNotSupports {

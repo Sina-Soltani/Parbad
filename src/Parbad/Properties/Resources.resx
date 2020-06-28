@@ -129,9 +129,6 @@
   <data name="OptionValueRequired" xml:space="preserve">
     <value>Gateway configuration failed. {0} is required.</value>
   </data>
-  <data name="PaymentCanceledProgrammatically" xml:space="preserve">
-    <value>Verifing failed. Payment is canceled programmatically.</value>
-  </data>
   <data name="RefundNotSupports" xml:space="preserve">
     <value>The Refund operation is not supported by this gateway.</value>
   </data>
