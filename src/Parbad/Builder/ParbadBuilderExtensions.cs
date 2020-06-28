@@ -34,7 +34,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             builder.Services.TryAddTransient<IGatewayProvider, DefaultGatewayProvider>();
 
-            builder.ConfigureMessages(options => { });
+            builder.ConfigureOptions(options => { });
 
             builder.ConfigurePaymentToken(tokenBuilder => tokenBuilder.UseGuidQueryStringPaymentTokenProvider());
 

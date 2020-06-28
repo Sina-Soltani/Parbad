@@ -327,6 +327,20 @@
             <param name="builder"></param>
             <param name="httpContextBuilder">A builder for configuring the HttpContext.</param>
         </member>
+        <member name="M:Parbad.Builder.ParbadOptionsExtensions.ConfigureOptions(Parbad.Builder.IParbadBuilder,System.Action{Parbad.Options.ParbadOptions})">
+            <summary>
+            Configures the Parbad options.
+            </summary>
+            <param name="builder"></param>
+            <param name="setupOptions"></param>
+        </member>
+        <member name="M:Parbad.Builder.ParbadOptionsExtensions.ConfigureOptions(Parbad.Builder.IParbadBuilder,Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Configures the Parbad options with the given <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/>.
+            </summary>
+            <param name="builder"></param>
+            <param name="configuration"></param>
+        </member>
         <member name="M:Parbad.Builder.PaymentTokenProviderExtensions.ConfigurePaymentToken(Parbad.Builder.IParbadBuilder,System.Action{Parbad.PaymentTokenProviders.IPaymentTokenBuilder})">
             <summary>
             Configures the <see cref="T:Parbad.PaymentTokenProviders.IPaymentTokenProvider"/> required by Parbad to create
@@ -1130,16 +1144,10 @@
         <member name="T:Parbad.Internal.DefaultOnlinePayment">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.Internal.DefaultOnlinePayment.#ctor(System.IServiceProvider,Parbad.Storage.Abstractions.IStorageManager,Parbad.PaymentTokenProviders.IPaymentTokenProvider,Parbad.Abstraction.IGatewayProvider,Microsoft.Extensions.Options.IOptions{Parbad.Options.MessagesOptions},Microsoft.Extensions.Logging.ILogger{Parbad.IOnlinePayment})">
+        <member name="M:Parbad.Internal.DefaultOnlinePayment.#ctor(System.IServiceProvider,Parbad.Storage.Abstractions.IStorageManager,Parbad.PaymentTokenProviders.IPaymentTokenProvider,Parbad.Abstraction.IGatewayProvider,Microsoft.Extensions.Options.IOptions{Parbad.Options.ParbadOptions},Microsoft.Extensions.Logging.ILogger{Parbad.Internal.DefaultOnlinePayment})">
             <summary>
             Initializes an instance of <see cref="T:Parbad.Internal.DefaultOnlinePayment"/>.
             </summary>
-            <param name="services"></param>
-            <param name="storageManager"></param>
-            <param name="tokenProvider"></param>
-            <param name="gatewayProvider"></param>
-            <param name="messagesOptions"></param>
-            <param name="logger"></param>
         </member>
         <member name="P:Parbad.Internal.DefaultOnlinePayment.Services">
             <inheritdoc />
@@ -1889,6 +1897,26 @@
             <param name="onlinePayment"></param>
             <param name="verifyResult"></param>
             <param name="cancellationToken"></param>
+        </member>
+        <member name="T:Parbad.Options.MessagesOptions">
+            <summary>
+            Provides configuration for Parbad messages.
+            </summary>
+        </member>
+        <member name="T:Parbad.Options.ParbadOptions">
+            <summary>
+            Provides configuration for Parbad.
+            </summary>
+        </member>
+        <member name="P:Parbad.Options.ParbadOptions.EnableLogging">
+            <summary>
+            Enables or disables the logging. The default value is true.
+            </summary>
+        </member>
+        <member name="P:Parbad.Options.ParbadOptions.Messages">
+            <summary>
+            Contains all messages that Parbad uses in results.
+            </summary>
         </member>
         <member name="T:Parbad.ParbadBuilder">
             <inheritdoc />
