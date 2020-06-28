@@ -14,5 +14,11 @@ namespace Parbad.Options
         public string UnexpectedErrorText { get; set; } = "An unknown error is happened.";
 
         public string InvalidDataReceivedFromGateway { get; set; } = "Invalid data is received from the gateway";
+
+        public string PaymentIsAlreadyProcessedBefore { get; set; } = "The requested payment is already processed before.";
+
+        public string PaymentCanceledProgrammatically { get; set; } = "Payment is canceled programmatically.";
+
+        public string OnlyCompletedPaymentCanBeRefunded { get; set; } = "Only a completed payment can be refunded.";
     }
 }

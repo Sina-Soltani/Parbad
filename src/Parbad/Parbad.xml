@@ -2004,11 +2004,6 @@
               Looks up a localized string similar to Gateway configuration failed. {0} is required..
             </summary>
         </member>
-        <member name="P:Parbad.Properties.Resources.PaymentCanceledProgrammatically">
-            <summary>
-              Looks up a localized string similar to Verifing failed. Payment is canceled programmatically..
-            </summary>
-        </member>
         <member name="P:Parbad.Properties.Resources.RefundNotSupports">
             <summary>
               Looks up a localized string similar to The Refund operation is not supported by this gateway..
