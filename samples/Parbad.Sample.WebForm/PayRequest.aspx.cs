@@ -38,6 +38,8 @@ namespace Parbad.Sample.WebForm
                 }
             });
 
+            // Save the result.TrackingNumber in your database.
+
             if (result.IsSucceed)
             {
                 await result.GatewayTransporter.TransportAsync();
@@ -46,9 +48,6 @@ namespace Parbad.Sample.WebForm
             {
                 ResultPanel.Visible = true;
 
-                // Note: This is just for development and testing.
-                // Don't show the actual result object to clients in production environment.
-                // Instead, show only the important information such as IsSucceed, Tracking Number and Transaction Code.
                 LblTrackingNumber.Text = result.TrackingNumber.ToString();
                 LblAmount.Text = result.Amount.ToString();
                 LblGateway.Text = result.GatewayName;
