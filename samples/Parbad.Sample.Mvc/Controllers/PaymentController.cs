@@ -47,14 +47,13 @@ namespace Parbad.Sample.Mvc.Controllers
                 }
             });
 
+            // Save the result.TrackingNumber in your database.
+
             if (result.IsSucceed)
             {
                 return result.GatewayTransporter.TransportToGateway();
             }
 
-            // Note: This is just for development and testing.
-            // Don't show the actual result object to clients in production environment.
-            // Instead, show only the important information such as IsSucceed, Tracking Number and Transaction Code.
             return View("PayRequestError", result);
         }
 
@@ -72,7 +71,7 @@ namespace Parbad.Sample.Mvc.Controllers
                 return Content("The payment is already processed before.");
             }
 
-            // An example of checking the invoice in your website.
+            // This is an example of cancelling an invoice when you think that the payment process must be stopped.
             if (!Is_There_Still_Product_In_Shop(invoice.TrackingNumber))
             {
                 var cancelResult = await _onlinePayment.CancelAsync(invoice, cancellationReason: "Sorry, We have no more products to sell.");

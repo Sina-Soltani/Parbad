@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netcoreapp3.0</TargetFrameworks>
     <LangVersion>latest</LangVersion>
-    <VersionPrefix>3.5.0</VersionPrefix>
+    <VersionPrefix>3.5.1</VersionPrefix>
     <Authors>Parbad Sina Soltani</Authors>
     <Description>Parbad is a free, open-source, integrated and extensible library which connects your web applications to online payment gateways. Gateways can be added or developed by you.
 The Virtual Gateway also simulates the online payment process, which helps the application development.

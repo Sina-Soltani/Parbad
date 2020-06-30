@@ -12,6 +12,7 @@ namespace Parbad.Sample.WebForm
 
             var invoice = await StaticOnlinePayment.Instance.FetchAsync();
 
+            // This is an example of cancelling an invoice when you think that the payment process must be stopped.
             if (Is_There_Still_Product_In_Shop(invoice.TrackingNumber))
             {
                 var verifyResult = await StaticOnlinePayment.Instance.VerifyAsync(invoice);
