@@ -23,12 +23,7 @@ namespace Parbad.Builder
 
             builder.Services.Configure(setupOptions);
 
-            builder.Services.AddTransient<IOptions<MessagesOptions>>(provider =>
-            {
-                var messages = provider.GetRequiredService<IOptions<ParbadOptions>>().Value.Messages;
-
-                return new OptionsWrapper<MessagesOptions>(messages);
-            });
+            RegisterMessagesOptions(builder);
 
             return builder;
         }
@@ -44,6 +39,8 @@ namespace Parbad.Builder
             if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
             builder.Services.Configure<ParbadOptions>(configuration);
+
+            RegisterMessagesOptions(builder);
 
             return builder;
         }
@@ -68,6 +65,16 @@ namespace Parbad.Builder
             builder.Services.Configure<MessagesOptions>(configuration);
 
             return builder;
+        }
+
+        private static void RegisterMessagesOptions(IParbadBuilder builder)
+        {
+            builder.Services.AddTransient<IOptions<MessagesOptions>>(provider =>
+            {
+                var messages = provider.GetRequiredService<IOptions<ParbadOptions>>().Value.Messages;
+
+                return new OptionsWrapper<MessagesOptions>(messages);
+            });
         }
     }
 }
