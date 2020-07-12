@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Parbad.Storage.EntityFrameworkCore.Builder
 {
+    [Obsolete("This is obsolete and will be removed in a future version.")]
     public interface IEntityFrameworkCoreStorageBuilder
     {
         /// <summary>
@@ -33,6 +34,7 @@ namespace Parbad.Storage.EntityFrameworkCore.Builder
         /// <para>Note: Initializer will be called in order that you specified.</para>
         /// </summary>
         /// <param name="configureInitializer"></param>
+        [Obsolete("Database Initializers are not supported anymore and will be removed in a future version.")]
         IEntityFrameworkCoreStorageBuilder ConfigureDatabaseInitializer(Action<IDatabaseInitializerBuilder> configureInitializer);
     }
 }

@@ -1,15 +1,15 @@
 ﻿// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Parbad.Storage.EntityFrameworkCore.Builder;
 using Parbad.Storage.EntityFrameworkCore.Context;
 using Parbad.Storage.EntityFrameworkCore.Internal;
 
-namespace Parbad.Builder
+namespace Parbad.Storage.EntityFrameworkCore.Initializers
 {
     public static class DatabaseInitializerExtensions
     {
@@ -17,6 +17,7 @@ namespace Parbad.Builder
         /// Creates the Parbad database If it does not exist.
         /// </summary>
         /// <param name="builder"></param>
+        [Obsolete("Database Initializers are not supported anymore and will be removed in a future version.")]
         public static IDatabaseInitializerBuilder CreateDatabase(this IDatabaseInitializerBuilder builder)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -29,6 +30,7 @@ namespace Parbad.Builder
         /// Will migrate the database too.
         /// </summary>
         /// <param name="builder"></param>
+        [Obsolete("Database Initializers are not supported anymore and will be removed in a future version.")]
         public static IDatabaseInitializerBuilder CreateAndMigrateDatabase(this IDatabaseInitializerBuilder builder)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -40,6 +42,7 @@ namespace Parbad.Builder
         /// Deletes and creates the Parbad database.
         /// </summary>
         /// <param name="builder"></param>
+        [Obsolete("Database Initializers are not supported anymore and will be removed in a future version.")]
         public static IDatabaseInitializerBuilder DeleteAndCreateDatabase(this IDatabaseInitializerBuilder builder)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -58,6 +61,7 @@ namespace Parbad.Builder
         /// </summary>
         /// <param name="builder"></param>
         /// <param name="configureInitializer"></param>
+        [Obsolete("Database Initializers are not supported anymore and will be removed in a future version.")]
         public static IDatabaseInitializerBuilder AddInitializer(
                 this IDatabaseInitializerBuilder builder,
                 Func<ParbadDataContext, Task> configureInitializer)

@@ -8,6 +8,7 @@ using Parbad.Storage.EntityFrameworkCore.Initializers;
 
 namespace Parbad.Storage.EntityFrameworkCore.Internal
 {
+    [Obsolete("Database Initializers are not supported anymore and will be removed in a future version.")]
     internal class DatabaseInitializerBuilder : IDatabaseInitializerBuilder
     {
         public DatabaseInitializerBuilder(IServiceCollection services)

@@ -3,18 +3,27 @@
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Parbad.Storage.EntityFrameworkCore.Domain;
+using Parbad.Storage.EntityFrameworkCore.Options;
 
-namespace Parbad.Storage.EntityFrameworkCore.Domain.Payments
+namespace Parbad.Storage.EntityFrameworkCore.Configuration
 {
     /// <summary>
     /// Payment entity configuration.
     /// </summary>
-    public class PaymentConfiguration : IEntityTypeConfiguration<PaymentEntity>
+    public class PaymentConfiguration : EntityTypeConfiguration<PaymentEntity>
     {
-        /// <inheritdoc />
-        public void Configure(EntityTypeBuilder<PaymentEntity> builder)
+        /// <summary>
+        /// Initializes an instance of <see cref="PaymentConfiguration"/>.
+        /// </summary>
+        public PaymentConfiguration(EntityFrameworkCoreOptions efCoreOptions) : base(efCoreOptions)
         {
-            builder.ToTable("payment", "Parbad");
+        }
+
+        /// <inheritdoc />
+        public override void Configure(EntityTypeBuilder<PaymentEntity> builder, EntityFrameworkCoreOptions efCoreOptions)
+        {
+            builder.ToTable(efCoreOptions.PaymentTableOptions, efCoreOptions.DefaultSchema);
 
             builder
                 .HasKey(entity => entity.Id)

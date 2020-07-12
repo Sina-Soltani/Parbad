@@ -2,8 +2,7 @@
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
 using Parbad.Storage.Abstractions;
-using Parbad.Storage.EntityFrameworkCore.Domain.Payments;
-using Parbad.Storage.EntityFrameworkCore.Domain.Transactions;
+using Parbad.Storage.EntityFrameworkCore.Domain;
 
 namespace Parbad.Storage.EntityFrameworkCore.Internal
 {

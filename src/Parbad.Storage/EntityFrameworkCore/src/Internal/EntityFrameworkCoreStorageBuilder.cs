@@ -10,6 +10,7 @@ using Parbad.Storage.EntityFrameworkCore.Initializers;
 
 namespace Parbad.Storage.EntityFrameworkCore.Internal
 {
+    [Obsolete("This is obsolete and will be removed in a future version.")]
     internal class EntityFrameworkCoreStorageBuilder : IEntityFrameworkCoreStorageBuilder
     {
         public EntityFrameworkCoreStorageBuilder(IServiceCollection services)
@@ -19,6 +20,7 @@ namespace Parbad.Storage.EntityFrameworkCore.Internal
 
         public IServiceCollection Services { get; }
 
+        [Obsolete("Database Initializers are not supported anymore and will be removed in a future version.")]
         public IEntityFrameworkCoreStorageBuilder ConfigureDatabaseInitializer(Action<IDatabaseInitializerBuilder> configureInitializer)
         {
             if (configureInitializer == null) throw new ArgumentNullException(nameof(configureInitializer));

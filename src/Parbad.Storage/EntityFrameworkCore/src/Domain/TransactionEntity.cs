@@ -3,9 +3,8 @@
 
 using System;
 using Parbad.Storage.Abstractions;
-using Parbad.Storage.EntityFrameworkCore.Domain.Payments;
 
-namespace Parbad.Storage.EntityFrameworkCore.Domain.Transactions
+namespace Parbad.Storage.EntityFrameworkCore.Domain
 {
     public class TransactionEntity : Transaction
     {
