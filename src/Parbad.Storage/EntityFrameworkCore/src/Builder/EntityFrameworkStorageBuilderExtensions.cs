@@ -29,7 +29,7 @@ namespace Parbad.Storage.EntityFrameworkCore.Builder
         /// </summary>
         /// <param name="builder"></param>
         /// <param name="configureEfCoreOptions">Configures the EntityFrameworkCore options for Parbad.</param>
-        public static IStorageBuilder UseEntityFrameworkCore(this IStorageBuilder builder, Action<EntityFrameworkCoreOptions> configureEfCoreOptions)
+        public static IStorageBuilder UseEfCore(this IStorageBuilder builder, Action<EntityFrameworkCoreOptions> configureEfCoreOptions)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
             if (configureEfCoreOptions == null) throw new ArgumentNullException(nameof(configureEfCoreOptions));
@@ -65,7 +65,7 @@ namespace Parbad.Storage.EntityFrameworkCore.Builder
         /// </summary>
         /// <param name="builder"></param>
         /// <param name="configureDatabaseBuilder">Configure what database must be used and how it must be created.</param>
-        [Obsolete("This method is obsolete and will be removed in a future version. The recommended alternative is UseEntityFrameworkCore(Action<DbContextOptionsBuilder> configureDatabaseBuilder).", error: false)]
+        [Obsolete("This method is obsolete and will be removed in a future version. The recommended alternative is UseEfCore(Action<DbContextOptionsBuilder> configureDatabaseBuilder).", error: false)]
         public static IEntityFrameworkCoreStorageBuilder UseEntityFrameworkCore(this IStorageBuilder builder,
             Action<DbContextOptionsBuilder> configureDatabaseBuilder)
         {
