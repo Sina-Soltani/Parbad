@@ -72,6 +72,8 @@ namespace Parbad.Storage.EntityFrameworkCore.Builder
             if (builder == null) throw new ArgumentNullException(nameof(builder));
             if (configureDatabaseBuilder == null) throw new ArgumentNullException(nameof(configureDatabaseBuilder));
 
+            builder.Services.Configure<EntityFrameworkCoreOptions>(options => { });
+
             builder.Services.AddDbContext<ParbadDataContext>(configureDatabaseBuilder);
 
             builder.AddStorage<EntityFrameworkCoreStorage>(ServiceLifetime.Transient);
