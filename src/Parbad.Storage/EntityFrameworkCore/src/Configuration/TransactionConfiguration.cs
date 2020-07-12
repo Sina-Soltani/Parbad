@@ -3,18 +3,27 @@
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Parbad.Storage.EntityFrameworkCore.Domain;
+using Parbad.Storage.EntityFrameworkCore.Options;
 
-namespace Parbad.Storage.EntityFrameworkCore.Domain.Transactions
+namespace Parbad.Storage.EntityFrameworkCore.Configuration
 {
     /// <summary>
     /// Transaction entity configuration.
     /// </summary>
-    public class TransactionConfiguration : IEntityTypeConfiguration<TransactionEntity>
+    public class TransactionConfiguration : EntityTypeConfiguration<TransactionEntity>
     {
-        /// <inheritdoc />
-        public void Configure(EntityTypeBuilder<TransactionEntity> builder)
+        /// <summary>
+        /// Initializes an instance of <see cref="TransactionConfiguration"/>.
+        /// </summary>
+        public TransactionConfiguration(EntityFrameworkCoreOptions efCoreOptions) : base(efCoreOptions)
         {
-            builder.ToTable("transaction", "Parbad");
+        }
+
+        /// <inheritdoc />
+        public override void Configure(EntityTypeBuilder<TransactionEntity> builder, EntityFrameworkCoreOptions efCoreOptions)
+        {
+            builder.ToTable(efCoreOptions.TransactionTableOptions, efCoreOptions.DefaultSchema);
 
             builder
                 .HasKey(entity => entity.Id)

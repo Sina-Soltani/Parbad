@@ -7,12 +7,11 @@ namespace Parbad.Sample.AspNetCore
     {
         public static void Main(string[] args)
         {
-            CreateWebHostBuilder(args).Run();
+            CreateWebHostBuilder(args).Build().Run();
         }
 
-        public static IHost CreateWebHostBuilder(string[] args) =>
+        public static IHostBuilder CreateWebHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(builder => builder.UseStartup<Startup>())
-                .Build();
+                .ConfigureWebHostDefaults(builder => builder.UseStartup<Startup>());
     }
 }

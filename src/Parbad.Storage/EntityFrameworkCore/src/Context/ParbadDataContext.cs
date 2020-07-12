@@ -2,16 +2,21 @@
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
 using Microsoft.EntityFrameworkCore;
-using Parbad.Storage.EntityFrameworkCore.Domain.Payments;
-using Parbad.Storage.EntityFrameworkCore.Domain.Transactions;
+using Microsoft.Extensions.Options;
+using Parbad.Storage.EntityFrameworkCore.Configuration;
+using Parbad.Storage.EntityFrameworkCore.Domain;
+using Parbad.Storage.EntityFrameworkCore.Options;
 
 namespace Parbad.Storage.EntityFrameworkCore.Context
 {
     public class ParbadDataContext : DbContext
     {
-        public ParbadDataContext(DbContextOptions<ParbadDataContext> options) : base(options)
+        public ParbadDataContext(DbContextOptions<ParbadDataContext> options, IOptions<EntityFrameworkCoreOptions> efCoreOptions) : base(options)
         {
+            EntityFrameworkCoreOptions = efCoreOptions.Value;
         }
+
+        public EntityFrameworkCoreOptions EntityFrameworkCoreOptions { get; }
 
         public DbSet<PaymentEntity> Payments { get; set; }
 
@@ -20,8 +25,8 @@ namespace Parbad.Storage.EntityFrameworkCore.Context
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder
-                .ApplyConfiguration(new PaymentConfiguration())
-                .ApplyConfiguration(new TransactionConfiguration());
+                .ApplyConfiguration(new PaymentConfiguration(EntityFrameworkCoreOptions))
+                .ApplyConfiguration(new TransactionConfiguration(EntityFrameworkCoreOptions));
         }
     }
 }

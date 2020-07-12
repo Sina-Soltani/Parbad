@@ -9,6 +9,7 @@ using Parbad.Storage.EntityFrameworkCore.Initializers;
 
 namespace Parbad.Storage.EntityFrameworkCore.Internal
 {
+    [Obsolete("Database Initializers are not supported anymore and will be removed in a future version.")]
     public class CustomDatabaseInitializer : IDatabaseInitializer
     {
         private readonly Func<ParbadDataContext, Task> _configureInitializer;
