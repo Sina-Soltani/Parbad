@@ -4,6 +4,16 @@
         <name>Parbad.Gateway.Sepehr</name>
     </assembly>
     <members>
+        <member name="T:Parbad.Gateway.Sepehr.SepehrGateway">
+            <summary>
+            Sepehr Gateway.
+            </summary>
+        </member>
+        <member name="M:Parbad.Gateway.Sepehr.SepehrGateway.#ctor(Parbad.GatewayBuilders.IGatewayAccountProvider{Parbad.Gateway.Sepehr.SepehrGatewayAccount},Microsoft.AspNetCore.Http.IHttpContextAccessor,System.Net.Http.IHttpClientFactory,Microsoft.Extensions.Options.IOptions{Parbad.Options.ParbadOptions})">
+            <summary>
+            Initializes an instance of <see cref="T:Parbad.Gateway.Sepehr.SepehrGateway"/>.
+            </summary>
+        </member>
         <member name="M:Parbad.Gateway.Sepehr.SepehrGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
@@ -13,7 +23,12 @@
         <member name="M:Parbad.Gateway.Sepehr.SepehrGateway.RefundAsync(Parbad.InvoiceContext,Parbad.Money,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.Builder.SepehrGatewayBuilderExtensions.AddIdPay(Parbad.GatewayBuilders.IGatewayBuilder)">
+        <member name="T:Parbad.Gateway.Sepehr.SepehrGatewayVerificationAdditionalData">
+            <summary>
+            Contains some additional data after the invoice verification.
+            </summary>
+        </member>
+        <member name="M:Parbad.Builder.SepehrGatewayBuilderExtensions.AddSepehr(Parbad.GatewayBuilders.IGatewayBuilder)">
             <summary>
             Adds the Sepehr gateway to Parbad services.
             </summary>

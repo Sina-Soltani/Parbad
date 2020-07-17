@@ -15,7 +15,7 @@ namespace Parbad.Builder
         /// Adds the Sepehr gateway to Parbad services.
         /// </summary>
         /// <param name="builder"></param>
-        public static IGatewayConfigurationBuilder<SepehrGateway> AddIdPay(this IGatewayBuilder builder)
+        public static IGatewayConfigurationBuilder<SepehrGateway> AddSepehr(this IGatewayBuilder builder)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 

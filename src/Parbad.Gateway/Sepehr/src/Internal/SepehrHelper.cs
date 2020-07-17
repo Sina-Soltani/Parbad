@@ -21,9 +21,9 @@ namespace Parbad.Gateway.Sepehr.Internal
     {
         public const string VerificationAdditionalDataKey = "SepehrVerificationAdditionalData";
         public const string ApiBaseUrl = "https://mabna.shaparak.ir:8081/V1/";
-        public const string ApiTokenUrl = "/PeymentApi/GetToken";
-        public const string ApiAdviceUrl = "/PeymentApi/Advice";
-        public const string ApiRollbackUrl = "/PeymentApi/Rollback";
+        public const string ApiTokenUrl = "PeymentApi/GetToken";
+        public const string ApiAdviceUrl = "PeymentApi/Advice";
+        public const string ApiRollbackUrl = "PeymentApi/Rollback";
         public const string PaymentPageUrl = "https://mabna.shaparak.ir:8080/Pay";
 
         public static object CreateRequestData(Invoice invoice, SepehrGatewayAccount account)
