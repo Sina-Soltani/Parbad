@@ -9,6 +9,7 @@
         IranKish,
         Melli,
         AsanPardakht,
+        Sepehr,
         ZarinPal,
         PayIr,
         IdPay,
