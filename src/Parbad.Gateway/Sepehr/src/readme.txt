@@ -1,6 +1,6 @@
 ﻿---------------------------------------------------
 Parbad - Online Payment Library for .NET developers
-				Sepehr Gateway
+Sepehr Gateway
 ---------------------------------------------------
 
 GitHub: https://github.com/Sina-Soltani/Parbad
@@ -18,7 +18,7 @@ Configuration
         {
             accounts.AddInMemory(account =>
             {
-                account.TerminalId = "<Your Terminal ID>";
+                account.TerminalId = <Your Terminal ID>;
             });
         });
 })
