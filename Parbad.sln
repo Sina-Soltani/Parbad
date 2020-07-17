@@ -47,6 +47,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parbad.Gateway.PayIr", "src
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parbad.Gateway.IdPay", "src\Parbad.Gateway\IdPay\src\Parbad.Gateway.IdPay.csproj", "{8089DAB8-CD14-4FFE-BC5F-F84EF9CDE60F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parbad.Gateway.Sepehr", "src\Parbad.Gateway\Sepehr\src\Parbad.Gateway.Sepehr.csproj", "{3DE7D493-E7DF-4FEA-B589-2A38C19BC6E5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -101,6 +103,10 @@ Global
 		{8089DAB8-CD14-4FFE-BC5F-F84EF9CDE60F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8089DAB8-CD14-4FFE-BC5F-F84EF9CDE60F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8089DAB8-CD14-4FFE-BC5F-F84EF9CDE60F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DE7D493-E7DF-4FEA-B589-2A38C19BC6E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DE7D493-E7DF-4FEA-B589-2A38C19BC6E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DE7D493-E7DF-4FEA-B589-2A38C19BC6E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DE7D493-E7DF-4FEA-B589-2A38C19BC6E5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -118,6 +124,7 @@ Global
 		{0F2CD6C7-3D9A-4D9D-9132-AFBCBDA3F47C} = {571BD034-8370-432B-9B18-4C6FA697121C}
 		{A2E36E0D-D40F-46F7-90DF-B7498D0BCE22} = {571BD034-8370-432B-9B18-4C6FA697121C}
 		{8089DAB8-CD14-4FFE-BC5F-F84EF9CDE60F} = {571BD034-8370-432B-9B18-4C6FA697121C}
+		{3DE7D493-E7DF-4FEA-B589-2A38C19BC6E5} = {571BD034-8370-432B-9B18-4C6FA697121C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CBDDB699-C14A-4235-B0AE-32725230B4ED}
