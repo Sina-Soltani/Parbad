@@ -338,6 +338,10 @@
       <Project>{a2e36e0d-d40f-46f7-90df-b7498d0bce22}</Project>
       <Name>Parbad.Gateway.PayIr</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Parbad.Gateway\Sepehr\src\Parbad.Gateway.Sepehr.csproj">
+      <Project>{3de7d493-e7df-4fea-b589-2a38c19bc6e5}</Project>
+      <Name>Parbad.Gateway.Sepehr</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\Parbad.Gateway\ZarinPal\src\Parbad.Gateway.ZarinPal.csproj">
       <Project>{0f2cd6c7-3d9a-4d9d-9132-afbcbda3f47c}</Project>
       <Name>Parbad.Gateway.ZarinPal</Name>
