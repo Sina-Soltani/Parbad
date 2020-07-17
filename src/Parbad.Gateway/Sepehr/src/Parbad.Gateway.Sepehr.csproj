@@ -15,6 +15,7 @@
     <PackageTags>parbad Payment gateway bank Iran shetab sepehr mabna پرداخت درگاه بانک ایران شتاب سپهر مبنا کارت</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Description>Sepehr Gateway for Parbad project.
+
 For more information see: https://www.nuget.org/packages/Parbad/</Description>
   </PropertyGroup>
 
