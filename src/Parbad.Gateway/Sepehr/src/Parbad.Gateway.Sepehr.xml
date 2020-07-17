@@ -23,6 +23,11 @@
         <member name="M:Parbad.Gateway.Sepehr.SepehrGateway.RefundAsync(Parbad.InvoiceContext,Parbad.Money,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
+        <member name="M:Parbad.Gateway.Sepehr.SepehrGatewayPaymentResultExtensions.GetSepehrAdditionalData(Parbad.IPaymentVerifyResult)">
+            <summary>
+            Gets the verification additional data from Sepehr gateway.
+            </summary>
+        </member>
         <member name="T:Parbad.Gateway.Sepehr.SepehrGatewayVerificationAdditionalData">
             <summary>
             Contains some additional data after the invoice verification.

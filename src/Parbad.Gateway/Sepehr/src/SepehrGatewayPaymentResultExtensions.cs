@@ -8,6 +8,9 @@ namespace Parbad.Gateway.Sepehr
 {
     public static class SepehrGatewayPaymentResultExtensions
     {
+        /// <summary>
+        /// Gets the verification additional data from Sepehr gateway.
+        /// </summary>
         public static SepehrGatewayVerificationAdditionalData GetSepehrAdditionalData(this IPaymentVerifyResult result)
         {
             if (result == null) throw new ArgumentNullException(nameof(result));
