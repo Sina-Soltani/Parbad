@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Parbad.Gateway.YekPay</name>
+    </assembly>
+    <members>
+        <member name="T:Parbad.Gateway.YekPay.YekPayGateway">
+            <summary>
+            Sepehr Gateway.
+            </summary>
+        </member>
+        <member name="M:Parbad.Gateway.YekPay.YekPayGateway.#ctor(Parbad.GatewayBuilders.IGatewayAccountProvider{Parbad.Gateway.YekPay.YekPayGatewayAccount},Microsoft.AspNetCore.Http.IHttpContextAccessor,System.Net.Http.IHttpClientFactory,Microsoft.Extensions.Options.IOptions{Parbad.Options.ParbadOptions})">
+            <summary>
+            Initializes an instance of <see cref="T:Parbad.Gateway.YekPay.YekPayGateway"/>.
+            </summary>
+        </member>
+        <member name="M:Parbad.Gateway.YekPay.YekPayGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Gateway.YekPay.YekPayGateway.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Gateway.YekPay.YekPayGateway.RefundAsync(Parbad.InvoiceContext,Parbad.Money,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Builder.YekPayGatewayBuilderExtensions.AddYekPay(Parbad.GatewayBuilders.IGatewayBuilder)">
+            <summary>
+            Adds the YekPay gateway to Parbad services.
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.Builder.YekPayGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.YekPay.YekPayGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.Gateway.YekPay.YekPayGatewayAccount}})">
+            <summary>
+            Configures the accounts for YekPay gateway.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureAccounts">Configures the accounts.</param>
+        </member>
+        <member name="M:Parbad.YekPayGatewayInvoiceBuilderExtensions.UseYekPay(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Action{Parbad.Gateway.YekPay.YekPayRequest})">
+            <summary>
+            The invoice will be sent to YekPay gateway.
+            </summary>
+        </member>
+        <member name="M:Parbad.YekPayGatewayInvoiceBuilderExtensions.UseYekPay(Parbad.InvoiceBuilder.IInvoiceBuilder,Parbad.Gateway.YekPay.YekPayRequest)">
+            <summary>
+            The invoice will be sent to YekPay gateway.
+            </summary>
+        </member>
+    </members>
+</doc>
