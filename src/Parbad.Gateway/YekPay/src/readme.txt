@@ -1,6 +1,6 @@
 ﻿---------------------------------------------------
 Parbad - Online Payment Library for .NET developers
-Sepehr Gateway
+YekPay Gateway
 ---------------------------------------------------
 
 GitHub: https://github.com/Sina-Soltani/Parbad
@@ -13,12 +13,12 @@ Configuration
 .ConfigureGateways(gateways =>
 {
     gateways
-        .AddSepehr()
+        .AddYekPay()
         .WithAccounts(accounts =>
         {
             accounts.AddInMemory(account =>
             {
-                account.TerminalId = <Your Terminal ID>;
+                account.MerchantId = <Your Merchant ID>;
             });
         });
 })
@@ -29,11 +29,10 @@ Making a request
 
 var result = _onlinePayment.RequestAsync(invoice => 
 {
-    invoice.SetGateway("Sepehr");
-
-    // OR
-
-	invoice.UseSepehr();
+	invoice.UseYekPay(yekPay => 
+    {
+       // payment details
+    });
 })
 
 
