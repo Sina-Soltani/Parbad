@@ -36,16 +36,6 @@ namespace Parbad.Sample.AspNetCore
                         });
 
                     gateways
-                        .AddYekPay()
-                        .WithAccounts(accounts =>
-                        {
-                            accounts.AddInMemory(account =>
-                            {
-                                account.MerchantId = 123;
-                            });
-                        });
-
-                    gateways
                         .AddParbadVirtual()
                         .WithOptions(options => options.GatewayPath = "/MyVirtualGateway");
                 })
