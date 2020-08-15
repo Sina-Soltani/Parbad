@@ -47,6 +47,7 @@ namespace Parbad.Sample.AspNetCore.Controllers
                     request.LastName = "Testian";
                     request.Email = "Test@Testian.com";
                     request.PostalCode = "152323";
+                    request.Country = "Testan";
                     request.City = "Test Abad";
                     request.FromCurrencyCode = 978;
                     request.ToCurrencyCode = 364;

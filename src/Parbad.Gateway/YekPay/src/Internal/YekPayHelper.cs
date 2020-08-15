@@ -45,6 +45,7 @@ namespace Parbad.Gateway.YekPay.Internal
                 Mobile = yekPayRequest.Mobile,
                 Address = yekPayRequest.Address,
                 PostalCode = yekPayRequest.PostalCode,
+                Country = yekPayRequest.Country,
                 City = yekPayRequest.City,
                 Description = yekPayRequest.Description
             };

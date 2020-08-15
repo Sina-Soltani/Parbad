@@ -3,34 +3,14 @@
 
 namespace Parbad.Gateway.YekPay.Internal
 {
-    internal class YekPayRequestModel
+    internal class YekPayRequestModel : YekPayRequest
     {
         public long MerchantId { get; set; }
 
         public decimal Amount { get; set; }
 
-        public int FromCurrencyCode { get; set; }
-
-        public int ToCurrencyCode { get; set; }
-
         public long OrderNumber { get; set; }
 
         public string Callback { get; set; }
-
-        public string FirstName { get; set; }
-
-        public string LastName { get; set; }
-
-        public string Email { get; set; }
-
-        public string Mobile { get; set; }
-
-        public string Address { get; set; }
-
-        public string PostalCode { get; set; }
-
-        public string City { get; set; }
-
-        public string Description { get; set; }
     }
 }
