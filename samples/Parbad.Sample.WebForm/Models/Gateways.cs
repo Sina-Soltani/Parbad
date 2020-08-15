@@ -13,6 +13,7 @@
         ZarinPal,
         PayIr,
         IdPay,
+        YekPay,
         ParbadVirtual
     }
 }

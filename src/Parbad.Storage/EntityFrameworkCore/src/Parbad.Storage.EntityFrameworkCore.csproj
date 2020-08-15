@@ -22,10 +22,7 @@
 Table names and schemas are now configurable.</PackageReleaseNotes>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>Parbad.Storage.EntityFrameworkCore.xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Release|AnyCPU'">
     <DocumentationFile>Parbad.Storage.EntityFrameworkCore.xml</DocumentationFile>
   </PropertyGroup>
 
