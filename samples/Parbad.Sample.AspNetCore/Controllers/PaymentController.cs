@@ -40,6 +40,19 @@ namespace Parbad.Sample.AspNetCore.Controllers
                 {
                     invoice.SetTrackingNumber(viewModel.TrackingNumber);
                 }
+
+                invoice.UseYekPay(request =>
+                {
+                    request.FirstName = "Test";
+                    request.LastName = "Testian";
+                    request.Email = "Test@Testian.com";
+                    request.PostalCode = "152323";
+                    request.City = "Test Abad";
+                    request.FromCurrencyCode = 978;
+                    request.ToCurrencyCode = 364;
+                    request.Address = "Test";
+                    request.Mobile = "091331111331";
+                });
             });
 
             // Save the result.TrackingNumber in your database.

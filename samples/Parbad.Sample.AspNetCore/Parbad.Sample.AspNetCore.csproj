@@ -10,6 +10,7 @@
     <ProjectReference Include="..\..\src\Parbad.Gateway\IdPay\src\Parbad.Gateway.IdPay.csproj" />
     <ProjectReference Include="..\..\src\Parbad.Gateway\PayIr\src\Parbad.Gateway.PayIr.csproj" />
     <ProjectReference Include="..\..\src\Parbad.Gateway\Sepehr\src\Parbad.Gateway.Sepehr.csproj" />
+    <ProjectReference Include="..\..\src\Parbad.Gateway\YekPay\src\Parbad.Gateway.YekPay.csproj" />
     <ProjectReference Include="..\..\src\Parbad.Gateway\ZarinPal\src\Parbad.Gateway.ZarinPal.csproj" />
     <ProjectReference Include="..\..\src\Parbad.Storage\Cache\src\Parbad.Storage.Cache.csproj" />
     <ProjectReference Include="..\..\src\Parbad.Storage\EntityFrameworkCore\src\Parbad.Storage.EntityFrameworkCore.csproj" />
