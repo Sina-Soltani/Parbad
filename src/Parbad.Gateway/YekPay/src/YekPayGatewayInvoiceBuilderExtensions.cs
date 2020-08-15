@@ -22,6 +22,18 @@ namespace Parbad
 
             var yekPayRequest = new YekPayRequest();
             configureYekPay(yekPayRequest);
+
+            return UseYekPay(builder, yekPayRequest);
+        }
+
+        /// <summary>
+        /// The invoice will be sent to YekPay gateway.
+        /// </summary>
+        public static IInvoiceBuilder UseYekPay(this IInvoiceBuilder builder, YekPayRequest yekPayRequest)
+        {
+            if (builder == null) throw new ArgumentNullException(nameof(builder));
+            if (yekPayRequest == null) throw new ArgumentNullException(nameof(yekPayRequest));
+
             builder.SetYekPayRequest(yekPayRequest);
 
             builder.SetGateway(YekPayGateway.Name);
