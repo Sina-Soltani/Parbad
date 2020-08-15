@@ -72,7 +72,10 @@ namespace Parbad.Gateway.YekPay.Internal
             var descriptor = GatewayTransporterDescriptor.CreateRedirect(paymentPageUrl);
             var transporter = new DefaultGatewayTransporter(httpContext, descriptor);
 
-            return PaymentRequestResult.Succeed(transporter, account.Name);
+            var result = PaymentRequestResult.Succeed(transporter, account.Name);
+            result.DatabaseAdditionalData.Add(AuthorityAdditionalDataKey, response.Authority);
+
+            return result;
         }
 
         public static YekPayVerificationRequestModel CreateVerifyData(
