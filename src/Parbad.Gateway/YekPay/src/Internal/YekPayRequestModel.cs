@@ -5,7 +5,7 @@ namespace Parbad.Gateway.YekPay.Internal
 {
     internal class YekPayRequestModel : YekPayRequest
     {
-        public long MerchantId { get; set; }
+        public string MerchantId { get; set; }
 
         public decimal Amount { get; set; }
 

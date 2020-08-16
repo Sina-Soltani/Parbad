@@ -5,7 +5,7 @@ namespace Parbad.Gateway.YekPay.Internal
 {
     internal class YekPayVerificationRequestModel
     {
-        public long MerchantId { get; set; }
+        public string MerchantId { get; set; }
 
         public string Authority { get; set; }
     }
