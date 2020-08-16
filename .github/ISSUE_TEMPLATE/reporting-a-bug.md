@@ -2,7 +2,7 @@
 name: Reporting a bug
 about: گزارش خطا
 title: ''
-labels: bug
+labels: ''
 assignees: Sina-Soltani
 
 ---
