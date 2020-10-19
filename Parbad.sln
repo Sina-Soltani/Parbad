@@ -7,7 +7,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.gitattributes = .gitattributes
 		.gitignore = .gitignore
-		appveyor.yml = appveyor.yml
 		azure-pipelines.yml = azure-pipelines.yml
 		images\How-it-works.png = images\How-it-works.png
 		LICENSE.txt = LICENSE.txt
@@ -49,7 +48,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parbad.Gateway.IdPay", "src
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parbad.Gateway.Sepehr", "src\Parbad.Gateway\Sepehr\src\Parbad.Gateway.Sepehr.csproj", "{3DE7D493-E7DF-4FEA-B589-2A38C19BC6E5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parbad.Gateway.YekPay", "src\Parbad.Gateway\YekPay\src\Parbad.Gateway.YekPay.csproj", "{9AAFC4B2-678C-4C80-9F1E-8D97C029E598}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parbad.Gateway.YekPay", "src\Parbad.Gateway\YekPay\src\Parbad.Gateway.YekPay.csproj", "{9AAFC4B2-678C-4C80-9F1E-8D97C029E598}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
