@@ -151,7 +151,7 @@ namespace Parbad.Gateway.IranKish.Internal
                 $"<tem:token>{XmlHelper.EncodeXmlValue(callbackResult.Token)}</tem:token>" +
                 $"<tem:merchantId>{account.MerchantId}</tem:merchantId>" +
                 $"<tem:referenceNumber>{callbackResult.ReferenceId}</tem:referenceNumber>" +
-                "<tem:sha1Key></tem:sha1Key>" +
+                $"<tem:sha1Key>{account.Sha1Key}</tem:sha1Key>" +
                 "</tem:KicccPaymentsVerification>" +
                 "</soapenv:Body>" +
                 "</soapenv:Envelope>";
