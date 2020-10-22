@@ -195,7 +195,7 @@ namespace Parbad.Gateway.IranKish.Internal
             IranKishCallbackResult callbackResult,
             MessagesOptions messagesOptions)
         {
-            var result = XmlHelper.GetNodeValueFromXml(webServiceResponse, "KicccPaymentsVerificationResult");
+            var result = XmlHelper.GetNodeValueFromXml(webServiceResponse, "KicccPaymentsVerificationResult", "http://tempuri.org/");
 
             // The result object is actually the amount of invoice . It must equal to invoice's amount.
             if (!long.TryParse(result, out var numericResult))
