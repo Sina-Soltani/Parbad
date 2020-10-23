@@ -209,7 +209,7 @@ namespace Parbad.Gateway.IranKish.Internal
                 };
             }
 
-            var isSuccess = numericResult != (long)context.Payment.Amount;
+            var isSuccess = numericResult == (long)context.Payment.Amount;
 
             var translatedMessage = isSuccess
                 ? messagesOptions.PaymentSucceed
