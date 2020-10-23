@@ -209,7 +209,7 @@ namespace Parbad.Gateway.IranKish.Internal
                 };
             }
 
-            var isSuccess = numericResult != (long)context.Payment.Amount;
+            var isSuccess = numericResult == (long)context.Payment.Amount;
 
             var translatedMessage = isSuccess
                 ? messagesOptions.PaymentSucceed
@@ -219,7 +219,7 @@ namespace Parbad.Gateway.IranKish.Internal
             {
                 TrackingNumber = callbackResult.InvoiceNumber,
                 TransactionCode = callbackResult.ReferenceId,
-                Status = PaymentVerifyResultStatus.Succeed,
+                Status = isSuccess ? PaymentVerifyResultStatus.Succeed : PaymentVerifyResultStatus.Failed,
                 Message = translatedMessage
             };
         }
