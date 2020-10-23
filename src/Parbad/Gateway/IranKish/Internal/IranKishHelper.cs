@@ -219,7 +219,7 @@ namespace Parbad.Gateway.IranKish.Internal
             {
                 TrackingNumber = callbackResult.InvoiceNumber,
                 TransactionCode = callbackResult.ReferenceId,
-                Status = PaymentVerifyResultStatus.Succeed,
+                Status = isSuccess ? PaymentVerifyResultStatus.Succeed : PaymentVerifyResultStatus.Failed,
                 Message = translatedMessage
             };
         }
