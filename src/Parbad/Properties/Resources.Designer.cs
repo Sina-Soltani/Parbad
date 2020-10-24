@@ -79,6 +79,25 @@ namespace Parbad.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Accounts cannot be an empty collection..
+        /// </summary>
+        internal static string MelliGatewayInvoiceBuilder_AddMelliMultiplexingAccounts_Accounts_cannot_be_an_empty_collection_ {
+            get {
+                return ResourceManager.GetString("MelliGatewayInvoiceBuilder_AddMelliMultiplexingAccounts_Accounts_cannot_be_an_emp" +
+                        "ty_collection_", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} cannot be a negative number.
+        /// </summary>
+        internal static string MultiplexingDataItem_MultiplexingDataItem__0__cannot_be_a_negative_number {
+            get {
+                return ResourceManager.GetString("MultiplexingDataItem_MultiplexingDataItem__0__cannot_be_a_negative_number", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No records saved in database..
         /// </summary>
         internal static string NoRecordsSavedInDatabase {

@@ -12,6 +12,9 @@ using Parbad.PaymentTokenProviders;
 
 namespace Parbad
 {
+    /// <summary>
+    /// payment extension
+    /// </summary>
     public static class OnlinePaymentExtensions
     {
         /// <summary>

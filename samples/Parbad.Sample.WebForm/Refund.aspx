@@ -1,4 +1,4 @@
-﻿<%@ Async="true" Page Title="Refund" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Refund.aspx.cs" Inherits="Parbad.Sample.WebForm.Refund" %>
+﻿<%@ Async="true" Title="Refund" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Refund.aspx.cs" Inherits="Parbad.Sample.WebForm.Refund" %>
 <asp:Content ID="Content1" ContentPlaceHolderID="MainContent" runat="server">
     <h1>Refund a payment</h1>
 

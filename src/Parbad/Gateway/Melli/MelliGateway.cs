@@ -2,6 +2,7 @@
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
 using System;
+using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -52,15 +53,23 @@ namespace Parbad.Gateway.Melli
         /// <inheritdoc />
         public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
         {
-            if (invoice == null) throw new ArgumentNullException(nameof(invoice));
+            try
+            {
+                if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-            var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
+                var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
 
-            var data = MelliHelper.CreateRequestData(invoice, account);
+                var data = MelliHelper.CreateRequestData(invoice, account);
 
-            var result = await PostJsonAsync<MelliApiRequestResult>(MelliHelper.ServiceRequestUrl, data, cancellationToken).ConfigureAwaitFalse();
+                var result = await PostJsonAsync<MelliApiRequestResult>(MelliHelper.ServiceRequestUrl, data, cancellationToken).ConfigureAwaitFalse();
 
-            return MelliHelper.CreateRequestResult(result, _httpContextAccessor.HttpContext, account, _messageOptions.Value);
+                return MelliHelper.CreateRequestResult(result, _httpContextAccessor.HttpContext, account, _messageOptions.Value);
+            }
+            catch (Exception e)
+            {
+
+                throw;
+            }
         }
 
         /// <inheritdoc />
@@ -95,6 +104,7 @@ namespace Parbad.Gateway.Melli
 
         private async Task<T> PostJsonAsync<T>(string url, object data, CancellationToken cancellationToken = default)
         {
+          
             var responseMessage = await _httpClient.PostJsonAsync(url, data, cancellationToken).ConfigureAwaitFalse();
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();

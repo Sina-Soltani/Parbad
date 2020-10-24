@@ -3,11 +3,10 @@
 
 using System;
 using Microsoft.Extensions.DependencyInjection;
-using Parbad.Gateway.Melli;
 using Parbad.Gateway.Melli.Internal;
 using Parbad.GatewayBuilders;
 
-namespace Parbad.Builder
+namespace Parbad.Gateway.Melli
 {
     public static class MelliGatewayBuilderExtensions
     {

@@ -1,11 +1,6 @@
 // Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
-using System;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Parbad.Abstraction;
 using Parbad.Gateway.Melli.Internal.Models;
@@ -13,30 +8,41 @@ using Parbad.Gateway.Melli.Internal.ResultTranslator;
 using Parbad.Http;
 using Parbad.Internal;
 using Parbad.Options;
+using System;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Parbad.Gateway.Melli.Internal
 {
     internal static class MelliHelper
     {
         public const string PaymentPageUrl = "https://sadad.shaparak.ir/VPG/Purchase";
-        public const string BaseServiceUrl = "https://sadad.shaparak.ir/";
+        public const string BaseServiceUrl = "https://sadad.shaparak.ir";
         public const string ServiceRequestUrl = "/VPG/api/v0/Request/PaymentRequest";
         public const string ServiceVerifyUrl = "/VPG/api/v0/Advice/Verify";
 
         private const int SuccessCode = 0;
         private const int DuplicateTrackingNumberCode = 1011;
+        public static string MultiplexingAccountsKey = "MultiplexingData";
 
         public static object CreateRequestData(Invoice invoice, MelliGatewayAccount account)
         {
             var signedData = SignRequestData(account.TerminalId, account.TerminalKey, invoice.TrackingNumber, invoice.Amount);
+            if (invoice.AdditionalData == null || !invoice.AdditionalData.ContainsKey(MultiplexingAccountsKey))
+            {
+                return CreateRequestObject(
+                    account.TerminalId,
+                    account.MerchantId,
+                    invoice.Amount,
+                    signedData,
+                    invoice.CallbackUrl,
+                    invoice.TrackingNumber);
+            }
 
-            return CreateRequestObject(
-                account.TerminalId,
-                account.MerchantId,
-                invoice.Amount,
-                signedData,
-                invoice.CallbackUrl,
-                invoice.TrackingNumber);
+            return CreateMultiplexingRequestData(invoice, account, signedData);
+
         }
 
         public static PaymentRequestResult CreateRequestResult(MelliApiRequestResult result, HttpContext httpContext, MelliGatewayAccount account, MessagesOptions messagesOptions)
@@ -209,6 +215,36 @@ namespace Parbad.Gateway.Melli.Internal
                 token = apiToken,
                 SignData = signedData
             };
+        }
+
+        private static object CreateMultiplexingRequestData(Invoice invoice, MelliGatewayAccount account, string signedData)
+        {
+            var multiplexingAccount = ((MultiplexingAccount)invoice.AdditionalData[MultiplexingAccountsKey]);
+
+
+            if (multiplexingAccount.MultiplexingRows.Count > 10)
+            {
+                throw new Exception("Cannot use more than 10 accounts for each Cumulative payment request.");
+            }
+
+            //create invoice info that have sharing 
+            var invoiceInfo = new
+            {
+                account.TerminalId,
+                account.MerchantId,
+                Amount = invoice.Amount.Value,
+                SignData = signedData,
+                ReturnUrl = invoice.CallbackUrl.Url,
+                LocalDateTime = DateTime.Now,
+                OrderId = invoice.TrackingNumber,
+                EnableMultiplexing = true,
+                MultiplexingData = new
+                {
+                    multiplexingAccount.Type,
+                    multiplexingAccount.MultiplexingRows
+                }
+            };
+            return invoiceInfo;
         }
     }
 }
