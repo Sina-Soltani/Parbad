@@ -7,9 +7,7 @@ using Parbad.Internal;
 
 namespace Parbad.Builder
 {
-    /// <summary>
-    /// gateway builder
-    /// </summary>
+    
     public static class GatewayBuilderExtensions
     {
         /// <summary>

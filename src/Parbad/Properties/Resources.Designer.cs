@@ -70,6 +70,15 @@ namespace Parbad.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} cannot be a negative number.
+        /// </summary>
+        internal static string Cannot_be_a_negative_number {
+            get {
+                return ResourceManager.GetString("Cannot_be_a_negative_number", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot get Parbad service from injector. Make sure that Parbad is initialized by using the ParbadBuilder class..
         /// </summary>
         internal static string CannotGetParbadServiceException {
@@ -89,15 +98,6 @@ namespace Parbad.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} cannot be a negative number.
-        /// </summary>
-        internal static string MultiplexingDataItem_MultiplexingDataItem__0__cannot_be_a_negative_number {
-            get {
-                return ResourceManager.GetString("MultiplexingDataItem_MultiplexingDataItem__0__cannot_be_a_negative_number", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to No records saved in database..
         /// </summary>
         internal static string NoRecordsSavedInDatabase {
@@ -112,6 +112,15 @@ namespace Parbad.Properties {
         internal static string OptionValueRequired {
             get {
                 return ResourceManager.GetString("OptionValueRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} cannot be a greater than 100.
+        /// </summary>
+        internal static string Percentage_cannot_be_greater_than_hundred {
+            get {
+                return ResourceManager.GetString("Percentage_cannot_be_greater_than_hundred", resourceCulture);
             }
         }
         

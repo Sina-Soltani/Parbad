@@ -8,6 +8,9 @@ using Parbad.GatewayBuilders;
 
 namespace Parbad.Gateway.Melli
 {
+    /// <summary>
+    /// Melli gate way extension to initialize in startup 
+    /// </summary>
     public static class MelliGatewayBuilderExtensions
     {
         /// <summary>

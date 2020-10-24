@@ -287,10 +287,13 @@
 &lt;/body&gt;
 &lt;/html&gt;</value>
   </data>
-  <data name="MultiplexingDataItem_MultiplexingDataItem__0__cannot_be_a_negative_number" xml:space="preserve">
+  <data name="Cannot_be_a_negative_number" xml:space="preserve">
     <value>{0} cannot be a negative number</value>
   </data>
   <data name="MelliGatewayInvoiceBuilder_AddMelliMultiplexingAccounts_Accounts_cannot_be_an_empty_collection_" xml:space="preserve">
     <value>Accounts cannot be an empty collection.</value>
+  </data>
+  <data name="Percentage_cannot_be_greater_than_hundred" xml:space="preserve">
+    <value>{0} cannot be a greater than 100</value>
   </data>
 </root>

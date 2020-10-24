@@ -54,7 +54,11 @@ namespace Parbad
 
             return new CallbackUrl(url);
         }
-
+        /// <summary>
+        /// Call back url that provide by user
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
         public int CompareTo(CallbackUrl other)
         {
             return string.Compare(Url, other.Url, StringComparison.OrdinalIgnoreCase);

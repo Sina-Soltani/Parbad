@@ -1,6 +1,11 @@
 // Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
+using System;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Parbad.Abstraction;
 using Parbad.Gateway.Melli.Internal.Models;
@@ -8,11 +13,6 @@ using Parbad.Gateway.Melli.Internal.ResultTranslator;
 using Parbad.Http;
 using Parbad.Internal;
 using Parbad.Options;
-using System;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Parbad.Gateway.Melli.Internal
 {
@@ -29,9 +29,9 @@ namespace Parbad.Gateway.Melli.Internal
 
         public static object CreateRequestData(Invoice invoice, MelliGatewayAccount account)
         {
-            var signedData = SignRequestData(account.TerminalId, account.TerminalKey, invoice.TrackingNumber, invoice.Amount);
+            var signedData = SignRequestData(account.TerminalId, account.TerminalKey, invoice.TrackingNumber,
+                invoice.Amount);
             if (invoice.AdditionalData == null || !invoice.AdditionalData.ContainsKey(MultiplexingAccountsKey))
-            {
                 return CreateRequestObject(
                     account.TerminalId,
                     account.MerchantId,
@@ -39,18 +39,14 @@ namespace Parbad.Gateway.Melli.Internal
                     signedData,
                     invoice.CallbackUrl,
                     invoice.TrackingNumber);
-            }
 
             return CreateMultiplexingRequestData(invoice, account, signedData);
-
         }
 
-        public static PaymentRequestResult CreateRequestResult(MelliApiRequestResult result, HttpContext httpContext, MelliGatewayAccount account, MessagesOptions messagesOptions)
+        public static PaymentRequestResult CreateRequestResult(MelliApiRequestResult result, HttpContext httpContext,
+            MelliGatewayAccount account, MessagesOptions messagesOptions)
         {
-            if (result == null)
-            {
-                return PaymentRequestResult.Failed(messagesOptions.UnexpectedErrorText);
-            }
+            if (result == null) return PaymentRequestResult.Failed(messagesOptions.UnexpectedErrorText);
 
             var isSucceed = result.ResCode == SuccessCode;
 
@@ -59,15 +55,11 @@ namespace Parbad.Gateway.Melli.Internal
                 string message;
 
                 if (result.ResCode == DuplicateTrackingNumberCode)
-                {
                     message = messagesOptions.DuplicateTrackingNumber;
-                }
                 else
-                {
                     message = !result.Description.IsNullOrEmpty()
                         ? result.Description
                         : MelliRequestResultTranslator.Translate(result.ResCode, messagesOptions);
-                }
 
                 return PaymentRequestResult.Failed(message, account.Name);
             }
@@ -88,29 +80,27 @@ namespace Parbad.Gateway.Melli.Internal
             MessagesOptions messagesOptions,
             CancellationToken cancellationToken)
         {
-            var apiResponseCode = await httpRequest.TryGetParamAsAsync<int>("ResCode", cancellationToken).ConfigureAwaitFalse();
+            var apiResponseCode = await httpRequest.TryGetParamAsAsync<int>("ResCode", cancellationToken)
+                .ConfigureAwaitFalse();
 
             if (!apiResponseCode.Exists || apiResponseCode.Value != SuccessCode)
-            {
                 return new MelliCallbackResult
                 {
                     IsSucceed = false,
                     Result = PaymentVerifyResult.Failed(messagesOptions.PaymentFailed)
                 };
-            }
 
             var apiToken = await httpRequest.TryGetParamAsync("Token", cancellationToken).ConfigureAwaitFalse();
-            var apiOrderId = await httpRequest.TryGetParamAsAsync<long>("OrderId", cancellationToken).ConfigureAwaitFalse();
+            var apiOrderId = await httpRequest.TryGetParamAsAsync<long>("OrderId", cancellationToken)
+                .ConfigureAwaitFalse();
 
             if (!apiOrderId.Exists || apiOrderId.Value != context.Payment.TrackingNumber)
-            {
                 return new MelliCallbackResult
                 {
                     IsSucceed = false,
                     Token = apiToken.Value,
                     Result = PaymentVerifyResult.Failed(messagesOptions.InvalidDataReceivedFromGateway)
                 };
-            }
 
             var signedData = SignVerifyData(account.TerminalKey, apiToken.Value);
 
@@ -124,23 +114,12 @@ namespace Parbad.Gateway.Melli.Internal
             };
         }
 
-        public static PaymentVerifyResult CreateVerifyResult(MelliApiVerifyResult result, MessagesOptions messagesOptions)
+        public static PaymentVerifyResult CreateVerifyResult(MelliApiVerifyResult result,
+            MessagesOptions messagesOptions)
         {
-            if (result == null)
-            {
-                return PaymentVerifyResult.Failed(messagesOptions.UnexpectedErrorText);
-            }
+            if (result == null) return PaymentVerifyResult.Failed(messagesOptions.UnexpectedErrorText);
 
-            string message;
-
-            if (!result.Description.IsNullOrEmpty())
-            {
-                message = result.Description;
-            }
-            else
-            {
-                message = MelliVerifyResultTranslator.Translate(result.ResCode, messagesOptions);
-            }
+            var message = !result.Description.IsNullOrEmpty() ? result.Description : MelliVerifyResultTranslator.Translate(result.ResCode, messagesOptions);
 
             var status = result.ResCode == SuccessCode
                 ? PaymentVerifyResultStatus.Succeed
@@ -174,7 +153,8 @@ namespace Parbad.Gateway.Melli.Internal
             }
         }
 
-        private static object CreateRequestObject(string terminalId, string merchantId, long amount, string signedData, string callbackUrl, long orderId)
+        private static object CreateRequestObject(string terminalId, string merchantId, long amount, string signedData,
+            string callbackUrl, long orderId)
         {
             return new
             {
@@ -217,17 +197,16 @@ namespace Parbad.Gateway.Melli.Internal
             };
         }
 
-        private static object CreateMultiplexingRequestData(Invoice invoice, MelliGatewayAccount account, string signedData)
+        private static object CreateMultiplexingRequestData(Invoice invoice, MelliGatewayAccount account,
+            string signedData)
         {
-            var multiplexingAccount = ((MultiplexingAccount)invoice.AdditionalData[MultiplexingAccountsKey]);
+            var multiplexingAccount = (MelliMultiplexInvoice) invoice.AdditionalData[MultiplexingAccountsKey];
 
-
+            //Check if share account do not more than 10 row
             if (multiplexingAccount.MultiplexingRows.Count > 10)
-            {
                 throw new Exception("Cannot use more than 10 accounts for each Cumulative payment request.");
-            }
 
-            //create invoice info that have sharing 
+            //Create invoice info that have sharing 
             var invoiceInfo = new
             {
                 account.TerminalId,

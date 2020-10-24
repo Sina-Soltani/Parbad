@@ -172,11 +172,6 @@
             <param name="builder"></param>
             <param name="configuration"></param>
         </member>
-        <member name="T:Parbad.Builder.GatewayBuilderExtensions">
-            <summary>
-            gateway builder
-            </summary>
-        </member>
         <member name="M:Parbad.Builder.GatewayBuilderExtensions.ConfigureGateways(Parbad.Builder.IParbadBuilder,System.Action{Parbad.GatewayBuilders.IGatewayBuilder})">
             <summary>
             Configures the gateways.
@@ -455,6 +450,13 @@
             <param name="name"></param>
             <param name="value"></param>
         </member>
+        <member name="M:Parbad.CallbackUrl.CompareTo(Parbad.CallbackUrl)">
+            <summary>
+            Call back url that provide by user
+            </summary>
+            <param name="other"></param>
+            <returns></returns>
+        </member>
         <member name="F:Parbad.GatewayAccountInvoiceExtensions.GatewayAccountKeyName">
             <summary>
             Gateway Account key in <see cref="P:Parbad.Abstraction.Invoice.AdditionalData"/> property.
@@ -646,80 +648,108 @@
         </member>
         <member name="T:Parbad.Gateway.Melli.IMelliGatewayInvoiceBuilder">
             <summary>
-            
             </summary>
         </member>
         <member name="P:Parbad.Gateway.Melli.IMelliGatewayInvoiceBuilder.InvoiceBuilder">
             <summary>
-            
             </summary>
         </member>
         <member name="M:Parbad.Gateway.Melli.IMelliGatewayInvoiceBuilder.AddMelliMultiplexingAccount(Parbad.Gateway.Melli.Internal.Models.MultiplexingType,System.Int64,System.Int32)">
             <summary>
-            
+                Add share account date to gateway
             </summary>
             <param name="type"></param>
             <param name="amount"></param>
             <param name="ibanNumber"></param>
             <returns></returns>
         </member>
-        <member name="M:Parbad.Gateway.Melli.IMelliGatewayInvoiceBuilder.AddMelliMultiplexingAccounts(Parbad.Gateway.Melli.Internal.Models.MultiplexingAccount)">
+        <member name="M:Parbad.Gateway.Melli.IMelliGatewayInvoiceBuilder.AddMelliMultiplexingAccounts(Parbad.Gateway.Melli.Internal.Models.MelliMultiplexInvoice)">
             <summary>
-            
+                Add share account date to gateway
             </summary>
             <param name="account"></param>
             <returns></returns>
         </member>
-        <member name="T:Parbad.Gateway.Melli.Internal.Models.MultiplexingAccount">
+        <member name="T:Parbad.Gateway.Melli.Internal.MelliGatewayInvoiceBuilder">
             <summary>
-            
             </summary>
         </member>
-        <member name="P:Parbad.Gateway.Melli.Internal.Models.MultiplexingAccount.Type">
+        <member name="M:Parbad.Gateway.Melli.Internal.MelliGatewayInvoiceBuilder.#ctor(Parbad.InvoiceBuilder.IInvoiceBuilder)">
             <summary>
-            Type of sharing
+            </summary>
+            <param name="invoiceBuilder"></param>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.MelliGatewayInvoiceBuilder.InvoiceBuilder">
+            <summary>
             </summary>
         </member>
-        <member name="P:Parbad.Gateway.Melli.Internal.Models.MultiplexingAccount.MultiplexingRows">
+        <member name="M:Parbad.Gateway.Melli.Internal.MelliGatewayInvoiceBuilder.AddMelliMultiplexingAccount(Parbad.Gateway.Melli.Internal.Models.MultiplexingType,System.Int64,System.Int32)">
             <summary>
-            the information of account top to 10
+            </summary>
+            <param name="type"></param>
+            <param name="amount"></param>
+            <param name="ibanNumber"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Parbad.Gateway.Melli.Internal.MelliGatewayInvoiceBuilder.AddMelliMultiplexingAccounts(Parbad.Gateway.Melli.Internal.Models.MelliMultiplexInvoice)">
+            <summary>
+            </summary>
+            <param name="account"></param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentNullException"></exception>
+            <exception cref="T:System.ArgumentException"></exception>
+        </member>
+        <member name="T:Parbad.Gateway.Melli.Internal.Models.MelliMultiplexInvoice">
+            <summary>
+            Main class that hold the share account info
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.Models.MelliMultiplexInvoice.Type">
+            <summary>
+                Type of sharing
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.Internal.Models.MelliMultiplexInvoice.MultiplexingRows">
+            <summary>
+                The information of account top to 10
             </summary>
         </member>
         <member name="T:Parbad.Gateway.Melli.Internal.Models.MultiplexingType">
             <summary>
-            type of share
+                Type of share
             </summary>
         </member>
         <member name="F:Parbad.Gateway.Melli.Internal.Models.MultiplexingType.Percentage">
             <summary>
-            Percentage share
+                Percentage share
             </summary>
         </member>
         <member name="F:Parbad.Gateway.Melli.Internal.Models.MultiplexingType.Amount">
             <summary>
-            Amount type
+                Amount type
             </summary>
         </member>
-        <member name="T:Parbad.Gateway.Melli.Internal.Models.MultiplexingDataItem">
+        <member name="T:Parbad.Gateway.Melli.Internal.Models.MelliMultiplexInvoiceItem">
             <summary>
-            share data
+                Share data
             </summary>
         </member>
-        <member name="M:Parbad.Gateway.Melli.Internal.Models.MultiplexingDataItem.#ctor(Parbad.Money,System.Int32)">
+        <member name="M:Parbad.Gateway.Melli.Internal.Models.MelliMultiplexInvoiceItem.#ctor(System.Int64,System.Int32,Parbad.Gateway.Melli.Internal.Models.MultiplexingType)">
             <summary>
-            fill share data
+                Fill share data
             </summary>
             <param name="amount"></param>
             <param name="ibanNumber"></param>
+            <param name="type"></param>
         </member>
-        <member name="P:Parbad.Gateway.Melli.Internal.Models.MultiplexingDataItem.IbanNumber">
+        <member name="P:Parbad.Gateway.Melli.Internal.Models.MelliMultiplexInvoiceItem.IbanNumber">
             <summary>
-            Iban number register in bank
+                Iban number register in bank
             </summary>
         </member>
-        <member name="P:Parbad.Gateway.Melli.Internal.Models.MultiplexingDataItem.Value">
+        <member name="P:Parbad.Gateway.Melli.Internal.Models.MelliMultiplexInvoiceItem.Value">
             <summary>
-            value of share
+                Value of share
             </summary>
         </member>
         <member name="T:Parbad.Gateway.Melli.Internal.ResultTranslator.MelliRequestResponseCodes">
@@ -1007,12 +1037,17 @@
         </member>
         <member name="T:Parbad.Gateway.Melli.MelliGateway">
             <summary>
-            Melli Gateway.
+                Melli Gateway.
+            </summary>
+        </member>
+        <member name="F:Parbad.Gateway.Melli.MelliGateway.Name">
+            <summary>
+            name of gateway
             </summary>
         </member>
         <member name="M:Parbad.Gateway.Melli.MelliGateway.#ctor(Microsoft.AspNetCore.Http.IHttpContextAccessor,System.Net.Http.IHttpClientFactory,Parbad.GatewayBuilders.IGatewayAccountProvider{Parbad.Gateway.Melli.MelliGatewayAccount},Microsoft.Extensions.Options.IOptions{Parbad.Options.MessagesOptions})">
             <summary>
-            Initializes an instance of <see cref="T:Parbad.Gateway.Melli.MelliGateway"/>.
+                Initializes an instance of <see cref="T:Parbad.Gateway.Melli.MelliGateway" />.
             </summary>
             <param name="httpContextAccessor"></param>
             <param name="httpClientFactory"></param>
@@ -1031,6 +1066,26 @@
         <member name="T:Parbad.Gateway.Melli.MelliGatewayAccount">
             <summary>
             Melli Gateway options class.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.MelliGatewayAccount.TerminalId">
+            <summary>
+            Terminal Id that provide by bank
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.MelliGatewayAccount.MerchantId">
+            <summary>
+            Merchant Id that provide by bank
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Melli.MelliGatewayAccount.TerminalKey">
+            <summary>
+            Terminal Key that provide by bank
+            </summary>
+        </member>
+        <member name="T:Parbad.Gateway.Melli.MelliGatewayBuilderExtensions">
+            <summary>
+            Melli gate way extension to initialize in startup 
             </summary>
         </member>
         <member name="M:Parbad.Gateway.Melli.MelliGatewayBuilderExtensions.AddMelli(Parbad.GatewayBuilders.IGatewayBuilder)">
@@ -1057,57 +1112,23 @@
             </summary>
             <param name="mainException">The main Exception object.</param>
         </member>
-        <member name="T:Parbad.Gateway.Melli.MelliGatewayInvoiceBuilder">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.Melli.MelliGatewayInvoiceBuilder.InvoiceBuilder">
-            <summary>
-            
-            </summary>
-        </member>
-        <member name="M:Parbad.Gateway.Melli.MelliGatewayInvoiceBuilder.#ctor(Parbad.InvoiceBuilder.IInvoiceBuilder)">
-            <summary>
-            
-            </summary>
-            <param name="invoiceBuilder"></param>
-        </member>
-        <member name="M:Parbad.Gateway.Melli.MelliGatewayInvoiceBuilder.AddMelliMultiplexingAccount(Parbad.Gateway.Melli.Internal.Models.MultiplexingType,System.Int64,System.Int32)">
-            <summary>
-            
-            </summary>
-            <param name="type"></param>
-            <param name="amount"></param>
-            <param name="ibanNumber"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Parbad.Gateway.Melli.MelliGatewayInvoiceBuilder.AddMelliMultiplexingAccounts(Parbad.Gateway.Melli.Internal.Models.MultiplexingAccount)">
-            <summary>
-            
-            </summary>
-            <param name="account"></param>
-            <returns></returns>
-            <exception cref="T:System.ArgumentNullException"></exception>
-            <exception cref="T:System.ArgumentException"></exception>
-        </member>
         <member name="T:Parbad.Gateway.Melli.MelliGatewayInvoiceBuilderExtensions">
             <summary>
-            Melli gate way extension that use in startup
+                Melli gate way extension that use in startup
             </summary>
         </member>
         <member name="M:Parbad.Gateway.Melli.MelliGatewayInvoiceBuilderExtensions.UseMelli(Parbad.InvoiceBuilder.IInvoiceBuilder)">
             <summary>
-            The invoice will be sent to Melli gateway.
+                The invoice will be sent to Melli gateway.
             </summary>
             <param name="builder"></param>
         </member>
         <member name="M:Parbad.Gateway.Melli.MelliGatewayInvoiceBuilderExtensions.UseMelli(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Action{Parbad.Gateway.Melli.IMelliGatewayInvoiceBuilder})">
             <summary>
-            Contains extra functions for Mellat Gateway.
+                The invoice will be sent to Melli gateway.
             </summary>
             <param name="builder"></param>
-            <param name="configureMelliInvoiceBuilder">Helps to build the extra functions of Mellat Gateway.</param>
+            <param name="configureMelliInvoiceBuilder">Helps to build the extra functions of Melli Gateway.</param>
         </member>
         <member name="M:Parbad.Gateway.ParbadVirtual.ParbadVirtualGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
@@ -2205,6 +2226,11 @@
               Looks up a localized string similar to Amount cannot be negative..
             </summary>
         </member>
+        <member name="P:Parbad.Properties.Resources.Cannot_be_a_negative_number">
+            <summary>
+              Looks up a localized string similar to {0} cannot be a negative number.
+            </summary>
+        </member>
         <member name="P:Parbad.Properties.Resources.CannotGetParbadServiceException">
             <summary>
               Looks up a localized string similar to Cannot get Parbad service from injector. Make sure that Parbad is initialized by using the ParbadBuilder class..
@@ -2215,11 +2241,6 @@
               Looks up a localized string similar to Accounts cannot be an empty collection..
             </summary>
         </member>
-        <member name="P:Parbad.Properties.Resources.MultiplexingDataItem_MultiplexingDataItem__0__cannot_be_a_negative_number">
-            <summary>
-              Looks up a localized string similar to {0} cannot be a negative number.
-            </summary>
-        </member>
         <member name="P:Parbad.Properties.Resources.NoRecordsSavedInDatabase">
             <summary>
               Looks up a localized string similar to No records saved in database..
@@ -2228,6 +2249,11 @@
         <member name="P:Parbad.Properties.Resources.OptionValueRequired">
             <summary>
               Looks up a localized string similar to Gateway configuration failed. {0} is required..
+            </summary>
+        </member>
+        <member name="P:Parbad.Properties.Resources.Percentage_cannot_be_greater_than_hundred">
+            <summary>
+              Looks up a localized string similar to {0} cannot be a greater than 100.
             </summary>
         </member>
         <member name="P:Parbad.Properties.Resources.RefundNotSupports">

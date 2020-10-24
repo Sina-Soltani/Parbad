@@ -38,7 +38,7 @@ namespace Parbad.Net
         /// <param name="data"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public static async Task<HttpResponseMessage> PostJsonAsync(this HttpClient httpClient, string requestUri, object data, CancellationToken cancellationToken = default)
+        public static  Task<HttpResponseMessage> PostJsonAsync(this HttpClient httpClient, string requestUri, object data, CancellationToken cancellationToken = default)
         {
             if (httpClient == null) throw new ArgumentNullException(nameof(httpClient));
             //ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Ssl3;
@@ -46,7 +46,7 @@ namespace Parbad.Net
 
             var json = JsonConvert.SerializeObject(data, Formatting.None);
 
-            return await httpClient.PostAsync(requestUri, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken);
+            return  httpClient.PostAsync(requestUri, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken);
         }
         /// <summary>
         /// 
