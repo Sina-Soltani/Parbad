@@ -11,5 +11,7 @@ namespace Parbad.Gateway.IranKish
     public class IranKishGatewayAccount : GatewayAccount
     {
         public string MerchantId { get; set; }
+
+        public string Sha1Key { get; set; }
     }
 }

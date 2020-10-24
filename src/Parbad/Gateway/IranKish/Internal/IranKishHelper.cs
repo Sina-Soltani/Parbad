@@ -97,27 +97,59 @@ namespace Parbad.Gateway.IranKish.Internal
             // Equals to TransactionCode in Parbad system.
             var referenceId = await httpRequest.TryGetParamAsync("ReferenceId", cancellationToken).ConfigureAwaitFalse();
 
-            var isSucceed = false;
+            var isSucceed = true;
+            var message = messagesOptions.InvalidDataReceivedFromGateway;
             PaymentVerifyResult verifyResult = null;
 
-            if (merchantId.Value != account.MerchantId ||
-                invoiceNumber.Value != context.Payment.TrackingNumber ||
-                !token.Exists ||
-                token.Value.IsNullOrEmpty())
+            if (!resultCode.Exists)
+            {
+                isSucceed = false;
+                message += "No ResultCode is received.";
+            }
+
+            if (!merchantId.Exists)
+            {
+                isSucceed = false;
+                message += " No MerchantId is received.";
+            }
+            else if (merchantId.Value != account.MerchantId)
+            {
+                isSucceed = false;
+                message += "MerchantId is not valid.";
+            }
+
+            if (!invoiceNumber.Exists)
+            {
+                isSucceed = false;
+                message += "No InvoiceNumber is received.";
+            }
+            else if (invoiceNumber.Value != context.Payment.TrackingNumber)
+            {
+                isSucceed = false;
+                message += "InvoiceNumber is not valid.";
+            }
+
+            if (!token.Exists || token.Value.IsNullOrEmpty())
+            {
+                isSucceed = false;
+                message += "No Token is received or it was null.";
+            }
+
+            if (!isSucceed)
             {
                 verifyResult = new PaymentVerifyResult
                 {
                     TrackingNumber = invoiceNumber.Value,
                     TransactionCode = referenceId.Value,
-                    IsSucceed = false,
-                    Message = messagesOptions.InvalidDataReceivedFromGateway
+                    Status = PaymentVerifyResultStatus.Failed,
+                    Message = message
                 };
             }
             else
             {
-                var translatedMessage = IranKishGatewayResultTranslator.Translate(resultCode.Value, messagesOptions);
-
                 isSucceed = resultCode.Value == OkResult;
+
+                var translatedMessage = IranKishGatewayResultTranslator.Translate(resultCode.Value, messagesOptions);
 
                 if (!isSucceed)
                 {
@@ -151,7 +183,7 @@ namespace Parbad.Gateway.IranKish.Internal
                 $"<tem:token>{XmlHelper.EncodeXmlValue(callbackResult.Token)}</tem:token>" +
                 $"<tem:merchantId>{account.MerchantId}</tem:merchantId>" +
                 $"<tem:referenceNumber>{callbackResult.ReferenceId}</tem:referenceNumber>" +
-                "<tem:sha1Key></tem:sha1Key>" +
+                $"<tem:sha1Key>{account.Sha1Key}</tem:sha1Key>" +
                 "</tem:KicccPaymentsVerification>" +
                 "</soapenv:Body>" +
                 "</soapenv:Envelope>";
@@ -163,7 +195,7 @@ namespace Parbad.Gateway.IranKish.Internal
             IranKishCallbackResult callbackResult,
             MessagesOptions messagesOptions)
         {
-            var result = XmlHelper.GetNodeValueFromXml(webServiceResponse, "KicccPaymentsVerificationResult");
+            var result = XmlHelper.GetNodeValueFromXml(webServiceResponse, "KicccPaymentsVerificationResult", "http://tempuri.org/");
 
             // The result object is actually the amount of invoice . It must equal to invoice's amount.
             if (!long.TryParse(result, out var numericResult))
@@ -173,11 +205,11 @@ namespace Parbad.Gateway.IranKish.Internal
                     TrackingNumber = callbackResult.InvoiceNumber,
                     TransactionCode = callbackResult.ReferenceId,
                     Status = PaymentVerifyResultStatus.Failed,
-                    Message = messagesOptions.InvalidDataReceivedFromGateway
+                    Message = $"{messagesOptions.InvalidDataReceivedFromGateway} Result: {result}"
                 };
             }
 
-            var isSuccess = numericResult != (long)context.Payment.Amount;
+            var isSuccess = numericResult == (long)context.Payment.Amount;
 
             var translatedMessage = isSuccess
                 ? messagesOptions.PaymentSucceed
@@ -187,7 +219,7 @@ namespace Parbad.Gateway.IranKish.Internal
             {
                 TrackingNumber = callbackResult.InvoiceNumber,
                 TransactionCode = callbackResult.ReferenceId,
-                Status = PaymentVerifyResultStatus.Succeed,
+                Status = isSuccess ? PaymentVerifyResultStatus.Succeed : PaymentVerifyResultStatus.Failed,
                 Message = translatedMessage
             };
         }
