@@ -35,24 +35,6 @@ namespace Parbad.Http
             return (exists, value);
         }
 
-        //public static bool TryGetParam(this HttpRequest httpRequest, string key, out StringValues value)
-        //{
-        //    if (httpRequest == null) throw new ArgumentNullException(nameof(httpRequest));
-        //    if (key == null) throw new ArgumentNullException(nameof(key));
-
-        //    var hasForm = (HttpMethods.IsPost(httpRequest.Method) ||
-        //                   HttpMethods.IsPut(httpRequest.Method) ||
-        //                   HttpMethods.IsDelete(httpRequest.Method) ||
-        //                   HttpMethods.IsPatch(httpRequest.Method)) &&
-        //                  httpRequest.HasFormContentType;
-
-        //    if (!hasForm) return httpRequest.Query.TryGetValue(key, out value);
-
-        //    return
-        //        httpRequest.Form.TryGetValue(key, out value) ||
-        //        httpRequest.Query.TryGetValue(key, out value);
-        //}
-
         public static async Task<(bool Exists, T Value)> TryGetParamAsAsync<T>(this HttpRequest httpRequest, string key, CancellationToken cancellationToken)
         {
             var result = await TryGetParamAsync(httpRequest, key, cancellationToken).ConfigureAwaitFalse();
