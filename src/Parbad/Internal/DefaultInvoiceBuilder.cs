@@ -57,7 +57,7 @@ namespace Parbad.Internal
 
             foreach (var formatter in formatters)
             {
-                await formatter.FormatAsync(invoice);
+                await formatter.FormatAsync(invoice, cancellationToken);
             }
 
             return invoice;
