@@ -40,11 +40,11 @@ namespace Parbad.Gateway.ParbadVirtual.MiddlewareInvoker
             switch (commandDetails.CommandType)
             {
                 case VirtualGatewayCommandType.Request:
-                    await HandleRequestCommand(httpContext, commandDetails);
+                    await HandleRequestPage(httpContext, commandDetails);
                     break;
 
                 case VirtualGatewayCommandType.Pay:
-                    await HandlePayCommand(httpContext, commandDetails);
+                    await HandleResultPage(httpContext, commandDetails);
                     break;
 
                 default:
@@ -53,7 +53,7 @@ namespace Parbad.Gateway.ParbadVirtual.MiddlewareInvoker
             }
         }
 
-        private async Task HandleRequestCommand(HttpContext httpContext, VirtualGatewayCommandDetails commandDetails)
+        private async Task HandleRequestPage(HttpContext httpContext, VirtualGatewayCommandDetails commandDetails)
         {
             var template = await GetTemplate("VirtualGatewayRequestTemplate.html");
 
@@ -68,7 +68,7 @@ namespace Parbad.Gateway.ParbadVirtual.MiddlewareInvoker
             await httpContext.Response.WriteAsync(html);
         }
 
-        private static async Task HandlePayCommand(HttpContext httpContext, VirtualGatewayCommandDetails commandDetails)
+        private static async Task HandleResultPage(HttpContext httpContext, VirtualGatewayCommandDetails commandDetails)
         {
             if (!httpContext.Request.Form.TryGetValue("isPaid", out var isPaid) ||
                 !bool.TryParse(isPaid, out var boolIsPaid))
@@ -116,7 +116,7 @@ namespace Parbad.Gateway.ParbadVirtual.MiddlewareInvoker
             using var stream = typeof(ParbadVirtualGatewayOptions)
                 .GetTypeInfo()
                 .Assembly
-                .GetManifestResourceStream($"Parbad.{templateName}");
+                .GetManifestResourceStream($"Parbad.Gateway.ParbadVirtual.{templateName}");
 
             var streamReader = new StreamReader(stream, Encoding.UTF8);
 

@@ -33,6 +33,11 @@ More information: https://github.com/Sina-Soltani/Parbad
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
     <NoWarn>1701;1702;1591</NoWarn>
   </PropertyGroup>
+  
+  <ItemGroup>
+    <EmbeddedResource Include="Gateway\ParbadVirtual\VirtualGatewayRequestTemplate.html" />
+    <EmbeddedResource Include="Gateway\ParbadVirtual\VirtualGatewayResultTemplate.html" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="11.0.1" />
