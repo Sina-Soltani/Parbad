@@ -19,7 +19,7 @@ namespace Parbad
         Failed,
 
         /// <summary>
-        /// The invoice is already verified before.
+        /// The invoice has been verified before.
         /// </summary>
         AlreadyVerified
     }
