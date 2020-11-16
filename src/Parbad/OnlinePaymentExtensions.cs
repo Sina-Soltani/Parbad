@@ -124,6 +124,16 @@ namespace Parbad
             => onlinePayment.FetchAsync().GetAwaiter().GetResult();
 
         /// <summary>
+        /// Fetches the invoice by the given tracking number.
+        /// </summary>
+        /// <param name="onlinePayment"></param>
+        /// <param name="trackingNumber">Invoice's tracking number.</param>
+        /// <exception cref="PaymentTokenProviderException"></exception>
+        /// <exception cref="InvoiceNotFoundException"></exception>
+        public static IPaymentFetchResult Fetch(this IOnlinePayment onlinePayment, long trackingNumber)
+            => onlinePayment.FetchAsync(trackingNumber).GetAwaiter().GetResult();
+
+        /// <summary>
         /// Verifies the given invoice.
         /// </summary>
         /// <param name="onlinePayment"></param>

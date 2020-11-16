@@ -1787,6 +1787,15 @@
             <exception cref="T:Parbad.PaymentTokenProviders.PaymentTokenProviderException"></exception>
             <exception cref="T:Parbad.Exceptions.InvoiceNotFoundException"></exception>
         </member>
+        <member name="M:Parbad.OnlinePaymentExtensions.Fetch(Parbad.IOnlinePayment,System.Int64)">
+            <summary>
+            Fetches the invoice by the given tracking number.
+            </summary>
+            <param name="onlinePayment"></param>
+            <param name="trackingNumber">Invoice's tracking number.</param>
+            <exception cref="T:Parbad.PaymentTokenProviders.PaymentTokenProviderException"></exception>
+            <exception cref="T:Parbad.Exceptions.InvoiceNotFoundException"></exception>
+        </member>
         <member name="M:Parbad.OnlinePaymentExtensions.Verify(Parbad.IOnlinePayment,System.Int64)">
             <summary>
             Verifies the given invoice.
