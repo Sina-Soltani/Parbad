@@ -1384,6 +1384,21 @@
             <param name="builder"></param>
             <param name="additionalData"></param>
         </member>
+        <member name="M:Parbad.InvoiceBuilderExtensions.AddOrUpdateAdditionalData(Parbad.InvoiceBuilder.IInvoiceBuilder,System.String,System.Object)">
+            <summary>
+            Adds or updates the given key and value to the invoice.
+            </summary>
+            <param name="builder"></param>
+            <param name="key">Key of the data</param>
+            <param name="value">Value of the data</param>
+        </member>
+        <member name="M:Parbad.InvoiceBuilderExtensions.AddOrUpdateAdditionalData(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Collections.Generic.IDictionary{System.String,System.Object})">
+            <summary>
+            Adds or updates the given dictionary to the additional data of the invoice.
+            </summary>
+            <param name="builder"></param>
+            <param name="additionalData"></param>
+        </member>
         <member name="M:Parbad.InvoiceBuilderExtensions.AddFormatter(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Action{Parbad.Abstraction.Invoice})">
             <summary>
             Adds the given formatter to the list of formatters.

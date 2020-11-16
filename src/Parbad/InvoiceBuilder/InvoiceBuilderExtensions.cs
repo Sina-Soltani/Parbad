@@ -107,6 +107,43 @@ namespace Parbad
         }
 
         /// <summary>
+        /// Adds or updates the given key and value to the invoice.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="key">Key of the data</param>
+        /// <param name="value">Value of the data</param>
+        public static IInvoiceBuilder AddOrUpdateAdditionalData(this IInvoiceBuilder builder, string key, object value)
+            => AddOrUpdateAdditionalData(builder, new Dictionary<string, object> { { key, value } });
+
+        /// <summary>
+        /// Adds or updates the given dictionary to the additional data of the invoice.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="additionalData"></param>
+        public static IInvoiceBuilder AddOrUpdateAdditionalData(this IInvoiceBuilder builder, IDictionary<string, object> additionalData)
+        {
+            if (builder == null) throw new ArgumentNullException(nameof(builder));
+            if (additionalData == null) throw new ArgumentNullException(nameof(additionalData));
+
+            AddFormatter(builder, invoice =>
+            {
+                foreach (var data in additionalData)
+                {
+                    if (invoice.AdditionalData.ContainsKey(data.Key))
+                    {
+                        invoice.AdditionalData[data.Key] = data.Value;
+                    }
+                    else
+                    {
+                        invoice.AdditionalData.Add(data.Key, data.Value);
+                    }
+                }
+            });
+
+            return builder;
+        }
+
+        /// <summary>
         /// Adds the given formatter to the list of formatters.
         /// </summary>
         /// <param name="builder"></param>
