@@ -30,12 +30,21 @@ namespace Parbad
         Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Fetches the invoice from the incoming request.
+        /// Fetches the invoice from the incoming HTTP request.
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <exception cref="PaymentTokenProviderException"></exception>
         /// <exception cref="InvoiceNotFoundException"></exception>
         Task<IPaymentFetchResult> FetchAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Fetches the invoice by the given tracking number.
+        /// </summary>
+        /// <param name="trackingNumber">Invoice's tracking number.</param>
+        /// <param name="cancellationToken"></param>
+        /// <exception cref="PaymentTokenProviderException"></exception>
+        /// <exception cref="InvoiceNotFoundException"></exception>
+        Task<IPaymentFetchResult> FetchAsync(long trackingNumber, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Verifies the given invoice.

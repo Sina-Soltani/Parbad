@@ -1158,6 +1158,9 @@
         <member name="M:Parbad.Internal.DefaultOnlinePayment.FetchAsync(System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
+        <member name="M:Parbad.Internal.DefaultOnlinePayment.FetchAsync(System.Int64,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
         <member name="M:Parbad.Internal.DefaultOnlinePayment.VerifyAsync(System.Int64,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
@@ -1438,8 +1441,17 @@
         </member>
         <member name="M:Parbad.IOnlinePayment.FetchAsync(System.Threading.CancellationToken)">
             <summary>
-            Fetches the invoice from the incoming request.
+            Fetches the invoice from the incoming HTTP request.
             </summary>
+            <param name="cancellationToken"></param>
+            <exception cref="T:Parbad.PaymentTokenProviders.PaymentTokenProviderException"></exception>
+            <exception cref="T:Parbad.Exceptions.InvoiceNotFoundException"></exception>
+        </member>
+        <member name="M:Parbad.IOnlinePayment.FetchAsync(System.Int64,System.Threading.CancellationToken)">
+            <summary>
+            Fetches the invoice by the given tracking number.
+            </summary>
+            <param name="trackingNumber">Invoice's tracking number.</param>
             <param name="cancellationToken"></param>
             <exception cref="T:Parbad.PaymentTokenProviders.PaymentTokenProviderException"></exception>
             <exception cref="T:Parbad.Exceptions.InvoiceNotFoundException"></exception>

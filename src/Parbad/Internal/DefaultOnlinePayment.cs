@@ -169,25 +169,22 @@ namespace Parbad.Internal
                 throw new InvoiceNotFoundException(paymentToken);
             }
 
-            Log(logger => logger.LogInformation(LoggingEvents.FetchPayment, "Fetching is finished."));
+            return CreateFetchResult(payment);
+        }
 
-            string message = null;
+        /// <inheritdoc />
+        public async Task<IPaymentFetchResult> FetchAsync(long trackingNumber, CancellationToken cancellationToken = default)
+        {
+            var payment = await _storageManager.GetPaymentByTrackingNumberAsync(trackingNumber, cancellationToken).ConfigureAwaitFalse();
 
-            if (payment.IsCompleted)
+            if (payment == null)
             {
-                message = _options.Messages.PaymentIsAlreadyProcessedBefore;
+                Log(logger => logger.LogError(LoggingEvents.FetchPayment, $"Fetching failed. The operation is not valid. No payment found for the given tracking number: {trackingNumber}"));
+
+                throw new InvoiceNotFoundException(trackingNumber);
             }
 
-            return new PaymentFetchResult
-            {
-                TrackingNumber = payment.TrackingNumber,
-                Amount = payment.Amount,
-                GatewayName = payment.GatewayName,
-                GatewayAccountName = payment.GatewayAccountName,
-                Status = payment.IsCompleted ? PaymentFetchResultStatus.AlreadyProcessed : PaymentFetchResultStatus.ReadyForVerifying,
-                IsAlreadyVerified = payment.IsPaid,
-                Message = message
-            };
+            return CreateFetchResult(payment);
         }
 
         /// <inheritdoc />
@@ -414,6 +411,29 @@ namespace Parbad.Internal
             Log(logger => logger.LogInformation(LoggingEvents.RefundPayment, $"Refunding the invoice {invoice.TrackingNumber} is finished."));
 
             return refundResult;
+        }
+
+        private IPaymentFetchResult CreateFetchResult(Payment payment)
+        {
+            Log(logger => logger.LogInformation(LoggingEvents.FetchPayment, "Fetching is finished."));
+
+            string message = null;
+
+            if (payment.IsCompleted)
+            {
+                message = _options.Messages.PaymentIsAlreadyProcessedBefore;
+            }
+
+            return new PaymentFetchResult
+            {
+                TrackingNumber = payment.TrackingNumber,
+                Amount = payment.Amount,
+                GatewayName = payment.GatewayName,
+                GatewayAccountName = payment.GatewayAccountName,
+                Status = payment.IsCompleted ? PaymentFetchResultStatus.AlreadyProcessed : PaymentFetchResultStatus.ReadyForVerifying,
+                IsAlreadyVerified = payment.IsPaid,
+                Message = message
+            };
         }
 
         private void Log(Action<ILogger> logger)
