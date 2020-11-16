@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
-    <VersionPrefix>1.0.4</VersionPrefix>
-    <LangVersion>latest</LangVersion>
+    <TargetFramework>net462</TargetFramework>
+    <VersionPrefix>1.1.0</VersionPrefix>
+    <LangVersion>9</LangVersion>
     <Authors>Sina Soltani</Authors>
     <Description>Owin integration for Parbad project.
 
@@ -18,7 +18,11 @@ For more information see: https://www.nuget.org/packages/Parbad/</Description>
     <PackageTags>parbad owin webforms Payment Gateway Bank Iran Shetab IranKish Mellat Melli Sadad Parsian Pasargad Saman Asan-Pardakht پرداخت درگاه بانک ایران شتاب ایران-کیش ملت ملی سداد پارسیان پاسارگاد سامان آسان-پرداخت</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
-    <PackageReleaseNotes>.NET Framework is upgraded to 4.6.2</PackageReleaseNotes>
+    <PackageReleaseNotes>.NET Framework is upgraded to 4.6.2.</PackageReleaseNotes>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <NoWarn>1701;1702;1591</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -30,7 +34,6 @@ For more information see: https://www.nuget.org/packages/Parbad/</Description>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Owin" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
     <PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="4.0.1" />
   </ItemGroup>
 

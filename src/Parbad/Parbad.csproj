@@ -27,20 +27,16 @@ New Invoice.AddOrUpdateAdditionalData method is added.
 Code improvement.</PackageReleaseNotes>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <NoWarn>1701;1702;1591</NoWarn>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>Parbad.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DocumentationFile>Parbad.xml</DocumentationFile>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
-    <NoWarn>1701;1702;1591</NoWarn>
-  </PropertyGroup>
-  
-  <ItemGroup>
-    <EmbeddedResource Include="Gateway\ParbadVirtual\VirtualGatewayRequestTemplate.html" />
-    <EmbeddedResource Include="Gateway\ParbadVirtual\VirtualGatewayResultTemplate.html" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="11.0.1" />
@@ -56,6 +52,11 @@ Code improvement.</PackageReleaseNotes>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.0' or '$(TargetFramework)' == 'netcoreapp3.1' or '$(TargetFramework)' == 'net5.0' ">
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Gateway\ParbadVirtual\VirtualGatewayRequestTemplate.html" />
+    <EmbeddedResource Include="Gateway\ParbadVirtual\VirtualGatewayResultTemplate.html" />
   </ItemGroup>
 
   <ItemGroup>

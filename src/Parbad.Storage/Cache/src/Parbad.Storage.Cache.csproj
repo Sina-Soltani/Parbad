@@ -21,6 +21,10 @@
     <PackageReleaseNotes>Supporting the netcoreapp3.1 and net5.0 is added.</PackageReleaseNotes>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <NoWarn>1701;1702;1591</NoWarn>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>Parbad.Storage.Cache.xml</DocumentationFile>
   </PropertyGroup>

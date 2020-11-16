@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net462</TargetFramework>
-    <VersionPrefix>2.0.6</VersionPrefix>
-    <LangVersion>latest</LangVersion>
+    <VersionPrefix>2.1.0</VersionPrefix>
+    <LangVersion>9</LangVersion>
     <Authors>Sina Soltani</Authors>
     <Description>ASP.NET MVC 4 and 5 integration for Parbad project.
 
@@ -21,6 +21,10 @@ For more information see: https://www.nuget.org/packages/Parbad/</Description>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
     <PackageReleaseNotes>.NET Framework is upgraded to 4.6.2</PackageReleaseNotes>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <NoWarn>1701;1702;1591</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
