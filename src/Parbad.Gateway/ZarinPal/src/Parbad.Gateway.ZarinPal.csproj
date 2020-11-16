@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netcoreapp3.0</TargetFrameworks>
-    <VersionPrefix>1.0.5</VersionPrefix>
-    <LangVersion>latest</LangVersion>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.0;net5.0</TargetFrameworks>
+    <VersionPrefix>1.1.0</VersionPrefix>
+    <LangVersion>9</LangVersion>
     <Authors>Sina Soltani</Authors>
     <Copyright>Copyright © Sina Soltani 2016</Copyright>
     <PackageProjectUrl>https://github.com/Sina-Soltani/Parbad</PackageProjectUrl>
@@ -17,8 +17,7 @@
     <Description>ZarinPal Gateway for Parbad project.
 
 For more information see: https://github.com/Sina-Soltani/Parbad</Description>
-    <PackageReleaseNotes>The bug on ASP.NET WebForms apps is fixed.
-Code improvement.</PackageReleaseNotes>
+    <PackageReleaseNotes>Supporting the netstandard2.1, netcoreapp3.1 and net5.0 is added.</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
@@ -30,21 +29,10 @@ Code improvement.</PackageReleaseNotes>
     <ProjectReference Include="..\..\..\Parbad\Parbad.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.2.0" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.0' ">
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
-
   <ItemGroup>
     <None Include="icon.png" pack="true" Visible="false" PackagePath="" />
     <None Include="readme.txt" pack="true" PackagePath="." />
-    <None Include="Parbad.Gateway.ZarinPal.xml" pack="true" Visible="false" PackagePath=""/>
+    <None Include="Parbad.Gateway.ZarinPal.xml" pack="true" Visible="false" PackagePath="" />
   </ItemGroup>
 
 </Project>
