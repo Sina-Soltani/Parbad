@@ -4,7 +4,7 @@
         <name>Parbad.Storage.EntityFrameworkCore</name>
     </assembly>
     <members>
-        <member name="M:Parbad.Storage.EntityFrameworkCore.Builder.EntityFrameworkStorageBuilderExtensions.UseEntityFrameworkCore(Parbad.Storage.Builder.IStorageBuilder,System.Action{Parbad.Storage.EntityFrameworkCore.Options.EntityFrameworkCoreOptions})">
+        <member name="M:Parbad.Storage.EntityFrameworkCore.Builder.EntityFrameworkStorageBuilderExtensions.UseEfCore(Parbad.Storage.Builder.IStorageBuilder,System.Action{Parbad.Storage.EntityFrameworkCore.Options.EntityFrameworkCoreOptions})">
             <summary>
             Uses the EntityFramework Core as a storage for saving and loading data.
             <para>
@@ -19,87 +19,6 @@
             </summary>
             <param name="builder"></param>
             <param name="configureEfCoreOptions">Configures the EntityFrameworkCore options for Parbad.</param>
-        </member>
-        <member name="M:Parbad.Storage.EntityFrameworkCore.Builder.EntityFrameworkStorageBuilderExtensions.UseEntityFrameworkCore(Parbad.Storage.Builder.IStorageBuilder,System.Action{Microsoft.EntityFrameworkCore.DbContextOptionsBuilder})">
-            <summary>
-            Uses the EntityFramework Core as a storage for saving and loading data.
-            <para>
-            Note: It means Parbad can save and load the data in different database providers
-            such as SQL Server, MySql, Sqlite, PostgreSQL, Oracle, InMemory, etc.
-            For more information see: https://docs.microsoft.com/en-us/ef/core/providers/.
-            </para>
-            <para>Note: This database is only for internal usages such as saving and loading payment information.
-            You don't need to think about merging and using this database with your own database.
-            The important payment information such as Tracking Number, Transaction Code, etc. will you get from the result of
-            all payment requests.</para>
-            </summary>
-            <param name="builder"></param>
-            <param name="configureDatabaseBuilder">Configure what database must be used and how it must be created.</param>
-        </member>
-        <member name="M:Parbad.Storage.EntityFrameworkCore.Builder.EntityFrameworkStorageBuilderExtensions.UseParbadMigrations``2(Microsoft.EntityFrameworkCore.Infrastructure.RelationalDbContextOptionsBuilder{``0,``1})">
-            <summary>
-            Uses the MigrationsAssembly method internally and passes the Parbad assembly name
-            as parameter for configuring the migrations.
-            </summary>
-            <typeparam name="TBuilder"></typeparam>
-            <typeparam name="TExtension"></typeparam>
-            <param name="builder"></param>
-        </member>
-        <member name="P:Parbad.Storage.EntityFrameworkCore.Builder.IDatabaseInitializerBuilder.Services">
-            <summary>
-            Provides solution to perform payment request, verify the requested payment and
-            refund a payment.
-            </summary>
-        </member>
-        <member name="M:Parbad.Storage.EntityFrameworkCore.Builder.IDatabaseInitializerBuilder.AddInitializer``1(Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
-            <summary>
-            Adds the specified <typeparamref name="TInitializer"/> to Parbad services.
-            Initializers will be called in order that you specified.
-            </summary>
-            <typeparam name="TInitializer"></typeparam>
-            <param name="initializerLifetime">The lifetime of the specified <typeparamref name="TInitializer"/>.</param>
-        </member>
-        <member name="M:Parbad.Storage.EntityFrameworkCore.Builder.IDatabaseInitializerBuilder.AddInitializer(Parbad.Storage.EntityFrameworkCore.Initializers.IDatabaseInitializer)">
-            <summary>
-            Adds the specified Initializer to Parbad services.
-            Initializers will be called in order that you specified.
-            </summary>
-            <param name="initializer"></param>
-        </member>
-        <member name="M:Parbad.Storage.EntityFrameworkCore.Builder.IDatabaseInitializerBuilder.AddInitializer(System.Func{System.IServiceProvider,Parbad.Storage.EntityFrameworkCore.Initializers.IDatabaseInitializer},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
-            <summary>
-            Adds the specified Initializer to Parbad services.
-            Initializers will be called in order that you specified.
-            </summary>
-            <param name="implementationFactory"></param>
-            <param name="initializerLifetime">The lifetime of the specified Initializer.</param>
-        </member>
-        <member name="P:Parbad.Storage.EntityFrameworkCore.Builder.IEntityFrameworkCoreStorageBuilder.Services">
-            <summary>
-            Provides solution to perform payment request, verify the requested payment and
-            refund a payment.
-            </summary>
-        </member>
-        <member name="M:Parbad.Storage.EntityFrameworkCore.Builder.IEntityFrameworkCoreStorageBuilder.ConfigureDatabaseInitializer(System.Action{Parbad.Storage.EntityFrameworkCore.Builder.IDatabaseInitializerBuilder})">
-            <summary>
-            Configures Parbad database initializer.
-            Initializer is useful for creating, deleting, migrating and seeding the Parbad database.
-            <para>Note: Use ConfigureDatabase method before using this method.</para>
-            <para>Note: Use one of predefined database creators depends on the database
-            provider (In-Memory, SQL Server, MySQL, Sqlite, etc.) that you chose.</para>
-            <para>Providers examples:</para>
-            <para>For In-Memory, use the CreateDatabase method.</para>
-            <para>For SQL Server, use the CreateAndMigrateDatabase method.</para>
-            <para>For Sqlite, use DeleteAndCreateDatabase.
-            Because Sqlite has some limitations with migrations.
-            In this case, one way to fix this is to first delete the old Parbad database and then create it again.
-            </para>
-            <para>If you prefer to initialize the Parbad database yourself, then use the UseInitializer method
-            and define how the database must be initialized.
-            </para>
-            <para>Note: Initializer will be called in order that you specified.</para>
-            </summary>
-            <param name="configureInitializer"></param>
         </member>
         <member name="T:Parbad.Storage.EntityFrameworkCore.Configuration.EntityTypeConfiguration`1">
             <summary>
@@ -225,45 +144,6 @@
         </member>
         <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorageManager.GetTransactionsAsync(Parbad.Storage.Abstractions.Payment,System.Threading.CancellationToken)">
             <inheritdoc />
-        </member>
-        <member name="M:Parbad.Storage.EntityFrameworkCore.Initializers.DatabaseInitializerExtensions.CreateDatabase(Parbad.Storage.EntityFrameworkCore.Builder.IDatabaseInitializerBuilder)">
-            <summary>
-            Creates the Parbad database If it does not exist.
-            </summary>
-            <param name="builder"></param>
-        </member>
-        <member name="M:Parbad.Storage.EntityFrameworkCore.Initializers.DatabaseInitializerExtensions.CreateAndMigrateDatabase(Parbad.Storage.EntityFrameworkCore.Builder.IDatabaseInitializerBuilder)">
-            <summary>
-            Creates the Parbad database If it does not exist.
-            Will migrate the database too.
-            </summary>
-            <param name="builder"></param>
-        </member>
-        <member name="M:Parbad.Storage.EntityFrameworkCore.Initializers.DatabaseInitializerExtensions.DeleteAndCreateDatabase(Parbad.Storage.EntityFrameworkCore.Builder.IDatabaseInitializerBuilder)">
-            <summary>
-            Deletes and creates the Parbad database.
-            </summary>
-            <param name="builder"></param>
-        </member>
-        <member name="M:Parbad.Storage.EntityFrameworkCore.Initializers.DatabaseInitializerExtensions.AddInitializer(Parbad.Storage.EntityFrameworkCore.Builder.IDatabaseInitializerBuilder,System.Func{Parbad.Storage.EntityFrameworkCore.Context.ParbadDataContext,System.Threading.Tasks.Task})">
-            <summary>
-            Adds the specified Initializer to Parbad services.
-            Initializers will be called in order that you specified.
-            </summary>
-            <param name="builder"></param>
-            <param name="configureInitializer"></param>
-        </member>
-        <member name="T:Parbad.Storage.EntityFrameworkCore.Initializers.IDatabaseInitializer">
-            <summary>
-            An initializer to initialize the database required by Parbad.
-            </summary>
-        </member>
-        <member name="M:Parbad.Storage.EntityFrameworkCore.Initializers.IDatabaseInitializer.InitializeAsync(Parbad.Storage.EntityFrameworkCore.Context.ParbadDataContext,System.Threading.CancellationToken)">
-            <summary>
-            Initializes the database.
-            </summary>
-            <param name="context">Parbad database.</param>
-            <param name="cancellationToken"></param>
         </member>
         <member name="T:Parbad.Storage.EntityFrameworkCore.Options.EntityFrameworkCoreOptions">
             <summary>
