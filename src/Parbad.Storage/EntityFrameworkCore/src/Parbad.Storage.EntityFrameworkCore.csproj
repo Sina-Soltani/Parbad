@@ -2,9 +2,9 @@
 
   <PropertyGroup>
     <PackageId>Parbad.Storage.EntityFrameworkCore</PackageId>
-    <VersionPrefix>1.1.0</VersionPrefix>
-    <LangVersion>latest</LangVersion>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <VersionPrefix>1.2.0</VersionPrefix>
+    <LangVersion>9</LangVersion>
+    <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
