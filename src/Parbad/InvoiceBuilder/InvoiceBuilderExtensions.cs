@@ -27,22 +27,6 @@ namespace Parbad
             => AddFormatter(builder, invoice => invoice.TrackingNumber = trackingNumber);
 
         /// <summary>
-        /// Sets amount of the invoice.
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="amount">The amount of invoice.</param>
-        public static IInvoiceBuilder SetAmount(this IInvoiceBuilder builder, decimal amount)
-            => AddFormatter(builder, invoice => invoice.Amount = new Money(amount));
-
-        /// <summary>
-        /// Sets amount of the invoice.
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="amount">The amount of invoice.</param>
-        public static IInvoiceBuilder SetAmount(this IInvoiceBuilder builder, long amount)
-            => AddFormatter(builder, invoice => invoice.Amount = Money.Parse(amount));
-
-        /// <summary>
         /// Sets the amount of the invoice.
         /// </summary>
         /// <param name="builder"></param>
