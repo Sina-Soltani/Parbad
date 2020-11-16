@@ -2,15 +2,17 @@
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
 using System;
+using System.IO;
+using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using Parbad.Gateway.ParbadVirtual;
-using Parbad.Gateway.ParbadVirtual.MiddlewareInvoker;
+using Parbad.Internal;
 
-namespace Parbad.Internal
+namespace Parbad.Gateway.ParbadVirtual.MiddlewareInvoker
 {
-    public class ParbadVirtualGatewayMiddlewareInvoker : IParbadVirtualGatewayMiddlewareInvoker
+    internal class ParbadVirtualGatewayMiddlewareInvoker : IParbadVirtualGatewayMiddlewareInvoker
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IOptions<ParbadVirtualGatewayOptions> _options;
@@ -51,9 +53,11 @@ namespace Parbad.Internal
             }
         }
 
-        private Task HandleRequestCommand(HttpContext httpContext, VirtualGatewayCommandDetails commandDetails)
+        private async Task HandleRequestCommand(HttpContext httpContext, VirtualGatewayCommandDetails commandDetails)
         {
-            var html = Properties.Resources.VirtualGatewayRequestHtml
+            var template = await GetTemplate("VirtualGatewayRequestTemplate.html");
+
+            var html = template
                 .Replace("#VirtualGatewayPath#", _options.Value.GatewayPath)
                 .Replace("#TrackingNumber#", commandDetails.TrackingNumber.ToString())
                 .Replace("#Amount#", commandDetails.Amount.ToString())
@@ -61,18 +65,21 @@ namespace Parbad.Internal
                 .Replace("#RedirectUrl#", commandDetails.RedirectUrl)
                 .Replace("#YearNow#", DateTime.Now.Year.ToString());
 
-            return httpContext.Response.WriteAsync(html);
+            await httpContext.Response.WriteAsync(html);
         }
 
-        private Task HandlePayCommand(HttpContext httpContext, VirtualGatewayCommandDetails commandDetails)
+        private static async Task HandlePayCommand(HttpContext httpContext, VirtualGatewayCommandDetails commandDetails)
         {
             if (!httpContext.Request.Form.TryGetValue("isPaid", out var isPaid) ||
                 !bool.TryParse(isPaid, out var boolIsPaid))
             {
-                return httpContext.Response.WriteAsync($"{nameof(isPaid)} field is not valid.");
+                await httpContext.Response.WriteAsync($"{nameof(isPaid)} field is not valid.");
+                return;
             }
 
-            var html = Properties.Resources.VirtualGatewayResultHtml
+            var template = await GetTemplate("VirtualGatewayResultTemplate.html");
+
+            var html = template
                 .Replace("#TrackingNumber#", commandDetails.TrackingNumber.ToString())
                 .Replace("#DisplayAmount#", ((long)commandDetails.Amount).ToString("N0"))
                 .Replace("#TransactionCode#", boolIsPaid ? Guid.NewGuid().ToString("N") : string.Empty)
@@ -82,7 +89,7 @@ namespace Parbad.Internal
                 .Replace("#CssStatusName#", boolIsPaid ? "success" : "danger")
                 .Replace("#StatusText#", boolIsPaid ? "Succeed" : "Failed");
 
-            return httpContext.Response.WriteAsync(html);
+            await httpContext.Response.WriteAsync(html);
         }
 
         private static async Task<VirtualGatewayCommandDetails> GetCommandDetails(HttpContext httpContext)
@@ -102,6 +109,18 @@ namespace Parbad.Internal
             }
 
             return new VirtualGatewayCommandDetails(commandType, trackingNumber, amount, redirectUrl);
+        }
+
+        private static Task<string> GetTemplate(string templateName)
+        {
+            using var stream = typeof(ParbadVirtualGatewayOptions)
+                .GetTypeInfo()
+                .Assembly
+                .GetManifestResourceStream($"Parbad.{templateName}");
+
+            var streamReader = new StreamReader(stream, Encoding.UTF8);
+
+            return streamReader.ReadToEndAsync();
         }
     }
 }
