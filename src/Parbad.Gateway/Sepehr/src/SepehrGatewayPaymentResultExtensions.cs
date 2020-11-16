@@ -20,7 +20,7 @@ namespace Parbad.Gateway.Sepehr
             return additionalData as SepehrGatewayVerificationAdditionalData;
         }
 
-        internal static void SetPayIrAdditionalData(this IPaymentVerifyResult result, SepehrGatewayVerificationAdditionalData additionalData)
+        internal static void SetSepehrAdditionalData(this IPaymentVerifyResult result, SepehrGatewayVerificationAdditionalData additionalData)
         {
             if (result == null) throw new ArgumentNullException(nameof(result));
             if (additionalData == null) throw new ArgumentNullException(nameof(additionalData));

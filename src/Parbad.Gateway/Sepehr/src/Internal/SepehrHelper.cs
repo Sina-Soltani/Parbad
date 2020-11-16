@@ -279,7 +279,7 @@ namespace Parbad.Gateway.Sepehr.Internal
                 Rrn = callbackResult.Rrn,
                 CardNumber = callbackResult.CardNumber
             };
-            verificationResult.SetPayIrAdditionalData(verificationAdditionalData);
+            verificationResult.SetSepehrAdditionalData(verificationAdditionalData);
             var serializedAdditionalData = JsonConvert.SerializeObject(verificationAdditionalData);
             verificationResult.DatabaseAdditionalData.Add(VerificationAdditionalDataKey, serializedAdditionalData);
 
