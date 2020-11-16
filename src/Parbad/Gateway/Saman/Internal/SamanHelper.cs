@@ -47,8 +47,8 @@ namespace Parbad.Gateway.Saman.Internal
         {
             var isSuccess = false;
             PaymentVerifyResult verifyResult = null;
-            StringValues referenceId;
-            StringValues transactionId;
+            StringValues referenceId = "";
+            StringValues transactionId = "";
 
             var state = await httpRequest.TryGetParamAsync("state", cancellationToken).ConfigureAwaitFalse();
 
