@@ -13,7 +13,11 @@ Parbad is a free and open-source integrated online payment library which helps d
 * Easy installation using Nuget
 * No need to add any web service
 * High security checks
-* Supports most known online payment providers (Banks) such as:
+* Virtual Gateway for developing and testing your application.
+* Configurable Proxy
+* Created with modern and standard technologies
+* Supports ASP.NET CORE, ASP.NET MVC and ASP.NET WebForms
+* Supported online payment providers:
   * [Mellat](https://www.nuget.org/packages/Parbad/)
   * [Melli](https://www.nuget.org/packages/Parbad/)
   * [Saman](https://www.nuget.org/packages/Parbad/)
@@ -26,10 +30,6 @@ Parbad is a free and open-source integrated online payment library which helps d
   * [Pay.ir](https://www.nuget.org/packages/Parbad.Gateway.PayIr/)
   * [IDPay.ir](https://www.nuget.org/packages/Parbad.Gateway.IdPay/)
   * [YekPay](https://www.nuget.org/packages/Parbad.Gateway.YekPay/)
-* Virtual gateway for developing and testing your application.
-* Using Proxy
-* Created with modern and standard technologies
-* Supports ASP.NET CORE, ASP.NET MVC and ASP.NET WebForms
 
 # How it works?
 ![image](https://raw.githubusercontent.com/Sina-Soltani/Parbad/master/images/How-it-works.png)
