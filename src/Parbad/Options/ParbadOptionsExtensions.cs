@@ -45,28 +45,6 @@ namespace Parbad.Builder
             return builder;
         }
 
-        [Obsolete("This method is obsolete and will be removed in a future version. The recommended alternative is ConfigureOptions().", error: false)]
-        public static IParbadBuilder ConfigureMessages(this IParbadBuilder builder, Action<MessagesOptions> configureOptions)
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-            if (configureOptions == null) throw new ArgumentNullException(nameof(configureOptions));
-
-            builder.ConfigureOptions(options => configureOptions(options.Messages));
-
-            return builder;
-        }
-
-        [Obsolete("This method is obsolete and will be removed in a future version. The recommended alternative is ConfigureOptions().", error: false)]
-        public static IParbadBuilder ConfigureMessages(this IParbadBuilder builder, IConfiguration configuration)
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-            if (configuration == null) throw new ArgumentNullException(nameof(configuration));
-
-            builder.Services.Configure<MessagesOptions>(configuration);
-
-            return builder;
-        }
-
         private static void RegisterMessagesOptions(IParbadBuilder builder)
         {
             builder.Services.AddTransient<IOptions<MessagesOptions>>(provider =>
