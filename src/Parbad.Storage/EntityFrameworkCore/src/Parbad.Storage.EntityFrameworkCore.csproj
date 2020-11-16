@@ -18,8 +18,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Authors>Sina Soltani</Authors>
     <Product>Parbad.Storage.EntityframeworkCore</Product>
-    <PackageReleaseNotes>You are now able to control the Migrations yourself.
-Table names and schemas are now configurable.</PackageReleaseNotes>
+    <PackageReleaseNotes>Supporting the netstandard2.1 is added. Obsolete classes, interfaces and methods are removed.</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Release|AnyCPU'">
