@@ -1673,7 +1673,7 @@
         </member>
         <member name="F:Parbad.PaymentVerifyResultStatus.AlreadyVerified">
             <summary>
-            The invoice is already verified before.
+            The invoice has been verified before.
             </summary>
         </member>
         <member name="T:Parbad.IPaymentVerifyResult">
