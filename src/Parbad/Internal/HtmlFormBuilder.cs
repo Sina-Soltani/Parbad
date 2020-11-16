@@ -10,7 +10,7 @@ namespace Parbad.Internal
     {
         public static string CreateForm(string url, IEnumerable<KeyValuePair<string, string>> data)
         {
-            var fields = string.Join("", data.Select(item => CreateHiddenInput(item.Key, item.Value)));
+            var fields = string.Join("", data.Select(CreateHiddenInput));
 
             return
                 "<html>" +
@@ -25,9 +25,9 @@ namespace Parbad.Internal
                 "</html>";
         }
 
-        public static string CreateHiddenInput(string name, string value)
+        public static string CreateHiddenInput(KeyValuePair<string, string> data)
         {
-            return $"<input type=\"hidden\" name=\"{name}\" value=\"{value}\" />";
+            return $"<input type=\"hidden\" name=\"{data.Key}\" value=\"{data.Value}\" />";
         }
     }
 }
