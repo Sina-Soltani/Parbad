@@ -21,7 +21,7 @@ namespace Microsoft.AspNetCore.Builder
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-#if NETCOREAPP3_0
+#if NETCOREAPP3_0 || Net_5
             var hostEnvironment = builder.ApplicationServices.GetRequiredService<Hosting.IWebHostEnvironment>();
             var isDevelopment = Microsoft.Extensions.Hosting.HostEnvironmentEnvExtensions.IsDevelopment(hostEnvironment);
 #else
