@@ -14,31 +14,20 @@ namespace Parbad.Gateway.IdPay.Internal
                 return $"Cannot parse the Status value to integer. Status: {status}";
             }
 
-            switch (integerStatus)
+            return integerStatus switch
             {
-                case 1:
-                    return "پرداخت انجام نشده است";
-                case 2:
-                    return "پرداخت ناموفق بوده است";
-                case 3:
-                    return "خطا رخ داده است";
-                case 4:
-                    return "بلوکه شده";
-                case 5:
-                    return "برگشت به پرداخت کننده";
-                case 6:
-                    return "برگشت خورده سیستمی";
-                case 10:
-                    return "در انتظار تایید پرداخت";
-                case 100:
-                    return "پرداخت تایید شده است";
-                case 101:
-                    return "پرداخت قبلا تایید شده است";
-                case 200:
-                    return "به دریافت کننده واریز شد";
-                default:
-                    return messagesOptions.UnexpectedErrorText;
-            }
+                1 => "پرداخت انجام نشده است",
+                2 => "پرداخت ناموفق بوده است",
+                3 => "خطا رخ داده است",
+                4 => "بلوکه شده",
+                5 => "برگشت به پرداخت کننده",
+                6 => "برگشت خورده سیستمی",
+                10 => "در انتظار تایید پرداخت",
+                100 => "پرداخت تایید شده است",
+                101 => "پرداخت قبلا تایید شده است",
+                200 => "به دریافت کننده واریز شد",
+                _ => messagesOptions.UnexpectedErrorText
+            };
         }
     }
 }

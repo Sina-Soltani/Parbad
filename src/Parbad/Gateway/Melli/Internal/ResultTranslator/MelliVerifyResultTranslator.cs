@@ -9,17 +9,13 @@ namespace Parbad.Gateway.Melli.Internal.ResultTranslator
     {
         public static string Translate(int? result, MessagesOptions options)
         {
-            switch (result)
+            return result switch
             {
-                case 0:
-                    return MelliVerifyResponseCodes.Code0;
-                case -1:
-                    return MelliVerifyResponseCodes.CodeMinus1;
-                case 101:
-                    return MelliVerifyResponseCodes.Code101;
-                default:
-                    return options.UnexpectedErrorText;
-            }
+                0 => MelliVerifyResponseCodes.Code0,
+                -1 => MelliVerifyResponseCodes.CodeMinus1,
+                101 => MelliVerifyResponseCodes.Code101,
+                _ => options.UnexpectedErrorText
+            };
         }
     }
 }
