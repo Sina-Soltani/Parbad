@@ -47,7 +47,9 @@ namespace Parbad.Gateway.ParbadVirtual
                       $"{httpContext.Request.Host.ToUriComponent()}" +
                       $"{_options.Value.GatewayPath}";
 
-            var transporterDescriptor = GatewayTransporterDescriptor.CreatePost(
+            return PaymentRequestResult.SucceedWithPost(
+                account.Name,
+                httpContext,
                 url,
                 new Dictionary<string, string>
                 {
@@ -56,10 +58,6 @@ namespace Parbad.Gateway.ParbadVirtual
                     {"amount", ((long) invoice.Amount).ToString()},
                     {"redirectUrl", invoice.CallbackUrl}
                 });
-
-            var transporter = new DefaultGatewayTransporter(httpContext, transporterDescriptor);
-
-            return PaymentRequestResult.Succeed(transporter, account.Name);
         }
 
         /// <inheritdoc />

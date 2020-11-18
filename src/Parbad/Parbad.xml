@@ -1080,6 +1080,13 @@
             </summary>
             <param name="builder"></param>
         </member>
+        <member name="M:Parbad.SamanGatewayInvoiceBuilderExtensions.EnableSamanMobileGateway(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Boolean)">
+            <summary>
+            Enables or disables the Saman Mobile gateway.
+            </summary>
+            <param name="builder"></param>
+            <param name="enable">If true, the invoice will be sent to Saman Mobile gateway. Otherwise it will be sent to Saman Web gateway.</param>
+        </member>
         <member name="T:Parbad.IGatewayTransporter">
             <summary>
             Defines a mechanism for transporting the client to a gateway.
@@ -1398,6 +1405,13 @@
             </summary>
             <param name="builder"></param>
             <param name="additionalData"></param>
+        </member>
+        <member name="M:Parbad.InvoiceBuilderExtensions.ChangeAdditionalData(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Action{System.Collections.Generic.IDictionary{System.String,System.Object}})">
+            <summary>
+            Changes the additional data.
+            </summary>
+            <param name="builder"></param>
+            <param name="onChange">An action to perform on the additional data.</param>
         </member>
         <member name="M:Parbad.InvoiceBuilderExtensions.AddFormatter(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Action{Parbad.Abstraction.Invoice})">
             <summary>

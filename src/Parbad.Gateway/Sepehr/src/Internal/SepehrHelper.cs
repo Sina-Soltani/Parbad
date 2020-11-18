@@ -69,17 +69,14 @@ namespace Parbad.Gateway.Sepehr.Internal
                 return PaymentRequestResult.Failed(messages.InvalidDataReceivedFromGateway, account.Name);
             }
 
-            var transporterDescriptor = GatewayTransporterDescriptor.CreatePost(
+            return PaymentRequestResult.SucceedWithPost(account.Name,
+                httpContext,
                 PaymentPageUrl,
                 new Dictionary<string, string>
                 {
                     {"TerminalID", account.TerminalId.ToString()},
-                    {"token", result.AccessToken }
+                    {"token", result.AccessToken}
                 });
-
-            var transporter = new DefaultGatewayTransporter(httpContext, transporterDescriptor);
-
-            return PaymentRequestResult.Succeed(transporter, account.Name);
         }
 
         public static async Task<CallbackResultModel> CreateCallbackResultAsync(

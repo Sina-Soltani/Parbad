@@ -83,7 +83,7 @@ namespace Parbad
         /// <param name="key">Key of the data</param>
         /// <param name="value">Value of the data</param>
         public static IInvoiceBuilder AddAdditionalData(this IInvoiceBuilder builder, string key, object value)
-            => AddFormatter(builder, invoice => invoice.AdditionalData.Add(key, value));
+            => ChangeAdditionalData(builder, additionalData => additionalData.Add(key, value));
 
         /// <summary>
         /// Appends the given dictionary to the additional data of the invoice.
@@ -95,11 +95,11 @@ namespace Parbad
             if (builder == null) throw new ArgumentNullException(nameof(builder));
             if (additionalData == null) throw new ArgumentNullException(nameof(additionalData));
 
-            AddFormatter(builder, invoice =>
+            ChangeAdditionalData(builder, invoiceAdditionalData =>
             {
                 foreach (var data in additionalData)
                 {
-                    invoice.AdditionalData.Add(data.Key, data.Value);
+                    invoiceAdditionalData.Add(data.Key, data.Value);
                 }
             });
 
@@ -125,22 +125,34 @@ namespace Parbad
             if (builder == null) throw new ArgumentNullException(nameof(builder));
             if (additionalData == null) throw new ArgumentNullException(nameof(additionalData));
 
-            AddFormatter(builder, invoice =>
+            ChangeAdditionalData(builder, invoiceAdditionalData =>
             {
                 foreach (var data in additionalData)
                 {
-                    if (invoice.AdditionalData.ContainsKey(data.Key))
+                    if (invoiceAdditionalData.ContainsKey(data.Key))
                     {
-                        invoice.AdditionalData[data.Key] = data.Value;
+                        invoiceAdditionalData[data.Key] = data.Value;
                     }
                     else
                     {
-                        invoice.AdditionalData.Add(data.Key, data.Value);
+                        invoiceAdditionalData.Add(data.Key, data.Value);
                     }
                 }
             });
 
             return builder;
+        }
+
+        /// <summary>
+        /// Changes the additional data.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="onChange">An action to perform on the additional data.</param>
+        public static IInvoiceBuilder ChangeAdditionalData(this IInvoiceBuilder builder, Action<IDictionary<string, object>> onChange)
+        {
+            if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+            return AddFormatter(builder, invoice => onChange(invoice.AdditionalData));
         }
 
         /// <summary>

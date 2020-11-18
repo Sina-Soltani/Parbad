@@ -44,11 +44,7 @@ namespace Parbad.Gateway.PayIr.Internal
 
             var paymentPageUrl = $"{PaymentPageUrl}{result.Token}";
 
-            var transporterDescriptor = GatewayTransporterDescriptor.CreateRedirect(paymentPageUrl);
-
-            var transporter = new DefaultGatewayTransporter(httpContext, transporterDescriptor);
-
-            return PaymentRequestResult.Succeed(transporter, account.Name);
+            return PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, paymentPageUrl);
         }
 
         public static async Task<PayIrCallbackResult> CreateCallbackResultAsync(HttpRequest httpRequest, CancellationToken cancellationToken)

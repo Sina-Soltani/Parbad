@@ -69,16 +69,14 @@ namespace Parbad.Gateway.AsanPardakht.Internal
                 return PaymentRequestResult.Failed(message, account.Name);
             }
 
-            var transporterDescriptor = GatewayTransporterDescriptor.CreatePost(
+            return PaymentRequestResult.SucceedWithPost(
+                account.Name,
+                httpContext,
                 PaymentPageUrl,
                 new Dictionary<string, string>
                 {
                     {"RefId", splitedResult[1]}
                 });
-
-            var transporter = new DefaultGatewayTransporter(httpContext, transporterDescriptor);
-
-            return PaymentRequestResult.Succeed(transporter, account.Name);
         }
 
         public static AsanPardakhtCallbackResult CreateCallbackResult(

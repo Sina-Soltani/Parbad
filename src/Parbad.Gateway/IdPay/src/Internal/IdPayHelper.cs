@@ -52,11 +52,7 @@ namespace Parbad.Gateway.IdPay.Internal
 
             var result = JsonConvert.DeserializeObject<IdPayRequestResultModel>(response);
 
-            var transporterDescriptor = GatewayTransporterDescriptor.CreateRedirect(result.Link);
-
-            var transporter = new DefaultGatewayTransporter(httpContext, transporterDescriptor);
-
-            return PaymentRequestResult.Succeed(transporter, account.Name);
+            return PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, result.Link);
         }
 
         public static async Task<IdPayCallbackResult> CreateCallbackResultAsync(

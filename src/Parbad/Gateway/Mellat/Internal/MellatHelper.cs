@@ -64,16 +64,14 @@ namespace Parbad.Gateway.Mellat.Internal
                 return PaymentRequestResult.Failed(message, account.Name);
             }
 
-            var transporterDescriptor = GatewayTransporterDescriptor.CreatePost(
+            return PaymentRequestResult.SucceedWithPost(
+                account.Name,
+                httpContext,
                 PaymentPageUrl,
                 new Dictionary<string, string>
                 {
                     {"RefId", refId}
                 });
-
-            var transporter = new DefaultGatewayTransporter(httpContext, transporterDescriptor);
-
-            return PaymentRequestResult.Succeed(transporter, account.Name);
         }
 
         public static async Task<MellatCallbackResult> CrateCallbackResultAsync(HttpRequest httpRequest,

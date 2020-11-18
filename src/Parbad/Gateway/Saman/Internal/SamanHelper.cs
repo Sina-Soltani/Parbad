@@ -3,15 +3,18 @@
 
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
+using Newtonsoft.Json;
 using Parbad.Abstraction;
 using Parbad.Gateway.Saman.Internal.Models;
 using Parbad.Gateway.Saman.Internal.ResultTranslators;
 using Parbad.Http;
 using Parbad.Internal;
+using Parbad.Net;
 using Parbad.Options;
 using Parbad.Utilities;
 
@@ -19,27 +22,28 @@ namespace Parbad.Gateway.Saman.Internal
 {
     internal static class SamanHelper
     {
-        public const string PaymentPageUrl = "https://sep.shaparak.ir/payment.aspx";
         public const string BaseServiceUrl = "https://sep.shaparak.ir/";
+        public static string PaymentPageUrl => $"{BaseServiceUrl}payment.aspx";
         public const string WebServiceUrl = "/payments/referencepayment.asmx";
+        public const string TokenWebServiceUrl = "/payments/initpayment.asmx";
+        public const string MobilePaymentTokenUrl = "/MobilePG/MobilePayment";
+        public static string MobilePaymentPageUrl => $"{BaseServiceUrl}OnlinePG/OnlinePG";
 
-        public static PaymentRequestResult CreateRequestResult(Invoice invoice, HttpContext httpContext, SamanGatewayAccount account)
+        public static Task<PaymentRequestResult> CreateRequest(
+            Invoice invoice,
+            HttpContext httpContext,
+            SamanGatewayAccount account,
+            HttpClient httpClient,
+            MessagesOptions messagesOptions,
+            CancellationToken cancellationToken)
         {
-            var transporterDescriptor = GatewayTransporterDescriptor.CreatePost(
-                PaymentPageUrl,
-                new Dictionary<string, string>
-                {
-                    {"Amount", invoice.Amount.ToLongString()},
-                    {"MID", account.MerchantId},
-                    {"ResNum", invoice.TrackingNumber.ToString()},
-                    {"RedirectURL", invoice.CallbackUrl}
-                });
+            if (invoice.IsSamanMobileGatewayEnabled())
+            {
+                return CreateMobilePaymentRequest(invoice, httpContext, account, httpClient, messagesOptions, cancellationToken);
+            }
 
-            var transporter = new DefaultGatewayTransporter(httpContext, transporterDescriptor);
-
-            return PaymentRequestResult.Succeed(transporter, account.Name);
+            return CreateWebPaymentRequest(invoice, httpContext, account, httpClient, messagesOptions, cancellationToken);
         }
-
         public static async Task<SamanCallbackResult> CreateCallbackResultAsync(
             HttpRequest httpRequest,
             MessagesOptions messagesOptions,
@@ -150,6 +154,112 @@ namespace Parbad.Gateway.Saman.Internal
                 Status = isSucceed ? PaymentRefundResultStatus.Succeed : PaymentRefundResultStatus.Failed,
                 Message = message
             };
+        }
+
+        private static async Task<PaymentRequestResult> CreateWebPaymentRequest(
+            Invoice invoice,
+            HttpContext httpContext,
+            SamanGatewayAccount account,
+            HttpClient httpClient,
+            MessagesOptions messagesOptions,
+            CancellationToken cancellationToken)
+        {
+            var data = CreateSoapRequest(invoice, account);
+
+            var responseMessage = await httpClient.PostXmlAsync(TokenWebServiceUrl, data, cancellationToken);
+
+            var response = await responseMessage.Content.ReadAsStringAsync();
+
+            var token = XmlHelper.GetNodeValueFromXml(response, "result");
+
+            string message = null;
+            var isSucceed = true;
+
+            if (token.IsNullOrEmpty())
+            {
+                message = $"{messagesOptions.InvalidDataReceivedFromGateway} Token is null or empty.";
+                isSucceed = false;
+            }
+            else if (long.TryParse(token, out var longToken) && longToken < 0)
+            {
+                message = SamanResultTranslator.Translate(longToken, messagesOptions);
+                isSucceed = false;
+            }
+
+            if (!isSucceed)
+            {
+                return PaymentRequestResult.Failed(message, account.Name);
+            }
+
+            return PaymentRequestResult.SucceedWithPost(
+                account.Name,
+                httpContext,
+                PaymentPageUrl,
+                new Dictionary<string, string>
+                {
+                    {"Token", token},
+                    {"RedirectURL", invoice.CallbackUrl}
+                });
+        }
+
+        private static async Task<PaymentRequestResult> CreateMobilePaymentRequest(
+            Invoice invoice,
+            HttpContext httpContext,
+            SamanGatewayAccount account,
+            HttpClient httpClient,
+            MessagesOptions messagesOptions,
+            CancellationToken cancellationToken)
+        {
+            var data = new SamanMobilePaymentTokenRequest
+            {
+                TerminalId = account.MerchantId,
+                ResNum = invoice.TrackingNumber.ToString(),
+                Amount = invoice.Amount,
+                RedirectUrl = invoice.CallbackUrl,
+                Action = "Token"
+            };
+
+            var responseMessage = await httpClient.PostJsonAsync(MobilePaymentTokenUrl, data, cancellationToken);
+
+            var response = await responseMessage.Content.ReadAsStringAsync();
+
+            var result = JsonConvert.DeserializeObject<SamanMobilePaymentTokenResponse>(response);
+
+            if (result == null)
+            {
+                var message =
+                    $"{messagesOptions.InvalidDataReceivedFromGateway} Serialized token response is null.";
+                return PaymentRequestResult.Failed(message, account.Name);
+            }
+
+            if (result.Status == -1)
+            {
+                return PaymentRequestResult.Failed(result.GetError(), account.Name);
+            }
+
+            return PaymentRequestResult.SucceedWithPost(
+                account.Name,
+                httpContext,
+                MobilePaymentPageUrl,
+                new Dictionary<string, string>
+                {
+                    {"Token", result.Token}
+                });
+        }
+
+        private static string CreateSoapRequest(Invoice invoice, SamanGatewayAccount account)
+        {
+            return
+                "<soapenv:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:urn=\"urn:Foo\">" +
+                "<soapenv:Header/>" +
+                "<soapenv:Body>" +
+                "<urn:RequestToken soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">" +
+                $"<TermID xsi:type=\"xsd:string\">{account.MerchantId}</TermID>" +
+                $"<ResNum xsi:type=\"xsd:string\">{invoice.TrackingNumber}</ResNum>" +
+                $"<TotalAmount xsi:type=\"xsd:long\">{(long)invoice.Amount}</TotalAmount>" +
+                "</urn:RequestToken>" +
+                "</soapenv:Body>" +
+                "</soapenv:Envelope>";
         }
     }
 }

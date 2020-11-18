@@ -68,11 +68,7 @@ namespace Parbad.Gateway.Melli.Internal
 
             var paymentPageUrl = $"{PaymentPageUrl}/Index?token={result.Token}";
 
-            var transporterDescriptor = GatewayTransporterDescriptor.CreateRedirect(paymentPageUrl);
-
-            var transporter = new DefaultGatewayTransporter(httpContext, transporterDescriptor);
-
-            return PaymentRequestResult.Succeed(transporter, account.Name);
+            return PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, paymentPageUrl);
         }
 
         public static async Task<MelliCallbackResult> CreateCallbackResultAsync(

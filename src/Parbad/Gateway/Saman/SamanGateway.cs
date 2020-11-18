@@ -21,7 +21,7 @@ namespace Parbad.Gateway.Saman
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
-        private readonly IOptions<MessagesOptions> _messageOptions;
+        private readonly MessagesOptions _messageOptions;
 
         public const string Name = "Saman";
 
@@ -33,7 +33,7 @@ namespace Parbad.Gateway.Saman
         {
             _httpContextAccessor = httpContextAccessor;
             _httpClient = httpClientFactory.CreateClient(this);
-            _messageOptions = messageOptions;
+            _messageOptions = messageOptions.Value;
         }
 
         /// <inheritdoc />
@@ -43,7 +43,17 @@ namespace Parbad.Gateway.Saman
 
             var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
 
-            return SamanHelper.CreateRequestResult(invoice, _httpContextAccessor.HttpContext, account);
+            var httpContext = _httpContextAccessor.HttpContext;
+
+            var result = await SamanHelper.CreateRequest(
+                invoice,
+                httpContext,
+                account,
+                _httpClient,
+                _messageOptions,
+                cancellationToken);
+
+            return result;
         }
 
         /// <inheritdoc />
@@ -53,7 +63,7 @@ namespace Parbad.Gateway.Saman
 
             var callbackResult = await SamanHelper.CreateCallbackResultAsync(
                     _httpContextAccessor.HttpContext.Request,
-                    _messageOptions.Value,
+                    _messageOptions,
                     cancellationToken)
                 .ConfigureAwaitFalse();
 
@@ -72,7 +82,7 @@ namespace Parbad.Gateway.Saman
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
-            return SamanHelper.CreateVerifyResult(response, context, callbackResult, _messageOptions.Value);
+            return SamanHelper.CreateVerifyResult(response, context, callbackResult, _messageOptions);
         }
 
         /// <inheritdoc />
@@ -90,7 +100,7 @@ namespace Parbad.Gateway.Saman
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
-            return SamanHelper.CreateRefundResult(response, _messageOptions.Value);
+            return SamanHelper.CreateRefundResult(response, _messageOptions);
         }
     }
 }

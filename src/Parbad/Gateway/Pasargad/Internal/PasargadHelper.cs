@@ -48,7 +48,9 @@ namespace Parbad.Gateway.Pasargad.Internal
 
             var signedData = SignData(account.PrivateKey, dataToSign);
 
-            var transporterDescriptor = GatewayTransporterDescriptor.CreatePost(
+            var result = PaymentRequestResult.SucceedWithPost(
+                account.Name,
+                httpContext,
                 PaymentPageUrl,
                 new Dictionary<string, string>
                 {
@@ -62,10 +64,6 @@ namespace Parbad.Gateway.Pasargad.Internal
                     {"timeStamp", timeStamp},
                     {"sign", signedData}
                 });
-
-            var transporter = new DefaultGatewayTransporter(httpContext, transporterDescriptor);
-
-            var result = PaymentRequestResult.Succeed(transporter, account.Name);
 
             result.DatabaseAdditionalData.Add("timeStamp", timeStamp);
 
