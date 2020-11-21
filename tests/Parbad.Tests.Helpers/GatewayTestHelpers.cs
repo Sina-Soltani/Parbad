@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace Parbad.Tests.Helpers
 {
-    public static class Helpers
+    public static class GatewayTestHelpers
     {
         public static async Task TestGatewayAsync<TGateway>(
             string gatewayName,
