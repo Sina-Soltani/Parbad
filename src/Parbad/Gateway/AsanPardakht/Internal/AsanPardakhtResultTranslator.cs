@@ -29,7 +29,7 @@ namespace Parbad.Gateway.AsanPardakht.Internal
                 return dictionary[code];
             }
 
-            return options.UnexpectedErrorText;
+            return $"{options.UnexpectedErrorText} Response: {result}";
         }
 
         private static IDictionary<int, string> RequestDictionary => new Dictionary<int, string>

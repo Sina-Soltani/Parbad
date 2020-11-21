@@ -13,6 +13,14 @@ namespace Parbad.Gateway.Saman.Internal.Models
 
         public string TransactionId { get; set; }
 
+        public string SecurePan { get; set; }
+
+        public string Cid { get; set; }
+
+        public string Rrn { get; set; }
+
+        public string TraceNo { get; set; }
+
         public PaymentVerifyResult Result { get; set; }
     }
 }

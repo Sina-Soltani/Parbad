@@ -32,7 +32,7 @@ namespace Parbad.Gateway.IranKish.Internal
                 "-80" => "تراکنش مورد نظر یافت نشد.",
                 "-81" => "خطای داخلی بانک.",
                 "-90" => "تراکنش قبلا تایید شده است.",
-                _ => options.UnexpectedErrorText
+                _ => $"{options.UnexpectedErrorText} Response: {result}"
             };
         }
     }

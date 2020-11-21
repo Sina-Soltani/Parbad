@@ -51,7 +51,6 @@ namespace Parbad.Gateway.AsanPardakht.Internal
 
         public static PaymentRequestResult CreateRequestResult(
             string response,
-            Invoice invoice,
             AsanPardakhtGatewayAccount account,
             HttpContext httpContext,
             MessagesOptions messagesOptions)

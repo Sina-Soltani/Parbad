@@ -34,7 +34,7 @@ namespace Parbad.Gateway.Saman.Internal.ResultTranslators
                 -16 => "خطای داخلی سیستم",
                 -17 => "برگشت زدن جزئی تراکنشی که با کارتی غیر از بانک سامان انجام شده است",
                 -18 => "IP Address پذیرنده نامعتبر است",
-                _ => options.UnexpectedErrorText
+                _ => $"{options.UnexpectedErrorText} Response: {result}"
             };
         }
     }

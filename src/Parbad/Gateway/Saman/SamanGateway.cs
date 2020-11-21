@@ -77,7 +77,7 @@ namespace Parbad.Gateway.Saman
             var data = SamanHelper.CreateVerifyData(callbackResult, account);
 
             var responseMessage = await _httpClient
-                .PostXmlAsync(SamanHelper.WebServiceUrl, data, cancellationToken)
+                .PostXmlAsync(SamanHelper.GetVerificationUrl(context), data, cancellationToken)
                 .ConfigureAwaitFalse();
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();

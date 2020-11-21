@@ -56,7 +56,7 @@ namespace Parbad.Gateway.Melli.Internal.ResultTranslator
                 1101 => MelliRequestResponseCodes.Code1101,
                 1103 => MelliRequestResponseCodes.Code1103,
                 1104 => MelliRequestResponseCodes.Code1104,
-                _ => options.UnexpectedErrorText
+                _ => $"{options.UnexpectedErrorText} Response: {result}"
             };
         }
     }

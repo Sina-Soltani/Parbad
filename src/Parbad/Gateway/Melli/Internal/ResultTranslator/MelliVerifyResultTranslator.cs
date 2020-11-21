@@ -14,7 +14,7 @@ namespace Parbad.Gateway.Melli.Internal.ResultTranslator
                 0 => MelliVerifyResponseCodes.Code0,
                 -1 => MelliVerifyResponseCodes.CodeMinus1,
                 101 => MelliVerifyResponseCodes.Code101,
-                _ => options.UnexpectedErrorText
+                _ => $"{options.UnexpectedErrorText} Response: {result}"
             };
         }
     }

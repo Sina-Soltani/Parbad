@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,18 +17,22 @@ using Parbad.Http;
 using Parbad.Internal;
 using Parbad.Net;
 using Parbad.Options;
+using Parbad.Storage.Abstractions;
 using Parbad.Utilities;
 
 namespace Parbad.Gateway.Saman.Internal
 {
     internal static class SamanHelper
     {
+        public const string MobileGatewayKey = "UseMobileGateway";
+        public const string AdditionalVerificationDataKey = "SamanAdditionalVerificationData";
         public const string BaseServiceUrl = "https://sep.shaparak.ir/";
         public static string PaymentPageUrl => $"{BaseServiceUrl}payment.aspx";
         public const string WebServiceUrl = "/payments/referencepayment.asmx";
         public const string TokenWebServiceUrl = "/payments/initpayment.asmx";
         public const string MobilePaymentTokenUrl = "/MobilePG/MobilePayment";
         public static string MobilePaymentPageUrl => $"{BaseServiceUrl}OnlinePG/OnlinePG";
+        public const string MobileVerifyPaymentUrl = "https://verify.sep.ir/Payments/ReferencePayment.asmx";
 
         public static Task<PaymentRequestResult> CreateRequest(
             Invoice invoice,
@@ -53,6 +58,11 @@ namespace Parbad.Gateway.Saman.Internal
             PaymentVerifyResult verifyResult = null;
             StringValues referenceId = "";
             StringValues transactionId = "";
+
+            var securePan = await httpRequest.TryGetParamAsync("SecurePan", cancellationToken).ConfigureAwaitFalse();
+            var cid = await httpRequest.TryGetParamAsync("CID", cancellationToken).ConfigureAwaitFalse();
+            var traceNo = await httpRequest.TryGetParamAsync("TraceNo", cancellationToken).ConfigureAwaitFalse();
+            var rrn = await httpRequest.TryGetParamAsync("RRN", cancellationToken).ConfigureAwaitFalse();
 
             var state = await httpRequest.TryGetParamAsync("state", cancellationToken).ConfigureAwaitFalse();
 
@@ -83,6 +93,10 @@ namespace Parbad.Gateway.Saman.Internal
                 IsSucceed = isSuccess,
                 ReferenceId = referenceId,
                 TransactionId = transactionId,
+                SecurePan = securePan.Value,
+                Cid = cid.Value,
+                TraceNo = traceNo.Value,
+                Rrn = rrn.Value,
                 Result = verifyResult
             };
         }
@@ -103,11 +117,11 @@ namespace Parbad.Gateway.Saman.Internal
 
         public static PaymentVerifyResult CreateVerifyResult(string webServiceResponse, InvoiceContext context, SamanCallbackResult callbackResult, MessagesOptions messagesOptions)
         {
-            var result = XmlHelper.GetNodeValueFromXml(webServiceResponse, "result");
+            var stringResult = XmlHelper.GetNodeValueFromXml(webServiceResponse, "result");
 
             //  This result is actually: TotalAmount
             //  it must be equals to TotalAmount in database.
-            var numericResult = Convert.ToInt64(result);
+            var numericResult = Convert.ToInt64(stringResult);
 
             var isSuccess = numericResult > 0 && numericResult == (long)context.Payment.Amount;
 
@@ -115,12 +129,22 @@ namespace Parbad.Gateway.Saman.Internal
                 ? messagesOptions.PaymentSucceed
                 : SamanResultTranslator.Translate(numericResult, messagesOptions);
 
-            return new PaymentVerifyResult
+            var result = new PaymentVerifyResult
             {
                 Status = isSuccess ? PaymentVerifyResultStatus.Succeed : PaymentVerifyResultStatus.Failed,
                 TransactionCode = callbackResult.TransactionId,
                 Message = message
             };
+
+            result.AdditionalData.Add(AdditionalVerificationDataKey, new SamanAdditionalVerificationData
+            {
+                Cid = callbackResult.Cid,
+                TraceNo = callbackResult.TraceNo,
+                SecurePan = callbackResult.SecurePan,
+                Rrn = callbackResult.Rrn
+            });
+
+            return result;
         }
 
         public static string CreateRefundData(InvoiceContext context, Money amount, SamanGatewayAccount account)
@@ -223,28 +247,31 @@ namespace Parbad.Gateway.Saman.Internal
 
             var response = await responseMessage.Content.ReadAsStringAsync();
 
-            var result = JsonConvert.DeserializeObject<SamanMobilePaymentTokenResponse>(response);
+            var tokenResponse = JsonConvert.DeserializeObject<SamanMobilePaymentTokenResponse>(response);
 
-            if (result == null)
+            if (tokenResponse == null)
             {
-                var message =
-                    $"{messagesOptions.InvalidDataReceivedFromGateway} Serialized token response is null.";
+                var message = $"{messagesOptions.InvalidDataReceivedFromGateway} Serialized token response is null.";
                 return PaymentRequestResult.Failed(message, account.Name);
             }
 
-            if (result.Status == -1)
+            if (tokenResponse.Status == -1)
             {
-                return PaymentRequestResult.Failed(result.GetError(), account.Name);
+                return PaymentRequestResult.Failed(tokenResponse.GetError(), account.Name);
             }
 
-            return PaymentRequestResult.SucceedWithPost(
+            var result = PaymentRequestResult.SucceedWithPost(
                 account.Name,
                 httpContext,
                 MobilePaymentPageUrl,
                 new Dictionary<string, string>
                 {
-                    {"Token", result.Token}
+                    {"Token", tokenResponse.Token}
                 });
+
+            result.DatabaseAdditionalData.Add(MobileGatewayKey, true.ToString());
+
+            return result;
         }
 
         private static string CreateSoapRequest(Invoice invoice, SamanGatewayAccount account)
@@ -260,6 +287,22 @@ namespace Parbad.Gateway.Saman.Internal
                 "</urn:RequestToken>" +
                 "</soapenv:Body>" +
                 "</soapenv:Envelope>";
+        }
+
+        public static string GetVerificationUrl(InvoiceContext invoiceContext)
+        {
+            var record = invoiceContext
+                .Transactions
+                .SingleOrDefault(transaction => transaction.Type == TransactionType.Request);
+
+            if (record == null || record.AdditionalData.IsNullOrEmpty()) return WebServiceUrl;
+
+            if (AdditionalDataConverter.ToDictionary(record).TryGetValue(MobileGatewayKey, out var isMobileGatewayEnabled) && bool.Parse(isMobileGatewayEnabled))
+            {
+                return MobileVerifyPaymentUrl;
+            }
+
+            return WebServiceUrl;
         }
     }
 }

@@ -8,7 +8,7 @@ namespace Parbad.Gateway.ZarinPal.Internal
 {
     internal static class ZarinPalStatusTranslator
     {
-        public static string Translate(string status, MessagesOptions messagesOptions)
+        public static string Translate(string status, MessagesOptions options)
         {
             if (status == null) throw new ArgumentNullException(nameof(status));
 
@@ -35,7 +35,7 @@ namespace Parbad.Gateway.ZarinPal.Internal
                 -54 => "درخواست مورد نظر آرشيو شده است.",
                 100 => "عمليات با موفقيت انجام گرديده است.",
                 101 => "عمليات پرداخت موفق بوده و قبلا تراكنش انجام شده است.",
-                _ => messagesOptions.UnexpectedErrorText
+                _ => $"{options.UnexpectedErrorText} Response: {status}"
             };
         }
     }

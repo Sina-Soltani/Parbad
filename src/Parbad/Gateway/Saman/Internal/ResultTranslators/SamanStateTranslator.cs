@@ -29,7 +29,7 @@ namespace Parbad.Gateway.Saman.Internal.ResultTranslators
                 "را ExpDate و یا فیلد CVV خریدار یا فیلد 2 اشتباه زده است. (یا اصلا وارد نکرده است)",
                 "No Sufficient Funds" => "موجودي به اندازي کافي در حساب وجود ندارد.",
                 "Issuer Down Slm" => "سیستم کارت بانک صادر کننده در وضعیت عملیاتي نیست.",
-                _ => options.UnexpectedErrorText
+                _ => $"{options.UnexpectedErrorText} Response: {result}"
             };
         }
     }

@@ -7,7 +7,7 @@ namespace Parbad.Gateway.IdPay.Internal
 {
     internal static class IdPayResultTranslator
     {
-        public static string TranslateStatus(string status, MessagesOptions messagesOptions)
+        public static string TranslateStatus(string status, MessagesOptions options)
         {
             if (!int.TryParse(status, out var integerStatus))
             {
@@ -26,7 +26,7 @@ namespace Parbad.Gateway.IdPay.Internal
                 100 => "پرداخت تایید شده است",
                 101 => "پرداخت قبلا تایید شده است",
                 200 => "به دریافت کننده واریز شد",
-                _ => messagesOptions.UnexpectedErrorText
+                _ => $"{options.UnexpectedErrorText} Response: {status}"
             };
         }
     }

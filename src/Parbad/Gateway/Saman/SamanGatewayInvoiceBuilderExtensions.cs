@@ -1,14 +1,13 @@
 ﻿using System;
 using Parbad.Abstraction;
 using Parbad.Gateway.Saman;
+using Parbad.Gateway.Saman.Internal;
 using Parbad.InvoiceBuilder;
 
 namespace Parbad
 {
     public static class SamanGatewayInvoiceBuilderExtensions
     {
-        private const string MobileGatewayKey = "UseMobileGateway";
-
         /// <summary>
         /// The invoice will be sent to Saman gateway.
         /// </summary>
@@ -29,7 +28,7 @@ namespace Parbad
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            builder.AddOrUpdateAdditionalData(MobileGatewayKey, enable);
+            builder.AddOrUpdateAdditionalData(SamanHelper.MobileGatewayKey, enable);
 
             return builder;
         }
@@ -38,9 +37,8 @@ namespace Parbad
         {
             if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-            return (bool)(invoice.AdditionalData.ContainsKey(MobileGatewayKey)
-                ? invoice.AdditionalData[MobileGatewayKey]
-                : false);
+            return invoice.AdditionalData.ContainsKey(SamanHelper.MobileGatewayKey) &&
+                   (bool)invoice.AdditionalData[SamanHelper.MobileGatewayKey];
         }
     }
 }
