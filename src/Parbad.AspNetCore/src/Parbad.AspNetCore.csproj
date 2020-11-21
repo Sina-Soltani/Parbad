@@ -41,13 +41,13 @@ For more information see: https://www.nuget.org/packages/Parbad/</Description>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Parbad\Parbad.csproj" />
+    <ProjectReference Include="..\..\Parbad\src\Parbad.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="icon.png" pack="true" Visible="false" PackagePath="" />
     <None Include="readme.txt" pack="true" PackagePath="." />
-    <None Include="Parbad.AspNetCore.xml" pack="true" Visible="false" PackagePath=""/>
+    <None Include="Parbad.AspNetCore.xml" pack="true" Visible="false" PackagePath="" />
   </ItemGroup>
 
 </Project>

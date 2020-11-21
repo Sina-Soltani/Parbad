@@ -42,7 +42,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Parbad\Parbad.csproj" />
+    <ProjectReference Include="..\..\..\Parbad\src\Parbad.csproj" />
   </ItemGroup>
 
   <ItemGroup>

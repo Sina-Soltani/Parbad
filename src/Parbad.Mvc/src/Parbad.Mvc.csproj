@@ -2,10 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>net462</TargetFramework>
-    <VersionPrefix>1.1.0</VersionPrefix>
+    <VersionPrefix>2.1.0</VersionPrefix>
     <LangVersion>9</LangVersion>
     <Authors>Sina Soltani</Authors>
-    <Description>Owin integration for Parbad project.
+    <Description>ASP.NET MVC 4 and 5 integration for Parbad project.
 
 For more information see: https://www.nuget.org/packages/Parbad/</Description>
     <Copyright>Copyright © Sina Soltani 2016</Copyright>
@@ -15,10 +15,12 @@ For more information see: https://www.nuget.org/packages/Parbad/</Description>
     <RepositoryUrl>https://github.com/Sina-Soltani/Parbad</RepositoryUrl>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <PackageTags>parbad owin webforms Payment Gateway Bank Iran Shetab IranKish Mellat Melli Sadad Parsian Pasargad Saman Asan-Pardakht پرداخت درگاه بانک ایران شتاب ایران-کیش ملت ملی سداد پارسیان پاسارگاد سامان آسان-پرداخت</PackageTags>
+    <PackageId>Parbad.Mvc5</PackageId>
+    <Product>Parbad.Mvc5</Product>
+    <PackageTags>parbad mvc Payment Gateway Bank Iran Shetab IranKish Mellat Melli Sadad Parsian Pasargad Saman Asan-Pardakht پرداخت درگاه بانک ایران شتاب ایران-کیش ملت ملی سداد پارسیان پاسارگاد سامان آسان-پرداخت</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
-    <PackageReleaseNotes>Target Framework is upgraded to 4.6.2.</PackageReleaseNotes>
+    <PackageReleaseNotes>Target Framework is upgraded to 4.6.2</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -26,19 +28,19 @@ For more information see: https://www.nuget.org/packages/Parbad/</Description>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>Parbad.Owin.xml</DocumentationFile>
+    <DocumentationFile>Parbad.Mvc.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>Parbad.Owin.xml</DocumentationFile>
+    <DocumentationFile>Parbad.Mvc.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Owin" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="4.0.1" />
+    <PackageReference Include="Microsoft.AspNet.Mvc" Version="4.0.20505" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Parbad\Parbad.csproj" />
+    <ProjectReference Include="..\..\Parbad.Owin\src\Parbad.Owin.csproj" />
+    <ProjectReference Include="..\..\Parbad\src\Parbad.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -47,7 +49,8 @@ For more information see: https://www.nuget.org/packages/Parbad/</Description>
 
   <ItemGroup>
     <None Include="icon.png" pack="true" Visible="false" PackagePath="" />
-    <None Include="Parbad.Owin.xml" pack="true" Visible="false" PackagePath=""/>
+    <None Include="readme.txt" pack="true" PackagePath="." />
+    <None Include="Parbad.Mvc.xml" pack="true" Visible="false" PackagePath="" />
   </ItemGroup>
 
 </Project>
