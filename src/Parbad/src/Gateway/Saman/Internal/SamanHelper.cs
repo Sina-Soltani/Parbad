@@ -188,7 +188,7 @@ namespace Parbad.Gateway.Saman.Internal
             MessagesOptions messagesOptions,
             CancellationToken cancellationToken)
         {
-            var data = CreateSoapRequest(invoice, account);
+            var data = CreateTokenRequest(invoice, account);
 
             var responseMessage = await httpClient.PostXmlAsync(TokenWebServiceUrl, data, cancellationToken);
 
@@ -274,7 +274,7 @@ namespace Parbad.Gateway.Saman.Internal
             return result;
         }
 
-        private static string CreateSoapRequest(Invoice invoice, SamanGatewayAccount account)
+        private static string CreateTokenRequest(Invoice invoice, SamanGatewayAccount account)
         {
             return
                 "<soapenv:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:urn=\"urn:Foo\">" +

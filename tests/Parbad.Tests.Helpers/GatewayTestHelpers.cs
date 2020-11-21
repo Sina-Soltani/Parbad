@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 using Moq;
@@ -15,16 +14,17 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Parbad.InvoiceBuilder;
 
 namespace Parbad.Tests.Helpers
 {
     public static class GatewayTestHelpers
     {
         public static async Task TestGatewayAsync<TGateway>(
-            string gatewayName,
-            Func<IGatewayBuilder, IGatewayConfigurationBuilder<TGateway>> configureGateways,
             Action<MockHttpMessageHandler> configureHttpClient,
             Action<HttpContext> configureHttpContext,
+            Func<IGatewayBuilder, IGatewayConfigurationBuilder<TGateway>> configureGateways,
+            Action<IInvoiceBuilder> configureInvoice,
             Action<IPaymentRequestResult> onRequestResult,
             Action<IPaymentFetchResult> onFetchResult,
             Action<IPaymentVerifyResult> onVerifyResult,
@@ -53,8 +53,9 @@ namespace Parbad.Tests.Helpers
 
             var onlinePayment = serviceProvider.GetRequiredService<IOnlinePayment>();
 
-            var requestResult = await onlinePayment.RequestAsync(gatewayName, 1, 1000, "http://www.mysite.com");
+            var requestResult = await onlinePayment.RequestAsync(configureInvoice);
 
+            LogWhenResultIsNotSucceed(requestResult);
             onRequestResult(requestResult);
 
             var storageManager = serviceProvider.GetRequiredService<IStorageManager>();
@@ -66,20 +67,24 @@ namespace Parbad.Tests.Helpers
                 .ToDictionary(_ => _.Key, _ => _.Value);
 
             queries.Add("paymentToken", payment.Token);
-            httpContext.Request.Query = new QueryCollection(queries);
+
+            httpContext.Request.Query = new TestableQueryCollection(queries);
 
             var invoice = await onlinePayment.FetchAsync();
 
+            LogWhenResultIsNotSucceed(invoice);
             onFetchResult(invoice);
 
             var verificationResult = await onlinePayment.VerifyAsync(invoice);
 
+            LogWhenResultIsNotSucceed(verificationResult);
             onVerifyResult(verificationResult);
 
             if (onRefundResult != null)
             {
                 var refundResult = await onlinePayment.RefundCompletelyAsync(verificationResult);
 
+                LogWhenResultIsNotSucceed(refundResult);
                 onRefundResult?.Invoke(refundResult);
             }
         }
@@ -92,12 +97,12 @@ namespace Parbad.Tests.Helpers
 
             if (queries != null)
             {
-                httpContext.Request.Query = new QueryCollection(queries);
+                //httpContext.Request.Query = new QueryCollection(queries);
             }
 
             if (form != null)
             {
-                httpContext.Request.Form = new FormCollection(form);
+                //httpContext.Request.Form = new FormCollection(form);
             }
 
             var httpContextAccessorMock = new Mock<IHttpContextAccessor>();
@@ -163,6 +168,14 @@ namespace Parbad.Tests.Helpers
                 .ReturnsAsync(() => accountCollectionMock.Object);
 
             return providerMock.Object;
+        }
+
+        public static void LogWhenResultIsNotSucceed(IPaymentResult result)
+        {
+            if (result != null && !result.IsSucceed)
+            {
+                Console.WriteLine($"Result message: {result.Message}");
+            }
         }
     }
 }

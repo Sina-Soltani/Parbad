@@ -27,6 +27,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parbad.Sample.AspNetCore", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{6BB6AFB4-7951-4435-8C10-95AF86B200F8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parbad.Tests.Helpers", "tests\Parbad.Tests.Helpers\Parbad.Tests.Helpers.csproj", "{0734FA60-C72F-4B48-90EB-EDA83D8394D2}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{571BD034-8370-432B-9B18-4C6FA697121C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Parbad", "Parbad", "{798D045E-BA67-4589-B7A2-5FD7B9FD76E8}"
@@ -78,8 +80,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "YekPay", "YekPay", "{2A049243-9D42-4B34-B6B5-1BB11C65D2B6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parbad.Gateway.YekPay", "src\Parbad.Gateway\YekPay\src\Parbad.Gateway.YekPay.csproj", "{9AAFC4B2-678C-4C80-9F1E-8D97C029E598}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parbad.Tests.Helpers", "tests\Parbad.Tests.Helpers\Parbad.Tests.Helpers.csproj", "{0734FA60-C72F-4B48-90EB-EDA83D8394D2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
