@@ -20,11 +20,11 @@ namespace Parbad
         }
 
         /// <summary>
-        /// Enables or disables the Saman Mobile gateway.
+        /// Enables or disables Saman Mobile gateway.
         /// </summary>
         /// <param name="builder"></param>
         /// <param name="enable">If true, the invoice will be sent to Saman Mobile gateway. Otherwise it will be sent to Saman Web gateway.</param>
-        public static IInvoiceBuilder EnableSamanMobileGateway(this IInvoiceBuilder builder, bool enable)
+        public static IInvoiceBuilder EnableSamanMobileGateway(this IInvoiceBuilder builder, bool enable = true)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 

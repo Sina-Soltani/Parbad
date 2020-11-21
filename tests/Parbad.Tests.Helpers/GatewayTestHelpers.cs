@@ -15,6 +15,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Parbad.InvoiceBuilder;
+using Parbad.PaymentTokenProviders;
 
 namespace Parbad.Tests.Helpers
 {
@@ -60,13 +61,13 @@ namespace Parbad.Tests.Helpers
 
             var storageManager = serviceProvider.GetRequiredService<IStorageManager>();
 
-            var payment = await storageManager.GetPaymentByTrackingNumberAsync(1);
+            var payment = await storageManager.GetPaymentByTrackingNumberAsync(requestResult.TrackingNumber);
 
             var queries = httpContext.Request
                 .Query
                 .ToDictionary(_ => _.Key, _ => _.Value);
 
-            queries.Add("paymentToken", payment.Token);
+            queries.Add(QueryStringPaymentTokenOptions.DefaultQueryName, payment.Token);
 
             httpContext.Request.Query = new TestableQueryCollection(queries);
 

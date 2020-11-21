@@ -10,10 +10,12 @@ namespace Parbad.Abstraction
     /// </summary>
     public abstract class GatewayAccount
     {
+        public static readonly string DefaultName = "Default";
+
         /// <summary>
         /// Gets or sets the name of this account. The default value is "Default".
         /// <para>Note: Make sure that accounts have different names. Otherwise a <see cref="DuplicateAccountException"/> will throw.</para>
         /// </summary>
-        public string Name { get; set; } = "Default";
+        public string Name { get; set; } = DefaultName;
     }
 }
