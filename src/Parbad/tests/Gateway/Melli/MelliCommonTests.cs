@@ -1,26 +1,32 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Parbad.Gateway.Melli;
 using Parbad.Gateway.Melli.Internal;
 using Parbad.Internal;
 using Parbad.InvoiceBuilder;
+using System;
 
 namespace Parbad.Tests.Gateway.Melli
 {
     [TestClass]
     public class MelliCommonTests
     {
-        [TestMethod]
-        public void Invoice_Is_Valid()
+        private IInvoiceBuilder _invoiceBuilder;
+
+        [TestInitialize]
+        public void Initialize()
         {
             var mockServiceProvider = new Mock<IServiceProvider>();
 
-            IInvoiceBuilder invoiceBuilder = new DefaultInvoiceBuilder(mockServiceProvider.Object);
+            _invoiceBuilder = new DefaultInvoiceBuilder(mockServiceProvider.Object);
+        }
 
-            invoiceBuilder.UseMelli();
+        [TestMethod]
+        public void Invoice_Must_Have_Correct_GatewayName()
+        {
+            _invoiceBuilder.UseMelli();
 
-            var invoice = invoiceBuilder.BuildAsync().GetAwaiter().GetResult();
+            var invoice = _invoiceBuilder.BuildAsync().GetAwaiter().GetResult();
 
             Assert.IsNotNull(invoice);
             Assert.IsNotNull(invoice.GatewayName);
