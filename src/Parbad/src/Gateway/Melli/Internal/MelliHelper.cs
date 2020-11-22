@@ -144,7 +144,7 @@ namespace Parbad.Gateway.Melli.Internal
             };
         }
 
-        private static string SignRequestData(string terminalId, string terminalKey, long orderId, long amount)
+        internal static string SignRequestData(string terminalId, string terminalKey, long orderId, long amount)
         {
             try
             {
@@ -178,7 +178,7 @@ namespace Parbad.Gateway.Melli.Internal
             };
         }
 
-        private static string SignVerifyData(string terminalKey, string token)
+        internal static string SignVerifyData(string terminalKey, string token)
         {
             try
             {

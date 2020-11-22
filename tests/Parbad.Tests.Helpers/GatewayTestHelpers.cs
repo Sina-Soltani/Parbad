@@ -22,10 +22,10 @@ namespace Parbad.Tests.Helpers
     public static class GatewayTestHelpers
     {
         public static async Task TestGatewayAsync<TGateway>(
-            Action<MockHttpMessageHandler> configureHttpClient,
-            Action<HttpContext> configureHttpContext,
             Func<IGatewayBuilder, IGatewayConfigurationBuilder<TGateway>> configureGateways,
             Action<IInvoiceBuilder> configureInvoice,
+            Action<MockHttpMessageHandler> configureHttpClient,
+            Action<HttpContext> configureHttpContext,
             Action<IPaymentRequestResult> onRequestResult,
             Action<IPaymentFetchResult> onFetchResult,
             Action<IPaymentVerifyResult> onVerifyResult,

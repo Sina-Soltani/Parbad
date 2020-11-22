@@ -24,7 +24,7 @@ namespace Parbad.Internal
         /// </summary>
         public DefaultInvoiceBuilder(IServiceProvider services)
         {
-            _services = services;
+            _services = services ?? throw new ArgumentNullException(nameof(services));
             _formatters = new List<IInvoiceFormatter>();
             _formatterTypes = new List<Type>();
         }

@@ -40,6 +40,27 @@ namespace Parbad.Tests.Gateway.Saman
             const string expectedTransactionCode = "test";
 
             await GatewayTestHelpers.TestGatewayAsync(
+                gateways =>
+                {
+                    return gateways
+                        .AddSaman()
+                        .WithAccounts(accounts =>
+                        {
+                            accounts.AddInMemory(account =>
+                            {
+                                account.MerchantId = expectedMerchantId;
+                                account.Password = "test";
+                            });
+                        });
+                },
+                invoice =>
+                {
+                    invoice
+                        .SetTrackingNumber(expectedTrackingNumber)
+                        .SetAmount(expectedAmount)
+                        .SetCallbackUrl(expectedCallbackUrl)
+                        .UseSaman();
+                },
                     handler =>
                     {
                         handler
@@ -61,27 +82,6 @@ namespace Parbad.Tests.Gateway.Saman
                         {"ResNum", expectedTransactionCode},
                         {"RefNum", "test"}
                         });
-                    },
-                    gateways =>
-                    {
-                        return gateways
-                            .AddSaman()
-                            .WithAccounts(accounts =>
-                            {
-                                accounts.AddInMemory(account =>
-                                {
-                                    account.MerchantId = expectedMerchantId;
-                                    account.Password = "test";
-                                });
-                            });
-                    },
-                    invoice =>
-                    {
-                        invoice
-                            .SetTrackingNumber(expectedTrackingNumber)
-                            .SetAmount(expectedAmount)
-                            .SetCallbackUrl(expectedCallbackUrl)
-                            .UseSaman();
                     },
                     result =>
                     {
@@ -158,6 +158,28 @@ namespace Parbad.Tests.Gateway.Saman
             const string expectedTransactionCode = "test";
 
             await GatewayTestHelpers.TestGatewayAsync(
+                gateways =>
+                {
+                    return gateways
+                        .AddSaman()
+                        .WithAccounts(accounts =>
+                        {
+                            accounts.AddInMemory(account =>
+                            {
+                                account.MerchantId = expectedMerchantId;
+                                account.Password = "test";
+                            });
+                        });
+                },
+                invoice =>
+                {
+                    invoice
+                        .SetTrackingNumber(expectedTrackingNumber)
+                        .SetAmount(expectedAmount)
+                        .SetCallbackUrl(expectedCallbackUrl)
+                        .EnableSamanMobileGateway()
+                        .UseSaman();
+                },
                     handler =>
                     {
                         handler
@@ -190,28 +212,6 @@ namespace Parbad.Tests.Gateway.Saman
                         {"ResNum", expectedTransactionCode},
                         {"RefNum", "test"}
                         });
-                    },
-                    gateways =>
-                    {
-                        return gateways
-                            .AddSaman()
-                            .WithAccounts(accounts =>
-                            {
-                                accounts.AddInMemory(account =>
-                                {
-                                    account.MerchantId = expectedMerchantId;
-                                    account.Password = "test";
-                                });
-                            });
-                    },
-                    invoice =>
-                    {
-                        invoice
-                            .SetTrackingNumber(expectedTrackingNumber)
-                            .SetAmount(expectedAmount)
-                            .SetCallbackUrl(expectedCallbackUrl)
-                            .EnableSamanMobileGateway()
-                            .UseSaman();
                     },
                     result =>
                     {
