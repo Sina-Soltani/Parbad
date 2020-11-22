@@ -11,7 +11,7 @@ using Parbad.GatewayBuilders;
 
 namespace Parbad.Internal
 {
-    internal class GatewayAccountCollection<TAccount> : IGatewayAccountCollection<TAccount>
+    public class GatewayAccountCollection<TAccount> : IGatewayAccountCollection<TAccount>
         where TAccount : GatewayAccount
     {
         private readonly ICollection<TAccount> _accounts;

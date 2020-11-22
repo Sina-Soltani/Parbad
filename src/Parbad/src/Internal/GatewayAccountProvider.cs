@@ -8,7 +8,7 @@ using Parbad.GatewayBuilders;
 
 namespace Parbad.Internal
 {
-    internal class GatewayAccountProvider<TAccount> : IGatewayAccountProvider<TAccount> where TAccount : GatewayAccount
+    public class GatewayAccountProvider<TAccount> : IGatewayAccountProvider<TAccount> where TAccount : GatewayAccount
     {
         private readonly IEnumerable<IGatewayAccountSource<TAccount>> _sources;
 
@@ -17,7 +17,7 @@ namespace Parbad.Internal
             _sources = sources;
         }
 
-        public async Task<IGatewayAccountCollection<TAccount>> LoadAccountsAsync()
+        public virtual async Task<IGatewayAccountCollection<TAccount>> LoadAccountsAsync()
         {
             var accounts = new GatewayAccountCollection<TAccount>();
 
