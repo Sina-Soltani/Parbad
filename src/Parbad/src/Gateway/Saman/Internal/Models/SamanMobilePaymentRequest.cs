@@ -12,6 +12,6 @@
 
         public long Amount { get; set; }
 
-        public long CellNumber { get; set; }
+        public long? CellNumber { get; set; }
     }
 }

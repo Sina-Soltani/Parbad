@@ -9,8 +9,11 @@ using RichardSzalay.MockHttp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Parbad.Abstraction;
+using Parbad.Gateway.Saman.Internal.Models;
 using Parbad.PaymentTokenProviders;
 
 namespace Parbad.Tests.Gateway.Saman
@@ -18,8 +21,7 @@ namespace Parbad.Tests.Gateway.Saman
     [TestClass]
     public class SamanGatewayTests
     {
-        public const string MobileGatewayKey = "UseMobileGateway";
-        public const string AdditionalVerificationDataKey = "SamanAdditionalVerificationData";
+        public const string FormRedirectUrlKey = "RedirectURL";
         public const string BaseServiceUrl = "https://sep.shaparak.ir/";
         public static string PaymentPageUrl => $"{BaseServiceUrl}payment.aspx";
         public const string WebServiceUrl = "/payments/referencepayment.asmx";
@@ -27,7 +29,6 @@ namespace Parbad.Tests.Gateway.Saman
         public const string MobilePaymentTokenUrl = "/MobilePG/MobilePayment";
         public static string MobilePaymentPageUrl => $"{BaseServiceUrl}OnlinePG/OnlinePG";
         public const string MobileVerifyPaymentUrl = "https://verify.sep.ir/Payments/ReferencePayment.asmx";
-        public const string FormRedirectUrlKey = "RedirectURL";
 
         [TestMethod]
         public async Task Saman_WebGateway_Works()
@@ -45,7 +46,7 @@ namespace Parbad.Tests.Gateway.Saman
                             .Expect(TokenWebServiceUrl)
                             .WithPartialContent("RequestToken")
                             .WithPartialContent(expectedMerchantId)
-                            .Respond(MediaTypes.Xml, GetTokenResponse());
+                            .Respond(MediaTypes.Xml, GetWebGatewayTokenResponse());
 
                         handler
                             .Expect(WebServiceUrl)
@@ -161,17 +162,25 @@ namespace Parbad.Tests.Gateway.Saman
                     {
                         handler
                             .Expect(MobilePaymentTokenUrl)
-                            .WithExactFormData(new[]
+                            .WithHttpMethod(HttpMethod.Post)
+                            .WithJsonBody<SamanMobilePaymentTokenRequest>(model =>
                             {
-                                new KeyValuePair<string, string>()
+                                var isModelValid =
+                                    model.Amount == expectedAmount &&
+                                    model.TerminalId == expectedMerchantId &&
+                                    model.ResNum == expectedTrackingNumber.ToString() &&
+                                    model.Action == "Token" &&
+                                    model.RedirectUrl != null &&
+                                    model.RedirectUrl.StartsWith(expectedCallbackUrl);
+
+                                return isModelValid;
                             })
-                            .WithPartialContent(expectedMerchantId)
-                            .Respond(MediaTypes.Json, GetTokenResponse());
+                            .Respond(MediaTypes.Json, GetMobileGatewayTokenResponse());
 
                         handler
                             .Expect(MobileVerifyPaymentUrl)
                             .WithPartialContent("verifyTransaction")
-                            .Respond(MediaTypes.Json, GetVerificationResponse());
+                            .Respond(MediaTypes.Xml, GetVerificationResponse());
                     },
                     context =>
                     {
@@ -258,7 +267,7 @@ namespace Parbad.Tests.Gateway.Saman
                     });
         }
 
-        private static string GetTokenResponse()
+        private static string GetWebGatewayTokenResponse()
         {
             return
                 "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:soapenc=\"http://schemas.xmlsoap.org/soap/encoding/\" xmlns:tns=\"urn:Foo\" xmlns:types=\"urn:Foo\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">" +
@@ -268,6 +277,15 @@ namespace Parbad.Tests.Gateway.Saman
                 "</types:RequestTokenResponse>" +
                 "</soap:Body>" +
                 "</soap:Envelope>";
+        }
+
+        private static string GetMobileGatewayTokenResponse()
+        {
+            return JsonConvert.SerializeObject(new
+            {
+                Status = 1,
+                Token = "test"
+            });
         }
 
         private static string GetVerificationResponse()
