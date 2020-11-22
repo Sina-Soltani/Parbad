@@ -1729,7 +1729,6 @@
             </para>
             </summary>
             <param name="value">The amount of money.</param>
-            <exception cref="T:System.ArgumentOutOfRangeException"></exception>
         </member>
         <member name="M:Parbad.Money.Parse(System.String)">
             <exception cref="T:System.Exception"></exception>

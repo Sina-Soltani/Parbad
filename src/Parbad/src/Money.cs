@@ -29,7 +29,6 @@ namespace Parbad
         /// </para>
         /// </summary>
         /// <param name="value">The amount of money.</param>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
         public Money(decimal value)
         {
             Value = value;
