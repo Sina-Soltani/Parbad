@@ -12,7 +12,9 @@ namespace Parbad.TrackingNumberProviders
         /// </summary>
         public static readonly string ConfigurationKey = "Parbad:AutoTrackingNumber";
 
-        public long MinimumValue { get; set; } = 1000;
+        public static readonly long DefaultMinimumNumber = 1000;
+
+        public long MinimumValue { get; set; } = DefaultMinimumNumber;
 
         public long MaximumValue { get; set; } = long.MaxValue;
     }
