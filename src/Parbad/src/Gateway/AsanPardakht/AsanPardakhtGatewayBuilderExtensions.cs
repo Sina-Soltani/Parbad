@@ -3,9 +3,9 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using Parbad.Gateway.AsanPardakht;
+using Parbad.Gateway.AsanPardakht.Internal;
 using Parbad.GatewayBuilders;
 using System;
-using Parbad.Gateway.AsanPardakht.Internal;
 
 namespace Parbad.Builder
 {
@@ -42,7 +42,7 @@ namespace Parbad.Builder
         }
 
         /// <summary>
-        /// Configures the options for AsanPardakhtGateway.
+        /// Configures the options for AsanPardakht Gateway.
         /// </summary>
         /// <param name="builder"></param>
         /// <param name="configureOptions">Configuration</param>

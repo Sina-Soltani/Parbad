@@ -1,10 +1,6 @@
 // Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
-using System;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Parbad.Abstraction;
@@ -13,6 +9,10 @@ using Parbad.GatewayBuilders;
 using Parbad.Internal;
 using Parbad.Net;
 using Parbad.Options;
+using System;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Parbad.Gateway.Mellat
 {
@@ -21,6 +21,7 @@ namespace Parbad.Gateway.Mellat
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
+        private readonly MellatGatewayOptions _gatewayOptions;
         private readonly IOptions<MessagesOptions> _messagesOptions;
 
         public const string Name = "Mellat";
@@ -29,11 +30,13 @@ namespace Parbad.Gateway.Mellat
             IHttpContextAccessor httpContextAccessor,
             IHttpClientFactory httpClientFactory,
             IGatewayAccountProvider<MellatGatewayAccount> accountProvider,
+            IOptions<MellatGatewayOptions> gatewayOptions,
             IOptions<MessagesOptions> messagesOptions) : base(accountProvider)
         {
             _httpContextAccessor = httpContextAccessor;
             _httpClient = httpClientFactory.CreateClient(this);
             _messagesOptions = messagesOptions;
+            _gatewayOptions = gatewayOptions.Value;
         }
 
         /// <inheritdoc />
@@ -46,12 +49,12 @@ namespace Parbad.Gateway.Mellat
             var data = MellatHelper.CreateRequestData(invoice, account);
 
             var responseMessage = await _httpClient
-                .PostXmlAsync(MellatHelper.GetWebServiceUrl(account.IsTestTerminal), data, cancellationToken)
+                .PostXmlAsync(GetApiUrl(account), data, cancellationToken)
                 .ConfigureAwaitFalse();
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
-            return MellatHelper.CreateRequestResult(response, _httpContextAccessor.HttpContext, _messagesOptions.Value, account);
+            return MellatHelper.CreateRequestResult(response, _httpContextAccessor.HttpContext, _gatewayOptions, _messagesOptions.Value, account);
         }
 
         /// <inheritdoc />
@@ -73,7 +76,7 @@ namespace Parbad.Gateway.Mellat
             var data = MellatHelper.CreateVerifyData(context, account, callbackResult);
 
             var responseMessage = await _httpClient
-                .PostXmlAsync(MellatHelper.GetWebServiceUrl(account.IsTestTerminal), data, cancellationToken)
+                .PostXmlAsync(GetApiUrl(account), data, cancellationToken)
                 .ConfigureAwaitFalse();
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
@@ -88,7 +91,7 @@ namespace Parbad.Gateway.Mellat
             data = MellatHelper.CreateSettleData(context, callbackResult, account);
 
             responseMessage = await _httpClient
-                .PostXmlAsync(MellatHelper.GetWebServiceUrl(account.IsTestTerminal), data, cancellationToken)
+                .PostXmlAsync(GetApiUrl(account), data, cancellationToken)
                 .ConfigureAwaitFalse();
 
             response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
@@ -106,12 +109,19 @@ namespace Parbad.Gateway.Mellat
             var data = MellatHelper.CreateRefundData(context, account);
 
             var responseMessage = await _httpClient
-                .PostXmlAsync(MellatHelper.GetWebServiceUrl(account.IsTestTerminal), data, cancellationToken)
+                .PostXmlAsync(GetApiUrl(account), data, cancellationToken)
                 .ConfigureAwaitFalse();
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
             return MellatHelper.CreateRefundResult(response, _messagesOptions.Value);
+        }
+
+        private string GetApiUrl(MellatGatewayAccount account)
+        {
+            return account.IsTestTerminal
+                ? _gatewayOptions.ApiTestUrl
+                : _gatewayOptions.ApiUrl;
         }
     }
 }

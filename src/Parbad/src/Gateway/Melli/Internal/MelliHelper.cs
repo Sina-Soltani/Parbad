@@ -16,11 +16,6 @@ namespace Parbad.Gateway.Melli.Internal
 {
     internal static class MelliHelper
     {
-        public const string PaymentPageUrl = "https://sadad.shaparak.ir/VPG/Purchase";
-        public const string BaseServiceUrl = "https://sadad.shaparak.ir/";
-        public const string ServiceRequestUrl = "/VPG/api/v0/Request/PaymentRequest";
-        public const string ServiceVerifyUrl = "/VPG/api/v0/Advice/Verify";
-
         private const int SuccessCode = 0;
         private const int DuplicateTrackingNumberCode = 1011;
 
@@ -39,7 +34,12 @@ namespace Parbad.Gateway.Melli.Internal
                 invoice.TrackingNumber);
         }
 
-        public static PaymentRequestResult CreateRequestResult(MelliApiRequestResult result, HttpContext httpContext, MelliGatewayAccount account, MessagesOptions messagesOptions)
+        public static PaymentRequestResult CreateRequestResult(
+            MelliApiRequestResult result,
+            HttpContext httpContext,
+            MelliGatewayAccount account,
+            MelliGatewayOptions gatewayOptions,
+            MessagesOptions messagesOptions)
         {
             if (result == null)
             {
@@ -66,7 +66,7 @@ namespace Parbad.Gateway.Melli.Internal
                 return PaymentRequestResult.Failed(message, account.Name);
             }
 
-            var paymentPageUrl = $"{PaymentPageUrl}/Index?token={result.Token}";
+            var paymentPageUrl = $"{gatewayOptions.PaymentPageUrl}/Index?token={result.Token}";
 
             return PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, paymentPageUrl);
         }

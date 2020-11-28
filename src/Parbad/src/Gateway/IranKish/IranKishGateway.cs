@@ -22,6 +22,7 @@ namespace Parbad.Gateway.IranKish
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
+        private readonly IranKishGatewayOptions _gatewayOptions;
         private readonly IOptions<MessagesOptions> _messageOptions;
 
         public const string Name = "IranKish";
@@ -30,10 +31,12 @@ namespace Parbad.Gateway.IranKish
             IHttpContextAccessor httpContextAccessor,
             IHttpClientFactory httpClientFactory,
             IGatewayAccountProvider<IranKishGatewayAccount> accountProvider,
+            IOptions<IranKishGatewayOptions> gatewayOptions,
             IOptions<MessagesOptions> messageOptions) : base(accountProvider)
         {
             _httpContextAccessor = httpContextAccessor;
             _httpClient = httpClientFactory.CreateClient(this);
+            _gatewayOptions = gatewayOptions.Value;
             _messageOptions = messageOptions;
         }
 
@@ -50,12 +53,12 @@ namespace Parbad.Gateway.IranKish
             _httpClient.DefaultRequestHeaders.Add(IranKishHelper.HttpRequestHeader.Key, IranKishHelper.HttpRequestHeader.Value);
 
             var responseMessage = await _httpClient
-                .PostXmlAsync(IranKishHelper.TokenWebServiceUrl, data, cancellationToken)
+                .PostXmlAsync(_gatewayOptions.ApiTokenUrl, data, cancellationToken)
                 .ConfigureAwaitFalse();
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
-            return IranKishHelper.CreateRequestResult(response, invoice, account, _httpContextAccessor.HttpContext, _messageOptions.Value);
+            return IranKishHelper.CreateRequestResult(response, account, _gatewayOptions, _httpContextAccessor.HttpContext, _messageOptions.Value);
         }
 
         /// <inheritdoc />
@@ -83,7 +86,7 @@ namespace Parbad.Gateway.IranKish
             _httpClient.DefaultRequestHeaders.Add(IranKishHelper.HttpVerifyHeader.Key, IranKishHelper.HttpVerifyHeader.Value);
 
             var responseMessage = await _httpClient
-                .PostXmlAsync(IranKishHelper.VerifyWebServiceUrl, data, cancellationToken)
+                .PostXmlAsync(_gatewayOptions.ApiVerificationUrl, data, cancellationToken)
                 .ConfigureAwaitFalse();
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();

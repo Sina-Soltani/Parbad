@@ -16,11 +16,6 @@ namespace Parbad.Gateway.IranKish.Internal
 {
     internal static class IranKishHelper
     {
-        public const string PaymentPageUrl = "https://ikc.shaparak.ir/TPayment/Payment/index";
-        public const string BaseServiceUrl = "https://ikc.shaparak.ir/";
-        public const string TokenWebServiceUrl = "/TToken/Tokens.svc";
-        public const string VerifyWebServiceUrl = "/TVerify/Verify.svc";
-
         public static KeyValuePair<string, string> HttpRequestHeader => new KeyValuePair<string, string>("SOAPAction", "http://tempuri.org/ITokens/MakeToken");
         public static KeyValuePair<string, string> HttpVerifyHeader => new KeyValuePair<string, string>("SOAPAction", "http://tempuri.org/IVerify/KicccPaymentsVerification");
 
@@ -47,8 +42,8 @@ namespace Parbad.Gateway.IranKish.Internal
 
         public static PaymentRequestResult CreateRequestResult(
             string webServiceResponse,
-            Invoice invoice,
             IranKishGatewayAccount account,
+            IranKishGatewayOptions gatewayOptions,
             HttpContext httpContext,
             MessagesOptions messagesOptions)
         {
@@ -71,7 +66,7 @@ namespace Parbad.Gateway.IranKish.Internal
             return PaymentRequestResult.SucceedWithPost(
                 account.Name,
                 httpContext,
-                PaymentPageUrl,
+                gatewayOptions.PaymentPageUrl,
                 new Dictionary<string, string>
                 {
                     {"merchantid", account.MerchantId},

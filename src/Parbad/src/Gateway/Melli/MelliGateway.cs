@@ -28,6 +28,7 @@ namespace Parbad.Gateway.Melli
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
         private readonly IMelliGatewayCrypto _crypto;
+        private readonly MelliGatewayOptions _gatewayOptions;
         private readonly IOptions<MessagesOptions> _messageOptions;
 
         public const string Name = "Melli";
@@ -39,18 +40,21 @@ namespace Parbad.Gateway.Melli
         /// <param name="httpClientFactory"></param>
         /// <param name="accountProvider"></param>
         /// <param name="crypto"></param>
+        /// <param name="gatewayOptions"></param>
         /// <param name="messageOptions"></param>
         public MelliGateway(
             IHttpContextAccessor httpContextAccessor,
             IHttpClientFactory httpClientFactory,
             IGatewayAccountProvider<MelliGatewayAccount> accountProvider,
             IMelliGatewayCrypto crypto,
+            IOptions<MelliGatewayOptions> gatewayOptions,
             IOptions<MessagesOptions> messageOptions) : base(accountProvider)
         {
             _httpContextAccessor = httpContextAccessor;
             _httpClient = httpClientFactory.CreateClient(this);
             _crypto = crypto;
             _messageOptions = messageOptions;
+            _gatewayOptions = gatewayOptions.Value;
         }
 
         /// <inheritdoc />
@@ -62,9 +66,9 @@ namespace Parbad.Gateway.Melli
 
             var data = MelliHelper.CreateRequestData(invoice, account, _crypto);
 
-            var result = await PostJsonAsync<MelliApiRequestResult>(MelliHelper.ServiceRequestUrl, data, cancellationToken).ConfigureAwaitFalse();
+            var result = await PostJsonAsync<MelliApiRequestResult>(_gatewayOptions.ApiRequestUrl, data, cancellationToken).ConfigureAwaitFalse();
 
-            return MelliHelper.CreateRequestResult(result, _httpContextAccessor.HttpContext, account, _messageOptions.Value);
+            return MelliHelper.CreateRequestResult(result, _httpContextAccessor.HttpContext, account, _gatewayOptions, _messageOptions.Value);
         }
 
         /// <inheritdoc />
@@ -87,7 +91,7 @@ namespace Parbad.Gateway.Melli
                 return data.Result;
             }
 
-            var result = await PostJsonAsync<MelliApiVerifyResult>(MelliHelper.ServiceVerifyUrl, data.JsonDataToVerify, cancellationToken).ConfigureAwaitFalse();
+            var result = await PostJsonAsync<MelliApiVerifyResult>(_gatewayOptions.ApiVerificationUrl, data.JsonDataToVerify, cancellationToken).ConfigureAwaitFalse();
 
             return MelliHelper.CreateVerifyResult(result, _messageOptions.Value);
         }

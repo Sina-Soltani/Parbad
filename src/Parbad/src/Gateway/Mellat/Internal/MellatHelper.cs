@@ -1,11 +1,6 @@
 // Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Parbad.Abstraction;
 using Parbad.Gateway.Mellat.Internal.Models;
@@ -13,6 +8,11 @@ using Parbad.Http;
 using Parbad.Internal;
 using Parbad.Options;
 using Parbad.Utilities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Parbad.Gateway.Mellat.Internal
 {
@@ -24,11 +24,6 @@ namespace Parbad.Gateway.Mellat.Internal
         private const string SettleSuccess = "45";
 
         internal const string CumulativeAccountsKey = "MellatCumulativeAccounts";
-
-        public const string BaseServiceUrl = "https://bpm.shaparak.ir/";
-        public const string WebServiceUrl = "/pgwchannel/services/pgw";
-        public const string PaymentPageUrl = "https://bpm.shaparak.ir/pgwchannel/startpay.mellat";
-        public const string TestWebServiceUrl = "/pgwchannel/services/pgwtest";
 
         public static string CreateRequestData(Invoice invoice, MellatGatewayAccount account)
         {
@@ -43,6 +38,7 @@ namespace Parbad.Gateway.Mellat.Internal
         public static PaymentRequestResult CreateRequestResult(
             string webServiceResponse,
             HttpContext httpContext,
+            MellatGatewayOptions gatewayOptions,
             MessagesOptions messagesOptions,
             GatewayAccount account)
         {
@@ -67,7 +63,7 @@ namespace Parbad.Gateway.Mellat.Internal
             return PaymentRequestResult.SucceedWithPost(
                 account.Name,
                 httpContext,
-                PaymentPageUrl,
+                gatewayOptions.PaymentPageUrl,
                 new Dictionary<string, string>
                 {
                     {"RefId", refId}
@@ -229,13 +225,6 @@ namespace Parbad.Gateway.Mellat.Internal
                 Status = isSuccess ? PaymentRefundResultStatus.Succeed : PaymentRefundResultStatus.Failed,
                 Message = message
             };
-        }
-
-        public static string GetWebServiceUrl(bool isTestTerminal)
-        {
-            return isTestTerminal
-                ? TestWebServiceUrl
-                : WebServiceUrl;
         }
 
         private static string CreateSimpleRequestData(Invoice invoice, MellatGatewayAccount account)
