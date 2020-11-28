@@ -27,6 +27,7 @@ namespace Parbad.Gateway.Melli
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
+        private readonly IMelliGatewayCrypto _crypto;
         private readonly IOptions<MessagesOptions> _messageOptions;
 
         public const string Name = "Melli";
@@ -37,15 +38,18 @@ namespace Parbad.Gateway.Melli
         /// <param name="httpContextAccessor"></param>
         /// <param name="httpClientFactory"></param>
         /// <param name="accountProvider"></param>
+        /// <param name="crypto"></param>
         /// <param name="messageOptions"></param>
         public MelliGateway(
             IHttpContextAccessor httpContextAccessor,
             IHttpClientFactory httpClientFactory,
             IGatewayAccountProvider<MelliGatewayAccount> accountProvider,
+            IMelliGatewayCrypto crypto,
             IOptions<MessagesOptions> messageOptions) : base(accountProvider)
         {
             _httpContextAccessor = httpContextAccessor;
             _httpClient = httpClientFactory.CreateClient(this);
+            _crypto = crypto;
             _messageOptions = messageOptions;
         }
 
@@ -56,7 +60,7 @@ namespace Parbad.Gateway.Melli
 
             var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
 
-            var data = MelliHelper.CreateRequestData(invoice, account);
+            var data = MelliHelper.CreateRequestData(invoice, account, _crypto);
 
             var result = await PostJsonAsync<MelliApiRequestResult>(MelliHelper.ServiceRequestUrl, data, cancellationToken).ConfigureAwaitFalse();
 
@@ -74,6 +78,7 @@ namespace Parbad.Gateway.Melli
                 context,
                 _httpContextAccessor.HttpContext.Request,
                 account,
+                _crypto,
                 _messageOptions.Value,
                 cancellationToken);
 

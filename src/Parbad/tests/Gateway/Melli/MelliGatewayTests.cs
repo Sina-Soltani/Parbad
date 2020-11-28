@@ -18,7 +18,7 @@ namespace Parbad.Tests.Gateway.Melli
     public class MelliGatewayTests
     {
         [TestMethod]
-        public async Task Melli_Works()
+        public async Task Requesting_And_Verifying_Work()
         {
             const long expectedTrackingNumber = 1;
             const long expectedAmount = 1000;
@@ -77,12 +77,11 @@ namespace Parbad.Tests.Gateway.Melli
                 },
                 result =>
                 {
-                    Console.WriteLine(result.Message);
                     Assert.IsNotNull(result);
+                    Assert.IsTrue(result.IsSucceed);
                     Assert.AreEqual(expectedTrackingNumber, result.TrackingNumber);
                     Assert.AreEqual(MelliGateway.Name, result.GatewayName);
                     Assert.AreEqual(GatewayAccount.DefaultName, result.GatewayAccountName);
-                    Assert.IsTrue(result.IsSucceed);
                     Assert.IsNotNull(result.GatewayTransporter);
                     Assert.IsNotNull(result.GatewayTransporter.Descriptor);
                     Assert.AreEqual(GatewayTransporterDescriptor.TransportType.Redirect, result.GatewayTransporter.Descriptor.Type);
@@ -93,28 +92,8 @@ namespace Parbad.Tests.Gateway.Melli
                     Assert.IsTrue(queries.ContainsKey("token"));
                     Assert.AreEqual("test", (string)queries["token"]);
                 },
-                result =>
-                {
-                    Assert.IsNotNull(result);
-                    Assert.AreEqual(expectedTrackingNumber, result.TrackingNumber);
-                    Assert.AreEqual(MelliGateway.Name, result.GatewayName);
-                    Assert.AreEqual(GatewayAccount.DefaultName, result.GatewayAccountName);
-                    Assert.AreEqual(expectedAmount, (long)result.Amount);
-                    Assert.IsTrue(result.IsSucceed);
-                    Assert.IsFalse(result.IsAlreadyVerified);
-                    Assert.AreEqual(PaymentFetchResultStatus.ReadyForVerifying, result.Status);
-                },
-                result =>
-                {
-                    Assert.IsNotNull(result);
-                    Assert.AreEqual(expectedTrackingNumber, result.TrackingNumber);
-                    Assert.AreEqual(MelliGateway.Name, result.GatewayName);
-                    Assert.AreEqual(GatewayAccount.DefaultName, result.GatewayAccountName);
-                    Assert.AreEqual(expectedAmount, (long)result.Amount);
-                    Assert.IsTrue(result.IsSucceed);
-                    Assert.AreEqual(PaymentVerifyResultStatus.Succeed, result.Status);
-                    Assert.IsNotNull(result.TransactionCode);
-                });
+                result => GatewayOnResultHelper.OnFetchResult(result, expectedTrackingNumber, expectedAmount, MelliGateway.Name),
+            result => GatewayOnResultHelper.OnVerifyResult(result, expectedTrackingNumber, expectedAmount, MelliGateway.Name));
         }
     }
 }

@@ -1,11 +1,6 @@
 // Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
-using System;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Parbad.Abstraction;
 using Parbad.Gateway.Melli.Internal.Models;
@@ -13,6 +8,9 @@ using Parbad.Gateway.Melli.Internal.ResultTranslator;
 using Parbad.Http;
 using Parbad.Internal;
 using Parbad.Options;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Parbad.Gateway.Melli.Internal
 {
@@ -26,9 +24,11 @@ namespace Parbad.Gateway.Melli.Internal
         private const int SuccessCode = 0;
         private const int DuplicateTrackingNumberCode = 1011;
 
-        public static object CreateRequestData(Invoice invoice, MelliGatewayAccount account)
+        public static object CreateRequestData(Invoice invoice, MelliGatewayAccount account, IMelliGatewayCrypto crypto)
         {
-            var signedData = SignRequestData(account.TerminalId, account.TerminalKey, invoice.TrackingNumber, invoice.Amount);
+            var data = $"{account.TerminalId};{invoice.TrackingNumber};{(long)invoice.Amount}";
+
+            var signedData = crypto.Encrypt(account.TerminalKey, data);
 
             return CreateRequestObject(
                 account.TerminalId,
@@ -75,6 +75,7 @@ namespace Parbad.Gateway.Melli.Internal
             InvoiceContext context,
             HttpRequest httpRequest,
             MelliGatewayAccount account,
+            IMelliGatewayCrypto crypto,
             MessagesOptions messagesOptions,
             CancellationToken cancellationToken)
         {
@@ -102,7 +103,7 @@ namespace Parbad.Gateway.Melli.Internal
                 };
             }
 
-            var signedData = SignVerifyData(account.TerminalKey, apiToken.Value);
+            var signedData = crypto.Encrypt(account.TerminalKey, apiToken.Value);
 
             var dataToVerify = CreateVerifyObject(apiToken.Value, signedData);
 
@@ -144,26 +145,6 @@ namespace Parbad.Gateway.Melli.Internal
             };
         }
 
-        internal static string SignRequestData(string terminalId, string terminalKey, long orderId, long amount)
-        {
-            try
-            {
-                var dataBytes = Encoding.UTF8.GetBytes($"{terminalId};{orderId};{amount}");
-
-                var symmetric = SymmetricAlgorithm.Create("TripleDes");
-                symmetric.Mode = CipherMode.ECB;
-                symmetric.Padding = PaddingMode.PKCS7;
-
-                var encryptor = symmetric.CreateEncryptor(Convert.FromBase64String(terminalKey), new byte[8]);
-
-                return Convert.ToBase64String(encryptor.TransformFinalBlock(dataBytes, 0, dataBytes.Length));
-            }
-            catch (Exception exception)
-            {
-                throw new MelliGatewayDataSigningException(exception);
-            }
-        }
-
         private static object CreateRequestObject(string terminalId, string merchantId, long amount, string signedData, string callbackUrl, long orderId)
         {
             return new
@@ -176,26 +157,6 @@ namespace Parbad.Gateway.Melli.Internal
                 LocalDateTime = DateTime.Now,
                 OrderId = orderId.ToString()
             };
-        }
-
-        internal static string SignVerifyData(string terminalKey, string token)
-        {
-            try
-            {
-                var dataBytes = Encoding.UTF8.GetBytes(token);
-
-                var symmetric = SymmetricAlgorithm.Create("TripleDes");
-                symmetric.Mode = CipherMode.ECB;
-                symmetric.Padding = PaddingMode.PKCS7;
-
-                var encryptor = symmetric.CreateEncryptor(Convert.FromBase64String(terminalKey), new byte[8]);
-
-                return Convert.ToBase64String(encryptor.TransformFinalBlock(dataBytes, 0, dataBytes.Length));
-            }
-            catch (Exception exception)
-            {
-                throw new MelliGatewayDataSigningException(exception);
-            }
         }
 
         private static object CreateVerifyObject(string apiToken, string signedData)

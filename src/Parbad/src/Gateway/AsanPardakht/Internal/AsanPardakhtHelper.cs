@@ -1,26 +1,22 @@
 ﻿// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Security.Cryptography;
-using System.Text;
 using Microsoft.AspNetCore.Http;
 using Parbad.Abstraction;
 using Parbad.Gateway.AsanPardakht.Internal.Models;
 using Parbad.Internal;
 using Parbad.Options;
 using Parbad.Utilities;
+using System.Collections.Generic;
 
 namespace Parbad.Gateway.AsanPardakht.Internal
 {
     internal static class AsanPardakhtHelper
     {
-        public const string PaymentPageUrl = "https://asan.shaparak.ir/";
-        public const string BaseServiceUrl = "https://services.asanpardakht.net/paygate/merchantservices.asmx";
+        //public const string PaymentPageUrl = "https://asan.shaparak.ir/";
+        //public const string BaseServiceUrl = "https://services.asanpardakht.net/paygate/merchantservices.asmx";
 
-        public static string CreateRequestData(Invoice invoice, AsanPardakhtGatewayAccount account)
+        public static string CreateRequestData(Invoice invoice, AsanPardakhtGatewayAccount account, IAsanPardakhtCrypto crypto)
         {
             var requestToEncrypt = string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8}",
                 1,
@@ -34,7 +30,7 @@ namespace Parbad.Gateway.AsanPardakht.Internal
                 "0"
             );
 
-            var encryptedRequest = Encrypt(requestToEncrypt, account.Key, account.IV);
+            var encryptedRequest = crypto.Encrypt(requestToEncrypt, account.Key, account.IV);
 
             return
                 "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tem=\"http://tempuri.org/\">" +
@@ -53,6 +49,7 @@ namespace Parbad.Gateway.AsanPardakht.Internal
             string response,
             AsanPardakhtGatewayAccount account,
             HttpContext httpContext,
+            AsanPardakhtGatewayOptions gatewayOptions,
             MessagesOptions messagesOptions)
         {
             var result = XmlHelper.GetNodeValueFromXml(response, "RequestOperationResult", "http://tempuri.org/");
@@ -71,7 +68,7 @@ namespace Parbad.Gateway.AsanPardakht.Internal
             return PaymentRequestResult.SucceedWithPost(
                 account.Name,
                 httpContext,
-                PaymentPageUrl,
+                gatewayOptions.PaymentPageUrl,
                 new Dictionary<string, string>
                 {
                     {"RefId", splitedResult[1]}
@@ -82,6 +79,7 @@ namespace Parbad.Gateway.AsanPardakht.Internal
             InvoiceContext context,
             AsanPardakhtGatewayAccount account,
             HttpRequest httpRequest,
+            IAsanPardakhtCrypto crypto,
             MessagesOptions messagesOptions)
         {
             httpRequest.Form.TryGetValue("ReturningParams", out var returningParams);
@@ -103,10 +101,10 @@ namespace Parbad.Gateway.AsanPardakht.Internal
             }
             else
             {
-                var decryptedResult = Decrypt(returningParams, account.Key, account.IV);
+                var decryptedResult = crypto.Decrypt(returningParams, account.Key, account.IV);
 
                 var splitedResult = decryptedResult.Split(',');
-
+                
                 var amount = splitedResult[0];
                 var preInvoiceID = splitedResult[1];
                 var token = splitedResult[2];
@@ -164,10 +162,13 @@ namespace Parbad.Gateway.AsanPardakht.Internal
             };
         }
 
-        public static string CreateVerifyData(AsanPardakhtCallbackResult callbackResult, AsanPardakhtGatewayAccount account)
+        public static string CreateVerifyData(
+            AsanPardakhtCallbackResult callbackResult,
+            AsanPardakhtGatewayAccount account,
+            IAsanPardakhtCrypto crypto)
         {
             var requestToEncrypt = account.UserName + "," + account.Password;
-            var encryptedRequest = Encrypt(requestToEncrypt, account.Key, account.IV);
+            var encryptedRequest = crypto.Encrypt(requestToEncrypt, account.Key, account.IV);
 
             return
                 "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tem=\"http://tempuri.org/\">" +
@@ -209,10 +210,13 @@ namespace Parbad.Gateway.AsanPardakht.Internal
             };
         }
 
-        public static string CreateSettleData(AsanPardakhtCallbackResult callbackResult, AsanPardakhtGatewayAccount account)
+        public static string CreateSettleData(
+            AsanPardakhtCallbackResult callbackResult,
+            AsanPardakhtGatewayAccount account,
+            IAsanPardakhtCrypto crypto)
         {
-            var requestToEncrypt = account.UserName + "," + account.Password;
-            var encryptedRequest = Encrypt(requestToEncrypt, account.Key, account.IV);
+            var requestToEncrypt = $"{account.UserName},{account.Password}";
+            var encryptedRequest = crypto.Encrypt(requestToEncrypt, account.Key, account.IV);
 
             return
                 "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tem=\"http://tempuri.org/\">" +
@@ -259,66 +263,6 @@ namespace Parbad.Gateway.AsanPardakht.Internal
             verifyResult.DatabaseAdditionalData.Add("LastFourDigitOfPAN", callbackResult.LastFourDigitOfPAN);
 
             return verifyResult;
-        }
-
-        private static string Encrypt(string input, string key, string iv)
-        {
-            var aes = new RijndaelManaged
-            {
-                KeySize = 256,
-                BlockSize = 256,
-                Padding = PaddingMode.PKCS7,
-                Key = Convert.FromBase64String(key),
-                IV = Convert.FromBase64String(iv)
-            };
-
-            var encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
-
-            byte[] buffer = null;
-
-            using (var stream = new MemoryStream())
-            {
-                using (var cryptoStream = new CryptoStream(stream, encryptor, CryptoStreamMode.Write))
-                {
-                    byte[] xml = Encoding.UTF8.GetBytes(input);
-
-                    cryptoStream.Write(xml, 0, xml.Length);
-                }
-
-                buffer = stream.ToArray();
-            }
-
-            return Convert.ToBase64String(buffer);
-        }
-
-        private static string Decrypt(string input, string key, string iv)
-        {
-            var aes = new RijndaelManaged
-            {
-                KeySize = 256,
-                BlockSize = 256,
-                Mode = CipherMode.CBC,
-                Padding = PaddingMode.PKCS7,
-                Key = Convert.FromBase64String(key),
-                IV = Convert.FromBase64String(iv)
-            };
-
-            var decryptor = aes.CreateDecryptor();
-            byte[] buffer = null;
-
-            using (var stream = new MemoryStream())
-            {
-                using (var cryptoStream = new CryptoStream(stream, decryptor, CryptoStreamMode.Write))
-                {
-                    byte[] xml = Convert.FromBase64String(input);
-
-                    cryptoStream.Write(xml, 0, xml.Length);
-                }
-
-                buffer = stream.ToArray();
-            }
-
-            return Encoding.UTF8.GetString(buffer);
         }
     }
 }

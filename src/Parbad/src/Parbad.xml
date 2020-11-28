@@ -222,6 +222,13 @@
             <param name="builder"></param>
             <param name="configureAccounts">Configures the accounts.</param>
         </member>
+        <member name="M:Parbad.Builder.AsanPardakhtGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.AsanPardakht.AsanPardakhtGateway},System.Action{Parbad.Gateway.AsanPardakht.AsanPardakhtGatewayOptions})">
+            <summary>
+            Configures the options for AsanPardakhtGateway.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureOptions">Configuration</param>
+        </member>
         <member name="M:Parbad.Builder.IranKishGatewayBuilderExtensions.AddIranKish(Parbad.GatewayBuilders.IGatewayBuilder)">
             <summary>
             Adds IranKish gateway to Parbad services.
@@ -940,13 +947,14 @@
             Melli Gateway.
             </summary>
         </member>
-        <member name="M:Parbad.Gateway.Melli.MelliGateway.#ctor(Microsoft.AspNetCore.Http.IHttpContextAccessor,System.Net.Http.IHttpClientFactory,Parbad.GatewayBuilders.IGatewayAccountProvider{Parbad.Gateway.Melli.MelliGatewayAccount},Microsoft.Extensions.Options.IOptions{Parbad.Options.MessagesOptions})">
+        <member name="M:Parbad.Gateway.Melli.MelliGateway.#ctor(Microsoft.AspNetCore.Http.IHttpContextAccessor,System.Net.Http.IHttpClientFactory,Parbad.GatewayBuilders.IGatewayAccountProvider{Parbad.Gateway.Melli.MelliGatewayAccount},Parbad.Gateway.Melli.IMelliGatewayCrypto,Microsoft.Extensions.Options.IOptions{Parbad.Options.MessagesOptions})">
             <summary>
             Initializes an instance of <see cref="T:Parbad.Gateway.Melli.MelliGateway"/>.
             </summary>
             <param name="httpContextAccessor"></param>
             <param name="httpClientFactory"></param>
             <param name="accountProvider"></param>
+            <param name="crypto"></param>
             <param name="messageOptions"></param>
         </member>
         <member name="M:Parbad.Gateway.Melli.MelliGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">

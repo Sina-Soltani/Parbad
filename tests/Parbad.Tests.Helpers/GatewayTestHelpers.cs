@@ -1,21 +1,15 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Primitives;
-using Moq;
-using Moq.Protected;
 using Parbad.Abstraction;
 using Parbad.Builder;
 using Parbad.GatewayBuilders;
+using Parbad.InvoiceBuilder;
+using Parbad.PaymentTokenProviders;
 using Parbad.Storage.Abstractions;
 using RichardSzalay.MockHttp;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
-using Parbad.InvoiceBuilder;
-using Parbad.PaymentTokenProviders;
 
 namespace Parbad.Tests.Helpers
 {
@@ -86,7 +80,7 @@ namespace Parbad.Tests.Helpers
                 var refundResult = await onlinePayment.RefundCompletelyAsync(verificationResult);
 
                 LogWhenResultIsNotSucceed(refundResult);
-                onRefundResult?.Invoke(refundResult);
+                onRefundResult.Invoke(refundResult);
             }
         }
 

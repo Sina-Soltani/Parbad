@@ -19,9 +19,11 @@ namespace Parbad.Builder
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            return builder.AddGateway<MelliGateway>()
-                .WithHttpClient(clientBuilder => clientBuilder.ConfigureHttpClient(client =>
-                    client.BaseAddress = new Uri(MelliHelper.BaseServiceUrl)));
+            builder.Services.AddSingleton<IMelliGatewayCrypto, MelliGatewayCrypto>();
+
+            return builder
+                .AddGateway<MelliGateway>()
+                .WithHttpClient(clientBuilder => clientBuilder.ConfigureHttpClient(client => client.BaseAddress = new Uri(MelliHelper.BaseServiceUrl)));
         }
 
         /// <summary>

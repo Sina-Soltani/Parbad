@@ -18,7 +18,7 @@ namespace Parbad
     /// <para>long a = Money</para>
     /// </para>
     /// </summary>
-    public readonly struct Money : IComparable<Money>
+    public readonly struct Money : IComparable<Money>, IEquatable<Money>, IEquatable<decimal>, IEquatable<long>
     {
         /// <summary>
         /// Defines money unit.
@@ -41,15 +41,24 @@ namespace Parbad
             return new Money(Value + amount);
         }
 
-        public bool Equals(Money other)
-        {
-            return Value == other.Value;
-        }
+        public bool Equals(Money? other) => false;
+        public bool Equals(Money other) => Value == other.Value;
+
+        public bool Equals(long? other) => false;
+        public bool Equals(long other) => (long)Value == other;
+
+        public bool Equals(decimal? other) => false;
+        public bool Equals(decimal other) => Value == other;
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
-            return obj is Money other && Equals(other);
+            var equals =
+                (obj is Money other && Equals(other)) ||
+                (obj is int intNumber) && Equals((long)intNumber) ||
+                (obj is long longNumber) && Equals(longNumber) ||
+                (obj is decimal decimalNumber) && Equals(decimalNumber);
+
+            return equals;
         }
 
         public override int GetHashCode()

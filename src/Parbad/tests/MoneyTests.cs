@@ -51,5 +51,15 @@ namespace Parbad.Tests
 
             Assert.AreEqual(0, instance.CompareTo(instance2));
         }
+
+        [TestMethod]
+        public void Equatable_Works()
+        {
+            var money = new Money(10);
+
+            Assert.AreEqual(money, 10L);
+            Assert.AreEqual(money, 10M);
+            Assert.AreEqual(money, new Money(10));
+        }
     }
 }

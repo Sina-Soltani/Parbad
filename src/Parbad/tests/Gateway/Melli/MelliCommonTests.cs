@@ -36,18 +36,13 @@ namespace Parbad.Tests.Gateway.Melli
         [TestMethod]
         public void Signing_Invalid_RequestData_Must_Throw_Exception()
         {
-            Assert.ThrowsException<MelliGatewayDataSigningException>(() =>
-            {
-                MelliHelper.SignRequestData("test", "abcd", 1, 1);
-            });
-        }
+            var crypto = new MelliGatewayCrypto();
 
-        [TestMethod]
-        public void Signing_Invalid_VerificationData_Must_Throw_Exception()
-        {
+            const string data = "test";
+
             Assert.ThrowsException<MelliGatewayDataSigningException>(() =>
             {
-                MelliHelper.SignVerifyData("abcd", "test");
+                crypto.Encrypt("test", data);
             });
         }
     }

@@ -22,6 +22,8 @@ namespace Parbad.Gateway.AsanPardakht
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
+        private readonly IAsanPardakhtCrypto _crypto;
+        private readonly AsanPardakhtGatewayOptions _gatewayOptions;
         private readonly IOptions<MessagesOptions> _messageOptions;
 
         public const string Name = "AsanPardakht";
@@ -30,10 +32,14 @@ namespace Parbad.Gateway.AsanPardakht
             IHttpContextAccessor httpContextAccessor,
             IHttpClientFactory httpClientFactory,
             IGatewayAccountProvider<AsanPardakhtGatewayAccount> accountProvider,
+            IAsanPardakhtCrypto crypto,
+            IOptions<AsanPardakhtGatewayOptions> gatewayOptions,
             IOptions<MessagesOptions> messageOptions) : base(accountProvider)
         {
             _httpContextAccessor = httpContextAccessor;
             _httpClient = httpClientFactory.CreateClient(this);
+            _crypto = crypto;
+            _gatewayOptions = gatewayOptions.Value;
             _messageOptions = messageOptions;
         }
 
@@ -44,15 +50,20 @@ namespace Parbad.Gateway.AsanPardakht
 
             var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
 
-            var data = AsanPardakhtHelper.CreateRequestData(invoice, account);
+            var data = AsanPardakhtHelper.CreateRequestData(invoice, account, _crypto);
 
             var responseMessage = await _httpClient
-                .PostXmlAsync(AsanPardakhtHelper.BaseServiceUrl, data, cancellationToken)
+                .PostXmlAsync(_gatewayOptions.ApiUrl, data, cancellationToken)
                 .ConfigureAwaitFalse();
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
-            return AsanPardakhtHelper.CreateRequestResult(response, account, _httpContextAccessor.HttpContext, _messageOptions.Value);
+            return AsanPardakhtHelper.CreateRequestResult(
+                response,
+                account,
+                _httpContextAccessor.HttpContext,
+                _gatewayOptions,
+                _messageOptions.Value);
         }
 
         /// <inheritdoc />
@@ -66,6 +77,7 @@ namespace Parbad.Gateway.AsanPardakht
                 context,
                 account,
                 _httpContextAccessor.HttpContext.Request,
+                _crypto,
                 _messageOptions.Value);
 
             if (!callbackResult.IsSucceed)
@@ -73,10 +85,10 @@ namespace Parbad.Gateway.AsanPardakht
                 return callbackResult.Result;
             }
 
-            var data = AsanPardakhtHelper.CreateVerifyData(callbackResult, account);
+            var data = AsanPardakhtHelper.CreateVerifyData(callbackResult, account, _crypto);
 
             var responseMessage = await _httpClient
-                .PostXmlAsync(AsanPardakhtHelper.BaseServiceUrl, data, cancellationToken)
+                .PostXmlAsync(_gatewayOptions.ApiUrl, data, cancellationToken)
                 .ConfigureAwaitFalse();
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
@@ -88,10 +100,10 @@ namespace Parbad.Gateway.AsanPardakht
                 return verifyResult.Result;
             }
 
-            data = AsanPardakhtHelper.CreateSettleData(callbackResult, account);
+            data = AsanPardakhtHelper.CreateSettleData(callbackResult, account, _crypto);
 
             responseMessage = await _httpClient
-                .PostXmlAsync(AsanPardakhtHelper.BaseServiceUrl, data, cancellationToken)
+                .PostXmlAsync(_gatewayOptions.ApiUrl, data, cancellationToken)
                 .ConfigureAwaitFalse();
 
             response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();

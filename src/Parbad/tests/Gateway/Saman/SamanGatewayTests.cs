@@ -31,7 +31,7 @@ namespace Parbad.Tests.Gateway.Saman
         public const string MobileVerifyPaymentUrl = "https://verify.sep.ir/Payments/ReferencePayment.asmx";
 
         [TestMethod]
-        public async Task Saman_WebGateway_Works()
+        public async Task WebGateway_Requesting_And_Verifying_Work()
         {
             const string expectedMerchantId = "test";
             const long expectedTrackingNumber = 1;
@@ -78,9 +78,9 @@ namespace Parbad.Tests.Gateway.Saman
                     {
                         context.Request.Query = new QueryCollection(new Dictionary<string, StringValues>
                         {
-                        {"state", "OK"},
-                        {"ResNum", expectedTransactionCode},
-                        {"RefNum", "test"}
+                            {"state", "OK"},
+                            {"ResNum", expectedTransactionCode},
+                            {"RefNum", "test"}
                         });
                     },
                     result =>
@@ -123,33 +123,12 @@ namespace Parbad.Tests.Gateway.Saman
                             }
                         }
                     },
-                    result =>
-                    {
-                        Assert.IsNotNull(result);
-                        Assert.IsTrue(result.IsSucceed);
-                        Assert.AreEqual(expectedTrackingNumber, result.TrackingNumber);
-                        Assert.AreEqual(SamanGateway.Name, result.GatewayName);
-                        Assert.AreEqual(GatewayAccount.DefaultName, result.GatewayAccountName);
-                        Assert.AreEqual(expectedAmount, (long)result.Amount);
-                        Assert.IsFalse(result.IsAlreadyVerified);
-                        Assert.AreEqual(PaymentFetchResultStatus.ReadyForVerifying, result.Status);
-                    },
-                    result =>
-                    {
-                        Assert.IsNotNull(result);
-                        Assert.IsTrue(result.IsSucceed);
-                        Assert.AreEqual(expectedTrackingNumber, result.TrackingNumber);
-                        Assert.AreEqual(SamanGateway.Name, result.GatewayName);
-                        Assert.AreEqual(GatewayAccount.DefaultName, result.GatewayAccountName);
-                        Assert.AreEqual(expectedAmount, (long)result.Amount);
-                        Assert.AreEqual(PaymentVerifyResultStatus.Succeed, result.Status);
-                        Assert.IsNotNull(result.TransactionCode);
-                        Assert.AreEqual(expectedTransactionCode, result.TransactionCode);
-                    });
+                result => GatewayOnResultHelper.OnFetchResult(result, expectedTrackingNumber, expectedAmount, SamanGateway.Name),
+                result => GatewayOnResultHelper.OnVerifyResult(result, expectedTrackingNumber, expectedAmount, SamanGateway.Name));
         }
 
         [TestMethod]
-        public async Task Saman_MobileGateway_Works()
+        public async Task MobileGateway_Requesting_And_Verifying_Work()
         {
             const string expectedMerchantId = "test";
             const long expectedTrackingNumber = 1;
