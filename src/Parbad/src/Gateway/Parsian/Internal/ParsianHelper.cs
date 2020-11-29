@@ -16,12 +16,6 @@ namespace Parbad.Gateway.Parsian.Internal
 {
     internal static class ParsianHelper
     {
-        private const string PaymentPageUrl = "https://pec.shaparak.ir/NewIPG/";
-        public const string BaseServiceUrl = "https://pec.shaparak.ir/";
-        public const string RequestServiceUrl = "/NewIPGServices/Sale/SaleService.asmx";
-        public const string VerifyServiceUrl = "/NewIPGServices/Confirm/ConfirmService.asmx";
-        public const string RefundServiceUrl = "/NewIPGServices/Reverse/ReversalService.asmx";
-
         public static string CreateRequestData(ParsianGatewayAccount account, Invoice invoice)
         {
             return
@@ -47,7 +41,12 @@ namespace Parbad.Gateway.Parsian.Internal
                 "</soapenv:Envelope> ";
         }
 
-        public static PaymentRequestResult CreateRequestResult(string webServiceResponse, HttpContext httpContext, ParsianGatewayAccount account, MessagesOptions messagesOptions)
+        public static PaymentRequestResult CreateRequestResult(
+            string webServiceResponse,
+            HttpContext httpContext,
+            ParsianGatewayAccount account,
+            ParsianGatewayOptions gatewayOptions,
+            MessagesOptions messagesOptions)
         {
             var token = XmlHelper.GetNodeValueFromXml(webServiceResponse, "Token", "https://pec.Shaparak.ir/NewIPGServices/Sale/SaleService");
             var status = XmlHelper.GetNodeValueFromXml(webServiceResponse, "Status", "https://pec.Shaparak.ir/NewIPGServices/Sale/SaleService");
@@ -67,7 +66,7 @@ namespace Parbad.Gateway.Parsian.Internal
                 return PaymentRequestResult.Failed(message, account.Name);
             }
 
-            var paymentPageUrl = $"{PaymentPageUrl}?Token={token}";
+            var paymentPageUrl = $"{gatewayOptions.PaymentPageUrl}?Token={token}";
 
             var result = PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, paymentPageUrl);
 

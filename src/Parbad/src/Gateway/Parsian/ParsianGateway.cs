@@ -21,6 +21,7 @@ namespace Parbad.Gateway.Parsian
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
+        private readonly ParsianGatewayOptions _gatewayOptions;
         private readonly IOptions<MessagesOptions> _messageOptions;
 
         public const string Name = "Parsian";
@@ -29,10 +30,12 @@ namespace Parbad.Gateway.Parsian
             IHttpContextAccessor httpContextAccessor,
             IHttpClientFactory httpClientFactory,
             IGatewayAccountProvider<ParsianGatewayAccount> accountProvider,
+            IOptions<ParsianGatewayOptions> gatewayOptions,
             IOptions<MessagesOptions> messageOptions) : base(accountProvider)
         {
             _httpContextAccessor = httpContextAccessor;
             _httpClient = httpClientFactory.CreateClient(this);
+            _gatewayOptions = gatewayOptions.Value;
             _messageOptions = messageOptions;
         }
 
@@ -46,12 +49,12 @@ namespace Parbad.Gateway.Parsian
             var data = ParsianHelper.CreateRequestData(account, invoice);
 
             var responseMessage = await _httpClient
-                .PostXmlAsync(ParsianHelper.RequestServiceUrl, data, cancellationToken)
+                .PostXmlAsync(_gatewayOptions.ApiRequestUrl, data, cancellationToken)
                 .ConfigureAwaitFalse();
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
-            return ParsianHelper.CreateRequestResult(response, _httpContextAccessor.HttpContext, account, _messageOptions.Value);
+            return ParsianHelper.CreateRequestResult(response, _httpContextAccessor.HttpContext, account, _gatewayOptions, _messageOptions.Value);
         }
 
         /// <inheritdoc />
@@ -71,7 +74,7 @@ namespace Parbad.Gateway.Parsian
             var data = ParsianHelper.CreateVerifyData(account, callbackResult);
 
             var responseMessage = await _httpClient
-                .PostXmlAsync(ParsianHelper.VerifyServiceUrl, data, cancellationToken)
+                .PostXmlAsync(_gatewayOptions.ApiVerificationUrl, data, cancellationToken)
                 .ConfigureAwaitFalse();
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
@@ -89,7 +92,7 @@ namespace Parbad.Gateway.Parsian
             var data = ParsianHelper.CreateRefundData(account, context, amount);
 
             var responseMessage = await _httpClient
-                .PostXmlAsync(ParsianHelper.RefundServiceUrl, data, cancellationToken)
+                .PostXmlAsync(_gatewayOptions.ApiRefundUrl, data, cancellationToken)
                 .ConfigureAwaitFalse();
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
