@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Parbad.Gateway.Saman.Internal;
@@ -21,11 +22,11 @@ namespace Parbad.Tests.Gateway.Saman
         }
 
         [TestMethod]
-        public void Invoice_Must_Have_Correct_GatewayName()
+        public async Task Invoice_Must_Have_Correct_GatewayName()
         {
             _invoiceBuilder.UseSaman();
 
-            var invoice = _invoiceBuilder.BuildAsync().GetAwaiter().GetResult();
+            var invoice = await _invoiceBuilder.BuildAsync();
 
             Assert.IsNotNull(invoice);
             Assert.IsNotNull(invoice.GatewayName);
@@ -33,11 +34,11 @@ namespace Parbad.Tests.Gateway.Saman
         }
 
         [TestMethod]
-        public void Invoice_Must_Have_Saman_MobileGateway_Enabled()
+        public async Task Invoice_Must_Have_Saman_MobileGateway_Enabled()
         {
             _invoiceBuilder.EnableSamanMobileGateway();
 
-            var invoice = _invoiceBuilder.BuildAsync().GetAwaiter().GetResult();
+            var invoice = await _invoiceBuilder.BuildAsync();
 
             Assert.IsNotNull(invoice);
 
@@ -48,11 +49,11 @@ namespace Parbad.Tests.Gateway.Saman
         }
 
         [TestMethod]
-        public void Invoice_Must_Have_Saman_MobileGateway_Disabled()
+        public async Task Invoice_Must_Have_Saman_MobileGateway_Disabled()
         {
             _invoiceBuilder.EnableSamanMobileGateway(false);
 
-            var invoice = _invoiceBuilder.BuildAsync().GetAwaiter().GetResult();
+            var invoice = await _invoiceBuilder.BuildAsync();
 
             Assert.IsNotNull(invoice);
 

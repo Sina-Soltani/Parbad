@@ -224,7 +224,7 @@
         </member>
         <member name="M:Parbad.Builder.AsanPardakhtGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.AsanPardakht.AsanPardakhtGateway},System.Action{Parbad.Gateway.AsanPardakht.AsanPardakhtGatewayOptions})">
             <summary>
-            Configures the options for AsanPardakhtGateway.
+            Configures the options for AsanPardakht Gateway.
             </summary>
             <param name="builder"></param>
             <param name="configureOptions">Configuration</param>
@@ -242,6 +242,13 @@
             <param name="builder"></param>
             <param name="configureAccounts">Configures the accounts.</param>
         </member>
+        <member name="M:Parbad.Builder.IranKishGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.IranKish.IranKishGateway},System.Action{Parbad.Gateway.IranKish.IranKishGatewayOptions})">
+            <summary>
+            Configures the options for IranKish Gateway.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureOptions">Configuration</param>
+        </member>
         <member name="M:Parbad.Builder.MellatGatewayBuilderExtensions.AddMellat(Parbad.GatewayBuilders.IGatewayBuilder)">
             <summary>
             Adds Mellat gateway to Parbad services.
@@ -255,6 +262,13 @@
             <param name="builder"></param>
             <param name="configureAccounts">Configures the accounts.</param>
         </member>
+        <member name="M:Parbad.Builder.MellatGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Mellat.MellatGateway},System.Action{Parbad.Gateway.Mellat.MellatGatewayOptions})">
+            <summary>
+            Configures the options for Mellat Gateway.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureOptions">Configuration</param>
+        </member>
         <member name="M:Parbad.Builder.MelliGatewayBuilderExtensions.AddMelli(Parbad.GatewayBuilders.IGatewayBuilder)">
             <summary>
             Adds Melli gateway to Parbad services.
@@ -267,6 +281,13 @@
             </summary>
             <param name="builder"></param>
             <param name="configureAccounts">Configures the accounts.</param>
+        </member>
+        <member name="M:Parbad.Builder.MelliGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Melli.MelliGateway},System.Action{Parbad.Gateway.Melli.MelliGatewayOptions})">
+            <summary>
+            Configures the options for AsanPardakhtGateway.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureOptions">Configuration</param>
         </member>
         <member name="M:Parbad.Builder.ParbadVirtualGatewayBuilderExtensions.AddParbadVirtual(Parbad.GatewayBuilders.IGatewayBuilder)">
             <summary>
@@ -301,6 +322,13 @@
             <param name="builder"></param>
             <param name="configureAccounts">Configures the accounts.</param>
         </member>
+        <member name="M:Parbad.Builder.ParsianGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Parsian.ParsianGateway},System.Action{Parbad.Gateway.Parsian.ParsianGatewayOptions})">
+            <summary>
+            Configures the options for Parsian Gateway.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureOptions">Configuration</param>
+        </member>
         <member name="M:Parbad.Builder.PasargadGatewayBuilderExtensions.AddPasargad(Parbad.GatewayBuilders.IGatewayBuilder)">
             <summary>
             Adds Pasargad gateway to Parbad services.
@@ -314,6 +342,13 @@
             <param name="builder"></param>
             <param name="configureAccounts">Configures the accounts.</param>
         </member>
+        <member name="M:Parbad.Builder.PasargadGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Pasargad.PasargadGateway},System.Action{Parbad.Gateway.Pasargad.PasargadGatewayOptions})">
+            <summary>
+            Configures the options for Pasargad Gateway.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureOptions">Configuration</param>
+        </member>
         <member name="M:Parbad.Builder.SamanGatewayBuilderExtensions.AddSaman(Parbad.GatewayBuilders.IGatewayBuilder)">
             <summary>
             Adds Saman gateway to Parbad services.
@@ -326,6 +361,13 @@
             </summary>
             <param name="builder"></param>
             <param name="configureAccounts">Configures the accounts.</param>
+        </member>
+        <member name="M:Parbad.Builder.SamanGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Saman.SamanGateway},System.Action{Parbad.Gateway.Saman.SamanGatewayOptions})">
+            <summary>
+            Configures the options for Saman Gateway.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureOptions">Configuration</param>
         </member>
         <member name="M:Parbad.Builder.HttpContextBuilderExtensions.ConfigureHttpContext(Parbad.Builder.IParbadBuilder,System.Action{Parbad.Http.IHttpContextBuilder})">
             <summary>
@@ -947,7 +989,7 @@
             Melli Gateway.
             </summary>
         </member>
-        <member name="M:Parbad.Gateway.Melli.MelliGateway.#ctor(Microsoft.AspNetCore.Http.IHttpContextAccessor,System.Net.Http.IHttpClientFactory,Parbad.GatewayBuilders.IGatewayAccountProvider{Parbad.Gateway.Melli.MelliGatewayAccount},Parbad.Gateway.Melli.IMelliGatewayCrypto,Microsoft.Extensions.Options.IOptions{Parbad.Options.MessagesOptions})">
+        <member name="M:Parbad.Gateway.Melli.MelliGateway.#ctor(Microsoft.AspNetCore.Http.IHttpContextAccessor,System.Net.Http.IHttpClientFactory,Parbad.GatewayBuilders.IGatewayAccountProvider{Parbad.Gateway.Melli.MelliGatewayAccount},Parbad.Gateway.Melli.IMelliGatewayCrypto,Microsoft.Extensions.Options.IOptions{Parbad.Gateway.Melli.MelliGatewayOptions},Microsoft.Extensions.Options.IOptions{Parbad.Options.MessagesOptions})">
             <summary>
             Initializes an instance of <see cref="T:Parbad.Gateway.Melli.MelliGateway"/>.
             </summary>
@@ -955,6 +997,7 @@
             <param name="httpClientFactory"></param>
             <param name="accountProvider"></param>
             <param name="crypto"></param>
+            <param name="gatewayOptions"></param>
             <param name="messageOptions"></param>
         </member>
         <member name="M:Parbad.Gateway.Melli.MelliGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
