@@ -21,16 +21,14 @@ namespace Parbad.Gateway.Pasargad.Internal
 {
     internal static class PasargadHelper
     {
-        public const string PaymentPageUrl = "https://pep.shaparak.ir/gateway.aspx";
-        public const string BaseServiceUrl = "https://pep.shaparak.ir/";
-        public const string CheckPaymentPageUrl = "/CheckTransactionResult.aspx";
-        public const string VerifyPaymentPageUrl = "/VerifyPayment.aspx";
-        public const string RefundPaymentPageUrl = "/DoRefund.aspx";
-
         private const string ActionNumber = "1003";
         private const string RefundNumber = "1004";
 
-        public static PaymentRequestResult CreateRequestResult(Invoice invoice, HttpContext httpContext, PasargadGatewayAccount account)
+        public static PaymentRequestResult CreateRequestResult(
+            Invoice invoice,
+            HttpContext httpContext,
+            PasargadGatewayAccount account,
+            PasargadGatewayOptions gatewayOptions)
         {
             var invoiceDate = GetTimeStamp(DateTime.Now);
 
@@ -51,7 +49,7 @@ namespace Parbad.Gateway.Pasargad.Internal
             var result = PaymentRequestResult.SucceedWithPost(
                 account.Name,
                 httpContext,
-                PaymentPageUrl,
+                gatewayOptions.PaymentPageUrl,
                 new Dictionary<string, string>
                 {
                     {"merchantCode", account.MerchantCode},
