@@ -21,6 +21,7 @@ namespace Parbad.Gateway.Saman
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
+        private readonly SamanGatewayOptions _gatewayOptions;
         private readonly MessagesOptions _messageOptions;
 
         public const string Name = "Saman";
@@ -29,10 +30,12 @@ namespace Parbad.Gateway.Saman
             IHttpContextAccessor httpContextAccessor,
             IHttpClientFactory httpClientFactory,
             IGatewayAccountProvider<SamanGatewayAccount> accountProvider,
+            IOptions<SamanGatewayOptions> gatewayOptions,
             IOptions<MessagesOptions> messageOptions) : base(accountProvider)
         {
             _httpContextAccessor = httpContextAccessor;
             _httpClient = httpClientFactory.CreateClient(this);
+            _gatewayOptions = gatewayOptions.Value;
             _messageOptions = messageOptions.Value;
         }
 
@@ -50,6 +53,7 @@ namespace Parbad.Gateway.Saman
                 httpContext,
                 account,
                 _httpClient,
+                _gatewayOptions,
                 _messageOptions,
                 cancellationToken);
 
@@ -77,7 +81,7 @@ namespace Parbad.Gateway.Saman
             var data = SamanHelper.CreateVerifyData(callbackResult, account);
 
             var responseMessage = await _httpClient
-                .PostXmlAsync(SamanHelper.GetVerificationUrl(context), data, cancellationToken)
+                .PostXmlAsync(SamanHelper.GetVerificationUrl(context, _gatewayOptions), data, cancellationToken)
                 .ConfigureAwaitFalse();
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
@@ -95,7 +99,7 @@ namespace Parbad.Gateway.Saman
             var data = SamanHelper.CreateRefundData(context, amount, account);
 
             var responseMessage = await _httpClient
-                .PostXmlAsync(SamanHelper.WebServiceUrl, data, cancellationToken)
+                .PostXmlAsync(SamanHelper.GetVerificationUrl(context, _gatewayOptions), data, cancellationToken)
                 .ConfigureAwaitFalse();
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();

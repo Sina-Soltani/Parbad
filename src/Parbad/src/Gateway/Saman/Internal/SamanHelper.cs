@@ -26,29 +26,24 @@ namespace Parbad.Gateway.Saman.Internal
     {
         public const string MobileGatewayKey = "UseMobileGateway";
         public const string AdditionalVerificationDataKey = "SamanAdditionalVerificationData";
-        public const string BaseServiceUrl = "https://sep.shaparak.ir/";
-        public static string PaymentPageUrl => $"{BaseServiceUrl}payment.aspx";
-        public const string WebServiceUrl = "/payments/referencepayment.asmx";
-        public const string TokenWebServiceUrl = "/payments/initpayment.asmx";
-        public const string MobilePaymentTokenUrl = "/MobilePG/MobilePayment";
-        public static string MobilePaymentPageUrl => $"{BaseServiceUrl}OnlinePG/OnlinePG";
-        public const string MobileVerifyPaymentUrl = "https://verify.sep.ir/Payments/ReferencePayment.asmx";
 
         public static Task<PaymentRequestResult> CreateRequest(
             Invoice invoice,
             HttpContext httpContext,
             SamanGatewayAccount account,
             HttpClient httpClient,
+            SamanGatewayOptions gatewayOptions,
             MessagesOptions messagesOptions,
             CancellationToken cancellationToken)
         {
             if (invoice.IsSamanMobileGatewayEnabled())
             {
-                return CreateMobilePaymentRequest(invoice, httpContext, account, httpClient, messagesOptions, cancellationToken);
+                return CreateMobilePaymentRequest(invoice, httpContext, account, httpClient, gatewayOptions, messagesOptions, cancellationToken);
             }
 
-            return CreateWebPaymentRequest(invoice, httpContext, account, httpClient, messagesOptions, cancellationToken);
+            return CreateWebPaymentRequest(invoice, httpContext, account, httpClient, gatewayOptions, messagesOptions, cancellationToken);
         }
+
         public static async Task<SamanCallbackResult> CreateCallbackResultAsync(
             HttpRequest httpRequest,
             MessagesOptions messagesOptions,
@@ -185,12 +180,13 @@ namespace Parbad.Gateway.Saman.Internal
             HttpContext httpContext,
             SamanGatewayAccount account,
             HttpClient httpClient,
+            SamanGatewayOptions gatewayOptions,
             MessagesOptions messagesOptions,
             CancellationToken cancellationToken)
         {
             var data = CreateTokenRequest(invoice, account);
 
-            var responseMessage = await httpClient.PostXmlAsync(TokenWebServiceUrl, data, cancellationToken);
+            var responseMessage = await httpClient.PostXmlAsync(gatewayOptions.WebApiTokenUrl, data, cancellationToken);
 
             var response = await responseMessage.Content.ReadAsStringAsync();
 
@@ -218,7 +214,7 @@ namespace Parbad.Gateway.Saman.Internal
             return PaymentRequestResult.SucceedWithPost(
                 account.Name,
                 httpContext,
-                PaymentPageUrl,
+                gatewayOptions.WebPaymentPageUrl,
                 new Dictionary<string, string>
                 {
                     {"Token", token},
@@ -231,6 +227,7 @@ namespace Parbad.Gateway.Saman.Internal
             HttpContext httpContext,
             SamanGatewayAccount account,
             HttpClient httpClient,
+            SamanGatewayOptions gatewayOptions,
             MessagesOptions messagesOptions,
             CancellationToken cancellationToken)
         {
@@ -243,7 +240,7 @@ namespace Parbad.Gateway.Saman.Internal
                 Action = "Token"
             };
 
-            var responseMessage = await httpClient.PostJsonAsync(MobilePaymentTokenUrl, data, cancellationToken);
+            var responseMessage = await httpClient.PostJsonAsync(gatewayOptions.MobileApiTokenUrl, data, cancellationToken);
 
             var response = await responseMessage.Content.ReadAsStringAsync();
 
@@ -263,7 +260,7 @@ namespace Parbad.Gateway.Saman.Internal
             var result = PaymentRequestResult.SucceedWithPost(
                 account.Name,
                 httpContext,
-                MobilePaymentPageUrl,
+                gatewayOptions.MobilePaymentPageUrl,
                 new Dictionary<string, string>
                 {
                     {"Token", tokenResponse.Token}
@@ -289,20 +286,20 @@ namespace Parbad.Gateway.Saman.Internal
                 "</soapenv:Envelope>";
         }
 
-        public static string GetVerificationUrl(InvoiceContext invoiceContext)
+        public static string GetVerificationUrl(InvoiceContext invoiceContext, SamanGatewayOptions gatewayOptions)
         {
             var record = invoiceContext
                 .Transactions
                 .SingleOrDefault(transaction => transaction.Type == TransactionType.Request);
 
-            if (record == null || record.AdditionalData.IsNullOrEmpty()) return WebServiceUrl;
+            if (record == null || record.AdditionalData.IsNullOrEmpty()) return gatewayOptions.WebApiUrl;
 
             if (AdditionalDataConverter.ToDictionary(record).TryGetValue(MobileGatewayKey, out var isMobileGatewayEnabled) && bool.Parse(isMobileGatewayEnabled))
             {
-                return MobileVerifyPaymentUrl;
+                return gatewayOptions.MobileApiVerificationUrl;
             }
 
-            return WebServiceUrl;
+            return gatewayOptions.WebApiUrl;
         }
     }
 }
