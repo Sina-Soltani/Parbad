@@ -55,7 +55,7 @@ namespace Parbad.Gateway.ParbadVirtual
                 {
                     {"CommandType", "request"},
                     {"trackingNumber", invoice.TrackingNumber.ToString()},
-                    {"amount", ((long) invoice.Amount).ToString()},
+                    {"amount", invoice.Amount.ToLongString()},
                     {"redirectUrl", invoice.CallbackUrl}
                 });
         }

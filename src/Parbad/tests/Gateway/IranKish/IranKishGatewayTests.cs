@@ -6,7 +6,6 @@ using Parbad.Gateway.IranKish;
 using Parbad.Tests.Helpers;
 using RichardSzalay.MockHttp;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Parbad.Tests.Gateway.IranKish
@@ -81,37 +80,16 @@ namespace Parbad.Tests.Gateway.IranKish
                         {"ReferenceId", ExpectedTransactionCode}
                     });
                 },
-                result =>
-                {
-                    Assert.IsNotNull(result);
-                    Assert.IsTrue(result.IsSucceed);
-                    Assert.AreEqual(IranKishGateway.Name, result.GatewayName);
-                    Assert.IsNotNull(result.GatewayTransporter);
-                    Assert.IsNotNull(result.GatewayTransporter.Descriptor);
-                    Assert.AreEqual(GatewayTransporterDescriptor.TransportType.Post, result.GatewayTransporter.Descriptor.Type);
-                    Assert.IsNotNull(result.GatewayTransporter.Descriptor.Url);
-                    Assert.IsNotNull(result.GatewayTransporter.Descriptor.Form);
-
-                    Assert.AreEqual(paymentPageUrl, result.GatewayTransporter.Descriptor.Url);
-
-                    var expectedForm = new Dictionary<string, string>
+                result => GatewayOnResultHelper.OnRequestResult(
+                    result,
+                    IranKishGateway.Name,
+                    GatewayTransporterDescriptor.TransportType.Post,
+                    expectedPaymentPageUrl: paymentPageUrl,
+                    expectedForm: new Dictionary<string, string>
                     {
                         {"merchantid", expectedRefId},
                         {"token", ExpectedToken}
-                    };
-
-                    foreach (var item in expectedForm)
-                    {
-                        var form = result
-                            .GatewayTransporter
-                            .Descriptor
-                            .Form
-                            .SingleOrDefault(_ => _.Key == item.Key);
-
-                        Assert.IsNotNull(form.Key);
-                        Assert.IsNotNull(form.Value);
-                    }
-                },
+                    }),
                 result => GatewayOnResultHelper.OnFetchResult(result, expectedTrackingNumber, ExpectedAmount, IranKishGateway.Name),
                 result => GatewayOnResultHelper.OnVerifyResult(result, expectedTrackingNumber, ExpectedAmount, IranKishGateway.Name, ExpectedTransactionCode));
         }
