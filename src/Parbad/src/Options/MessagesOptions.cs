@@ -16,7 +16,7 @@ namespace Parbad.Options
 
         public string UnexpectedErrorText { get; set; } = "An unknown error is happened.";
 
-        public string InvalidDataReceivedFromGateway { get; set; } = "Invalid data is received from the gateway";
+        public string InvalidDataReceivedFromGateway { get; set; } = "Invalid data is received from the gateway.";
 
         public string PaymentIsAlreadyProcessedBefore { get; set; } = "The requested payment is already processed before.";
 

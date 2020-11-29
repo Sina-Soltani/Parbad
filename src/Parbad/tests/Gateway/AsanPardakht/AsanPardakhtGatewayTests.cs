@@ -141,18 +141,6 @@ namespace Parbad.Tests.Gateway.AsanPardakht
                 result => GatewayOnResultHelper.OnVerifyResult(result, expectedTrackingNumber, ExpectedAmount, AsanPardakhtGateway.Name));
         }
 
-        private static string GetSettleResponse()
-        {
-            return
-                "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">" +
-                "<soap:Body>" +
-                "<RequestReconciliationResponse xmlns=\"http://tempuri.org/\">" +
-                "<RequestReconciliationResult>600</RequestReconciliationResult>" +
-                "</RequestReconciliationResponse>" +
-                "</soap:Body>" +
-                "</soap:Envelope>";
-        }
-
         private static string GetRequestResponse(string refId)
         {
             return
@@ -173,6 +161,18 @@ namespace Parbad.Tests.Gateway.AsanPardakht
                 "<RequestVerificationResponse xmlns=\"http://tempuri.org/\">" +
                 "<RequestVerificationResult>500</RequestVerificationResult>" +
                 "</RequestVerificationResponse>" +
+                "</soap:Body>" +
+                "</soap:Envelope>";
+        }
+
+        private static string GetSettleResponse()
+        {
+            return
+                "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">" +
+                "<soap:Body>" +
+                "<RequestReconciliationResponse xmlns=\"http://tempuri.org/\">" +
+                "<RequestReconciliationResult>600</RequestReconciliationResult>" +
+                "</RequestReconciliationResponse>" +
                 "</soap:Body>" +
                 "</soap:Envelope>";
         }

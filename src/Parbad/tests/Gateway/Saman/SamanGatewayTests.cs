@@ -1,44 +1,33 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Primitives;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
 using Parbad.Builder;
 using Parbad.Gateway.Saman;
+using Parbad.Gateway.Saman.Internal.Models;
 using Parbad.Tests.Helpers;
 using RichardSzalay.MockHttp;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Parbad.Abstraction;
-using Parbad.Gateway.Saman.Internal.Models;
-using Parbad.PaymentTokenProviders;
 
 namespace Parbad.Tests.Gateway.Saman
 {
     [TestClass]
     public class SamanGatewayTests
     {
-        public const string FormRedirectUrlKey = "RedirectURL";
-        public const string BaseServiceUrl = "https://sep.shaparak.ir/";
-        public static string PaymentPageUrl => $"{BaseServiceUrl}payment.aspx";
-        public const string WebServiceUrl = "/payments/referencepayment.asmx";
-        public const string TokenWebServiceUrl = "/payments/initpayment.asmx";
-        public const string MobilePaymentTokenUrl = "/MobilePG/MobilePayment";
-        public static string MobilePaymentPageUrl => $"{BaseServiceUrl}OnlinePG/OnlinePG";
-        public const string MobileVerifyPaymentUrl = "https://verify.sep.ir/Payments/ReferencePayment.asmx";
+        private const string ExpectedMerchantId = "test";
+        private const long ExpectedTrackingNumber = 1;
+        private const long ExpectedAmount = 1000;
+        private const string ExpectedTransactionCode = "test";
+        private const string FormRedirectUrlKey = "RedirectURL";
+        private const string ExpectedCallbackUrl = "http://www.mywebsite.com";
+        private const string ApiUrl = "http://localhost/";
+        private const string PaymentPageUrl = "http://localhost/";
 
         [TestMethod]
         public async Task WebGateway_Requesting_And_Verifying_Work()
         {
-            const string expectedMerchantId = "test";
-            const long expectedTrackingNumber = 1;
-            const long expectedAmount = 1000;
-            const string expectedCallbackUrl = "http://www.mywebsite.com";
-            const string expectedTransactionCode = "test";
-
             await GatewayTestHelpers.TestGatewayAsync(
                 gateways =>
                 {
@@ -48,94 +37,67 @@ namespace Parbad.Tests.Gateway.Saman
                         {
                             accounts.AddInMemory(account =>
                             {
-                                account.MerchantId = expectedMerchantId;
+                                account.MerchantId = ExpectedMerchantId;
                                 account.Password = "test";
                             });
+                        })
+                        .WithOptions(options =>
+                        {
+                            options.WebApiUrl = ApiUrl;
+                            options.WebApiTokenUrl = ApiUrl;
+                            options.WebPaymentPageUrl = PaymentPageUrl;
+                            options.MobileApiTokenUrl = ApiUrl;
+                            options.MobileApiVerificationUrl = ApiUrl;
+                            options.MobilePaymentPageUrl = ApiUrl;
                         });
                 },
                 invoice =>
                 {
                     invoice
-                        .SetTrackingNumber(expectedTrackingNumber)
-                        .SetAmount(expectedAmount)
-                        .SetCallbackUrl(expectedCallbackUrl)
+                        .SetTrackingNumber(ExpectedTrackingNumber)
+                        .SetAmount(ExpectedAmount)
+                        .SetCallbackUrl(ExpectedCallbackUrl)
                         .UseSaman();
                 },
-                    handler =>
-                    {
-                        handler
-                            .Expect(TokenWebServiceUrl)
-                            .WithPartialContent("RequestToken")
-                            .WithPartialContent(expectedMerchantId)
-                            .Respond(MediaTypes.Xml, GetWebGatewayTokenResponse());
+                handler =>
+                {
+                    handler
+                        .Expect(ApiUrl)
+                        .WithPartialContent("RequestToken")
+                        .WithPartialContent(ExpectedMerchantId)
+                        .Respond(MediaTypes.Xml, GetWebGatewayTokenResponse());
 
-                        handler
-                            .Expect(WebServiceUrl)
-                            .WithPartialContent("verifyTransaction")
-                            .Respond(MediaTypes.Xml, GetVerificationResponse());
-                    },
-                    context =>
+                    handler
+                        .Expect(ApiUrl)
+                        .WithPartialContent("verifyTransaction")
+                        .Respond(MediaTypes.Xml, GetVerificationResponse());
+                },
+                context =>
+                {
+                    context.Request.Query = new QueryCollection(new Dictionary<string, StringValues>
                     {
-                        context.Request.Query = new QueryCollection(new Dictionary<string, StringValues>
-                        {
-                            {"state", "OK"},
-                            {"ResNum", expectedTransactionCode},
-                            {"RefNum", "test"}
-                        });
-                    },
-                    result =>
+                        {"state", "OK"},
+                        {"ResNum", ExpectedTransactionCode},
+                        {"RefNum", "test"}
+                    });
+                },
+                result => GatewayOnResultHelper.OnRequestResult(
+                    result,
+                    SamanGateway.Name,
+                    GatewayTransporterDescriptor.TransportType.Post,
+                    PaymentPageUrl,
+                    expectedForm: new Dictionary<string, string>
                     {
-                        Assert.IsNotNull(result);
-                        Assert.IsTrue(result.IsSucceed);
-                        Assert.AreEqual(SamanGateway.Name, result.GatewayName);
-                        Assert.IsNotNull(result.GatewayTransporter);
-                        Assert.IsNotNull(result.GatewayTransporter.Descriptor);
-                        Assert.AreEqual(GatewayTransporterDescriptor.TransportType.Post, result.GatewayTransporter.Descriptor.Type);
-                        Assert.IsNotNull(result.GatewayTransporter.Descriptor.Url);
-                        Assert.IsNotNull(result.GatewayTransporter.Descriptor.Form);
-
-                        Assert.AreEqual(PaymentPageUrl, result.GatewayTransporter.Descriptor.Url);
-
-                        var expectedForm = new Dictionary<string, string>
-                        {
                         {"Token", "test"},
-                        {FormRedirectUrlKey, expectedCallbackUrl}
-                        };
-                        foreach (var item in expectedForm)
-                        {
-                            var form = result
-                                .GatewayTransporter
-                                .Descriptor
-                                .Form
-                                .SingleOrDefault(_ => _.Key == item.Key);
-
-                            Assert.IsNotNull(form.Key);
-                            Assert.IsNotNull(form.Value);
-
-                            if (form.Key == FormRedirectUrlKey)
-                            {
-                                Assert.IsNotNull(form);
-                                Assert.IsTrue(form.Value.StartsWith(item.Value));
-                                var url = new Uri(form.Value);
-                                var query = QueryHelpers.ParseQuery(url.Query);
-                                Assert.IsTrue(query.ContainsKey(QueryStringPaymentTokenOptions.DefaultQueryName));
-                                Assert.IsNotNull(query[QueryStringPaymentTokenOptions.DefaultQueryName]);
-                            }
-                        }
-                    },
-                result => GatewayOnResultHelper.OnFetchResult(result, expectedTrackingNumber, expectedAmount, SamanGateway.Name),
-                result => GatewayOnResultHelper.OnVerifyResult(result, expectedTrackingNumber, expectedAmount, SamanGateway.Name));
+                        {FormRedirectUrlKey, ExpectedCallbackUrl}
+                    }),
+                result => GatewayOnResultHelper.OnFetchResult(result, ExpectedTrackingNumber, ExpectedAmount, SamanGateway.Name),
+                result => GatewayOnResultHelper.OnVerifyResult(result, ExpectedTrackingNumber, ExpectedAmount, SamanGateway.Name, ExpectedTransactionCode));
         }
 
         [TestMethod]
         public async Task MobileGateway_Requesting_And_Verifying_Work()
         {
-            const string expectedMerchantId = "test";
-            const long expectedTrackingNumber = 1;
-            const long expectedAmount = 1000;
-            const string expectedCallbackUrl = "http://www.mywebsite.com";
-            const string expectedTransactionCode = "test";
-
             await GatewayTestHelpers.TestGatewayAsync(
                 gateways =>
                 {
@@ -145,41 +107,50 @@ namespace Parbad.Tests.Gateway.Saman
                         {
                             accounts.AddInMemory(account =>
                             {
-                                account.MerchantId = expectedMerchantId;
+                                account.MerchantId = ExpectedMerchantId;
                                 account.Password = "test";
                             });
+                        })
+                        .WithOptions(options =>
+                        {
+                            options.WebApiUrl = ApiUrl;
+                            options.WebApiTokenUrl = ApiUrl;
+                            options.WebPaymentPageUrl = PaymentPageUrl;
+                            options.MobileApiTokenUrl = ApiUrl;
+                            options.MobileApiVerificationUrl = ApiUrl;
+                            options.MobilePaymentPageUrl = ApiUrl;
                         });
                 },
                 invoice =>
                 {
                     invoice
-                        .SetTrackingNumber(expectedTrackingNumber)
-                        .SetAmount(expectedAmount)
-                        .SetCallbackUrl(expectedCallbackUrl)
+                        .SetTrackingNumber(ExpectedTrackingNumber)
+                        .SetAmount(ExpectedAmount)
+                        .SetCallbackUrl(ExpectedCallbackUrl)
                         .EnableSamanMobileGateway()
                         .UseSaman();
                 },
                     handler =>
                     {
                         handler
-                            .Expect(MobilePaymentTokenUrl)
+                            .Expect(ApiUrl)
                             .WithHttpMethod(HttpMethod.Post)
                             .WithJsonBody<SamanMobilePaymentTokenRequest>(model =>
                             {
                                 var isModelValid =
-                                    model.Amount == expectedAmount &&
-                                    model.TerminalId == expectedMerchantId &&
-                                    model.ResNum == expectedTrackingNumber.ToString() &&
+                                    model.Amount == ExpectedAmount &&
+                                    model.TerminalId == ExpectedMerchantId &&
+                                    model.ResNum == ExpectedTrackingNumber.ToString() &&
                                     model.Action == "Token" &&
                                     model.RedirectUrl != null &&
-                                    model.RedirectUrl.StartsWith(expectedCallbackUrl);
+                                    model.RedirectUrl.StartsWith(ExpectedCallbackUrl);
 
                                 return isModelValid;
                             })
                             .Respond(MediaTypes.Json, GetMobileGatewayTokenResponse());
 
                         handler
-                            .Expect(MobileVerifyPaymentUrl)
+                            .Expect(PaymentPageUrl)
                             .WithPartialContent("verifyTransaction")
                             .Respond(MediaTypes.Xml, GetVerificationResponse());
                     },
@@ -188,62 +159,21 @@ namespace Parbad.Tests.Gateway.Saman
                         context.Request.Query = new QueryCollection(new Dictionary<string, StringValues>
                         {
                         {"state", "OK"},
-                        {"ResNum", expectedTransactionCode},
+                        {"ResNum", ExpectedTransactionCode},
                         {"RefNum", "test"}
                         });
                     },
-                    result =>
+                result => GatewayOnResultHelper.OnRequestResult(
+                    result,
+                    SamanGateway.Name,
+                    GatewayTransporterDescriptor.TransportType.Post,
+                    PaymentPageUrl,
+                    expectedForm: new Dictionary<string, string>
                     {
-                        Assert.IsNotNull(result);
-                        Assert.IsTrue(result.IsSucceed);
-                        Assert.AreEqual(SamanGateway.Name, result.GatewayName);
-                        Assert.IsNotNull(result.GatewayTransporter);
-                        Assert.IsNotNull(result.GatewayTransporter.Descriptor);
-                        Assert.AreEqual(GatewayTransporterDescriptor.TransportType.Post, result.GatewayTransporter.Descriptor.Type);
-                        Assert.IsNotNull(result.GatewayTransporter.Descriptor.Url);
-                        Assert.IsNotNull(result.GatewayTransporter.Descriptor.Form);
-
-                        Assert.AreEqual(MobilePaymentPageUrl, result.GatewayTransporter.Descriptor.Url);
-
-                        var expectedForm = new Dictionary<string, string>
-                        {
-                            {"Token", "test"}
-                        };
-                        foreach (var item in expectedForm)
-                        {
-                            var form = result
-                                .GatewayTransporter
-                                .Descriptor
-                                .Form
-                                .SingleOrDefault(_ => _.Key == item.Key);
-
-                            Assert.IsNotNull(form.Key);
-                            Assert.IsNotNull(form.Value);
-                        }
-                    },
-                    result =>
-                    {
-                        Assert.IsNotNull(result);
-                        Assert.IsTrue(result.IsSucceed);
-                        Assert.AreEqual(expectedTrackingNumber, result.TrackingNumber);
-                        Assert.AreEqual(SamanGateway.Name, result.GatewayName);
-                        Assert.AreEqual(GatewayAccount.DefaultName, result.GatewayAccountName);
-                        Assert.AreEqual(expectedAmount, (long)result.Amount);
-                        Assert.IsFalse(result.IsAlreadyVerified);
-                        Assert.AreEqual(PaymentFetchResultStatus.ReadyForVerifying, result.Status);
-                    },
-                    result =>
-                    {
-                        Assert.IsNotNull(result);
-                        Assert.IsTrue(result.IsSucceed);
-                        Assert.AreEqual(expectedTrackingNumber, result.TrackingNumber);
-                        Assert.AreEqual(SamanGateway.Name, result.GatewayName);
-                        Assert.AreEqual(GatewayAccount.DefaultName, result.GatewayAccountName);
-                        Assert.AreEqual(expectedAmount, (long)result.Amount);
-                        Assert.AreEqual(PaymentVerifyResultStatus.Succeed, result.Status);
-                        Assert.IsNotNull(result.TransactionCode);
-                        Assert.AreEqual(expectedTransactionCode, result.TransactionCode);
-                    });
+                        {"Token", "test"}
+                    }),
+                result => GatewayOnResultHelper.OnFetchResult(result, ExpectedTrackingNumber, ExpectedAmount, SamanGateway.Name),
+                result => GatewayOnResultHelper.OnVerifyResult(result, ExpectedTrackingNumber, ExpectedAmount, SamanGateway.Name, ExpectedTransactionCode));
         }
 
         private static string GetWebGatewayTokenResponse()

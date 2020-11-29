@@ -50,7 +50,6 @@ namespace Parbad.Tests.Helpers
 
             var requestResult = await onlinePayment.RequestAsync(configureInvoice);
 
-            LogWhenResultIsNotSucceed(requestResult);
             onRequestResult(requestResult);
 
             var storageManager = serviceProvider.GetRequiredService<IStorageManager>();
@@ -67,28 +66,17 @@ namespace Parbad.Tests.Helpers
 
             var invoice = await onlinePayment.FetchAsync();
 
-            LogWhenResultIsNotSucceed(invoice);
             onFetchResult(invoice);
 
             var verificationResult = await onlinePayment.VerifyAsync(invoice);
 
-            LogWhenResultIsNotSucceed(verificationResult);
             onVerifyResult(verificationResult);
 
             if (onRefundResult != null)
             {
                 var refundResult = await onlinePayment.RefundCompletelyAsync(verificationResult);
 
-                LogWhenResultIsNotSucceed(refundResult);
                 onRefundResult.Invoke(refundResult);
-            }
-        }
-
-        public static void LogWhenResultIsNotSucceed(IPaymentResult result)
-        {
-            if (result != null && !result.IsSucceed)
-            {
-                Console.WriteLine($"Result message: {result.Message}");
             }
         }
     }

@@ -23,6 +23,8 @@ namespace Parbad.Tests.Gateway.Melli
             const long expectedTrackingNumber = 1;
             const long expectedAmount = 1000;
             const string expectedCallbackUrl = "http://www.mywebsite.com";
+            const string apiUrl = "http://localhost/";
+            const string paymentPageUrl = "http://localhost/";
 
             await GatewayTestHelpers.TestGatewayAsync(
                 gateways =>
@@ -36,6 +38,12 @@ namespace Parbad.Tests.Gateway.Melli
                                 account.TerminalId = "test";
                                 account.TerminalKey = "853f31351e51cd9c5222c28e408bf2a3";
                             });
+                        })
+                        .WithOptions(options =>
+                        {
+                            options.ApiRequestUrl = apiUrl;
+                            options.ApiVerificationUrl = apiUrl;
+                            options.PaymentPageUrl = paymentPageUrl;
                         });
                 },
                 invoice =>
