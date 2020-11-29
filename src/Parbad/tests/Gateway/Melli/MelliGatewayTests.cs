@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Primitives;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
-using Parbad.Abstraction;
 using Parbad.Builder;
 using Parbad.Gateway.Melli;
 using Parbad.Tests.Helpers;
@@ -23,7 +22,8 @@ namespace Parbad.Tests.Gateway.Melli
             const long expectedTrackingNumber = 1;
             const long expectedAmount = 1000;
             const string expectedCallbackUrl = "http://www.mywebsite.com";
-            const string apiUrl = "http://localhost/";
+            const string apiRequestUrl = "http://localhost/request";
+            const string apiVerificationUrl = "http://localhost/verify";
             const string paymentPageUrl = "http://localhost/";
 
             await GatewayTestHelpers.TestGatewayAsync(
@@ -41,8 +41,8 @@ namespace Parbad.Tests.Gateway.Melli
                         })
                         .WithOptions(options =>
                         {
-                            options.ApiRequestUrl = apiUrl;
-                            options.ApiVerificationUrl = apiUrl;
+                            options.ApiRequestUrl = apiRequestUrl;
+                            options.ApiVerificationUrl = apiVerificationUrl;
                             options.PaymentPageUrl = paymentPageUrl;
                         });
                 },
@@ -57,7 +57,7 @@ namespace Parbad.Tests.Gateway.Melli
                 handler =>
                 {
                     handler
-                        .When("*/PaymentRequest")
+                        .Expect(apiRequestUrl)
                         .Respond("application/json", JsonConvert.SerializeObject(new
                         {
                             ResCode = 0,
@@ -65,7 +65,7 @@ namespace Parbad.Tests.Gateway.Melli
                         }));
 
                     handler
-                        .When("*/Verify")
+                        .Expect(apiVerificationUrl)
                         .Respond("application/json", JsonConvert.SerializeObject(new
                         {
                             ResCode = 0,
@@ -83,23 +83,17 @@ namespace Parbad.Tests.Gateway.Melli
                         {"OrderId", "1"}
                     });
                 },
-                result =>
-                {
-                    Assert.IsNotNull(result);
-                    Assert.IsTrue(result.IsSucceed);
-                    Assert.AreEqual(expectedTrackingNumber, result.TrackingNumber);
-                    Assert.AreEqual(MelliGateway.Name, result.GatewayName);
-                    Assert.AreEqual(GatewayAccount.DefaultName, result.GatewayAccountName);
-                    Assert.IsNotNull(result.GatewayTransporter);
-                    Assert.IsNotNull(result.GatewayTransporter.Descriptor);
-                    Assert.AreEqual(GatewayTransporterDescriptor.TransportType.Redirect, result.GatewayTransporter.Descriptor.Type);
-                    Assert.IsNotNull(result.GatewayTransporter.Descriptor.Url);
-
-                    var uri = new Uri(result.GatewayTransporter.Descriptor.Url);
-                    var queries = QueryHelpers.ParseQuery(uri.Query);
-                    Assert.IsTrue(queries.ContainsKey("token"));
-                    Assert.AreEqual("test", (string)queries["token"]);
-                },
+                result => GatewayOnResultHelper.OnRequestResult(
+                    result,
+                    MelliGateway.Name,
+                    GatewayTransporterDescriptor.TransportType.Redirect,
+                    additionalChecks: () =>
+                    {
+                        var uri = new Uri(result.GatewayTransporter.Descriptor.Url);
+                        var queries = QueryHelpers.ParseQuery(uri.Query);
+                        Assert.IsTrue(queries.ContainsKey("token"));
+                        Assert.AreEqual("test", (string)queries["token"]);
+                    }),
                 result => GatewayOnResultHelper.OnFetchResult(result, expectedTrackingNumber, expectedAmount, MelliGateway.Name),
             result => GatewayOnResultHelper.OnVerifyResult(result, expectedTrackingNumber, expectedAmount, MelliGateway.Name));
         }

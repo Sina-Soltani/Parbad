@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Parbad.Abstraction;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,8 @@ namespace Parbad.Tests.Gateway
             IPaymentRequestResult result,
             string expectedGatewayName,
             GatewayTransporterDescriptor.TransportType transportType,
-            string expectedPaymentPageUrl,
+            Action additionalChecks = null,
+            string expectedPaymentPageUrl = null,
             IDictionary<string, string> expectedForm = null)
         {
             Assert.IsNotNull(result);
@@ -29,28 +31,33 @@ namespace Parbad.Tests.Gateway
             if (transportType == GatewayTransporterDescriptor.TransportType.Post)
             {
                 Assert.IsNotNull(result.GatewayTransporter.Descriptor.Form);
+
+                if (expectedForm != null)
+                {
+                    foreach (var item in expectedForm)
+                    {
+                        var form = result
+                            .GatewayTransporter
+                            .Descriptor
+                            .Form
+                            .SingleOrDefault(_ => _.Key == item.Key);
+
+                        Assert.IsNotNull(form.Key);
+                        Assert.IsNotNull(form.Value);
+                    }
+                }
             }
             else
             {
                 Assert.IsNull(result.GatewayTransporter.Descriptor.Form);
             }
 
-            Assert.AreEqual(expectedPaymentPageUrl, result.GatewayTransporter.Descriptor.Url);
-
-            if (expectedForm != null)
+            if (!string.IsNullOrEmpty(expectedPaymentPageUrl))
             {
-                foreach (var item in expectedForm)
-                {
-                    var form = result
-                        .GatewayTransporter
-                        .Descriptor
-                        .Form
-                        .SingleOrDefault(_ => _.Key == item.Key);
-
-                    Assert.IsNotNull(form.Key);
-                    Assert.IsNotNull(form.Value);
-                }
+                Assert.AreEqual(expectedPaymentPageUrl, result.GatewayTransporter.Descriptor.Url);
             }
+
+            additionalChecks?.Invoke();
         }
 
         public static void OnFetchResult(

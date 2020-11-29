@@ -85,7 +85,7 @@ namespace Parbad.Tests.Gateway.Saman
                     result,
                     SamanGateway.Name,
                     GatewayTransporterDescriptor.TransportType.Post,
-                    PaymentPageUrl,
+                    expectedPaymentPageUrl: PaymentPageUrl,
                     expectedForm: new Dictionary<string, string>
                     {
                         {"Token", "test"},
@@ -167,7 +167,7 @@ namespace Parbad.Tests.Gateway.Saman
                     result,
                     SamanGateway.Name,
                     GatewayTransporterDescriptor.TransportType.Post,
-                    PaymentPageUrl,
+                    expectedPaymentPageUrl: PaymentPageUrl,
                     expectedForm: new Dictionary<string, string>
                     {
                         {"Token", "test"}
