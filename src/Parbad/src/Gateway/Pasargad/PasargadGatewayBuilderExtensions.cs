@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Parbad.Gateway.Pasargad;
 using Parbad.GatewayBuilders;
 using System;
+using Parbad.Gateway.Pasargad.Internal;
 
 namespace Parbad.Builder
 {
@@ -17,6 +18,8 @@ namespace Parbad.Builder
         public static IGatewayConfigurationBuilder<PasargadGateway> AddPasargad(this IGatewayBuilder builder)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+            builder.Services.AddSingleton<IPasargadCrypto, PasargadCrypto>();
 
             return builder
                 .AddGateway<PasargadGateway>()

@@ -58,7 +58,7 @@ namespace Parbad.Tests.Gateway.Melli
                 {
                     handler
                         .Expect(apiRequestUrl)
-                        .Respond("application/json", JsonConvert.SerializeObject(new
+                        .Respond(MediaTypes.Json, JsonConvert.SerializeObject(new
                         {
                             ResCode = 0,
                             Token = "test"
@@ -66,7 +66,7 @@ namespace Parbad.Tests.Gateway.Melli
 
                     handler
                         .Expect(apiVerificationUrl)
-                        .Respond("application/json", JsonConvert.SerializeObject(new
+                        .Respond(MediaTypes.Json, JsonConvert.SerializeObject(new
                         {
                             ResCode = 0,
                             Token = "test",

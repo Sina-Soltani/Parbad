@@ -21,6 +21,7 @@ namespace Parbad.Gateway.Pasargad
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
+        private readonly IPasargadCrypto _crypto;
         private readonly PasargadGatewayOptions _gatewayOptions;
         private readonly IOptions<MessagesOptions> _messageOptions;
 
@@ -30,11 +31,13 @@ namespace Parbad.Gateway.Pasargad
             IHttpContextAccessor httpContextAccessor,
             IHttpClientFactory httpClientFactory,
             IGatewayAccountProvider<PasargadGatewayAccount> accountProvider,
+            IPasargadCrypto crypto,
             IOptions<PasargadGatewayOptions> gatewayOptions,
             IOptions<MessagesOptions> messageOptions) : base(accountProvider)
         {
             _httpContextAccessor = httpContextAccessor;
             _httpClient = httpClientFactory.CreateClient(this);
+            _crypto = crypto;
             _gatewayOptions = gatewayOptions.Value;
             _messageOptions = messageOptions;
         }
@@ -46,7 +49,7 @@ namespace Parbad.Gateway.Pasargad
 
             var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
 
-            return PasargadHelper.CreateRequestResult(invoice, _httpContextAccessor.HttpContext, account, _gatewayOptions);
+            return PasargadHelper.CreateRequestResult(invoice, _httpContextAccessor.HttpContext, account, _crypto, _gatewayOptions);
         }
 
         /// <inheritdoc />
@@ -86,7 +89,7 @@ namespace Parbad.Gateway.Pasargad
                 return checkCallbackResult.Result;
             }
 
-            var data = PasargadHelper.CreateVerifyData(context, account, callbackResult);
+            var data = PasargadHelper.CreateVerifyData(context, account, _crypto, callbackResult);
 
             responseMessage = await _httpClient.PostFormAsync(
                     _gatewayOptions.ApiVerificationUrl,
@@ -106,7 +109,7 @@ namespace Parbad.Gateway.Pasargad
 
             var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 
-            var data = PasargadHelper.CreateRefundData(context, amount, account);
+            var data = PasargadHelper.CreateRefundData(context, amount, _crypto, account);
 
             var responseMessage = await _httpClient.PostFormAsync(
                     _gatewayOptions.ApiRefundUrl,

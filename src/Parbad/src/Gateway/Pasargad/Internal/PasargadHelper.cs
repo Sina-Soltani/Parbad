@@ -1,13 +1,6 @@
 // Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Parbad.Abstraction;
 using Parbad.Gateway.Pasargad.Internal.Models;
@@ -16,6 +9,11 @@ using Parbad.Internal;
 using Parbad.Options;
 using Parbad.Storage.Abstractions;
 using Parbad.Utilities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Parbad.Gateway.Pasargad.Internal
 {
@@ -28,6 +26,7 @@ namespace Parbad.Gateway.Pasargad.Internal
             Invoice invoice,
             HttpContext httpContext,
             PasargadGatewayAccount account,
+            IPasargadCrypto crypto,
             PasargadGatewayOptions gatewayOptions)
         {
             var invoiceDate = GetTimeStamp(DateTime.Now);
@@ -44,7 +43,7 @@ namespace Parbad.Gateway.Pasargad.Internal
                 ActionNumber,
                 timeStamp);
 
-            var signedData = SignData(account.PrivateKey, dataToSign);
+            var signedData = crypto.Encrypt(account.PrivateKey, dataToSign);
 
             var result = PaymentRequestResult.SucceedWithPost(
                 account.Name,
@@ -149,7 +148,11 @@ namespace Parbad.Gateway.Pasargad.Internal
             };
         }
 
-        public static IEnumerable<KeyValuePair<string, string>> CreateVerifyData(InvoiceContext context, PasargadGatewayAccount account, PasargadCallbackResult callbackResult)
+        public static IEnumerable<KeyValuePair<string, string>> CreateVerifyData(
+            InvoiceContext context,
+            PasargadGatewayAccount account,
+            IPasargadCrypto crypto,
+            PasargadCallbackResult callbackResult)
         {
             var timeStamp = GetTimeStamp(DateTime.Now);
 
@@ -161,7 +164,7 @@ namespace Parbad.Gateway.Pasargad.Internal
                 (long)context.Payment.Amount,
                 timeStamp);
 
-            var signData = SignData(account.PrivateKey, dataToSign);
+            var signData = crypto.Encrypt(account.PrivateKey, dataToSign);
 
             return new[]
             {
@@ -193,7 +196,11 @@ namespace Parbad.Gateway.Pasargad.Internal
             };
         }
 
-        public static IEnumerable<KeyValuePair<string, string>> CreateRefundData(InvoiceContext context, Money amount, PasargadGatewayAccount account)
+        public static IEnumerable<KeyValuePair<string, string>> CreateRefundData(
+            InvoiceContext context,
+            Money amount,
+            IPasargadCrypto crypto,
+            PasargadGatewayAccount account)
         {
             var transactionRecord = context.Transactions.FirstOrDefault(transaction => transaction.Type == TransactionType.Request);
 
@@ -218,7 +225,7 @@ namespace Parbad.Gateway.Pasargad.Internal
                 RefundNumber,
                 timeStamp);
 
-            var signedData = SignData(account.PrivateKey, dataToSign);
+            var signedData = crypto.Encrypt(account.PrivateKey, dataToSign);
 
             return new[]
             {
@@ -248,39 +255,6 @@ namespace Parbad.Gateway.Pasargad.Internal
                 Status = isSucceed ? PaymentRefundResultStatus.Succeed : PaymentRefundResultStatus.Failed,
                 Message = message
             };
-        }
-
-        public static bool IsPrivateKeyValid(string privateKey)
-        {
-            try
-            {
-                using (var rsa = new RSACryptoServiceProvider())
-                {
-                    rsa.FromXmlString(privateKey);
-                }
-
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        private static string SignData(string privateKey, string dataToSign)
-        {
-            using (var rsa = new RSACryptoServiceProvider())
-            {
-                byte[] encryptedData;
-#if NETSTANDARD2_0
-                rsa.FromXml(privateKey);
-                encryptedData = rsa.SignData(Encoding.UTF8.GetBytes(dataToSign), HashAlgorithmName.SHA1, RSASignaturePadding.Pkcs1);
-#else
-                rsa.FromXmlString(privateKey);
-                encryptedData = rsa.SignData(Encoding.UTF8.GetBytes(dataToSign), new SHA1CryptoServiceProvider());
-#endif
-                return Convert.ToBase64String(encryptedData);
-            }
         }
 
         private static string GetTimeStamp(DateTime dateTime)
