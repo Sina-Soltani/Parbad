@@ -78,13 +78,13 @@ namespace Parbad.Tests.Gateway.Pasargad
                         .SetTrackingNumber(ExpectedTrackingNumber)
                         .SetAmount(ExpectedAmount)
                         .SetCallbackUrl(expectedCallbackUrl)
-                        .UseAsanPardakht();
+                        .UsePasargad();
                 },
                 handler =>
                 {
                     handler
                         .When("*CheckTransactionResult")
-                        .Respond(MediaTypes.Xml, GetRequestResponse());
+                        .Respond(MediaTypes.Xml, GetCheckCallbackResponse());
 
                     handler
                         .When("*VerifyPayment")
@@ -94,7 +94,7 @@ namespace Parbad.Tests.Gateway.Pasargad
                 {
                     context.Request.Query = new QueryCollection(new Dictionary<string, StringValues>
                     {
-                        {"iN", "test"},
+                        {"iN", ExpectedTrackingNumber.ToString()},
                         {"iD", "test"},
                         {"tref", ExpectedTransactionCode},
                         {"result", "true"}
@@ -119,17 +119,18 @@ namespace Parbad.Tests.Gateway.Pasargad
                 result => GatewayOnResultHelper.OnVerifyResult(result, ExpectedTrackingNumber, ExpectedAmount, PasargadGateway.Name, expectedTransactionCode: ExpectedTransactionCode));
         }
 
-        private static string GetRequestResponse()
+        private static string GetCheckCallbackResponse()
         {
             return
-                "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">" +
+                "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
                 "<soap:Body>" +
-                "<RequestOperationResponse xmlns=\"http://tempuri.org/\">" +
+                "<ns2:bpPayRequestResponse xmlns:ns2=\"http://interfaces.core.sw.bps.com/\">" +
                 $"<invoiceNumber>{ExpectedTrackingNumber}</invoiceNumber>" +
                 $"<action>{ExpectedActionNumber}</action>" +
                 $"<merchantCode>{ExpectedMerchantCode}</merchantCode>" +
                 $"<terminalCode>{ExpectedTerminalCode}</terminalCode>" +
-                "</RequestOperationResponse>" +
+                "<result>true</result>" +
+                "</ns2:bpPayRequestResponse>" +
                 "</soap:Body>" +
                 "</soap:Envelope>";
         }
@@ -137,11 +138,11 @@ namespace Parbad.Tests.Gateway.Pasargad
         private static string GetVerificationResponse()
         {
             return
-                "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">" +
+                "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
                 "<soap:Body>" +
-                "<RequestVerificationResponse xmlns=\"http://tempuri.org/\">" +
-                "<RequestVerificationResult>500</RequestVerificationResult>" +
-                "</RequestVerificationResponse>" +
+                "<ns2:bpPayRequestResponse xmlns:ns2=\"http://interfaces.core.sw.bps.com/\">" +
+                "<result>true</result>" +
+                "</ns2:bpPayRequestResponse>" +
                 "</soap:Body>" +
                 "</soap:Envelope>";
         }
