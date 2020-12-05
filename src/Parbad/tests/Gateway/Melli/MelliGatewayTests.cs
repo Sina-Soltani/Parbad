@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Primitives;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
+using NUnit.Framework;
 using Parbad.Builder;
 using Parbad.Gateway.Melli;
 using Parbad.Tests.Helpers;
@@ -13,10 +13,9 @@ using System.Threading.Tasks;
 
 namespace Parbad.Tests.Gateway.Melli
 {
-    [TestClass]
     public class MelliGatewayTests
     {
-        [TestMethod]
+        [Test]
         public async Task Requesting_And_Verifying_Work()
         {
             const long expectedTrackingNumber = 1;

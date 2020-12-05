@@ -1,27 +1,26 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
+﻿using Moq;
+using NUnit.Framework;
 using Parbad.Gateway.Saman.Internal;
 using Parbad.Internal;
 using Parbad.InvoiceBuilder;
+using System;
+using System.Threading.Tasks;
 
 namespace Parbad.Tests.Gateway.Saman
 {
-    [TestClass]
     public class SamanCommonTests
     {
         private IInvoiceBuilder _invoiceBuilder;
 
-        [TestInitialize]
-        public void Initialize()
+        [SetUp]
+        public void Setup()
         {
             var mockServiceProvider = new Mock<IServiceProvider>();
 
             _invoiceBuilder = new DefaultInvoiceBuilder(mockServiceProvider.Object);
         }
 
-        [TestMethod]
+        [Test]
         public async Task Invoice_Must_Have_Correct_GatewayName()
         {
             _invoiceBuilder.UseSaman();
@@ -33,7 +32,7 @@ namespace Parbad.Tests.Gateway.Saman
             Assert.IsTrue(invoice.GatewayName.Equals("saman", StringComparison.OrdinalIgnoreCase));
         }
 
-        [TestMethod]
+        [Test]
         public async Task Invoice_Must_Have_Saman_MobileGateway_Enabled()
         {
             _invoiceBuilder.EnableSamanMobileGateway();
@@ -44,11 +43,11 @@ namespace Parbad.Tests.Gateway.Saman
 
             Assert.IsNotNull(invoice.AdditionalData);
             Assert.IsTrue(invoice.AdditionalData.ContainsKey(SamanHelper.MobileGatewayKey));
-            Assert.IsInstanceOfType(invoice.AdditionalData[SamanHelper.MobileGatewayKey], typeof(bool));
+            Assert.IsInstanceOf<bool>(invoice.AdditionalData[SamanHelper.MobileGatewayKey]);
             Assert.AreEqual(true, invoice.AdditionalData[SamanHelper.MobileGatewayKey]);
         }
 
-        [TestMethod]
+        [Test]
         public async Task Invoice_Must_Have_Saman_MobileGateway_Disabled()
         {
             _invoiceBuilder.EnableSamanMobileGateway(false);
@@ -59,7 +58,7 @@ namespace Parbad.Tests.Gateway.Saman
 
             Assert.IsNotNull(invoice.AdditionalData);
             Assert.IsTrue(invoice.AdditionalData.ContainsKey(SamanHelper.MobileGatewayKey));
-            Assert.IsInstanceOfType(invoice.AdditionalData[SamanHelper.MobileGatewayKey], typeof(bool));
+            Assert.IsInstanceOf<bool>(invoice.AdditionalData[SamanHelper.MobileGatewayKey]);
             Assert.AreEqual(false, invoice.AdditionalData[SamanHelper.MobileGatewayKey]);
         }
     }

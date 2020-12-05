@@ -1,19 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Parbad.Abstraction;
 using Parbad.Internal;
 using Parbad.PaymentTokenProviders;
 using Parbad.Tests.Helpers;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using NUnit.Framework;
 
 namespace Parbad.Tests
 {
-    [TestClass]
     public class PaymentTokenProviderTests
     {
         private IHttpContextAccessor _httpContextAccessor;
@@ -21,17 +20,19 @@ namespace Parbad.Tests
         private IPaymentTokenProvider _provider;
         private Invoice _invoice;
 
-        [TestInitialize]
-        public void Initialize()
+        [SetUp]
+        public void Setup()
         {
-            _invoice = new Invoice();
-            _invoice.CallbackUrl = CallbackUrl.Parse("http://www.mysite.com");
+            _invoice = new Invoice { CallbackUrl = CallbackUrl.Parse("http://www.mysite.com") };
+
             _httpContextAccessor = MockHelpers.MockHttpContextAccessor();
+
             _options = new OptionsWrapper<QueryStringPaymentTokenOptions>(new QueryStringPaymentTokenOptions());
+
             _provider = new GuidQueryStringPaymentTokenProvider(_httpContextAccessor, _options);
         }
 
-        [TestMethod]
+        [Test]
         public async Task Token_Must_Not_Be_Null()
         {
             var token = await _provider.ProvideTokenAsync(_invoice);
@@ -39,7 +40,7 @@ namespace Parbad.Tests
             Assert.IsNotNull(token);
         }
 
-        [TestMethod]
+        [Test]
         public async Task Token_Must_Be_Guid()
         {
             var token = await _provider.ProvideTokenAsync(_invoice);
@@ -47,7 +48,7 @@ namespace Parbad.Tests
             Assert.IsTrue(Guid.TryParse(token, out _));
         }
 
-        [TestMethod]
+        [Test]
         public async Task CallbackUrl_Must_Have_Default_TokenName()
         {
             await _provider.ProvideTokenAsync(_invoice);
@@ -59,7 +60,7 @@ namespace Parbad.Tests
             Assert.IsTrue(query.ContainsKey(QueryStringPaymentTokenOptions.DefaultQueryName));
         }
 
-        [TestMethod]
+        [Test]
         public async Task CallbackUrl_Must_Have_TokenName_From_Options()
         {
             const string expectedQueryName = "test";
@@ -75,7 +76,7 @@ namespace Parbad.Tests
             Assert.IsTrue(query.ContainsKey(expectedQueryName));
         }
 
-        [TestMethod]
+        [Test]
         public async Task CallbackUrl_Must_Have_Correct_TokenValue()
         {
             var token = await _provider.ProvideTokenAsync(_invoice);
@@ -89,7 +90,7 @@ namespace Parbad.Tests
             Assert.AreEqual(token, (string)query[QueryStringPaymentTokenOptions.DefaultQueryName]);
         }
 
-        [TestMethod]
+        [Test]
         public async Task Must_Provide_Unique_Tokens()
         {
             var token1 = await _provider.ProvideTokenAsync(_invoice);
@@ -98,7 +99,7 @@ namespace Parbad.Tests
             Assert.AreNotEqual(token2, token1);
         }
 
-        [TestMethod]
+        [Test]
         public async Task Must_Return_Null_When_No_Token_Exists()
         {
             var token = await _provider.RetrieveTokenAsync();
@@ -106,7 +107,7 @@ namespace Parbad.Tests
             Assert.IsNull(token);
         }
 
-        [TestMethod]
+        [Test]
         public async Task Must_Return_The_Token_From_QueryString()
         {
             const string expectedToken = "test";
@@ -122,7 +123,7 @@ namespace Parbad.Tests
             Assert.AreEqual(expectedToken, token);
         }
 
-        [TestMethod]
+        [Test]
         public async Task Must_Return_The_Token_From_QueryString_With_CustomQueryName()
         {
             const string expectedToken = "test";

@@ -2,8 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Primitives;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using NUnit.Framework;
 using Parbad.Builder;
 using Parbad.Gateway.AsanPardakht;
 using Parbad.Tests.Helpers;
@@ -13,7 +13,6 @@ using System.Threading.Tasks;
 
 namespace Parbad.Tests.Gateway.AsanPardakht
 {
-    [TestClass]
     public class AsanPardakhtGatewayTests
     {
         private IAsanPardakhtCrypto _crypto;
@@ -21,8 +20,8 @@ namespace Parbad.Tests.Gateway.AsanPardakht
         private const long ExpectedAmount = 1000;
         private const string ExpectedTransactionCode = "test";
 
-        [TestInitialize]
-        public void Initialize()
+        [SetUp]
+        public void Setup()
         {
             var mockCrypto = new Mock<IAsanPardakhtCrypto>();
             mockCrypto
@@ -38,7 +37,7 @@ namespace Parbad.Tests.Gateway.AsanPardakht
             _crypto = mockCrypto.Object;
         }
 
-        [TestMethod]
+        [Test]
         public async Task Requesting_And_Verifying_Work()
         {
             const string expectedRefId = "test";

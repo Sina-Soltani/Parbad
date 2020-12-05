@@ -5,9 +5,9 @@ using Parbad.InvoiceBuilder;
 using System;
 using System.Threading.Tasks;
 
-namespace Parbad.Tests.Gateway.AsanPardakht
+namespace Parbad.Gateway.IdPay.Tests
 {
-    public class AsanPardakhtCommonTests
+    public class IdPayCommonTests
     {
         private IInvoiceBuilder _invoiceBuilder;
 
@@ -22,13 +22,13 @@ namespace Parbad.Tests.Gateway.AsanPardakht
         [Test]
         public async Task Invoice_Must_Have_Correct_GatewayName()
         {
-            _invoiceBuilder.UseAsanPardakht();
+            _invoiceBuilder.UseIdPay();
 
             var invoice = await _invoiceBuilder.BuildAsync();
 
             Assert.IsNotNull(invoice);
             Assert.IsNotNull(invoice.GatewayName);
-            Assert.IsTrue(invoice.GatewayName.Equals("AsanPardakht", StringComparison.OrdinalIgnoreCase));
+            Assert.IsTrue(invoice.GatewayName.Equals("IdPay", StringComparison.OrdinalIgnoreCase));
         }
     }
 }

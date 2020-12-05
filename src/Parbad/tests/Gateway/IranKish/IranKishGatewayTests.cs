@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Parbad.Builder;
 using Parbad.Gateway.IranKish;
 using Parbad.Tests.Helpers;
@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 
 namespace Parbad.Tests.Gateway.IranKish
 {
-    [TestClass]
     public class IranKishGatewayTests
     {
         private const string ExpectedMerchantId = "test";
@@ -18,7 +17,7 @@ namespace Parbad.Tests.Gateway.IranKish
         private const string ExpectedTransactionCode = "test";
         private const string ExpectedToken = "Token";
 
-        [TestMethod]
+        [Test]
         public async Task Requesting_And_Verifying_Work()
         {
             const string expectedRefId = "test";

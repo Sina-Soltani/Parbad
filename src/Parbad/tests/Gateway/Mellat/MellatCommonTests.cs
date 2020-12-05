@@ -1,18 +1,17 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
+﻿using Moq;
 using Parbad.Internal;
 using Parbad.InvoiceBuilder;
 using System;
 using System.Threading.Tasks;
+using NUnit.Framework;
 
 namespace Parbad.Tests.Gateway.Mellat
 {
-    [TestClass]
     public class MellatCommonTests
     {
         private IInvoiceBuilder _invoiceBuilder;
 
-        [TestInitialize]
+        [SetUp]
         public void Initialize()
         {
             var mockServiceProvider = new Mock<IServiceProvider>();
@@ -20,7 +19,7 @@ namespace Parbad.Tests.Gateway.Mellat
             _invoiceBuilder = new DefaultInvoiceBuilder(mockServiceProvider.Object);
         }
 
-        [TestMethod]
+        [Test]
         public async Task Invoice_Must_Have_Correct_GatewayName()
         {
             _invoiceBuilder.UseMellat();

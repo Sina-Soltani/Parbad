@@ -1,10 +1,10 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using NUnit.Framework;
 using Parbad.Abstraction;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Parbad.Tests.Gateway
+namespace Parbad.Tests.Helpers
 {
     public static class GatewayOnResultHelper
     {

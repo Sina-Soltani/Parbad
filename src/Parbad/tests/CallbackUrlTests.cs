@@ -1,16 +1,15 @@
 ﻿using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+using NUnit.Framework;
 using Parbad.Exceptions;
+using System;
 
 namespace Parbad.Tests
 {
-    [TestClass]
     public class CallbackUrlTests
     {
         private const string ExpectedUrl = "http://www.mysite.com";
 
-        [TestMethod]
+        [Test]
         public void Url_Must_Be_Equal_With_ExpectedUrl()
         {
             var instance1 = new CallbackUrl(ExpectedUrl);
@@ -22,7 +21,7 @@ namespace Parbad.Tests
             Assert.AreEqual(ExpectedUrl, instance3.Url);
         }
 
-        [TestMethod]
+        [Test]
         public void ToString_Value_Must_Be_Equal_With_Url()
         {
             var instance = new CallbackUrl(ExpectedUrl);
@@ -30,7 +29,7 @@ namespace Parbad.Tests
             Assert.AreEqual(ExpectedUrl, instance.ToString());
         }
 
-        [TestMethod]
+        [Test]
         public void QueryString_Works()
         {
             const string expectedQueryName = "test";
@@ -48,7 +47,7 @@ namespace Parbad.Tests
             Assert.AreEqual(expectedQueryValue, (string)query[expectedQueryName]);
         }
 
-        [TestMethod]
+        [Test]
         public void Casted_Value_Must_Be_Equal_With_Url()
         {
             var url = (string)new CallbackUrl(ExpectedUrl);
@@ -56,10 +55,10 @@ namespace Parbad.Tests
             Assert.AreEqual(ExpectedUrl, url);
         }
 
-        [TestMethod]
+        [Test]
         public void NonValidUrl_Must_Throw_Exception()
         {
-            Assert.ThrowsException<CallbackUrlFormatException>(() => new CallbackUrl("abcd"));
+            Assert.Throws<CallbackUrlFormatException>(() => new CallbackUrl("abcd"));
         }
     }
 }

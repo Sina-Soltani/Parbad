@@ -1,23 +1,22 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Parbad.Builder;
+using Parbad.Gateway.Mellat;
 using Parbad.Tests.Helpers;
 using RichardSzalay.MockHttp;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Parbad.Gateway.Mellat;
+using NUnit.Framework;
 
 namespace Parbad.Tests.Gateway.Mellat
 {
-    [TestClass]
     public class MellatGatewayTests
     {
         private const long ExpectedAmount = 1000;
         private const string ExpectedTransactionCode = "test";
         private const string ExpectedRefId = "token";
 
-        [TestMethod]
+        [Test]
         public async Task Requesting_And_Verifying_Work()
         {
             const long expectedTrackingNumber = 1;

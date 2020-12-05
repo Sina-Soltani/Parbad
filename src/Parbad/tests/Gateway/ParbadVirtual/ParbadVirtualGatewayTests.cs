@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Parbad.Builder;
 using Parbad.Gateway.ParbadVirtual;
 using Parbad.Tests.Helpers;
@@ -9,13 +9,12 @@ using System.Threading.Tasks;
 
 namespace Parbad.Tests.Gateway.ParbadVirtual
 {
-    [TestClass]
     public class ParbadVirtualGatewayTests
     {
         private const long ExpectedAmount = 1000;
         private const string ExpectedTransactionCode = "test";
 
-        [TestMethod]
+        [Test]
         public async Task Requesting_And_Verifying_Work()
         {
             const long expectedTrackingNumber = 1;

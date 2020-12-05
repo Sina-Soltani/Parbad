@@ -1,5 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
+﻿using Moq;
+using NUnit.Framework;
 using Parbad.Internal;
 using Parbad.InvoiceBuilder;
 using System;
@@ -7,20 +7,19 @@ using System.Threading.Tasks;
 
 namespace Parbad.Tests.Gateway.Pasargad
 {
-    [TestClass]
     public class PasargadCommonTests
     {
         private IInvoiceBuilder _invoiceBuilder;
 
-        [TestInitialize]
-        public void Initialize()
+        [SetUp]
+        public void Setup()
         {
             var mockServiceProvider = new Mock<IServiceProvider>();
 
             _invoiceBuilder = new DefaultInvoiceBuilder(mockServiceProvider.Object);
         }
 
-        [TestMethod]
+        [Test]
         public async Task Invoice_Must_Have_Correct_GatewayName()
         {
             _invoiceBuilder.UsePasargad();

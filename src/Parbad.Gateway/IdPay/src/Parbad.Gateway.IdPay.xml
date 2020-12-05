@@ -26,6 +26,13 @@
             <param name="builder"></param>
             <param name="configureAccounts">Configures the accounts.</param>
         </member>
+        <member name="M:Parbad.Builder.IdPayGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.IdPay.IdPayGateway},System.Action{Parbad.Gateway.IdPay.IdPayGatewayOptions})">
+            <summary>
+            Configures the options for IdPay Gateway.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureOptions">Configuration</param>
+        </member>
         <member name="M:Parbad.IdPayGatewayInvoiceBuilderExtensions.UseIdPay(Parbad.InvoiceBuilder.IInvoiceBuilder)">
             <summary>
             The invoice will be sent to IDPay.ir gateway.
