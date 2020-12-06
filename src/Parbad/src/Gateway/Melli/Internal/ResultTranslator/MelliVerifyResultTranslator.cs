@@ -1,4 +1,4 @@
-// Copyright (c) Parbad. All rights reserved.
+﻿// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
 using Parbad.Options;
@@ -11,9 +11,9 @@ namespace Parbad.Gateway.Melli.Internal.ResultTranslator
         {
             return result switch
             {
-                0 => MelliVerifyResponseCodes.Code0,
-                -1 => MelliVerifyResponseCodes.CodeMinus1,
-                101 => MelliVerifyResponseCodes.Code101,
+                0 => "نتیجه تراکنش موفق است",
+                -1 => "پارامترهای ارسالی صحیح نیست و يا تراکنش در سیستم وجود ندارد.",
+                101 => "مهلت ارسال تراکنش به پايان رسیده است",
                 _ => $"{options.UnexpectedErrorText} Response: {result}"
             };
         }
