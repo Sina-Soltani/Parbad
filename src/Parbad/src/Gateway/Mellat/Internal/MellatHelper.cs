@@ -257,7 +257,7 @@ namespace Parbad.Gateway.Mellat.Internal
 
         private static string CreateCumulativeRequestData(Invoice invoice, MellatGatewayAccount account)
         {
-            var cumulativeAccounts = (IList<MellatCumulativeDynamicAccount>)invoice.AdditionalData[CumulativeAccountsKey];
+            var cumulativeAccounts = (List<MellatCumulativeDynamicAccount>)invoice.AdditionalData[CumulativeAccountsKey];
 
             if (cumulativeAccounts.Count > 10)
             {

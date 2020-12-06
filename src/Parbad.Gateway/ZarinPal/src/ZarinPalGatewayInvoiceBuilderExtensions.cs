@@ -16,21 +16,13 @@ namespace Parbad
         /// <param name="builder"></param>
         /// <param name="zarinPalInvoice">Describes an invoice for ZarinPal gateway.</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public static IInvoiceBuilder UseZarinPal(this IInvoiceBuilder builder, ZarinPalInvoice zarinPalInvoice)
+        public static IInvoiceBuilder SetZarinPalData(this IInvoiceBuilder builder, ZarinPalInvoice zarinPalInvoice)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            builder.AddFormatter(invoice =>
-            {
-                if (invoice.AdditionalData.ContainsKey(ZarinPalHelper.ZarinPalRequestAdditionalKeyName))
-                {
-                    invoice.AdditionalData.Remove(ZarinPalHelper.ZarinPalRequestAdditionalKeyName);
-                }
+            builder.AddOrUpdateAdditionalData(ZarinPalHelper.ZarinPalRequestAdditionalKeyName, zarinPalInvoice);
 
-                invoice.AdditionalData.Add(ZarinPalHelper.ZarinPalRequestAdditionalKeyName, zarinPalInvoice);
-            });
-
-            return builder.SetGateway(ZarinPalGateway.Name);
+            return builder;
         }
 
         /// <summary>
@@ -41,7 +33,7 @@ namespace Parbad
         /// <param name="email">Buyer's email.</param>
         /// <param name="mobile">Buyer's mobile.</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public static IInvoiceBuilder UseZarinPal(this IInvoiceBuilder builder, string description, string email = null, string mobile = null)
-            => UseZarinPal(builder, new ZarinPalInvoice(description, email, mobile));
+        public static IInvoiceBuilder SetZarinPalData(this IInvoiceBuilder builder, string description, string email = null, string mobile = null)
+            => SetZarinPalData(builder, new ZarinPalInvoice(description, email, mobile));
     }
 }

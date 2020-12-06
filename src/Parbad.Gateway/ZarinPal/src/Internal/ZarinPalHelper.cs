@@ -28,7 +28,7 @@ namespace Parbad.Gateway.ZarinPal.Internal
             if (!invoice.AdditionalData.ContainsKey(ZarinPalRequestAdditionalKeyName) ||
                 !(invoice.AdditionalData[ZarinPalRequestAdditionalKeyName] is ZarinPalInvoice zarinPalInvoice))
             {
-                throw new InvalidOperationException("ZarinPal gateway error. For creating an invoice for ZarinPal gateway please use the UseZarinPal method instead of the SetGateway.");
+                throw new InvalidOperationException("Request failed. ZarinPal Gateway needs invoice information. Please use the SetZarinPalData method to add the data.");
             }
 
             var email = zarinPalInvoice.Email.IsNullOrEmpty() ? null : XmlHelper.EncodeXmlValue(zarinPalInvoice.Email);

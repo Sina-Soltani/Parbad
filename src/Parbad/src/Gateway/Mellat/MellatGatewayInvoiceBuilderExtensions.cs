@@ -1,7 +1,9 @@
-﻿using System;
-using Parbad.Gateway.Mellat;
+﻿using Parbad.Gateway.Mellat;
 using Parbad.Gateway.Mellat.Internal;
 using Parbad.InvoiceBuilder;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Parbad
 {
@@ -18,18 +20,41 @@ namespace Parbad
             return builder.SetGateway(MellatGateway.Name);
         }
 
-        /// <summary>
-        /// Contains extra functions for Mellat Gateway.
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="configureMellatInvoiceBuilder">Helps to build the extra functions of Mellat Gateway.</param>
-        public static IInvoiceBuilder UseMellat(this IInvoiceBuilder builder, Action<IMellatGatewayInvoiceBuilder> configureMellatInvoiceBuilder)
+        public static IInvoiceBuilder AddMellatCumulativeAccount(this IInvoiceBuilder builder, long subServiceId, long amount)
         {
-            if (configureMellatInvoiceBuilder == null) throw new ArgumentNullException(nameof(configureMellatInvoiceBuilder));
+            return AddMellatCumulativeAccount(builder, subServiceId, amount, 0);
+        }
 
-            UseMellat(builder);
+        public static IInvoiceBuilder AddMellatCumulativeAccount(this IInvoiceBuilder builder, long subServiceId, long amount, long payerId)
+        {
+            return AddMellatCumulativeAccounts(builder, new List<MellatCumulativeDynamicAccount>
+            {
+                new MellatCumulativeDynamicAccount(subServiceId, amount, payerId)
+            });
+        }
 
-            configureMellatInvoiceBuilder(new MellatGatewayInvoiceBuilder(builder));
+        public static IInvoiceBuilder AddMellatCumulativeAccounts(this IInvoiceBuilder builder, IEnumerable<MellatCumulativeDynamicAccount> accounts)
+        {
+            if (accounts == null) throw new ArgumentNullException(nameof(accounts));
+            if (!accounts.Any()) throw new ArgumentException("Accounts cannot be an empty collection.", nameof(accounts));
+
+            List<MellatCumulativeDynamicAccount> allAccounts = null;
+
+            builder.ChangeAdditionalData(data =>
+            {
+                if (data.ContainsKey(MellatHelper.CumulativeAccountsKey))
+                {
+                    allAccounts = (List<MellatCumulativeDynamicAccount>)data[MellatHelper.CumulativeAccountsKey];
+                }
+                else
+                {
+                    allAccounts = new List<MellatCumulativeDynamicAccount>();
+                }
+
+                allAccounts.AddRange(accounts);
+            });
+
+            builder.AddAdditionalData(MellatHelper.CumulativeAccountsKey, allAccounts);
 
             return builder;
         }
