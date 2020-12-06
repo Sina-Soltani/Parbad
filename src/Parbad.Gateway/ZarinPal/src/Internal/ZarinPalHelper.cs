@@ -1,22 +1,20 @@
 ﻿// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Parbad.Abstraction;
 using Parbad.Http;
 using Parbad.Internal;
 using Parbad.Options;
 using Parbad.Utilities;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Parbad.Gateway.ZarinPal.Internal
 {
     internal static class ZarinPalHelper
     {
-        public const string WebServiceUrl = "https://#.zarinpal.com/pg/services/WebGate/service";
-        public const string PaymentPageUrl = "https://#.zarinpal.com/pg/StartPay/";
         public const string NumericOkResult = "100";
         public const string StringOkResult = "OK";
         public const string NumericAlreadyOkResult = "101";
@@ -55,6 +53,7 @@ namespace Parbad.Gateway.ZarinPal.Internal
         public static PaymentRequestResult CreateRequestResult(string response,
             HttpContext httpContext,
             ZarinPalGatewayAccount account,
+            ZarinPalGatewayOptions gatewayOptions,
             MessagesOptions messagesOptions)
         {
             var status = XmlHelper.GetNodeValueFromXml(response, "Status", "http://zarinpal.com/");
@@ -69,7 +68,7 @@ namespace Parbad.Gateway.ZarinPal.Internal
                 return PaymentRequestResult.Failed(message, account.Name);
             }
 
-            var paymentPageUrl = GetWebPageUrl(account.IsSandbox) + authority;
+            var paymentPageUrl = GetWebPageUrl(account.IsSandbox, gatewayOptions) + authority;
 
             return PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, paymentPageUrl);
         }
@@ -139,18 +138,18 @@ namespace Parbad.Gateway.ZarinPal.Internal
             return PaymentVerifyResult.Succeed(refId, messagesOptions.PaymentSucceed);
         }
 
-        public static string GetWebServiceUrl(bool isSandbox)
+        public static string GetApiUrl(bool isSandbox, ZarinPalGatewayOptions gatewayOptions)
         {
             var urlPrefix = isSandbox ? "sandbox" : "www";
 
-            return WebServiceUrl.Replace("#", urlPrefix);
+            return gatewayOptions.ApiUrl.Replace("#", urlPrefix);
         }
 
-        public static string GetWebPageUrl(bool isSandbox)
+        public static string GetWebPageUrl(bool isSandbox, ZarinPalGatewayOptions gatewayOptions)
         {
             var urlPrefix = isSandbox ? "sandbox" : "www";
 
-            return PaymentPageUrl.Replace("#", urlPrefix);
+            return gatewayOptions.PaymentPageUrl.Replace("#", urlPrefix);
         }
     }
 }

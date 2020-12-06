@@ -9,7 +9,7 @@
             Sepehr Gateway.
             </summary>
         </member>
-        <member name="M:Parbad.Gateway.YekPay.YekPayGateway.#ctor(Parbad.GatewayBuilders.IGatewayAccountProvider{Parbad.Gateway.YekPay.YekPayGatewayAccount},Microsoft.AspNetCore.Http.IHttpContextAccessor,System.Net.Http.IHttpClientFactory,Microsoft.Extensions.Options.IOptions{Parbad.Options.ParbadOptions})">
+        <member name="M:Parbad.Gateway.YekPay.YekPayGateway.#ctor(Parbad.GatewayBuilders.IGatewayAccountProvider{Parbad.Gateway.YekPay.YekPayGatewayAccount},Microsoft.AspNetCore.Http.IHttpContextAccessor,System.Net.Http.IHttpClientFactory,Microsoft.Extensions.Options.IOptions{Parbad.Gateway.YekPay.YekPayGatewayOptions},Microsoft.Extensions.Options.IOptions{Parbad.Options.ParbadOptions})">
             <summary>
             Initializes an instance of <see cref="T:Parbad.Gateway.YekPay.YekPayGateway"/>.
             </summary>
@@ -35,6 +35,13 @@
             </summary>
             <param name="builder"></param>
             <param name="configureAccounts">Configures the accounts.</param>
+        </member>
+        <member name="M:Parbad.Gateway.YekPay.YekPayGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.YekPay.YekPayGateway},System.Action{Parbad.Gateway.YekPay.YekPayGatewayOptions})">
+            <summary>
+            Configures the options for YekPay Gateway.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureOptions">Configuration</param>
         </member>
         <member name="M:Parbad.Gateway.YekPay.YekPayGatewayInvoiceBuilderExtensions.UseYekPay(Parbad.InvoiceBuilder.IInvoiceBuilder)">
             <summary>

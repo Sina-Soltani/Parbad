@@ -1,10 +1,6 @@
 ﻿// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
-using System;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -15,6 +11,10 @@ using Parbad.GatewayBuilders;
 using Parbad.Internal;
 using Parbad.Net;
 using Parbad.Options;
+using System;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Parbad.Gateway.YekPay
 {
@@ -26,6 +26,7 @@ namespace Parbad.Gateway.YekPay
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
+        private readonly YekPayGatewayOptions _gatewayOptions;
         private readonly ParbadOptions _options;
 
         public const string Name = "YekPay";
@@ -42,10 +43,12 @@ namespace Parbad.Gateway.YekPay
             IGatewayAccountProvider<YekPayGatewayAccount> accountProvider,
             IHttpContextAccessor httpContextAccessor,
             IHttpClientFactory httpClientFactory,
+            IOptions<YekPayGatewayOptions> gatewayOptions,
             IOptions<ParbadOptions> options) : base(accountProvider)
         {
             _httpContextAccessor = httpContextAccessor;
             _httpClient = httpClientFactory.CreateClient(this);
+            _gatewayOptions = gatewayOptions.Value;
             _options = options.Value;
         }
 
@@ -59,10 +62,10 @@ namespace Parbad.Gateway.YekPay
             var data = YekPayHelper.CreateRequestData(invoice, account);
 
             var responseMessage = await _httpClient
-                .PostJsonAsync(YekPayHelper.ApiRequestUrl, data, DefaultSerializerSettings, cancellationToken)
+                .PostJsonAsync(_gatewayOptions.ApiRequestUrl, data, DefaultSerializerSettings, cancellationToken)
                 .ConfigureAwaitFalse();
 
-            return await YekPayHelper.CreateRequestResult(responseMessage, _httpContextAccessor.HttpContext, account, _options.Messages);
+            return await YekPayHelper.CreateRequestResult(responseMessage, _httpContextAccessor.HttpContext, account, _gatewayOptions, _options.Messages);
         }
 
         /// <inheritdoc />
@@ -75,7 +78,7 @@ namespace Parbad.Gateway.YekPay
             var data = YekPayHelper.CreateVerifyData(context.Transactions, account);
 
             var responseMessage = await _httpClient
-                .PostJsonAsync(YekPayHelper.ApiVerifyUrl, data, DefaultSerializerSettings, cancellationToken)
+                .PostJsonAsync(_gatewayOptions.ApiVerificationUrl, data, DefaultSerializerSettings, cancellationToken)
                 .ConfigureAwaitFalse();
 
             return await YekPayHelper.CreateVerifyResult(responseMessage, _options.Messages);

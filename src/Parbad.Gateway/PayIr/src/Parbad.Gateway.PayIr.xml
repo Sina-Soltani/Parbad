@@ -26,6 +26,13 @@
             <param name="builder"></param>
             <param name="configureAccounts">Configures the accounts.</param>
         </member>
+        <member name="M:Parbad.Gateway.PayIr.PayIrGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.PayIr.PayIrGateway},System.Action{Parbad.Gateway.PayIr.PayIrGatewayOptions})">
+            <summary>
+            Configures the options for PayIr Gateway.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureOptions">Configuration</param>
+        </member>
         <member name="M:Parbad.Gateway.PayIr.PayIrGatewayInvoiceBuilderExtensions.UsePayIr(Parbad.InvoiceBuilder.IInvoiceBuilder)">
             <summary>
             The invoice will be sent to Pay.ir gateway.

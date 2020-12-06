@@ -1,17 +1,17 @@
 ﻿// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Parbad.Abstraction;
 using Parbad.Internal;
 using Parbad.Options;
 using Parbad.Storage.Abstractions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace Parbad.Gateway.YekPay.Internal
 {
@@ -19,11 +19,6 @@ namespace Parbad.Gateway.YekPay.Internal
     {
         private const string AuthorityAdditionalDataKey = "Authority";
         private const int SuccessCode = 100;
-
-        public const string ApiBaseUrl = "https://gate.yekpay.com/api/";
-        public const string ApiRequestUrl = "payment/request";
-        public const string ApiVerifyUrl = "payment/verify";
-        public static string PaymentPageUrl => $"{ApiBaseUrl}payment/start/";
 
         public static YekPayRequestModel CreateRequestData(Invoice invoice, YekPayGatewayAccount account)
         {
@@ -51,7 +46,12 @@ namespace Parbad.Gateway.YekPay.Internal
             };
         }
 
-        public static async Task<PaymentRequestResult> CreateRequestResult(HttpResponseMessage responseMessage, HttpContext httpContext, YekPayGatewayAccount account, MessagesOptions optionsMessages)
+        public static async Task<PaymentRequestResult> CreateRequestResult(
+            HttpResponseMessage responseMessage,
+            HttpContext httpContext,
+            YekPayGatewayAccount account,
+            YekPayGatewayOptions gatewayOptions,
+            MessagesOptions optionsMessages)
         {
             var message = await responseMessage.Content.ReadAsStringAsync();
 
@@ -69,7 +69,7 @@ namespace Parbad.Gateway.YekPay.Internal
                 return PaymentRequestResult.Failed(failureMessage, account.Name);
             }
 
-            var paymentPageUrl = PaymentPageUrl + response.Authority;
+            var paymentPageUrl = gatewayOptions.PaymentPageUrl + response.Authority;
 
             var result = PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, paymentPageUrl);
             result.DatabaseAdditionalData.Add(AuthorityAdditionalDataKey, response.Authority);

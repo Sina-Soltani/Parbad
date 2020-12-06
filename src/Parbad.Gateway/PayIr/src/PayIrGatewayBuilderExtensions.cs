@@ -1,10 +1,9 @@
 ﻿// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
-using System;
 using Microsoft.Extensions.DependencyInjection;
-using Parbad.Gateway.PayIr.Internal;
 using Parbad.GatewayBuilders;
+using System;
 
 namespace Parbad.Gateway.PayIr
 {
@@ -18,9 +17,10 @@ namespace Parbad.Gateway.PayIr
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            return builder.AddGateway<PayIrGateway>()
-                .WithHttpClient(clientBuilder =>
-                    clientBuilder.ConfigureHttpClient(client => client.BaseAddress = new Uri(PayIrHelper.WebServiceUrl)));
+            return builder
+                .AddGateway<PayIrGateway>()
+                .WithHttpClient(clientBuilder => { })
+                .WithOptions(options => { });
         }
 
         /// <summary>
@@ -36,5 +36,19 @@ namespace Parbad.Gateway.PayIr
 
             return builder.WithAccounts(configureAccounts);
         }
+        /// <summary>
+        /// Configures the options for PayIr Gateway.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="configureOptions">Configuration</param>
+        public static IGatewayConfigurationBuilder<PayIrGateway> WithOptions(
+            this IGatewayConfigurationBuilder<PayIrGateway> builder,
+            Action<PayIrGatewayOptions> configureOptions)
+        {
+            builder.Services.Configure(configureOptions);
+
+            return builder;
+        }
+
     }
 }

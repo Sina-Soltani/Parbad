@@ -15,10 +15,6 @@ namespace Parbad.Gateway.PayIr.Internal
 {
     internal static class PayIrHelper
     {
-        public const string WebServiceUrl = "https://pay.ir";
-        public const string WebServiceRequestUrl = "pg/send";
-        public const string WebServiceVerifyUrl = "pg/verify";
-        public const string PaymentPageUrl = WebServiceUrl + "/pg/";
         public const string OkResult = "1";
 
         public static PayIrRequestModel CreateRequestData(PayIrGatewayAccount account, Invoice invoice)
@@ -33,7 +29,7 @@ namespace Parbad.Gateway.PayIr.Internal
             };
         }
 
-        public static PaymentRequestResult CreateRequestResult(string response, HttpContext httpContext, PayIrGatewayAccount account)
+        public static PaymentRequestResult CreateRequestResult(string response, HttpContext httpContext, PayIrGatewayAccount account, PayIrGatewayOptions gatewayOptions)
         {
             var result = JsonConvert.DeserializeObject<PayIrRequestResponseModel>(response);
 
@@ -42,7 +38,7 @@ namespace Parbad.Gateway.PayIr.Internal
                 return PaymentRequestResult.Failed(result.ErrorMessage, account.Name);
             }
 
-            var paymentPageUrl = $"{PaymentPageUrl}{result.Token}";
+            var paymentPageUrl = $"{gatewayOptions.PaymentPageUrl}{result.Token}";
 
             return PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, paymentPageUrl);
         }

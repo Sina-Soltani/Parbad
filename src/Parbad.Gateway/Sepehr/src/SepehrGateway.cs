@@ -1,10 +1,6 @@
 ﻿// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
-using System;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -15,6 +11,10 @@ using Parbad.GatewayBuilders;
 using Parbad.Internal;
 using Parbad.Net;
 using Parbad.Options;
+using System;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Parbad.Gateway.Sepehr
 {
@@ -26,6 +26,7 @@ namespace Parbad.Gateway.Sepehr
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
+        private readonly SepehrGatewayOptions _gatewayOptions;
         private readonly ParbadOptions _options;
 
         public const string Name = "Sepehr";
@@ -42,10 +43,12 @@ namespace Parbad.Gateway.Sepehr
             IGatewayAccountProvider<SepehrGatewayAccount> accountProvider,
             IHttpContextAccessor httpContextAccessor,
             IHttpClientFactory httpClientFactory,
+            IOptions<SepehrGatewayOptions> gatewayOptions,
             IOptions<ParbadOptions> options) : base(accountProvider)
         {
             _httpContextAccessor = httpContextAccessor;
             _httpClient = httpClientFactory.CreateClient(this);
+            _gatewayOptions = gatewayOptions.Value;
             _options = options.Value;
         }
 
@@ -59,10 +62,10 @@ namespace Parbad.Gateway.Sepehr
             var data = SepehrHelper.CreateRequestData(invoice, account);
 
             var responseMessage = await _httpClient
-                .PostJsonAsync(SepehrHelper.ApiTokenUrl, data, DefaultSerializerSettings, cancellationToken)
+                .PostJsonAsync(_gatewayOptions.ApiTokenUrl, data, DefaultSerializerSettings, cancellationToken)
                 .ConfigureAwaitFalse();
 
-            return await SepehrHelper.CreateRequestResult(responseMessage, _httpContextAccessor.HttpContext, account, _options.Messages);
+            return await SepehrHelper.CreateRequestResult(responseMessage, _httpContextAccessor.HttpContext, account, _gatewayOptions, _options.Messages);
         }
 
         /// <inheritdoc />
@@ -88,7 +91,7 @@ namespace Parbad.Gateway.Sepehr
             var data = SepehrHelper.CreateVerifyData(callbackResult, account);
 
             var responseMessage = await _httpClient
-                .PostJsonAsync(SepehrHelper.ApiAdviceUrl, data, DefaultSerializerSettings, cancellationToken)
+                .PostJsonAsync(_gatewayOptions.ApiAdviceUrl, data, DefaultSerializerSettings, cancellationToken)
                 .ConfigureAwaitFalse();
 
             return await SepehrHelper.CreateVerifyResult(context, responseMessage, callbackResult, _options.Messages);
@@ -104,7 +107,7 @@ namespace Parbad.Gateway.Sepehr
             var data = SepehrHelper.CreateRefundData(context, account);
 
             var responseMessage = await _httpClient
-                .PostJsonAsync(SepehrHelper.ApiRollbackUrl, data, DefaultSerializerSettings, cancellationToken)
+                .PostJsonAsync(_gatewayOptions.ApiRollbackUrl, data, DefaultSerializerSettings, cancellationToken)
                 .ConfigureAwaitFalse();
 
             return await SepehrHelper.CreateRefundResult(context, responseMessage, _options.Messages);
