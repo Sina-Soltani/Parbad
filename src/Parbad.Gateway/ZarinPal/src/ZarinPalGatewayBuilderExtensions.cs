@@ -38,7 +38,7 @@ namespace Parbad.Gateway.ZarinPal
         }
 
         /// <summary>
-        /// Configures the options for AsanPardakht Gateway.
+        /// Configures the options for ZarinPal Gateway.
         /// </summary>
         /// <param name="builder"></param>
         /// <param name="configureOptions">Configuration</param>
