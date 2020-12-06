@@ -55,6 +55,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Cache", "Cache", "{C326BFDC
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parbad.Storage.Cache", "src\Parbad.Storage\Cache\src\Parbad.Storage.Cache.csproj", "{CB53D8C8-452A-4D74-A3D9-CBE9167009DD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parbad.Storage.Cache.Tests", "src\Parbad.Storage\Cache\tests\Parbad.Storage.Cache.Tests.csproj", "{3946E29D-BCC1-4F3B-9DDD-120E83ED24BC}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EntityFrameworkCore", "EntityFrameworkCore", "{7EF1A53E-23E8-4835-9B4D-2107F7281868}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parbad.Storage.EntityFrameworkCore", "src\Parbad.Storage\EntityFrameworkCore\src\Parbad.Storage.EntityFrameworkCore.csproj", "{601E9A72-3154-4D7B-AADA-68167A60E29E}"
@@ -82,8 +84,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "YekPay", "YekPay", "{2A049243-9D42-4B34-B6B5-1BB11C65D2B6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parbad.Gateway.YekPay", "src\Parbad.Gateway\YekPay\src\Parbad.Gateway.YekPay.csproj", "{9AAFC4B2-678C-4C80-9F1E-8D97C029E598}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parbad.Storage.Cache.Tests", "src\Parbad.Storage\Cache\tests\Parbad.Storage.Cache.Tests\Parbad.Storage.Cache.Tests.csproj", "{3946E29D-BCC1-4F3B-9DDD-120E83ED24BC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
