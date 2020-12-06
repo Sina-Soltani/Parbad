@@ -11,7 +11,19 @@ namespace Parbad
     public static class ZarinPalGatewayInvoiceBuilderExtensions
     {
         /// <summary>
-        /// The invoice will be sent to ZarinPal gateway.
+        /// The invoice will be sent to ZarinPal Gateway.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static IInvoiceBuilder UseZarinPal(this IInvoiceBuilder builder)
+        {
+            if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+            return builder.SetGateway(ZarinPalGateway.Name);
+        }
+
+        /// <summary>
+        /// Sets ZarinPal Gateway data.
         /// </summary>
         /// <param name="builder"></param>
         /// <param name="zarinPalInvoice">Describes an invoice for ZarinPal gateway.</param>
@@ -26,7 +38,7 @@ namespace Parbad
         }
 
         /// <summary>
-        /// The invoice will be sent to ZarinPal gateway.
+        /// Sets ZarinPal Gateway data.
         /// </summary>
         /// <param name="builder"></param>
         /// <param name="description">A short description about this invoice which is required by ZarinPal gateway.</param>
