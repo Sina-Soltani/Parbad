@@ -2,11 +2,10 @@
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
 using System;
-using Parbad.Gateway.ZarinPal;
 using Parbad.Gateway.ZarinPal.Internal;
 using Parbad.InvoiceBuilder;
 
-namespace Parbad
+namespace Parbad.Gateway.ZarinPal
 {
     public static class ZarinPalGatewayInvoiceBuilderExtensions
     {

@@ -13,20 +13,20 @@
         <member name="M:Parbad.Gateway.PayIr.PayIrGateway.RefundAsync(Parbad.InvoiceContext,Parbad.Money,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.Builder.PayIrGatewayBuilderExtensions.AddPayIr(Parbad.GatewayBuilders.IGatewayBuilder)">
+        <member name="M:Parbad.Gateway.PayIr.PayIrGatewayBuilderExtensions.AddPayIr(Parbad.GatewayBuilders.IGatewayBuilder)">
             <summary>
             Adds the Pay.ir gateway to Parbad services.
             </summary>
             <param name="builder"></param>
         </member>
-        <member name="M:Parbad.Builder.PayIrGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.PayIr.PayIrGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.Gateway.PayIr.PayIrGatewayAccount}})">
+        <member name="M:Parbad.Gateway.PayIr.PayIrGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.PayIr.PayIrGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.Gateway.PayIr.PayIrGatewayAccount}})">
             <summary>
             Configures the accounts for Pay.ir.
             </summary>
             <param name="builder"></param>
             <param name="configureAccounts">Configures the accounts.</param>
         </member>
-        <member name="M:Parbad.PayIrGatewayInvoiceBuilderExtensions.UsePayIr(Parbad.InvoiceBuilder.IInvoiceBuilder)">
+        <member name="M:Parbad.Gateway.PayIr.PayIrGatewayInvoiceBuilderExtensions.UsePayIr(Parbad.InvoiceBuilder.IInvoiceBuilder)">
             <summary>
             The invoice will be sent to Pay.ir gateway.
             </summary>

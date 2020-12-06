@@ -3,11 +3,10 @@
 
 using System;
 using Microsoft.Extensions.DependencyInjection;
-using Parbad.Gateway.Sepehr;
 using Parbad.Gateway.Sepehr.Internal;
 using Parbad.GatewayBuilders;
 
-namespace Parbad.Builder
+namespace Parbad.Gateway.Sepehr
 {
     public static class SepehrGatewayBuilderExtensions
     {

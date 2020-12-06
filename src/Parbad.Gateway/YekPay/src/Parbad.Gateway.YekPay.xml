@@ -23,25 +23,30 @@
         <member name="M:Parbad.Gateway.YekPay.YekPayGateway.RefundAsync(Parbad.InvoiceContext,Parbad.Money,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.Builder.YekPayGatewayBuilderExtensions.AddYekPay(Parbad.GatewayBuilders.IGatewayBuilder)">
+        <member name="M:Parbad.Gateway.YekPay.YekPayGatewayBuilderExtensions.AddYekPay(Parbad.GatewayBuilders.IGatewayBuilder)">
             <summary>
             Adds the YekPay gateway to Parbad services.
             </summary>
             <param name="builder"></param>
         </member>
-        <member name="M:Parbad.Builder.YekPayGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.YekPay.YekPayGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.Gateway.YekPay.YekPayGatewayAccount}})">
+        <member name="M:Parbad.Gateway.YekPay.YekPayGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.YekPay.YekPayGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.Gateway.YekPay.YekPayGatewayAccount}})">
             <summary>
             Configures the accounts for YekPay gateway.
             </summary>
             <param name="builder"></param>
             <param name="configureAccounts">Configures the accounts.</param>
         </member>
-        <member name="M:Parbad.YekPayGatewayInvoiceBuilderExtensions.UseYekPay(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Action{Parbad.Gateway.YekPay.YekPayRequest})">
+        <member name="M:Parbad.Gateway.YekPay.YekPayGatewayInvoiceBuilderExtensions.UseYekPay(Parbad.InvoiceBuilder.IInvoiceBuilder)">
             <summary>
             The invoice will be sent to YekPay gateway.
             </summary>
         </member>
-        <member name="M:Parbad.YekPayGatewayInvoiceBuilderExtensions.UseYekPay(Parbad.InvoiceBuilder.IInvoiceBuilder,Parbad.Gateway.YekPay.YekPayRequest)">
+        <member name="M:Parbad.Gateway.YekPay.YekPayGatewayInvoiceBuilderExtensions.SetYekPayData(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Action{Parbad.Gateway.YekPay.YekPayRequest})">
+            <summary>
+            The invoice will be sent to YekPay gateway.
+            </summary>
+        </member>
+        <member name="M:Parbad.Gateway.YekPay.YekPayGatewayInvoiceBuilderExtensions.SetYekPayData(Parbad.InvoiceBuilder.IInvoiceBuilder,Parbad.Gateway.YekPay.YekPayRequest)">
             <summary>
             The invoice will be sent to YekPay gateway.
             </summary>

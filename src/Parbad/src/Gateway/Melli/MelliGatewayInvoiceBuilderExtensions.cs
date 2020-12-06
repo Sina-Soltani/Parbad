@@ -1,8 +1,7 @@
 ﻿using System;
-using Parbad.Gateway.Melli;
 using Parbad.InvoiceBuilder;
 
-namespace Parbad
+namespace Parbad.Gateway.Melli
 {
     public static class MelliGatewayInvoiceBuilderExtensions
     {

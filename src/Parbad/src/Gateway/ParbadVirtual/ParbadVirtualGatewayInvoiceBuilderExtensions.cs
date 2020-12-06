@@ -1,10 +1,9 @@
 ﻿using System;
-using Parbad.Gateway.ParbadVirtual;
 using Parbad.InvoiceBuilder;
 
-namespace Parbad
+namespace Parbad.Gateway.ParbadVirtual
 {
-    public static class ParbadGatewayInvoiceBuilderExtensions
+    public static class ParbadVirtualGatewayInvoiceBuilderExtensions
     {
         /// <summary>
         /// The invoice will be sent to Parbad Virtual gateway.

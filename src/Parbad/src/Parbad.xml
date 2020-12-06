@@ -209,166 +209,6 @@
             <param name="webProxy">The proxy that must be used.</param>
             <returns></returns>
         </member>
-        <member name="M:Parbad.Builder.AsanPardakhtGatewayBuilderExtensions.AddAsanPardakht(Parbad.GatewayBuilders.IGatewayBuilder)">
-            <summary>
-            Adds AsanPardakht gateway to Parbad services.
-            </summary>
-            <param name="builder"></param>
-        </member>
-        <member name="M:Parbad.Builder.AsanPardakhtGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.AsanPardakht.AsanPardakhtGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.Gateway.AsanPardakht.AsanPardakhtGatewayAccount}})">
-            <summary>
-            Configures the accounts for <see cref="T:Parbad.Gateway.AsanPardakht.AsanPardakhtGateway"/>.
-            </summary>
-            <param name="builder"></param>
-            <param name="configureAccounts">Configures the accounts.</param>
-        </member>
-        <member name="M:Parbad.Builder.AsanPardakhtGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.AsanPardakht.AsanPardakhtGateway},System.Action{Parbad.Gateway.AsanPardakht.AsanPardakhtGatewayOptions})">
-            <summary>
-            Configures the options for AsanPardakht Gateway.
-            </summary>
-            <param name="builder"></param>
-            <param name="configureOptions">Configuration</param>
-        </member>
-        <member name="M:Parbad.Builder.IranKishGatewayBuilderExtensions.AddIranKish(Parbad.GatewayBuilders.IGatewayBuilder)">
-            <summary>
-            Adds IranKish gateway to Parbad services.
-            </summary>
-            <param name="builder"></param>
-        </member>
-        <member name="M:Parbad.Builder.IranKishGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.IranKish.IranKishGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.Gateway.IranKish.IranKishGatewayAccount}})">
-            <summary>
-            Configures the accounts for <see cref="T:Parbad.Gateway.IranKish.IranKishGateway"/>.
-            </summary>
-            <param name="builder"></param>
-            <param name="configureAccounts">Configures the accounts.</param>
-        </member>
-        <member name="M:Parbad.Builder.IranKishGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.IranKish.IranKishGateway},System.Action{Parbad.Gateway.IranKish.IranKishGatewayOptions})">
-            <summary>
-            Configures the options for IranKish Gateway.
-            </summary>
-            <param name="builder"></param>
-            <param name="configureOptions">Configuration</param>
-        </member>
-        <member name="M:Parbad.Builder.MellatGatewayBuilderExtensions.AddMellat(Parbad.GatewayBuilders.IGatewayBuilder)">
-            <summary>
-            Adds Mellat gateway to Parbad services.
-            </summary>
-            <param name="builder"></param>
-        </member>
-        <member name="M:Parbad.Builder.MellatGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Mellat.MellatGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.Gateway.Mellat.MellatGatewayAccount}})">
-            <summary>
-            Configures the accounts for <see cref="T:Parbad.Gateway.Mellat.MellatGateway"/>.
-            </summary>
-            <param name="builder"></param>
-            <param name="configureAccounts">Configures the accounts.</param>
-        </member>
-        <member name="M:Parbad.Builder.MellatGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Mellat.MellatGateway},System.Action{Parbad.Gateway.Mellat.MellatGatewayOptions})">
-            <summary>
-            Configures the options for Mellat Gateway.
-            </summary>
-            <param name="builder"></param>
-            <param name="configureOptions">Configuration</param>
-        </member>
-        <member name="M:Parbad.Builder.MelliGatewayBuilderExtensions.AddMelli(Parbad.GatewayBuilders.IGatewayBuilder)">
-            <summary>
-            Adds Melli gateway to Parbad services.
-            </summary>
-            <param name="builder"></param>
-        </member>
-        <member name="M:Parbad.Builder.MelliGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Melli.MelliGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.Gateway.Melli.MelliGatewayAccount}})">
-            <summary>
-            Configures the accounts for <see cref="T:Parbad.Gateway.Melli.MelliGateway"/>.
-            </summary>
-            <param name="builder"></param>
-            <param name="configureAccounts">Configures the accounts.</param>
-        </member>
-        <member name="M:Parbad.Builder.MelliGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Melli.MelliGateway},System.Action{Parbad.Gateway.Melli.MelliGatewayOptions})">
-            <summary>
-            Configures the options for AsanPardakhtGateway.
-            </summary>
-            <param name="builder"></param>
-            <param name="configureOptions">Configuration</param>
-        </member>
-        <member name="M:Parbad.Builder.ParbadVirtualGatewayBuilderExtensions.AddParbadVirtual(Parbad.GatewayBuilders.IGatewayBuilder)">
-            <summary>
-            Adds the Parbad Virtual Gateway to Parbad services.
-            </summary>
-            <param name="builder"></param>
-        </member>
-        <member name="M:Parbad.Builder.ParbadVirtualGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.ParbadVirtual.ParbadVirtualGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.Gateway.ParbadVirtual.ParbadVirtualGatewayAccount}})">
-            <summary>
-            Configures the accounts for <see cref="T:Parbad.Gateway.ParbadVirtual.ParbadVirtualGateway"/>.
-            </summary>
-            <param name="builder"></param>
-            <param name="configureAccounts">Configures the accounts.</param>
-        </member>
-        <member name="M:Parbad.Builder.ParbadVirtualGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.ParbadVirtual.ParbadVirtualGateway},System.Action{Parbad.Gateway.ParbadVirtual.ParbadVirtualGatewayOptions})">
-            <summary>
-            Configures Parbad Virtual gateway options.
-            </summary>
-            <param name="builder"></param>
-            <param name="configureOptions"></param>
-        </member>
-        <member name="M:Parbad.Builder.ParsianGatewayBuilderExtensions.AddParsian(Parbad.GatewayBuilders.IGatewayBuilder)">
-            <summary>
-            Adds Parsian gateway to Parbad services.
-            </summary>
-            <param name="builder"></param>
-        </member>
-        <member name="M:Parbad.Builder.ParsianGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Parsian.ParsianGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.Gateway.Parsian.ParsianGatewayAccount}})">
-            <summary>
-            Configures the accounts for <see cref="T:Parbad.Gateway.Parsian.ParsianGateway"/>.
-            </summary>
-            <param name="builder"></param>
-            <param name="configureAccounts">Configures the accounts.</param>
-        </member>
-        <member name="M:Parbad.Builder.ParsianGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Parsian.ParsianGateway},System.Action{Parbad.Gateway.Parsian.ParsianGatewayOptions})">
-            <summary>
-            Configures the options for Parsian Gateway.
-            </summary>
-            <param name="builder"></param>
-            <param name="configureOptions">Configuration</param>
-        </member>
-        <member name="M:Parbad.Builder.PasargadGatewayBuilderExtensions.AddPasargad(Parbad.GatewayBuilders.IGatewayBuilder)">
-            <summary>
-            Adds Pasargad gateway to Parbad services.
-            </summary>
-            <param name="builder"></param>
-        </member>
-        <member name="M:Parbad.Builder.PasargadGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Pasargad.PasargadGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.Gateway.Pasargad.PasargadGatewayAccount}})">
-            <summary>
-            Configures the accounts for <see cref="T:Parbad.Gateway.Pasargad.PasargadGateway"/>.
-            </summary>
-            <param name="builder"></param>
-            <param name="configureAccounts">Configures the accounts.</param>
-        </member>
-        <member name="M:Parbad.Builder.PasargadGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Pasargad.PasargadGateway},System.Action{Parbad.Gateway.Pasargad.PasargadGatewayOptions})">
-            <summary>
-            Configures the options for Pasargad Gateway.
-            </summary>
-            <param name="builder"></param>
-            <param name="configureOptions">Configuration</param>
-        </member>
-        <member name="M:Parbad.Builder.SamanGatewayBuilderExtensions.AddSaman(Parbad.GatewayBuilders.IGatewayBuilder)">
-            <summary>
-            Adds Saman gateway to Parbad services.
-            </summary>
-            <param name="builder"></param>
-        </member>
-        <member name="M:Parbad.Builder.SamanGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Saman.SamanGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.Gateway.Saman.SamanGatewayAccount}})">
-            <summary>
-            Configures the accounts for <see cref="T:Parbad.Gateway.Saman.SamanGateway"/>.
-            </summary>
-            <param name="builder"></param>
-            <param name="configureAccounts">Configures the accounts.</param>
-        </member>
-        <member name="M:Parbad.Builder.SamanGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Saman.SamanGateway},System.Action{Parbad.Gateway.Saman.SamanGatewayOptions})">
-            <summary>
-            Configures the options for Saman Gateway.
-            </summary>
-            <param name="builder"></param>
-            <param name="configureOptions">Configuration</param>
-        </member>
         <member name="M:Parbad.Builder.HttpContextBuilderExtensions.ConfigureHttpContext(Parbad.Builder.IParbadBuilder,System.Action{Parbad.Http.IHttpContextBuilder})">
             <summary>
             Configures the <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/> required by Parbad.
@@ -658,6 +498,32 @@
         <member name="M:Parbad.Gateway.AsanPardakht.AsanPardakhtGateway.RefundAsync(Parbad.InvoiceContext,Parbad.Money,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
+        <member name="M:Parbad.Gateway.AsanPardakht.AsanPardakhtGatewayBuilderExtensions.AddAsanPardakht(Parbad.GatewayBuilders.IGatewayBuilder)">
+            <summary>
+            Adds AsanPardakht gateway to Parbad services.
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.Gateway.AsanPardakht.AsanPardakhtGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.AsanPardakht.AsanPardakhtGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.Gateway.AsanPardakht.AsanPardakhtGatewayAccount}})">
+            <summary>
+            Configures the accounts for <see cref="T:Parbad.Gateway.AsanPardakht.AsanPardakhtGateway"/>.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureAccounts">Configures the accounts.</param>
+        </member>
+        <member name="M:Parbad.Gateway.AsanPardakht.AsanPardakhtGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.AsanPardakht.AsanPardakhtGateway},System.Action{Parbad.Gateway.AsanPardakht.AsanPardakhtGatewayOptions})">
+            <summary>
+            Configures the options for AsanPardakht Gateway.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureOptions">Configuration</param>
+        </member>
+        <member name="M:Parbad.Gateway.AsanPardakht.AsanPardakhtGatewayInvoiceBuilderExtensions.UseAsanPardakht(Parbad.InvoiceBuilder.IInvoiceBuilder)">
+            <summary>
+            The invoice will be sent to Asan Pardakht gateway.
+            </summary>
+            <param name="builder"></param>
+        </member>
         <member name="P:Parbad.Gateway.IranKish.Internal.IranKishCallbackResult.InvoiceNumber">
             <summary>
             Equals to TrackingNumber in Parbad system.
@@ -682,6 +548,32 @@
             IranKish gateway account.
             </summary>
         </member>
+        <member name="M:Parbad.Gateway.IranKish.IranKishGatewayBuilderExtensions.AddIranKish(Parbad.GatewayBuilders.IGatewayBuilder)">
+            <summary>
+            Adds IranKish gateway to Parbad services.
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.Gateway.IranKish.IranKishGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.IranKish.IranKishGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.Gateway.IranKish.IranKishGatewayAccount}})">
+            <summary>
+            Configures the accounts for <see cref="T:Parbad.Gateway.IranKish.IranKishGateway"/>.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureAccounts">Configures the accounts.</param>
+        </member>
+        <member name="M:Parbad.Gateway.IranKish.IranKishGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.IranKish.IranKishGateway},System.Action{Parbad.Gateway.IranKish.IranKishGatewayOptions})">
+            <summary>
+            Configures the options for IranKish Gateway.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureOptions">Configuration</param>
+        </member>
+        <member name="M:Parbad.Gateway.IranKish.IranKishGatewayInvoiceBuilderExtensions.UseIranKish(Parbad.InvoiceBuilder.IInvoiceBuilder)">
+            <summary>
+            The invoice will be sent to Iran Kish gateway.
+            </summary>
+            <param name="builder"></param>
+        </member>
         <member name="M:Parbad.Gateway.Mellat.MellatGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
@@ -695,6 +587,32 @@
             <summary>
             The requests will be sent to the test terminal of Mellat Gateway.
             </summary>
+        </member>
+        <member name="M:Parbad.Gateway.Mellat.MellatGatewayBuilderExtensions.AddMellat(Parbad.GatewayBuilders.IGatewayBuilder)">
+            <summary>
+            Adds Mellat gateway to Parbad services.
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.Gateway.Mellat.MellatGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Mellat.MellatGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.Gateway.Mellat.MellatGatewayAccount}})">
+            <summary>
+            Configures the accounts for <see cref="T:Parbad.Gateway.Mellat.MellatGateway"/>.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureAccounts">Configures the accounts.</param>
+        </member>
+        <member name="M:Parbad.Gateway.Mellat.MellatGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Mellat.MellatGateway},System.Action{Parbad.Gateway.Mellat.MellatGatewayOptions})">
+            <summary>
+            Configures the options for Mellat Gateway.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureOptions">Configuration</param>
+        </member>
+        <member name="M:Parbad.Gateway.Mellat.MellatGatewayInvoiceBuilderExtensions.UseMellat(Parbad.InvoiceBuilder.IInvoiceBuilder)">
+            <summary>
+            The invoice will be sent to Mellat gateway.
+            </summary>
+            <param name="builder"></param>
         </member>
         <member name="T:Parbad.Gateway.Melli.MelliGateway">
             <summary>
@@ -726,6 +644,26 @@
             Melli Gateway options class.
             </summary>
         </member>
+        <member name="M:Parbad.Gateway.Melli.MelliGatewayBuilderExtensions.AddMelli(Parbad.GatewayBuilders.IGatewayBuilder)">
+            <summary>
+            Adds Melli gateway to Parbad services.
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.Gateway.Melli.MelliGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Melli.MelliGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.Gateway.Melli.MelliGatewayAccount}})">
+            <summary>
+            Configures the accounts for <see cref="T:Parbad.Gateway.Melli.MelliGateway"/>.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureAccounts">Configures the accounts.</param>
+        </member>
+        <member name="M:Parbad.Gateway.Melli.MelliGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Melli.MelliGateway},System.Action{Parbad.Gateway.Melli.MelliGatewayOptions})">
+            <summary>
+            Configures the options for AsanPardakhtGateway.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureOptions">Configuration</param>
+        </member>
         <member name="T:Parbad.Gateway.Melli.MelliGatewayDataSigningException">
             <summary>
             The exception that is thrown when an error by signing is occurred.
@@ -737,6 +675,12 @@
             </summary>
             <param name="mainException">The main Exception object.</param>
         </member>
+        <member name="M:Parbad.Gateway.Melli.MelliGatewayInvoiceBuilderExtensions.UseMelli(Parbad.InvoiceBuilder.IInvoiceBuilder)">
+            <summary>
+            The invoice will be sent to Melli gateway.
+            </summary>
+            <param name="builder"></param>
+        </member>
         <member name="M:Parbad.Gateway.ParbadVirtual.ParbadVirtualGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
@@ -745,6 +689,32 @@
         </member>
         <member name="M:Parbad.Gateway.ParbadVirtual.ParbadVirtualGateway.RefundAsync(Parbad.InvoiceContext,Parbad.Money,System.Threading.CancellationToken)">
             <inheritdoc />
+        </member>
+        <member name="M:Parbad.Gateway.ParbadVirtual.ParbadVirtualGatewayBuilderExtensions.AddParbadVirtual(Parbad.GatewayBuilders.IGatewayBuilder)">
+            <summary>
+            Adds the Parbad Virtual Gateway to Parbad services.
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.Gateway.ParbadVirtual.ParbadVirtualGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.ParbadVirtual.ParbadVirtualGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.Gateway.ParbadVirtual.ParbadVirtualGatewayAccount}})">
+            <summary>
+            Configures the accounts for <see cref="T:Parbad.Gateway.ParbadVirtual.ParbadVirtualGateway"/>.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureAccounts">Configures the accounts.</param>
+        </member>
+        <member name="M:Parbad.Gateway.ParbadVirtual.ParbadVirtualGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.ParbadVirtual.ParbadVirtualGateway},System.Action{Parbad.Gateway.ParbadVirtual.ParbadVirtualGatewayOptions})">
+            <summary>
+            Configures Parbad Virtual gateway options.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureOptions"></param>
+        </member>
+        <member name="M:Parbad.Gateway.ParbadVirtual.ParbadVirtualGatewayInvoiceBuilderExtensions.UseParbadVirtual(Parbad.InvoiceBuilder.IInvoiceBuilder)">
+            <summary>
+            The invoice will be sent to Parbad Virtual gateway.
+            </summary>
+            <param name="builder"></param>
         </member>
         <member name="P:Parbad.Gateway.ParbadVirtual.ParbadVirtualGatewayOptions.GatewayPath">
             <summary>
@@ -765,6 +735,32 @@
         <member name="M:Parbad.Gateway.Parsian.ParsianGateway.RefundAsync(Parbad.InvoiceContext,Parbad.Money,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
+        <member name="M:Parbad.Gateway.Parsian.ParsianGatewayBuilderExtensions.AddParsian(Parbad.GatewayBuilders.IGatewayBuilder)">
+            <summary>
+            Adds Parsian gateway to Parbad services.
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.Gateway.Parsian.ParsianGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Parsian.ParsianGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.Gateway.Parsian.ParsianGatewayAccount}})">
+            <summary>
+            Configures the accounts for <see cref="T:Parbad.Gateway.Parsian.ParsianGateway"/>.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureAccounts">Configures the accounts.</param>
+        </member>
+        <member name="M:Parbad.Gateway.Parsian.ParsianGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Parsian.ParsianGateway},System.Action{Parbad.Gateway.Parsian.ParsianGatewayOptions})">
+            <summary>
+            Configures the options for Parsian Gateway.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureOptions">Configuration</param>
+        </member>
+        <member name="M:Parbad.Gateway.Parsian.ParsianGatewayInvoiceBuilderExtensions.UseParsian(Parbad.InvoiceBuilder.IInvoiceBuilder)">
+            <summary>
+            The invoice will be sent to Parsian gateway.
+            </summary>
+            <param name="builder"></param>
+        </member>
         <member name="P:Parbad.Gateway.Pasargad.Internal.Models.PasargadCallbackResult.InvoiceNumber">
             <summary>
             Equals to ReferenceID in Parbad system.
@@ -779,6 +775,32 @@
         <member name="M:Parbad.Gateway.Pasargad.PasargadGateway.RefundAsync(Parbad.InvoiceContext,Parbad.Money,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
+        <member name="M:Parbad.Gateway.Pasargad.PasargadGatewayBuilderExtensions.AddPasargad(Parbad.GatewayBuilders.IGatewayBuilder)">
+            <summary>
+            Adds Pasargad gateway to Parbad services.
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.Gateway.Pasargad.PasargadGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Pasargad.PasargadGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.Gateway.Pasargad.PasargadGatewayAccount}})">
+            <summary>
+            Configures the accounts for <see cref="T:Parbad.Gateway.Pasargad.PasargadGateway"/>.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureAccounts">Configures the accounts.</param>
+        </member>
+        <member name="M:Parbad.Gateway.Pasargad.PasargadGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Pasargad.PasargadGateway},System.Action{Parbad.Gateway.Pasargad.PasargadGatewayOptions})">
+            <summary>
+            Configures the options for Pasargad Gateway.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureOptions">Configuration</param>
+        </member>
+        <member name="M:Parbad.Gateway.Pasargad.PasargadGatewayInvoiceBuilderExtensions.UsePasargad(Parbad.InvoiceBuilder.IInvoiceBuilder)">
+            <summary>
+            The invoice will be sent to Pasargad gateway.
+            </summary>
+            <param name="builder"></param>
+        </member>
         <member name="M:Parbad.Gateway.Saman.SamanGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
@@ -788,55 +810,33 @@
         <member name="M:Parbad.Gateway.Saman.SamanGateway.RefundAsync(Parbad.InvoiceContext,Parbad.Money,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.AsanPardakhtGatewayInvoiceBuilderExtensions.UseAsanPardakht(Parbad.InvoiceBuilder.IInvoiceBuilder)">
+        <member name="M:Parbad.Gateway.Saman.SamanGatewayBuilderExtensions.AddSaman(Parbad.GatewayBuilders.IGatewayBuilder)">
             <summary>
-            The invoice will be sent to Asan Pardakht gateway.
+            Adds Saman gateway to Parbad services.
             </summary>
             <param name="builder"></param>
         </member>
-        <member name="M:Parbad.IranKishGatewayInvoiceBuilderExtensions.UseIranKish(Parbad.InvoiceBuilder.IInvoiceBuilder)">
+        <member name="M:Parbad.Gateway.Saman.SamanGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Saman.SamanGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.Gateway.Saman.SamanGatewayAccount}})">
             <summary>
-            The invoice will be sent to Iran Kish gateway.
+            Configures the accounts for <see cref="T:Parbad.Gateway.Saman.SamanGateway"/>.
             </summary>
             <param name="builder"></param>
+            <param name="configureAccounts">Configures the accounts.</param>
         </member>
-        <member name="M:Parbad.MellatGatewayInvoiceBuilderExtensions.UseMellat(Parbad.InvoiceBuilder.IInvoiceBuilder)">
+        <member name="M:Parbad.Gateway.Saman.SamanGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Saman.SamanGateway},System.Action{Parbad.Gateway.Saman.SamanGatewayOptions})">
             <summary>
-            The invoice will be sent to Mellat gateway.
+            Configures the options for Saman Gateway.
             </summary>
             <param name="builder"></param>
+            <param name="configureOptions">Configuration</param>
         </member>
-        <member name="M:Parbad.MelliGatewayInvoiceBuilderExtensions.UseMelli(Parbad.InvoiceBuilder.IInvoiceBuilder)">
-            <summary>
-            The invoice will be sent to Melli gateway.
-            </summary>
-            <param name="builder"></param>
-        </member>
-        <member name="M:Parbad.ParbadGatewayInvoiceBuilderExtensions.UseParbadVirtual(Parbad.InvoiceBuilder.IInvoiceBuilder)">
-            <summary>
-            The invoice will be sent to Parbad Virtual gateway.
-            </summary>
-            <param name="builder"></param>
-        </member>
-        <member name="M:Parbad.ParsianGatewayInvoiceBuilderExtensions.UseParsian(Parbad.InvoiceBuilder.IInvoiceBuilder)">
-            <summary>
-            The invoice will be sent to Parsian gateway.
-            </summary>
-            <param name="builder"></param>
-        </member>
-        <member name="M:Parbad.PasargadGatewayInvoiceBuilderExtensions.UsePasargad(Parbad.InvoiceBuilder.IInvoiceBuilder)">
-            <summary>
-            The invoice will be sent to Pasargad gateway.
-            </summary>
-            <param name="builder"></param>
-        </member>
-        <member name="M:Parbad.SamanGatewayInvoiceBuilderExtensions.UseSaman(Parbad.InvoiceBuilder.IInvoiceBuilder)">
+        <member name="M:Parbad.Gateway.Saman.SamanGatewayInvoiceBuilderExtensions.UseSaman(Parbad.InvoiceBuilder.IInvoiceBuilder)">
             <summary>
             The invoice will be sent to Saman gateway.
             </summary>
             <param name="builder"></param>
         </member>
-        <member name="M:Parbad.SamanGatewayInvoiceBuilderExtensions.EnableSamanMobileGateway(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Boolean)">
+        <member name="M:Parbad.Gateway.Saman.SamanGatewayInvoiceBuilderExtensions.EnableSamanMobileGateway(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Boolean)">
             <summary>
             Enables or disables Saman Mobile gateway.
             </summary>

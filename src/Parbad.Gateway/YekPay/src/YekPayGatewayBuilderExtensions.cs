@@ -3,11 +3,10 @@
 
 using System;
 using Microsoft.Extensions.DependencyInjection;
-using Parbad.Gateway.YekPay;
 using Parbad.Gateway.YekPay.Internal;
 using Parbad.GatewayBuilders;
 
-namespace Parbad.Builder
+namespace Parbad.Gateway.YekPay
 {
     public static class YekPayGatewayBuilderExtensions
     {

@@ -1,8 +1,7 @@
 ﻿using System;
-using Parbad.Gateway.Pasargad;
 using Parbad.InvoiceBuilder;
 
-namespace Parbad
+namespace Parbad.Gateway.Pasargad
 {
     public static class PasargadGatewayInvoiceBuilderExtensions
     {

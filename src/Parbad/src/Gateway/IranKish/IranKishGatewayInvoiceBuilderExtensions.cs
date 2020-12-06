@@ -1,8 +1,7 @@
 ﻿using System;
-using Parbad.Gateway.IranKish;
 using Parbad.InvoiceBuilder;
 
-namespace Parbad
+namespace Parbad.Gateway.IranKish
 {
     public static class IranKishGatewayInvoiceBuilderExtensions
     {

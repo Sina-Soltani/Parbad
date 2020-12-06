@@ -1,8 +1,7 @@
 ﻿using System;
-using Parbad.Gateway.Parsian;
 using Parbad.InvoiceBuilder;
 
-namespace Parbad
+namespace Parbad.Gateway.Parsian
 {
     public static class ParsianGatewayInvoiceBuilderExtensions
     {

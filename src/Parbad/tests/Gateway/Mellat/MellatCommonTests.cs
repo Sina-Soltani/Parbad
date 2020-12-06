@@ -4,6 +4,7 @@ using Parbad.InvoiceBuilder;
 using System;
 using System.Threading.Tasks;
 using NUnit.Framework;
+using Parbad.Gateway.Mellat;
 
 namespace Parbad.Tests.Gateway.Mellat
 {

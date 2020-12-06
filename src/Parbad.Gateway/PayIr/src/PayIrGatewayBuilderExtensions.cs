@@ -3,11 +3,10 @@
 
 using System;
 using Microsoft.Extensions.DependencyInjection;
-using Parbad.Gateway.PayIr;
 using Parbad.Gateway.PayIr.Internal;
 using Parbad.GatewayBuilders;
 
-namespace Parbad.Builder
+namespace Parbad.Gateway.PayIr
 {
     public static class PayIrGatewayBuilderExtensions
     {

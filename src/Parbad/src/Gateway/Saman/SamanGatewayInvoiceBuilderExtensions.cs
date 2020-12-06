@@ -1,10 +1,9 @@
 ﻿using System;
 using Parbad.Abstraction;
-using Parbad.Gateway.Saman;
 using Parbad.Gateway.Saman.Internal;
 using Parbad.InvoiceBuilder;
 
-namespace Parbad
+namespace Parbad.Gateway.Saman
 {
     public static class SamanGatewayInvoiceBuilderExtensions
     {

@@ -4,6 +4,7 @@ using Parbad.Internal;
 using Parbad.InvoiceBuilder;
 using System;
 using System.Threading.Tasks;
+using Parbad.Gateway.Parsian;
 
 namespace Parbad.Tests.Gateway.Parsian
 {
