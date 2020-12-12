@@ -1,17 +1,17 @@
-using Microsoft.Extensions.Caching.Distributed;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Parbad.Storage.Abstractions;
-using Parbad.Storage.Cache.DistributedCache;
-using System.Linq;
-using System.Threading.Tasks;
+using Parbad.Storage.Cache.MemoryCache;
 
-namespace Parbad.Storage.Cache.Tests.MemoryCache
+namespace Parbad.Storage.Cache.Tests
 {
-    public class DistributedMemoryCacheTests
+    public class MemoryCacheTests
     {
-        private DistributedCacheStorage _storage;
+        private MemoryCacheStorage _storage;
         private static Payment PaymentTestData => new Payment
         {
             TrackingNumber = 1,
@@ -38,14 +38,14 @@ namespace Parbad.Storage.Cache.Tests.MemoryCache
         public void Setup()
         {
             var services = new ServiceCollection()
-                .AddDistributedMemoryCache()
-                .Configure<DistributedCacheStorageOptions>(_ => { })
+                .AddMemoryCache()
+                .Configure<MemoryCacheStorageOptions>(_ => { })
                 .BuildServiceProvider();
 
-            var memoryCache = services.GetRequiredService<IDistributedCache>();
-            var options = services.GetRequiredService<IOptions<DistributedCacheStorageOptions>>();
+            var memoryCache = services.GetRequiredService<IMemoryCache>();
+            var options = services.GetRequiredService<IOptions<MemoryCacheStorageOptions>>();
 
-            _storage = new DistributedCacheStorage(memoryCache, options);
+            _storage = new MemoryCacheStorage(memoryCache, options);
         }
 
         [Test]
