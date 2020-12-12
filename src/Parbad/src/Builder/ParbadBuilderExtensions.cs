@@ -1,15 +1,14 @@
 // Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Parbad;
 using Parbad.Abstraction;
-using Parbad.Builder;
 using Parbad.Internal;
 using Parbad.InvoiceBuilder;
 using Parbad.TrackingNumberProviders;
 
-namespace Microsoft.Extensions.DependencyInjection
+namespace Parbad.Builder
 {
     public static class ParbadBuilderExtensions
     {

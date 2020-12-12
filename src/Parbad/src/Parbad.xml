@@ -148,6 +148,11 @@
             </para>
             </summary>
         </member>
+        <member name="M:Parbad.Builder.ParbadBuilderExtensions.AddParbad(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Adds Parbad pre-configured services to the specified <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/>.
+            </summary>
+        </member>
         <member name="M:Parbad.Builder.GatewayAccountBuilderExtensions.AddInMemory``1(Parbad.GatewayBuilders.IGatewayAccountBuilder{``0},System.Collections.Generic.IEnumerable{``0})">
             <summary>
             Adds an in-memory account of type <typeparamref name="TAccount"/>.
@@ -2063,11 +2068,6 @@
         <member name="M:Parbad.TrackingNumberProviderExtensions.UseAutoRandomTrackingNumber(Parbad.InvoiceBuilder.IInvoiceBuilder)">
             <summary>
             Generates a new tracking number randomly in <see cref="T:System.Int64"/> range.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Extensions.DependencyInjection.ParbadBuilderExtensions.AddParbad(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
-            <summary>
-            Adds Parbad pre-configured services to the specified <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/>.
             </summary>
         </member>
     </members>
