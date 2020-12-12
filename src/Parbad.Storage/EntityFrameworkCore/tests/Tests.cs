@@ -1,18 +1,19 @@
-using Microsoft.Extensions.Caching.Distributed;
+using System;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Parbad.Storage.Abstractions;
-using Parbad.Storage.Cache.DistributedCache;
+using Parbad.Storage.EntityFrameworkCore.Context;
+using Parbad.Storage.EntityFrameworkCore.Options;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Parbad.Storage.Cache.Tests
+namespace Parbad.Storage.EntityFrameworkCore.Tests
 {
-    public class DistributedMemoryCacheTests
+    public class Tests
     {
         private ServiceProvider _services;
-        private DistributedCacheStorage _storage;
+        private EntityFrameworkCoreStorage _storage;
 
         private static Payment PaymentTestData => new Payment
         {
@@ -40,14 +41,13 @@ namespace Parbad.Storage.Cache.Tests
         public void Setup()
         {
             _services = new ServiceCollection()
-                .AddDistributedMemoryCache()
-                .Configure<DistributedCacheStorageOptions>(_ => { })
+                .Configure<EntityFrameworkCoreOptions>(options => { })
+                .AddDbContext<ParbadDataContext>(builder => builder.UseInMemoryDatabase(Guid.NewGuid().ToString()))
                 .BuildServiceProvider();
 
-            var memoryCache = _services.GetRequiredService<IDistributedCache>();
-            var options = _services.GetRequiredService<IOptions<DistributedCacheStorageOptions>>();
+            var context = _services.GetRequiredService<ParbadDataContext>();
 
-            _storage = new DistributedCacheStorage(memoryCache, options);
+            _storage = new EntityFrameworkCoreStorage(context);
         }
 
         [TearDown]

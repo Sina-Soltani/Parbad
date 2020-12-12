@@ -78,6 +78,8 @@ namespace Parbad.Tests.Helpers
 
                 onRefundResult.Invoke(refundResult);
             }
+
+            await serviceProvider.DisposeAsync();
         }
     }
 }

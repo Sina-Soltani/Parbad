@@ -11,7 +11,9 @@ namespace Parbad.Storage.Cache.Tests
 {
     public class MemoryCacheTests
     {
+        private ServiceProvider _services;
         private MemoryCacheStorage _storage;
+
         private static Payment PaymentTestData => new Payment
         {
             TrackingNumber = 1,
@@ -37,15 +39,21 @@ namespace Parbad.Storage.Cache.Tests
         [SetUp]
         public void Setup()
         {
-            var services = new ServiceCollection()
+            _services = new ServiceCollection()
                 .AddMemoryCache()
                 .Configure<MemoryCacheStorageOptions>(_ => { })
                 .BuildServiceProvider();
 
-            var memoryCache = services.GetRequiredService<IMemoryCache>();
-            var options = services.GetRequiredService<IOptions<MemoryCacheStorageOptions>>();
+            var memoryCache = _services.GetRequiredService<IMemoryCache>();
+            var options = _services.GetRequiredService<IOptions<MemoryCacheStorageOptions>>();
 
             _storage = new MemoryCacheStorage(memoryCache, options);
+        }
+
+        [TearDown]
+        public ValueTask Cleanup()
+        {
+            return _services.DisposeAsync();
         }
 
         [Test]
