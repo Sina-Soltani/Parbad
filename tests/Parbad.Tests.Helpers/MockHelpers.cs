@@ -18,12 +18,12 @@ namespace Parbad.Tests.Helpers
 
             if (queries != null)
             {
-                //httpContext.Request.Query = new QueryCollection(queries);
+                httpContext.Request.Query = new QueryCollection(queries);
             }
 
             if (form != null)
             {
-                //httpContext.Request.Form = new FormCollection(form);
+                httpContext.Request.Form = new FormCollection(form);
             }
 
             var httpContextAccessorMock = new Mock<IHttpContextAccessor>();
