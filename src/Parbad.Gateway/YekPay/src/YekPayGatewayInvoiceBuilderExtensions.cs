@@ -43,12 +43,12 @@ namespace Parbad.Gateway.YekPay
             if (builder == null) throw new ArgumentNullException(nameof(builder));
             if (yekPayRequest == null) throw new ArgumentNullException(nameof(yekPayRequest));
 
-            builder.SetYekPayRequest(yekPayRequest);
+            SetYekPayRequest(builder, yekPayRequest);
 
             return builder;
         }
 
-        internal static void SetYekPayRequest(this IInvoiceBuilder builder, YekPayRequest yekPayRequest)
+        internal static void SetYekPayRequest(IInvoiceBuilder builder, YekPayRequest yekPayRequest)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
             if (yekPayRequest == null) throw new ArgumentNullException(nameof(yekPayRequest));
