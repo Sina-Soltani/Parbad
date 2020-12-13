@@ -350,11 +350,11 @@
       <Project>{0f2cd6c7-3d9a-4d9d-9132-afbcbda3f47c}</Project>
       <Name>Parbad.Gateway.ZarinPal</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Parbad.Mvc\Parbad.Mvc.csproj">
+    <ProjectReference Include="..\..\src\Parbad.Mvc\src\Parbad.Mvc.csproj">
       <Project>{19fbd363-c6f1-4dfc-a311-da8485b6f8a4}</Project>
       <Name>Parbad.Mvc</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Parbad.Owin\Parbad.Owin.csproj">
+    <ProjectReference Include="..\..\src\Parbad.Owin\src\Parbad.Owin.csproj">
       <Project>{a1815d72-31a8-45bf-95b5-2a1f1008e0f8}</Project>
       <Name>Parbad.Owin</Name>
     </ProjectReference>
@@ -366,7 +366,7 @@
       <Project>{601e9a72-3154-4d7b-aada-68167a60e29e}</Project>
       <Name>Parbad.Storage.EntityFrameworkCore</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\Parbad\Parbad.csproj">
+    <ProjectReference Include="..\..\src\Parbad\src\Parbad.csproj">
       <Project>{53d0b3cc-2fd4-4113-a368-60715fb8518e}</Project>
       <Name>Parbad</Name>
     </ProjectReference>

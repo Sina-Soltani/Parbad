@@ -21,6 +21,7 @@ namespace Parbad.Gateway.ZarinPal
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
+        private readonly ZarinPalGatewayOptions _gatewayOptions;
         private readonly IOptions<MessagesOptions> _messagesOptions;
 
         public const string Name = "ZarinPal";
@@ -29,10 +30,12 @@ namespace Parbad.Gateway.ZarinPal
             IGatewayAccountProvider<ZarinPalGatewayAccount> accountProvider,
             IHttpContextAccessor httpContextAccessor,
             IHttpClientFactory httpClientFactory,
+            IOptions<ZarinPalGatewayOptions> gatewayOptions,
             IOptions<MessagesOptions> messagesOptions) : base(accountProvider)
         {
             _httpContextAccessor = httpContextAccessor;
             _httpClient = httpClientFactory.CreateClient(this);
+            _gatewayOptions = gatewayOptions.Value;
             _messagesOptions = messagesOptions;
         }
 
@@ -46,12 +49,12 @@ namespace Parbad.Gateway.ZarinPal
             var data = ZarinPalHelper.CreateRequestData(account, invoice);
 
             var responseMessage = await _httpClient
-                .PostXmlAsync(ZarinPalHelper.GetWebServiceUrl(account.IsSandbox), data, cancellationToken)
+                .PostXmlAsync(ZarinPalHelper.GetApiUrl(account.IsSandbox, _gatewayOptions), data, cancellationToken)
                 .ConfigureAwaitFalse();
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
-            return ZarinPalHelper.CreateRequestResult(response, _httpContextAccessor.HttpContext, account, _messagesOptions.Value);
+            return ZarinPalHelper.CreateRequestResult(response, _httpContextAccessor.HttpContext, account, _gatewayOptions, _messagesOptions.Value);
         }
 
         /// <inheritdoc />
@@ -71,7 +74,7 @@ namespace Parbad.Gateway.ZarinPal
             var data = ZarinPalHelper.CreateVerifyData(account, callbackResult, context.Payment.Amount);
 
             var responseMessage = await _httpClient
-                .PostXmlAsync(ZarinPalHelper.GetWebServiceUrl(account.IsSandbox), data, cancellationToken)
+                .PostXmlAsync(ZarinPalHelper.GetApiUrl(account.IsSandbox, _gatewayOptions), data, cancellationToken)
                 .ConfigureAwaitFalse();
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();

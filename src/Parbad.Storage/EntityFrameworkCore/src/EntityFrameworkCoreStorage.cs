@@ -113,7 +113,6 @@ namespace Parbad.Storage.EntityFrameworkCore
 
             var record = await Context
                 .Transactions
-                .AsNoTracking()
                 .SingleOrDefaultAsync(model => model.Id == transaction.Id, cancellationToken);
 
             if (record == null) throw new InvalidOperationException($"No transaction records found in database with id {transaction.Id}");
@@ -133,7 +132,6 @@ namespace Parbad.Storage.EntityFrameworkCore
 
             var record = await Context
                 .Transactions
-                .AsNoTracking()
                 .SingleOrDefaultAsync(model => model.Id == transaction.Id, cancellationToken);
 
             if (record == null) throw new InvalidOperationException($"No transaction records found in database with id {transaction.Id}");

@@ -17,12 +17,9 @@ namespace Parbad.Gateway.IdPay.Internal
 {
     internal static class IdPayHelper
     {
-        public const string ApiUrl = "https://api.idpay.ir/v1.1/";
-        public const string RequestUrl = "payment";
-        public const string VerifyUrl = "payment/verify";
         public const string ApiKey = "X-API-KEY";
         public const string SandBoxKey = "X-SANDBOX";
-        public const string SandBoxApiKey = "6a7f99eb-7c20-4412-a972-6dfb7cd253a4";
+        public const string SandBoxApiValue = "6a7f99eb-7c20-4412-a972-6dfb7cd253a4";
         public const string Succeed = "100";
         public const string ReadyForVerifying = "10";
 
@@ -52,11 +49,7 @@ namespace Parbad.Gateway.IdPay.Internal
 
             var result = JsonConvert.DeserializeObject<IdPayRequestResultModel>(response);
 
-            var transporterDescriptor = GatewayTransporterDescriptor.CreateRedirect(result.Link);
-
-            var transporter = new DefaultGatewayTransporter(httpContext, transporterDescriptor);
-
-            return PaymentRequestResult.Succeed(transporter, account.Name);
+            return PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, result.Link);
         }
 
         public static async Task<IdPayCallbackResult> CreateCallbackResultAsync(
@@ -130,7 +123,7 @@ namespace Parbad.Gateway.IdPay.Internal
 
         public static void AssignHeaders(HttpRequestHeaders headers, IdPayGatewayAccount account)
         {
-            var api = account.IsTestAccount ? SandBoxApiKey : account.Api;
+            var api = account.IsTestAccount ? SandBoxApiValue : account.Api;
 
             headers.AddOrUpdate(ApiKey, api);
 

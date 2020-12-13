@@ -1,10 +1,6 @@
 ﻿// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
-using System;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -15,6 +11,10 @@ using Parbad.GatewayBuilders;
 using Parbad.Internal;
 using Parbad.Net;
 using Parbad.Options;
+using System;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Parbad.Gateway.IdPay
 {
@@ -23,11 +23,12 @@ namespace Parbad.Gateway.IdPay
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
-        private readonly IOptions<MessagesOptions> _messagesOptions;
+        private readonly IdPayGatewayOptions _gatewayOptions;
+        private readonly MessagesOptions _messagesOptions;
 
         public const string Name = "IdPay";
 
-        private JsonSerializerSettings DefaultSerializerSettings => new JsonSerializerSettings
+        private static JsonSerializerSettings DefaultSerializerSettings => new JsonSerializerSettings
         {
             ContractResolver = new CamelCasePropertyNamesContractResolver()
         };
@@ -36,11 +37,13 @@ namespace Parbad.Gateway.IdPay
             IGatewayAccountProvider<IdPayGatewayAccount> accountProvider,
             IHttpContextAccessor httpContextAccessor,
             IHttpClientFactory httpClientFactory,
+            IOptions<IdPayGatewayOptions> gatewayOptions,
             IOptions<MessagesOptions> messagesOptions) : base(accountProvider)
         {
             _httpContextAccessor = httpContextAccessor;
             _httpClient = httpClientFactory.CreateClient(this);
-            _messagesOptions = messagesOptions;
+            _gatewayOptions = gatewayOptions.Value;
+            _messagesOptions = messagesOptions.Value;
         }
 
         /// <inheritdoc />
@@ -55,7 +58,7 @@ namespace Parbad.Gateway.IdPay
             var data = IdPayHelper.CreateRequestData(invoice);
 
             var responseMessage = await _httpClient
-                .PostJsonAsync(IdPayHelper.RequestUrl, data, DefaultSerializerSettings, cancellationToken)
+                .PostJsonAsync(_gatewayOptions.ApiRequestUrl, data, DefaultSerializerSettings, cancellationToken)
                 .ConfigureAwaitFalse();
 
             return await IdPayHelper.CreateRequestResult(responseMessage, _httpContextAccessor.HttpContext, account);
@@ -69,7 +72,7 @@ namespace Parbad.Gateway.IdPay
             var callbackResult = await IdPayHelper.CreateCallbackResultAsync(
                     context,
                     _httpContextAccessor.HttpContext.Request,
-                    _messagesOptions.Value,
+                    _messagesOptions,
                     cancellationToken)
                 .ConfigureAwaitFalse();
 
@@ -85,10 +88,10 @@ namespace Parbad.Gateway.IdPay
             var data = IdPayHelper.CreateVerifyData(context, callbackResult);
 
             var responseMessage = await _httpClient
-                .PostJsonAsync(IdPayHelper.VerifyUrl, data, DefaultSerializerSettings, cancellationToken)
+                .PostJsonAsync(_gatewayOptions.ApiVerificationUrl, data, DefaultSerializerSettings, cancellationToken)
                 .ConfigureAwaitFalse();
 
-            return await IdPayHelper.CreateVerifyResult(responseMessage, _messagesOptions.Value);
+            return await IdPayHelper.CreateVerifyResult(responseMessage, _messagesOptions);
         }
 
         /// <inheritdoc />

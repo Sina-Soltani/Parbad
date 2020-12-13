@@ -3,10 +3,9 @@
 
 using System;
 using Parbad.Abstraction;
-using Parbad.Gateway.YekPay;
 using Parbad.InvoiceBuilder;
 
-namespace Parbad
+namespace Parbad.Gateway.YekPay
 {
     public static class YekPayGatewayInvoiceBuilderExtensions
     {
@@ -15,7 +14,17 @@ namespace Parbad
         /// <summary>
         /// The invoice will be sent to YekPay gateway.
         /// </summary>
-        public static IInvoiceBuilder UseYekPay(this IInvoiceBuilder builder, Action<YekPayRequest> configureYekPay)
+        public static IInvoiceBuilder UseYekPay(this IInvoiceBuilder builder)
+        {
+            if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+            return builder.SetGateway(YekPayGateway.Name);
+        }
+
+        /// <summary>
+        /// The invoice will be sent to YekPay gateway.
+        /// </summary>
+        public static IInvoiceBuilder SetYekPayData(this IInvoiceBuilder builder, Action<YekPayRequest> configureYekPay)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
             if (configureYekPay == null) throw new ArgumentNullException(nameof(configureYekPay));
@@ -23,38 +32,28 @@ namespace Parbad
             var yekPayRequest = new YekPayRequest();
             configureYekPay(yekPayRequest);
 
-            return UseYekPay(builder, yekPayRequest);
+            return SetYekPayData(builder, yekPayRequest);
         }
 
         /// <summary>
         /// The invoice will be sent to YekPay gateway.
         /// </summary>
-        public static IInvoiceBuilder UseYekPay(this IInvoiceBuilder builder, YekPayRequest yekPayRequest)
+        public static IInvoiceBuilder SetYekPayData(this IInvoiceBuilder builder, YekPayRequest yekPayRequest)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
             if (yekPayRequest == null) throw new ArgumentNullException(nameof(yekPayRequest));
 
-            builder.SetYekPayRequest(yekPayRequest);
-
-            builder.SetGateway(YekPayGateway.Name);
+            SetYekPayRequest(builder, yekPayRequest);
 
             return builder;
         }
 
-        internal static void SetYekPayRequest(this IInvoiceBuilder builder, YekPayRequest yekPayRequest)
+        internal static void SetYekPayRequest(IInvoiceBuilder builder, YekPayRequest yekPayRequest)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
             if (yekPayRequest == null) throw new ArgumentNullException(nameof(yekPayRequest));
 
-            builder.AddFormatter(invoice =>
-            {
-                if (invoice.AdditionalData.ContainsKey(YekPayRequestKey))
-                {
-                    invoice.AdditionalData.Remove(YekPayRequestKey);
-                }
-
-                invoice.AdditionalData.Add(YekPayRequestKey, yekPayRequest);
-            });
+            builder.AddOrUpdateAdditionalData(YekPayRequestKey, yekPayRequest);
         }
 
         internal static YekPayRequest GetYekPayRequest(this Invoice invoice)

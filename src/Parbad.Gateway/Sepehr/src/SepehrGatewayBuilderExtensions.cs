@@ -1,13 +1,11 @@
 ﻿// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
-using System;
 using Microsoft.Extensions.DependencyInjection;
-using Parbad.Gateway.Sepehr;
-using Parbad.Gateway.Sepehr.Internal;
 using Parbad.GatewayBuilders;
+using System;
 
-namespace Parbad.Builder
+namespace Parbad.Gateway.Sepehr
 {
     public static class SepehrGatewayBuilderExtensions
     {
@@ -19,9 +17,10 @@ namespace Parbad.Builder
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            return builder.AddGateway<SepehrGateway>()
-                .WithHttpClient(clientBuilder =>
-                    clientBuilder.ConfigureHttpClient(client => client.BaseAddress = new Uri(SepehrHelper.ApiBaseUrl)));
+            return builder
+                .AddGateway<SepehrGateway>()
+                .WithHttpClient(clientBuilder => { })
+                .WithOptions(options => { });
         }
 
         /// <summary>
@@ -36,6 +35,20 @@ namespace Parbad.Builder
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
             return builder.WithAccounts(configureAccounts);
+        }
+
+        /// <summary>
+        /// Configures the options for Sepehr Gateway.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="configureOptions">Configuration</param>
+        public static IGatewayConfigurationBuilder<SepehrGateway> WithOptions(
+            this IGatewayConfigurationBuilder<SepehrGateway> builder,
+            Action<SepehrGatewayOptions> configureOptions)
+        {
+            builder.Services.Configure(configureOptions);
+
+            return builder;
         }
     }
 }
