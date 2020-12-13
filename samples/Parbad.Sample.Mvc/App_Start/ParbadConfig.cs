@@ -1,4 +1,6 @@
 ﻿using Parbad.Builder;
+using Parbad.Gateway.Mellat;
+using Parbad.Gateway.ParbadVirtual;
 
 namespace Parbad.Sample.Mvc
 {

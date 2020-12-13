@@ -1,11 +1,6 @@
 ﻿// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
-using System;
-using System.Net.Http;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -16,6 +11,10 @@ using Parbad.GatewayBuilders;
 using Parbad.Internal;
 using Parbad.Net;
 using Parbad.Options;
+using System;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Parbad.Gateway.PayIr
 {
@@ -23,11 +22,12 @@ namespace Parbad.Gateway.PayIr
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
-        private readonly IOptions<MessagesOptions> _messagesOptions;
+        private readonly PayIrGatewayOptions _gatewayOptions;
+        private readonly MessagesOptions _messagesOptions;
 
         public const string Name = "PayIr";
 
-        private JsonSerializerSettings DefaultSerializerSettings => new JsonSerializerSettings
+        private static JsonSerializerSettings DefaultSerializerSettings => new JsonSerializerSettings
         {
             ContractResolver = new CamelCasePropertyNamesContractResolver()
         };
@@ -36,11 +36,13 @@ namespace Parbad.Gateway.PayIr
             IGatewayAccountProvider<PayIrGatewayAccount> accountProvider,
             IHttpContextAccessor httpContextAccessor,
             IHttpClientFactory httpClientFactory,
+            IOptions<PayIrGatewayOptions> gatewayOptions,
             IOptions<MessagesOptions> messagesOptions) : base(accountProvider)
         {
             _httpContextAccessor = httpContextAccessor;
             _httpClient = httpClientFactory.CreateClient(this);
-            _messagesOptions = messagesOptions;
+            _gatewayOptions = gatewayOptions.Value;
+            _messagesOptions = messagesOptions.Value;
         }
 
         /// <inheritdoc />
@@ -53,12 +55,12 @@ namespace Parbad.Gateway.PayIr
             var data = PayIrHelper.CreateRequestData(account, invoice);
 
             var responseMessage = await _httpClient
-                .PostJsonAsync(PayIrHelper.WebServiceRequestUrl, data, DefaultSerializerSettings, cancellationToken)
+                .PostJsonAsync(_gatewayOptions.ApiRequestUrl, data, DefaultSerializerSettings, cancellationToken)
                 .ConfigureAwaitFalse();
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
-            return PayIrHelper.CreateRequestResult(response, _httpContextAccessor.HttpContext, account);
+            return PayIrHelper.CreateRequestResult(response, _httpContextAccessor.HttpContext, account, _gatewayOptions);
         }
 
         /// <inheritdoc />
@@ -78,12 +80,12 @@ namespace Parbad.Gateway.PayIr
             var data = PayIrHelper.CreateVerifyData(account, callbackResult);
 
             var responseMessage = await _httpClient
-                .PostJsonAsync(PayIrHelper.WebServiceVerifyUrl, data, DefaultSerializerSettings, cancellationToken)
+                .PostJsonAsync(_gatewayOptions.ApiVerificationUrl, data, DefaultSerializerSettings, cancellationToken)
                 .ConfigureAwaitFalse();
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
-            return PayIrHelper.CreateVerifyResult(response, _messagesOptions.Value);
+            return PayIrHelper.CreateVerifyResult(response, _messagesOptions);
         }
 
         /// <inheritdoc />

@@ -90,9 +90,6 @@ namespace Parbad.Sample.AspNetCore.Controllers
         {
             var result = await _onlinePayment.RefundCompletelyAsync(viewModel.TrackingNumber);
 
-            // Note: This is just for development and testing.
-            // Don't show the actual result object to clients in production environment.
-            // Instead, show only the important information such as IsSucceed, Tracking Number and Transaction Code.
             return View("RefundResult", result);
         }
 

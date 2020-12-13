@@ -9,7 +9,7 @@
             Sepehr Gateway.
             </summary>
         </member>
-        <member name="M:Parbad.Gateway.Sepehr.SepehrGateway.#ctor(Parbad.GatewayBuilders.IGatewayAccountProvider{Parbad.Gateway.Sepehr.SepehrGatewayAccount},Microsoft.AspNetCore.Http.IHttpContextAccessor,System.Net.Http.IHttpClientFactory,Microsoft.Extensions.Options.IOptions{Parbad.Options.ParbadOptions})">
+        <member name="M:Parbad.Gateway.Sepehr.SepehrGateway.#ctor(Parbad.GatewayBuilders.IGatewayAccountProvider{Parbad.Gateway.Sepehr.SepehrGatewayAccount},Microsoft.AspNetCore.Http.IHttpContextAccessor,System.Net.Http.IHttpClientFactory,Microsoft.Extensions.Options.IOptions{Parbad.Gateway.Sepehr.SepehrGatewayOptions},Microsoft.Extensions.Options.IOptions{Parbad.Options.ParbadOptions})">
             <summary>
             Initializes an instance of <see cref="T:Parbad.Gateway.Sepehr.SepehrGateway"/>.
             </summary>
@@ -23,6 +23,31 @@
         <member name="M:Parbad.Gateway.Sepehr.SepehrGateway.RefundAsync(Parbad.InvoiceContext,Parbad.Money,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
+        <member name="M:Parbad.Gateway.Sepehr.SepehrGatewayBuilderExtensions.AddSepehr(Parbad.GatewayBuilders.IGatewayBuilder)">
+            <summary>
+            Adds the Sepehr gateway to Parbad services.
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.Gateway.Sepehr.SepehrGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Sepehr.SepehrGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.Gateway.Sepehr.SepehrGatewayAccount}})">
+            <summary>
+            Configures the accounts for Sepehr gateway.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureAccounts">Configures the accounts.</param>
+        </member>
+        <member name="M:Parbad.Gateway.Sepehr.SepehrGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Sepehr.SepehrGateway},System.Action{Parbad.Gateway.Sepehr.SepehrGatewayOptions})">
+            <summary>
+            Configures the options for Sepehr Gateway.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureOptions">Configuration</param>
+        </member>
+        <member name="M:Parbad.Gateway.Sepehr.SepehrGatewayInvoiceBuilderExtensions.UseSepehr(Parbad.InvoiceBuilder.IInvoiceBuilder)">
+            <summary>
+            The invoice will be sent to Sepehr gateway.
+            </summary>
+        </member>
         <member name="M:Parbad.Gateway.Sepehr.SepehrGatewayPaymentResultExtensions.GetSepehrAdditionalData(Parbad.IPaymentVerifyResult)">
             <summary>
             Gets the verification additional data from Sepehr gateway.
@@ -31,24 +56,6 @@
         <member name="T:Parbad.Gateway.Sepehr.SepehrGatewayVerificationAdditionalData">
             <summary>
             Contains some additional data after the invoice verification.
-            </summary>
-        </member>
-        <member name="M:Parbad.Builder.SepehrGatewayBuilderExtensions.AddSepehr(Parbad.GatewayBuilders.IGatewayBuilder)">
-            <summary>
-            Adds the Sepehr gateway to Parbad services.
-            </summary>
-            <param name="builder"></param>
-        </member>
-        <member name="M:Parbad.Builder.SepehrGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Sepehr.SepehrGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.Gateway.Sepehr.SepehrGatewayAccount}})">
-            <summary>
-            Configures the accounts for Sepehr gateway.
-            </summary>
-            <param name="builder"></param>
-            <param name="configureAccounts">Configures the accounts.</param>
-        </member>
-        <member name="M:Parbad.SepehrGatewayInvoiceBuilderExtensions.UseSepehr(Parbad.InvoiceBuilder.IInvoiceBuilder)">
-            <summary>
-            The invoice will be sent to Sepehr gateway.
             </summary>
         </member>
     </members>

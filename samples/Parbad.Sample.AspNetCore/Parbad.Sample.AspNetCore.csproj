@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <LangVersion>latest</LangVersion>
+    <TargetFramework>net5.0</TargetFramework>
+    <LangVersion>9</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Parbad.AspNetCore\Parbad.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\src\Parbad.AspNetCore\src\Parbad.AspNetCore.csproj" />
     <ProjectReference Include="..\..\src\Parbad.Gateway\IdPay\src\Parbad.Gateway.IdPay.csproj" />
     <ProjectReference Include="..\..\src\Parbad.Gateway\PayIr\src\Parbad.Gateway.PayIr.csproj" />
     <ProjectReference Include="..\..\src\Parbad.Gateway\Sepehr\src\Parbad.Gateway.Sepehr.csproj" />
@@ -14,7 +14,7 @@
     <ProjectReference Include="..\..\src\Parbad.Gateway\ZarinPal\src\Parbad.Gateway.ZarinPal.csproj" />
     <ProjectReference Include="..\..\src\Parbad.Storage\Cache\src\Parbad.Storage.Cache.csproj" />
     <ProjectReference Include="..\..\src\Parbad.Storage\EntityFrameworkCore\src\Parbad.Storage.EntityFrameworkCore.csproj" />
-    <ProjectReference Include="..\..\src\Parbad\Parbad.csproj" />
+    <ProjectReference Include="..\..\src\Parbad\src\Parbad.csproj" />
   </ItemGroup>
 
 </Project>

@@ -9,29 +9,17 @@ namespace Parbad.Gateway.Sepehr.Internal
     {
         public static string Translate(string result, MessagesOptions options)
         {
-            switch (result)
+            return result switch
             {
-                case "-1":
-                    return "تراکنش پیدا نشد";
-
-                case "-2":
-                    return "در زمان دریافت توکن، به دلیل عدم وجود آی پی و یا به دلیل بسته بودن خروجی پورت ۸۰۸۱ از سمت هاست، این خطا ایجاد میگردد. تراکنش قبلا Reverse شده است";
-
-                case "-3":
-                    return "Total Error خطای عمومی";
-
-                case "-4":
-                    return "امکان انجام درخواست برای این تراکنش وجود ندارد.";
-
-                case "-5":
-                    return "آدرس IP نامعتبر می‌باشد.";
-
-                case "-6":
-                    return "عدم فعال بودن سرویس برگشت تراکنش برای پذیرنده.";
-
-                default:
-                    return options.UnexpectedErrorText;
-            }
+                "-1" => "تراکنش پیدا نشد",
+                "-2" =>
+                "در زمان دریافت توکن، به دلیل عدم وجود آی پی و یا به دلیل بسته بودن خروجی پورت ۸۰۸۱ از سمت هاست، این خطا ایجاد میگردد. تراکنش قبلا Reverse شده است",
+                "-3" => "Total Error خطای عمومی",
+                "-4" => "امکان انجام درخواست برای این تراکنش وجود ندارد.",
+                "-5" => "آدرس IP نامعتبر می‌باشد.",
+                "-6" => "عدم فعال بودن سرویس برگشت تراکنش برای پذیرنده.",
+                _ => $"{options.UnexpectedErrorText} Response: {result}"
+            };
         }
     }
 }

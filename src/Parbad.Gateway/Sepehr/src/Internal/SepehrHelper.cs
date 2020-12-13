@@ -1,12 +1,6 @@
 ﻿// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Parbad.Abstraction;
@@ -14,17 +8,18 @@ using Parbad.Http;
 using Parbad.Internal;
 using Parbad.Options;
 using Parbad.Storage.Abstractions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Parbad.Gateway.Sepehr.Internal
 {
     internal static class SepehrHelper
     {
         public const string VerificationAdditionalDataKey = "SepehrVerificationAdditionalData";
-        public const string ApiBaseUrl = "https://mabna.shaparak.ir:8081/V1/";
-        public const string ApiTokenUrl = "PeymentApi/GetToken";
-        public const string ApiAdviceUrl = "PeymentApi/Advice";
-        public const string ApiRollbackUrl = "PeymentApi/Rollback";
-        public const string PaymentPageUrl = "https://mabna.shaparak.ir:8080/Pay";
 
         public static object CreateRequestData(Invoice invoice, SepehrGatewayAccount account)
         {
@@ -41,6 +36,7 @@ namespace Parbad.Gateway.Sepehr.Internal
             HttpResponseMessage responseMessage,
             HttpContext httpContext,
             SepehrGatewayAccount account,
+            SepehrGatewayOptions gatewayOptions,
             MessagesOptions messages)
         {
             if (!responseMessage.IsSuccessStatusCode)
@@ -69,17 +65,14 @@ namespace Parbad.Gateway.Sepehr.Internal
                 return PaymentRequestResult.Failed(messages.InvalidDataReceivedFromGateway, account.Name);
             }
 
-            var transporterDescriptor = GatewayTransporterDescriptor.CreatePost(
-                PaymentPageUrl,
+            return PaymentRequestResult.SucceedWithPost(account.Name,
+                httpContext,
+                gatewayOptions.PaymentPageUrl,
                 new Dictionary<string, string>
                 {
                     {"TerminalID", account.TerminalId.ToString()},
-                    {"token", result.AccessToken }
+                    {"token", result.AccessToken}
                 });
-
-            var transporter = new DefaultGatewayTransporter(httpContext, transporterDescriptor);
-
-            return PaymentRequestResult.Succeed(transporter, account.Name);
         }
 
         public static async Task<CallbackResultModel> CreateCallbackResultAsync(
@@ -279,7 +272,7 @@ namespace Parbad.Gateway.Sepehr.Internal
                 Rrn = callbackResult.Rrn,
                 CardNumber = callbackResult.CardNumber
             };
-            verificationResult.SetPayIrAdditionalData(verificationAdditionalData);
+            verificationResult.SetSepehrAdditionalData(verificationAdditionalData);
             var serializedAdditionalData = JsonConvert.SerializeObject(verificationAdditionalData);
             verificationResult.DatabaseAdditionalData.Add(VerificationAdditionalDataKey, serializedAdditionalData);
 

@@ -1,11 +1,11 @@
 ﻿// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
-using System;
-using Parbad.Gateway.ZarinPal;
+using Microsoft.Extensions.DependencyInjection;
 using Parbad.GatewayBuilders;
+using System;
 
-namespace Parbad.Builder
+namespace Parbad.Gateway.ZarinPal
 {
     public static class ZarinPalGatewayBuilderExtensions
     {
@@ -17,7 +17,10 @@ namespace Parbad.Builder
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            return builder.AddGateway<ZarinPalGateway>();
+            return builder
+                .AddGateway<ZarinPalGateway>()
+                .WithHttpClient(clientBuilder => { })
+                .WithOptions(options => { });
         }
 
         /// <summary>
@@ -32,6 +35,20 @@ namespace Parbad.Builder
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
             return builder.WithAccounts(configureAccounts);
+        }
+
+        /// <summary>
+        /// Configures the options for ZarinPal Gateway.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="configureOptions">Configuration</param>
+        public static IGatewayConfigurationBuilder<ZarinPalGateway> WithOptions(
+            this IGatewayConfigurationBuilder<ZarinPalGateway> builder,
+            Action<ZarinPalGatewayOptions> configureOptions)
+        {
+            builder.Services.Configure(configureOptions);
+
+            return builder;
         }
     }
 }
