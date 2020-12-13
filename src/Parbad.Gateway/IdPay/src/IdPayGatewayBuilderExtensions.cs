@@ -17,7 +17,8 @@ namespace Parbad.Gateway.IdPay
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            return builder.AddGateway<IdPayGateway>()
+            return builder
+                .AddGateway<IdPayGateway>()
                 .WithHttpClient(clientBuilder => { })
                 .WithOptions(options => { });
         }
