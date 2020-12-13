@@ -31,6 +31,10 @@ steps:
     projects: $(projects)
     arguments: '-c $(buildConfiguration)'
 - task: DotNetCoreCLI@2
+  inputs:
+    command: 'test'
+    projects: '**/*.Tests.csproj'
+- task: DotNetCoreCLI@2
   displayName: 'packing'
   condition: eq(variables['build.sourceBranch'], 'refs/heads/dev')
   inputs:
