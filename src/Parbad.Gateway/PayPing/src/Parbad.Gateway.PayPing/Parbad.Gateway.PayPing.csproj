@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.0;net5.0</TargetFrameworks>
+        <VersionPrefix>1.1.0</VersionPrefix>
+        <LangVersion>9</LangVersion>
+        <Authors>Ali Zaferany</Authors>
+        <PackageProjectUrl>https://github.com/Sina-Soltani/Parbad</PackageProjectUrl>
+        <PackageIcon>icon.png</PackageIcon>
+        <PackageIconUrl>https://raw.githubusercontent.com/Sina-Soltani/Parbad/master/images/Parbad-128x128.png</PackageIconUrl>
+        <RepositoryUrl>https://github.com/Sina-Soltani/Parbad</RepositoryUrl>
+        <PackageTags>parbad Payment Gateway Bank Iran Shetab payping پرداخت درگاه بانک ایران شتاب پی پینگ</PackageTags>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <Description>PayPing Gateway for Parbad project.
+
+            For more information see: https://github.com/Sina-Soltani/Parbad</Description>
+        <PackageReleaseNotes>Supporting the netstandard2.1, netcoreapp3.1 and net5.0 is added.</PackageReleaseNotes>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <NoWarn>1701;1702;1591</NoWarn>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|AnyCPU'">
+        <DocumentationFile>Parbad.Gateway.PayPing.xml</DocumentationFile>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|AnyCPU'">
+        <DocumentationFile>Parbad.Gateway.PayPing.xml</DocumentationFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\..\Parbad\src\Parbad.csproj" />
+        <ProjectReference Include="..\..\..\Parbad\src\Parbad.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="icon.png" pack="true" Visible="false" PackagePath="" />
+        <None Include="Parbad.Gateway.PayPing.xml" pack="true" Visible="false" PackagePath="" />
+        <None Update="icon.png">
+          <pack>true</pack>
+          <Visible>false</Visible>
+        </None>
+        <None Update="Parbad.Gateway.PayPing.xml">
+          <pack>true</pack>
+          <Visible>false</Visible>
+        </None>
+    </ItemGroup>
+
+</Project>

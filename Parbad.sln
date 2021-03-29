@@ -79,6 +79,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "YekPay", "YekPay", "{2A0492
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parbad.Gateway.YekPay", "src\Parbad.Gateway\YekPay\src\Parbad.Gateway.YekPay.csproj", "{9AAFC4B2-678C-4C80-9F1E-8D97C029E598}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PayPing", "PayPing", "{1D465EDA-62B0-4F4D-A742-FB6C9B35FF4C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parbad.Gateway.PayPing", "src\Parbad.Gateway\PayPing\src\Parbad.Gateway.PayPing\Parbad.Gateway.PayPing.csproj", "{0D2BD346-EBBE-48CB-B2FA-567BB55378A5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -149,6 +153,10 @@ Global
 		{9AAFC4B2-678C-4C80-9F1E-8D97C029E598}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9AAFC4B2-678C-4C80-9F1E-8D97C029E598}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9AAFC4B2-678C-4C80-9F1E-8D97C029E598}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D2BD346-EBBE-48CB-B2FA-567BB55378A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D2BD346-EBBE-48CB-B2FA-567BB55378A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D2BD346-EBBE-48CB-B2FA-567BB55378A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D2BD346-EBBE-48CB-B2FA-567BB55378A5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -183,6 +191,8 @@ Global
 		{3DE7D493-E7DF-4FEA-B589-2A38C19BC6E5} = {1EF96D66-1D9D-4D82-9094-6FE841B22BE2}
 		{2A049243-9D42-4B34-B6B5-1BB11C65D2B6} = {B1447D20-66E0-46FB-B0DB-BCBEBA7B337A}
 		{9AAFC4B2-678C-4C80-9F1E-8D97C029E598} = {2A049243-9D42-4B34-B6B5-1BB11C65D2B6}
+		{1D465EDA-62B0-4F4D-A742-FB6C9B35FF4C} = {B1447D20-66E0-46FB-B0DB-BCBEBA7B337A}
+		{0D2BD346-EBBE-48CB-B2FA-567BB55378A5} = {1D465EDA-62B0-4F4D-A742-FB6C9B35FF4C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CBDDB699-C14A-4235-B0AE-32725230B4ED}
