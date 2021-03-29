@@ -30,7 +30,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\..\Parbad\src\Parbad.csproj" />
+        <ProjectReference Include="..\..\..\Parbad\src\Parbad.csproj" />
     </ItemGroup>
 
     <ItemGroup>
