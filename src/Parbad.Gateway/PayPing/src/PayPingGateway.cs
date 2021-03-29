@@ -119,16 +119,9 @@ namespace Parbad.Gateway.PayPing
 
             var body = await _httpContextAccessor.HttpContext.Request.ReadFormAsync(cancellationToken);
             var refId = StringValues.Empty;
-
-            long trackingNumber;
             try
             {
                 body.TryGetValue("refid", out refId);
-
-                var clientRefId = StringValues.Empty;
-                body.TryGetValue("clientrefid", out clientRefId);
-
-                long.TryParse(clientRefId, out trackingNumber);
             }
             catch (Exception e)
             {
