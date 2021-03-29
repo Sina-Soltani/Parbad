@@ -14,13 +14,10 @@ namespace Parbad.Gateway.PayPing
         /// <summary>
         /// The invoice will be sent to PayPing gateway.
         /// </summary>
-        public static IInvoiceBuilder UsePayPing(this IInvoiceBuilder builder, Action<PayPingRequest> configurePayPing = null)
+        public static IInvoiceBuilder UsePayPing(this IInvoiceBuilder builder)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
-            if (configurePayPing != null)
-                SetPayPingData(builder, configurePayPing);
             
-            builder.UseAutoIncrementTrackingNumber();
             return builder.SetGateway(PayPingGateway.Name);
         }
 

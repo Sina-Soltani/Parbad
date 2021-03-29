@@ -2,7 +2,7 @@
 {
     public class VerifyPayRequestModel
     {
-        public decimal Amount { get; set; }
+        public int Amount { get; set; }
         public string RefId { get; set; }
     }
 }

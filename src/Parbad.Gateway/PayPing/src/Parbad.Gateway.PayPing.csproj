@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.0;net5.0</TargetFrameworks>
-        <VersionPrefix>1.1.0</VersionPrefix>
+        <VersionPrefix>1.0.0</VersionPrefix>
         <LangVersion>9</LangVersion>
         <Authors>Ali Zaferany</Authors>
         <PackageProjectUrl>https://github.com/Sina-Soltani/Parbad</PackageProjectUrl>
@@ -31,12 +31,9 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\..\Parbad\src\Parbad.csproj" />
-        <ProjectReference Include="..\..\..\Parbad\src\Parbad.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <None Include="icon.png" pack="true" Visible="false" PackagePath="" />
-        <None Include="Parbad.Gateway.PayPing.xml" pack="true" Visible="false" PackagePath="" />
         <None Update="icon.png">
           <pack>true</pack>
           <Visible>false</Visible>

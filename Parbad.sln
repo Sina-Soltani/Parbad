@@ -81,7 +81,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parbad.Gateway.YekPay", "sr
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PayPing", "PayPing", "{1D465EDA-62B0-4F4D-A742-FB6C9B35FF4C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parbad.Gateway.PayPing", "src\Parbad.Gateway\PayPing\src\Parbad.Gateway.PayPing\Parbad.Gateway.PayPing.csproj", "{0D2BD346-EBBE-48CB-B2FA-567BB55378A5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parbad.Gateway.PayPing", "src\Parbad.Gateway\PayPing\src\Parbad.Gateway.PayPing.csproj", "{0D2BD346-EBBE-48CB-B2FA-567BB55378A5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

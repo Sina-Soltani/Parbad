@@ -20,6 +20,7 @@ using Parbad.GatewayBuilders;
 using Parbad.Internal;
 using Parbad.Net;
 using Parbad.Options;
+using Parbad.Storage.Abstractions;
 
 namespace Parbad.Gateway.PayPing
 {
@@ -29,6 +30,7 @@ namespace Parbad.Gateway.PayPing
     [Gateway(Name)]
     public class PayPingGateway : GatewayBase<PayPingGatewayAccount>
     {
+        private readonly IStorageManager _storageManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<PayPingGateway> _logger;
         private readonly HttpClient _httpClient;
@@ -46,6 +48,7 @@ namespace Parbad.Gateway.PayPing
         /// Initializes an instance of <see cref="PayPingGateway"/>.
         /// </summary>
         public PayPingGateway(
+            IStorageManager storageManager,
             IGatewayAccountProvider<PayPingGatewayAccount> accountProvider,
             IHttpContextAccessor httpContextAccessor,
             IHttpClientFactory httpClientFactory,
@@ -53,6 +56,7 @@ namespace Parbad.Gateway.PayPing
             IOptions<PayPingGatewayOptions> gatewayOptions,
             IOptions<ParbadOptions> options) : base(accountProvider)
         {
+            _storageManager = storageManager;
             _httpContextAccessor = httpContextAccessor;
             _logger = logger;
             _httpClient = httpClientFactory.CreateClient(this);
@@ -71,21 +75,19 @@ namespace Parbad.Gateway.PayPing
             _httpClient.DefaultRequestHeaders.Authorization
                 = new AuthenticationHeaderValue("Bearer", account.BearerToken);
 
-            var model = new CreatePayRequestModel()
+            var body = new CreatePayRequestModel()
             {
-                Amount = invoice.Amount.Value,
-                Description = invoice.GetPayPingRequest().Description,
-                PayerIdentity = invoice.GetPayPingRequest().Mobile,
-                PayerName = invoice.GetPayPingRequest().PayerName,
+                Amount = (int) invoice.Amount.Value,
+                Description = invoice.GetPayPingRequest()?.Description,
+                PayerIdentity = invoice.GetPayPingRequest()?.Mobile,
+                PayerName = invoice.GetPayPingRequest()?.PayerName,
                 ReturnUrl = invoice.CallbackUrl.Url,
                 ClientRefId = invoice.TrackingNumber.ToString()
             };
-            var data = JsonConvert.SerializeObject(model, DefaultSerializerSettings);
 
-            var content = new StringContent(data, Encoding.UTF8, "application/json");
 
             //Send Create pay Request
-            var response = await _httpClient.PostAsync(_pingGatewayOptions.ApiRequestUrl, content, cancellationToken);
+            var response = await _httpClient.PostJsonAsync(_pingGatewayOptions.ApiRequestUrl, body, cancellationToken);
 
             //Check if we ran into an Issue
             response.EnsureSuccessStatusCode();
@@ -104,52 +106,72 @@ namespace Parbad.Gateway.PayPing
         }
 
         /// <inheritdoc />
-        public override async Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default)
+        public override async Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context,
+            CancellationToken cancellationToken = default)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
             var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 
-            _httpClient.DefaultRequestHeaders.Authorization 
+            _httpClient.DefaultRequestHeaders.Authorization
                 = new AuthenticationHeaderValue("Bearer", account.BearerToken);
-            
+
+
+            var body = await _httpContextAccessor.HttpContext.Request.ReadFormAsync(cancellationToken);
+            var refId = StringValues.Empty;
+
+            long trackingNumber;
+            try
+            {
+                body.TryGetValue("refid", out refId);
+
+                var clientRefId = StringValues.Empty;
+                body.TryGetValue("clientrefid", out clientRefId);
+
+                long.TryParse(clientRefId, out trackingNumber);
+            }
+            catch (Exception e)
+            {
+                return PaymentVerifyResult.Failed($"Verify Payment With RefId : {refId} Faild");
+            }
+
             var verifyModel = new VerifyPayRequestModel()
             {
-                Amount = context.Payment.Amount,
-                RefId = context.Payment.TrackingNumber.ToString()
+                Amount = (int) context.Payment.Amount,
+                RefId = refId
             };
-            
-            //Convert Request Model to Json String
-            var data = JsonConvert.SerializeObject(verifyModel,DefaultSerializerSettings);
-            var content = new StringContent(data, Encoding.UTF8, "application/json");
 
             //Send Verify pay Request
-            var response = await _httpClient.PostAsync(_pingGatewayOptions.ApiVerificationUrl, content,cancellationToken);
-            
-            //Check if we ran into an Issue
-            if(!response.IsSuccessStatusCode)
-                return PaymentVerifyResult.Failed($"Verify Payment With RefId And ClientRefId : {context.Payment.TrackingNumber} Faild");
+            var response =
+                await _httpClient.PostJsonAsync(_pingGatewayOptions.ApiVerificationUrl, verifyModel, cancellationToken);
 
-            
+            //Check if we ran into an Issue
+            if (!response.IsSuccessStatusCode)
+                return PaymentVerifyResult.Failed($"Verify Payment With RefId : {refId.ToString()} Faild");
+
+
             //Get Response data 
             string responseBody = await response.Content.ReadAsStringAsync();
             _logger.LogInformation(responseBody);
-            
+
             var paymentDetails = JsonConvert.DeserializeObject<VerifyPayResponseModel>(responseBody);
-            
-            if (paymentDetails.Amount == context.Payment.Amount)  // Just for Ensure For Verify Acknowledge
+
+            if (paymentDetails.Amount == context.Payment.Amount) // Just for Ensure For Verify Acknowledge
             {
                 return PaymentVerifyResult.Succeed(context.Payment.TrackingNumber.ToString(),
                     _options.Messages.PaymentSucceed);
             }
-            
-            return PaymentVerifyResult.Failed($"Check This Payment With PayPing Amount Miss Match => RefId And ClientRefId : {context.Payment.TrackingNumber}");
+
+            return PaymentVerifyResult.Failed(
+                $"Check This Payment With PayPing Amount Miss Match => RefId : {refId.ToString()}");
         }
 
         /// <inheritdoc />
-        public override Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default)
+        public override Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount,
+            CancellationToken cancellationToken = default)
         {
-            return PaymentRefundResult.Failed("The Refund operation is not supported by this gateway.").ToInterfaceAsync();
+            return PaymentRefundResult.Failed("The Refund operation is not supported by this gateway.")
+                .ToInterfaceAsync();
         }
     }
 }

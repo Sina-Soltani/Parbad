@@ -32,9 +32,19 @@ namespace Parbad.Gateway.PayPing
         public override async Task<IPaymentFetchResult> FetchAsync(CancellationToken cancellationToken = default)
         {
             var body =await _httpContextAccessor.HttpContext.Request.ReadFormAsync(cancellationToken);
-            var refId = StringValues.Empty;
-            body.TryGetValue("refid", out refId);
-            return await base.FetchAsync(long.Parse(refId), cancellationToken);
+            var clientrefid = StringValues.Empty;
+            long trackingNumber;
+            try
+            {
+                body.TryGetValue("clientrefid", out clientrefid);
+                long.TryParse(clientrefid, out trackingNumber);
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"PayPing clientrefid ({clientrefid.ToString()}) Parse To Long Failed");
+            }
+            
+            return await base.FetchAsync(trackingNumber, cancellationToken);
 
         }
     }

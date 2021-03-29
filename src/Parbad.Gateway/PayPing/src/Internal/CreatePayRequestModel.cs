@@ -2,7 +2,7 @@
 {
     internal class CreatePayRequestModel
     {
-        public decimal Amount { get; set; }
+        public int Amount { get; set; }
         public string PayerIdentity { get; set; }
         public string PayerName { get; set; }
         public string Description { get; set; }
