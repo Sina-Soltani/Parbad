@@ -16,6 +16,6 @@
         /// <summary>
         /// https://api.payping.ir/v2/pay/gotoipg/{Code}
         /// </summary>
-        public string PaymentPageUrl { get; set; } = "https://api.payping.ir/v2/pay/gotoipg/";
+        public string PaymentPageUrl { get; set; } = "https://api.payping.ir/v2/pay/gotoipg";
     }
 }

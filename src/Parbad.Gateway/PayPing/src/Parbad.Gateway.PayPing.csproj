@@ -35,12 +35,12 @@
 
     <ItemGroup>
         <None Update="icon.png">
-          <pack>true</pack>
-          <Visible>false</Visible>
+            <pack>true</pack>
+            <Visible>false</Visible>
         </None>
         <None Update="Parbad.Gateway.PayPing.xml">
-          <pack>true</pack>
-          <Visible>false</Visible>
+            <pack>true</pack>
+            <Visible>false</Visible>
         </None>
     </ItemGroup>
 

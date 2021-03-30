@@ -19,8 +19,6 @@ namespace Parbad.Gateway.PayPing
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
             
-            builder.Services.TryAddTransient<IOnlinePayment, PayPingOnlinePayment>();
-            
             return builder
                 .AddGateway<PayPingGateway>()
                 .WithHttpClient(clientBuilder => { })

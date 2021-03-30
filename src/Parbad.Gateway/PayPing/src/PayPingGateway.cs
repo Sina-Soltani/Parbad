@@ -101,7 +101,7 @@ namespace Parbad.Gateway.PayPing
 
             //Redirect User to GateWay with our PayCodeS
 
-            var url = string.Format(_pingGatewayOptions.PaymentPageUrl, createPayResult.Code);
+            var url = _pingGatewayOptions.PaymentPageUrl.TrimEnd('/') + "/" + createPayResult.Code;
             return PaymentRequestResult.SucceedWithRedirect(account.Name, _httpContextAccessor.HttpContext, url);
         }
 

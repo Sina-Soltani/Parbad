@@ -18,6 +18,7 @@ Configuration
         {
             accounts.AddInMemory(account =>
             {
+                account.Name = "PayPing"; // optional if there is only 1 account for this gateway
                 account.BearerToken = <Your Bearer Token>;   // https://app.payping.ir/token
             });
         });
@@ -31,7 +32,6 @@ var result = _onlinePayment.RequestAsync(invoice =>
 {
 	invoice.SetAmount(viewModel.Amount)
         .SetCallbackUrl(callbackUrl)
-        .UseAutoIncrementTrackingNumber() // important need it 
         .SetPayPingData(payPingRequest => // optional
         {
             // for example Mobile for save card number and etc on ipgs  // https://github.com/Sina-Soltani/Parbad/issues/159
