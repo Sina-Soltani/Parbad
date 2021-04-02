@@ -1,8 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <PackageId>Parbad.Owin</PackageId>
+    <Product>Parbad.Owin</Product>
     <TargetFramework>net462</TargetFramework>
-    <VersionPrefix>1.1.0</VersionPrefix>
+    <VersionPrefix>1.2.0</VersionPrefix>
     <LangVersion>9</LangVersion>
     <Authors>Sina Soltani</Authors>
     <Description>Owin integration for Parbad project.
@@ -18,7 +20,6 @@ For more information see: https://www.nuget.org/packages/Parbad/</Description>
     <PackageTags>parbad owin webforms Payment Gateway Bank Iran Shetab IranKish Mellat Melli Sadad Parsian Pasargad Saman Asan-Pardakht پرداخت درگاه بانک ایران شتاب ایران-کیش ملت ملی سداد پارسیان پاسارگاد سامان آسان-پرداخت</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
-    <PackageReleaseNotes>Target Framework is upgraded to 4.6.2.</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup>
