@@ -1,9 +1,14 @@
 // Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
-using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Parbad.Abstraction;
 using Parbad.Builder;
+using Parbad.Internal;
+using Parbad.InvoiceBuilder;
+using Parbad.TrackingNumberProviders;
+using System;
 
 namespace Parbad
 {
@@ -39,7 +44,31 @@ namespace Parbad
         /// </summary>
         public static IParbadBuilder CreateDefaultBuilder(IServiceCollection services = null)
         {
-            return (services ?? new ServiceCollection()).AddParbad();
+            services ??= new ServiceCollection();
+
+            var builder = new ParbadBuilder(services);
+
+            builder.Services.AddOptions();
+
+            builder.Services.AddHttpClient();
+
+            builder.Services.TryAddTransient<IOnlinePayment, DefaultOnlinePayment>();
+            builder.Services.TryAddSingleton<IOnlinePaymentAccessor, OnlinePaymentAccessor>();
+
+            builder.Services.TryAddTransient<IInvoiceBuilder, DefaultInvoiceBuilder>();
+
+            builder.Services.TryAddTransient<AutoIncrementTrackingNumber>();
+            builder.Services.TryAddTransient<AutoRandomTrackingNumber>();
+
+            builder.Services.TryAddTransient<IGatewayProvider, DefaultGatewayProvider>();
+
+            builder.ConfigureOptions(options => { });
+
+            builder.ConfigurePaymentToken(tokenBuilder => tokenBuilder.UseGuidQueryStringPaymentTokenProvider());
+
+            builder.Services.TryAddTransient(typeof(IParbadLogger<>), typeof(ParbadLogger<>));
+
+            return builder;
         }
     }
 }
