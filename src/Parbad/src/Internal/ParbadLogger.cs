@@ -10,12 +10,14 @@ namespace Parbad.Internal
 {
     internal class ParbadLogger<TCategoryName> : IParbadLogger<TCategoryName>
     {
-        private readonly ParbadOptions _options;
         private readonly ILogger<TCategoryName> _logger;
+        private readonly ParbadOptions _options;
 
-        public ParbadLogger(IOptions<ParbadOptions> options, ILogger<TCategoryName> logger)
+        public ParbadLogger(ILogger<TCategoryName> logger, IOptions<ParbadOptions> options)
         {
-            _logger = logger;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+            if (options == null) throw new ArgumentNullException(nameof(options));
             _options = options.Value;
         }
 
