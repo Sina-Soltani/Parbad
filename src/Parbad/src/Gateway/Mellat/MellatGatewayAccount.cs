@@ -12,10 +12,5 @@ namespace Parbad.Gateway.Mellat
         public string UserName { get; set; }
 
         public string UserPassword { get; set; }
-
-        /// <summary>
-        /// The requests will be sent to the test terminal of Mellat Gateway.
-        /// </summary>
-        public bool IsTestTerminal { get; set; }
     }
 }

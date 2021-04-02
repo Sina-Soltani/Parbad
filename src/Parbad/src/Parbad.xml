@@ -565,11 +565,6 @@
         <member name="M:Parbad.Gateway.Mellat.MellatGateway.RefundAsync(Parbad.InvoiceContext,Parbad.Money,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="P:Parbad.Gateway.Mellat.MellatGatewayAccount.IsTestTerminal">
-            <summary>
-            The requests will be sent to the test terminal of Mellat Gateway.
-            </summary>
-        </member>
         <member name="M:Parbad.Gateway.Mellat.MellatGatewayBuilderExtensions.AddMellat(Parbad.GatewayBuilders.IGatewayBuilder)">
             <summary>
             Adds Mellat gateway to Parbad services.
@@ -889,7 +884,7 @@
         <member name="T:Parbad.Internal.DefaultOnlinePayment">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.Internal.DefaultOnlinePayment.#ctor(System.IServiceProvider,Parbad.Storage.Abstractions.IStorageManager,Parbad.PaymentTokenProviders.IPaymentTokenProvider,Parbad.Abstraction.IGatewayProvider,Microsoft.Extensions.Options.IOptions{Parbad.Options.ParbadOptions},Microsoft.Extensions.Logging.ILogger{Parbad.Internal.DefaultOnlinePayment})">
+        <member name="M:Parbad.Internal.DefaultOnlinePayment.#ctor(System.IServiceProvider,Parbad.Storage.Abstractions.IStorageManager,Parbad.PaymentTokenProviders.IPaymentTokenProvider,Parbad.Abstraction.IGatewayProvider,Microsoft.Extensions.Options.IOptions{Parbad.Options.ParbadOptions},Parbad.IParbadLogger{Parbad.Internal.DefaultOnlinePayment})">
             <summary>
             Initializes an instance of <see cref="T:Parbad.Internal.DefaultOnlinePayment"/>.
             </summary>
@@ -1265,6 +1260,12 @@
             </summary>
             <exception cref="T:Parbad.Exceptions.ParbadServiceNotInitializedException"></exception>
         </member>
+        <member name="T:Parbad.IParbadLogger`1">
+            <summary>
+            Parbad internal Logger controls the logging.
+            </summary>
+            <typeparam name="TCategoryName"></typeparam>
+        </member>
         <member name="T:Parbad.IPaymentCancelResult">
             <summary>
             Describes the result of the Cancel operation.
@@ -1452,8 +1453,10 @@
             as <see cref="T:System.Int64"/> by Parbad.
             </para>
             <para>Examples:
-            <para>decimal a = Money</para>
-            <para>long a = Money</para>
+            <para>decimal a = new Money(1000)</para>
+            <para>long a = new Money(1000)</para>
+            <para>Money m = 1000.55m</para>
+            <para>Money m = 1000</para>
             </para>
             </summary>
         </member>

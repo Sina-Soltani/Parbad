@@ -49,7 +49,7 @@ namespace Parbad.Gateway.Mellat
             var data = MellatHelper.CreateRequestData(invoice, account);
 
             var responseMessage = await _httpClient
-                .PostXmlAsync(GetApiUrl(account), data, cancellationToken)
+                .PostXmlAsync(_gatewayOptions.ApiUrl, data, cancellationToken)
                 .ConfigureAwaitFalse();
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
@@ -76,7 +76,7 @@ namespace Parbad.Gateway.Mellat
             var data = MellatHelper.CreateVerifyData(context, account, callbackResult);
 
             var responseMessage = await _httpClient
-                .PostXmlAsync(GetApiUrl(account), data, cancellationToken)
+                .PostXmlAsync(_gatewayOptions.ApiUrl, data, cancellationToken)
                 .ConfigureAwaitFalse();
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
@@ -91,7 +91,7 @@ namespace Parbad.Gateway.Mellat
             data = MellatHelper.CreateSettleData(context, callbackResult, account);
 
             responseMessage = await _httpClient
-                .PostXmlAsync(GetApiUrl(account), data, cancellationToken)
+                .PostXmlAsync(_gatewayOptions.ApiUrl, data, cancellationToken)
                 .ConfigureAwaitFalse();
 
             response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
@@ -109,19 +109,12 @@ namespace Parbad.Gateway.Mellat
             var data = MellatHelper.CreateRefundData(context, account);
 
             var responseMessage = await _httpClient
-                .PostXmlAsync(GetApiUrl(account), data, cancellationToken)
+                .PostXmlAsync(_gatewayOptions.ApiUrl, data, cancellationToken)
                 .ConfigureAwaitFalse();
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
             return MellatHelper.CreateRefundResult(response, _messagesOptions.Value);
-        }
-
-        private string GetApiUrl(MellatGatewayAccount account)
-        {
-            return account.IsTestTerminal
-                ? _gatewayOptions.ApiTestUrl
-                : _gatewayOptions.ApiUrl;
         }
     }
 }
