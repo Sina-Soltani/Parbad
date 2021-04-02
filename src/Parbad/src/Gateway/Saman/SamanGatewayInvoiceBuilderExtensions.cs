@@ -36,8 +36,8 @@ namespace Parbad.Gateway.Saman
         {
             if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-            return invoice.AdditionalData.ContainsKey(SamanHelper.MobileGatewayKey) &&
-                   (bool)invoice.AdditionalData[SamanHelper.MobileGatewayKey];
+            return invoice.Properties.ContainsKey(SamanHelper.MobileGatewayKey) &&
+                   (bool)invoice.Properties[SamanHelper.MobileGatewayKey];
         }
     }
 }

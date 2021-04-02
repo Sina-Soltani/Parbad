@@ -23,8 +23,8 @@ namespace Parbad.Gateway.ZarinPal.Internal
 
         public static string CreateRequestData(ZarinPalGatewayAccount account, Invoice invoice)
         {
-            if (!invoice.AdditionalData.ContainsKey(ZarinPalRequestAdditionalKeyName) ||
-                !(invoice.AdditionalData[ZarinPalRequestAdditionalKeyName] is ZarinPalInvoice zarinPalInvoice))
+            if (!invoice.Properties.ContainsKey(ZarinPalRequestAdditionalKeyName) ||
+                !(invoice.Properties[ZarinPalRequestAdditionalKeyName] is ZarinPalInvoice zarinPalInvoice))
             {
                 throw new InvalidOperationException("Request failed. ZarinPal Gateway needs invoice information. Please use the SetZarinPalData method to add the data.");
             }

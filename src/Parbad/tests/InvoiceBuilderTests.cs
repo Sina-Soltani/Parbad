@@ -93,9 +93,9 @@ namespace Parbad.Tests
 
             var invoice = await _builder.BuildAsync();
 
-            Assert.IsNotNull(invoice.AdditionalData);
-            Assert.IsTrue(invoice.AdditionalData.ContainsKey(expectedKey));
-            Assert.AreEqual(expectedValue, invoice.AdditionalData[expectedKey]);
+            Assert.IsNotNull(invoice.Properties);
+            Assert.IsTrue(invoice.Properties.ContainsKey(expectedKey));
+            Assert.AreEqual(expectedValue, invoice.Properties[expectedKey]);
         }
 
         [Test]
@@ -120,9 +120,9 @@ namespace Parbad.Tests
 
             var invoice = await _builder.BuildAsync();
 
-            Assert.IsNotNull(invoice.AdditionalData);
-            Assert.IsTrue(invoice.AdditionalData.ContainsKey(expectedKey));
-            Assert.AreEqual(expectedValue, invoice.AdditionalData[expectedKey]);
+            Assert.IsNotNull(invoice.Properties);
+            Assert.IsTrue(invoice.Properties.ContainsKey(expectedKey));
+            Assert.AreEqual(expectedValue, invoice.Properties[expectedKey]);
         }
 
         [Test]

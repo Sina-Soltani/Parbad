@@ -27,7 +27,7 @@ namespace Parbad.Gateway.Mellat.Internal
 
         public static string CreateRequestData(Invoice invoice, MellatGatewayAccount account)
         {
-            if (invoice.AdditionalData == null || !invoice.AdditionalData.ContainsKey(CumulativeAccountsKey))
+            if (invoice.Properties == null || !invoice.Properties.ContainsKey(CumulativeAccountsKey))
             {
                 return CreateSimpleRequestData(invoice, account);
             }
@@ -257,7 +257,7 @@ namespace Parbad.Gateway.Mellat.Internal
 
         private static string CreateCumulativeRequestData(Invoice invoice, MellatGatewayAccount account)
         {
-            var cumulativeAccounts = (List<MellatCumulativeDynamicAccount>)invoice.AdditionalData[CumulativeAccountsKey];
+            var cumulativeAccounts = (List<MellatCumulativeDynamicAccount>)invoice.Properties[CumulativeAccountsKey];
 
             if (cumulativeAccounts.Count > 10)
             {

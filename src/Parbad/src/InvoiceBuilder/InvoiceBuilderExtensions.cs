@@ -152,7 +152,7 @@ namespace Parbad
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            return AddFormatter(builder, invoice => onChange(invoice.AdditionalData));
+            return AddFormatter(builder, invoice => onChange(invoice.Properties));
         }
 
         /// <summary>

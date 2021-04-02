@@ -15,7 +15,7 @@ namespace Parbad.Abstraction
         /// </summary>
         public Invoice()
         {
-            AdditionalData = new Dictionary<string, object>();
+            Properties = new Dictionary<string, object>();
         }
 
         /// <summary>
@@ -45,8 +45,8 @@ namespace Parbad.Abstraction
         public string GatewayName { get; set; }
 
         /// <summary>
-        /// Gets or sets the additional data of the invoice.
+        /// Gets or sets the properties of the invoice.
         /// </summary>
-        public IDictionary<string, object> AdditionalData { get; set; }
+        public IDictionary<string, object> Properties { get; set; }
     }
 }

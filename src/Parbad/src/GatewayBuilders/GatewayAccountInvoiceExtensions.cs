@@ -11,7 +11,7 @@ namespace Parbad
     public static class GatewayAccountInvoiceExtensions
     {
         /// <summary>
-        /// Gateway Account key in <see cref="Invoice.AdditionalData"/> property.
+        /// Gateway Account key in <see cref="Invoice.Properties"/> property.
         /// </summary>
         public const string GatewayAccountKeyName = "AccountName";
 
@@ -38,9 +38,9 @@ namespace Parbad
         {
             if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-            if (!invoice.AdditionalData.ContainsKey(GatewayAccountKeyName)) return null;
+            if (!invoice.Properties.ContainsKey(GatewayAccountKeyName)) return null;
 
-            return (string)invoice.AdditionalData[GatewayAccountKeyName];
+            return (string)invoice.Properties[GatewayAccountKeyName];
         }
     }
 }

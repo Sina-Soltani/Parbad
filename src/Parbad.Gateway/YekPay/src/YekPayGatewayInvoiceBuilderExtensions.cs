@@ -60,9 +60,9 @@ namespace Parbad.Gateway.YekPay
         {
             if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-            if (invoice.AdditionalData.ContainsKey(YekPayRequestKey))
+            if (invoice.Properties.ContainsKey(YekPayRequestKey))
             {
-                return (YekPayRequest)invoice.AdditionalData[YekPayRequestKey];
+                return (YekPayRequest)invoice.Properties[YekPayRequestKey];
             }
 
             return null;
