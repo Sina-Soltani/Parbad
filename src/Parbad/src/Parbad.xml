@@ -117,9 +117,9 @@
             Gets or sets the name of the gateway which the invoice must be paid in.
             </summary>
         </member>
-        <member name="P:Parbad.Abstraction.Invoice.AdditionalData">
+        <member name="P:Parbad.Abstraction.Invoice.Properties">
             <summary>
-            Gets or sets the additional data of the invoice.
+            Gets or sets the properties of the invoice.
             </summary>
         </member>
         <member name="T:Parbad.Builder.IParbadBuilder">
@@ -336,7 +336,7 @@
         </member>
         <member name="F:Parbad.GatewayAccountInvoiceExtensions.GatewayAccountKeyName">
             <summary>
-            Gateway Account key in <see cref="P:Parbad.Abstraction.Invoice.AdditionalData"/> property.
+            Gateway Account key in <see cref="P:Parbad.Abstraction.Invoice.Properties"/> property.
             </summary>
         </member>
         <member name="M:Parbad.GatewayAccountInvoiceExtensions.UseAccount(Parbad.InvoiceBuilder.IInvoiceBuilder,System.String)">
@@ -1109,7 +1109,7 @@
             <exception cref="T:Parbad.Exceptions.GatewayNotFoundException"></exception>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
-        <member name="M:Parbad.InvoiceBuilderExtensions.AddAdditionalData(Parbad.InvoiceBuilder.IInvoiceBuilder,System.String,System.Object)">
+        <member name="M:Parbad.InvoiceBuilderExtensions.AddProperty(Parbad.InvoiceBuilder.IInvoiceBuilder,System.String,System.Object)">
             <summary>
             Adds the given key and value to the invoice.
             </summary>
@@ -1117,14 +1117,14 @@
             <param name="key">Key of the data</param>
             <param name="value">Value of the data</param>
         </member>
-        <member name="M:Parbad.InvoiceBuilderExtensions.AddAdditionalData(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Collections.Generic.IDictionary{System.String,System.Object})">
+        <member name="M:Parbad.InvoiceBuilderExtensions.AddProperties(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Collections.Generic.IDictionary{System.String,System.Object})">
             <summary>
-            Appends the given dictionary to the additional data of the invoice.
+            Appends the given dictionary to the properties of the invoice.
             </summary>
             <param name="builder"></param>
-            <param name="additionalData"></param>
+            <param name="properties"></param>
         </member>
-        <member name="M:Parbad.InvoiceBuilderExtensions.AddOrUpdateAdditionalData(Parbad.InvoiceBuilder.IInvoiceBuilder,System.String,System.Object)">
+        <member name="M:Parbad.InvoiceBuilderExtensions.AddOrUpdateProperty(Parbad.InvoiceBuilder.IInvoiceBuilder,System.String,System.Object)">
             <summary>
             Adds or updates the given key and value to the invoice.
             </summary>
@@ -1132,19 +1132,19 @@
             <param name="key">Key of the data</param>
             <param name="value">Value of the data</param>
         </member>
-        <member name="M:Parbad.InvoiceBuilderExtensions.AddOrUpdateAdditionalData(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Collections.Generic.IDictionary{System.String,System.Object})">
+        <member name="M:Parbad.InvoiceBuilderExtensions.AddOrUpdateProperties(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Collections.Generic.IDictionary{System.String,System.Object})">
             <summary>
-            Adds or updates the given dictionary to the additional data of the invoice.
+            Adds or updates the given dictionary to the properties of the invoice.
             </summary>
             <param name="builder"></param>
-            <param name="additionalData"></param>
+            <param name="properties"></param>
         </member>
-        <member name="M:Parbad.InvoiceBuilderExtensions.ChangeAdditionalData(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Action{System.Collections.Generic.IDictionary{System.String,System.Object}})">
+        <member name="M:Parbad.InvoiceBuilderExtensions.ChangeProperties(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Action{System.Collections.Generic.IDictionary{System.String,System.Object}})">
             <summary>
-            Changes the additional data.
+            Changes the properties.
             </summary>
             <param name="builder"></param>
-            <param name="onChange">An action to perform on the additional data.</param>
+            <param name="onChange">An action to perform on the properties.</param>
         </member>
         <member name="M:Parbad.InvoiceBuilderExtensions.AddFormatter(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Action{Parbad.Abstraction.Invoice})">
             <summary>

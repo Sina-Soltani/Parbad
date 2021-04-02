@@ -8,80 +8,82 @@ namespace Parbad.Storage.EntityFrameworkCore.Internal
 {
     internal static class Mapper
     {
-        public static PaymentEntity ToEntity(this Payment payment)
+        public static PaymentEntity ToEntity(this Payment model)
         {
             return new PaymentEntity
             {
-                TrackingNumber = payment.TrackingNumber,
-                Amount = payment.Amount,
-                Token = payment.Token,
-                TransactionCode = payment.TransactionCode,
-                GatewayName = payment.GatewayName,
-                GatewayAccountName = payment.GatewayAccountName,
-                IsCompleted = payment.IsCompleted,
-                IsPaid = payment.IsPaid
+                TrackingNumber = model.TrackingNumber,
+                Amount = model.Amount,
+                Token = model.Token,
+                TransactionCode = model.TransactionCode,
+                GatewayName = model.GatewayName,
+                GatewayAccountName = model.GatewayAccountName,
+                IsCompleted = model.IsCompleted,
+                IsPaid = model.IsPaid
             };
         }
 
-        public static void ToEntity(Payment dataRecord, PaymentEntity dbRecord)
+        public static void ToEntity(Payment model, PaymentEntity entity)
         {
-            dbRecord.TrackingNumber = dataRecord.TrackingNumber;
-            dbRecord.Amount = dataRecord.Amount;
-            dbRecord.Token = dataRecord.Token;
-            dbRecord.TransactionCode = dataRecord.TransactionCode;
-            dbRecord.GatewayName = dataRecord.GatewayName;
-            dbRecord.GatewayAccountName = dataRecord.GatewayAccountName;
-            dbRecord.IsCompleted = dataRecord.IsCompleted;
-            dbRecord.IsPaid = dataRecord.IsPaid;
+            entity.TrackingNumber = model.TrackingNumber;
+            entity.Amount = model.Amount;
+            entity.Token = model.Token;
+            entity.TransactionCode = model.TransactionCode;
+            entity.GatewayName = model.GatewayName;
+            entity.GatewayAccountName = model.GatewayAccountName;
+            entity.IsCompleted = model.IsCompleted;
+            entity.IsPaid = model.IsPaid;
         }
 
-        public static Payment ToModel(this PaymentEntity payment)
+        public static Payment ToModel(this PaymentEntity entity)
         {
             return new Payment
             {
-                TrackingNumber = payment.TrackingNumber,
-                Amount = payment.Amount,
-                Token = payment.Token,
-                TransactionCode = payment.TransactionCode,
-                GatewayName = payment.GatewayName,
-                GatewayAccountName = payment.GatewayAccountName,
-                IsCompleted = payment.IsCompleted,
-                IsPaid = payment.IsPaid
+                Id = entity.Id,
+                TrackingNumber = entity.TrackingNumber,
+                Amount = entity.Amount,
+                Token = entity.Token,
+                TransactionCode = entity.TransactionCode,
+                GatewayName = entity.GatewayName,
+                GatewayAccountName = entity.GatewayAccountName,
+                IsCompleted = entity.IsCompleted,
+                IsPaid = entity.IsPaid
             };
         }
 
-        public static TransactionEntity ToEntity(this Transaction transaction)
+        public static TransactionEntity ToEntity(this Transaction model)
         {
             return new TransactionEntity
             {
-                Amount = transaction.Amount,
-                Type = transaction.Type,
-                IsSucceed = transaction.IsSucceed,
-                Message = transaction.Message,
-                AdditionalData = transaction.AdditionalData,
-                PaymentId = transaction.PaymentId
+                Amount = model.Amount,
+                Type = model.Type,
+                IsSucceed = model.IsSucceed,
+                Message = model.Message,
+                AdditionalData = model.AdditionalData,
+                PaymentId = model.PaymentId
             };
         }
 
-        public static void ToEntity(Transaction dataRecord, TransactionEntity dbRecord)
+        public static void ToEntity(Transaction model, TransactionEntity entity)
         {
-            dbRecord.Amount = dataRecord.Amount;
-            dbRecord.Type = dataRecord.Type;
-            dbRecord.IsSucceed = dataRecord.IsSucceed;
-            dbRecord.Message = dataRecord.Message;
-            dbRecord.AdditionalData = dataRecord.AdditionalData;
+            entity.Amount = model.Amount;
+            entity.Type = model.Type;
+            entity.IsSucceed = model.IsSucceed;
+            entity.Message = model.Message;
+            entity.AdditionalData = model.AdditionalData;
         }
 
-        public static Transaction ToModel(this TransactionEntity transaction)
+        public static Transaction ToModel(this TransactionEntity entity)
         {
             return new Transaction
             {
-                Amount = transaction.Amount,
-                Type = transaction.Type,
-                IsSucceed = transaction.IsSucceed,
-                Message = transaction.Message,
-                AdditionalData = transaction.AdditionalData,
-                PaymentId = transaction.PaymentId
+                Id = entity.Id,
+                Amount = entity.Amount,
+                Type = entity.Type,
+                IsSucceed = entity.IsSucceed,
+                Message = entity.Message,
+                AdditionalData = entity.AdditionalData,
+                PaymentId = entity.PaymentId
             };
         }
     }

@@ -1,8 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿// Copyright (c) Parbad. All rights reserved.
+// Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
+
 using Parbad.Gateway.Mellat.Internal;
 using Parbad.InvoiceBuilder;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Parbad.Gateway.Mellat
 {
@@ -39,7 +42,7 @@ namespace Parbad.Gateway.Mellat
 
             List<MellatCumulativeDynamicAccount> allAccounts = null;
 
-            builder.ChangeAdditionalData(data =>
+            builder.ChangeProperties(data =>
             {
                 if (data.ContainsKey(MellatHelper.CumulativeAccountsKey))
                 {
@@ -53,7 +56,7 @@ namespace Parbad.Gateway.Mellat
                 allAccounts.AddRange(accounts);
             });
 
-            builder.AddAdditionalData(MellatHelper.CumulativeAccountsKey, allAccounts);
+            builder.AddProperty(MellatHelper.CumulativeAccountsKey, allAccounts);
 
             return builder;
         }

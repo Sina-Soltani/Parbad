@@ -43,16 +43,16 @@ namespace Parbad.Storage.EntityFrameworkCore
         {
             if (payment == null) throw new ArgumentNullException(nameof(payment));
 
-            var domain = payment.ToEntity();
-            domain.CreatedOn = DateTime.UtcNow;
+            var entity = payment.ToEntity();
+            entity.CreatedOn = DateTime.UtcNow;
 
-            Context.Payments.Add(domain);
+            Context.Payments.Add(entity);
 
             await Context.SaveChangesAsync(cancellationToken);
 
-            Context.Entry(domain).State = EntityState.Detached;
+            Context.Entry(entity).State = EntityState.Detached;
 
-            payment.Id = domain.Id;
+            payment.Id = entity.Id;
         }
 
         /// <inheritdoc />
@@ -97,14 +97,14 @@ namespace Parbad.Storage.EntityFrameworkCore
         {
             if (transaction == null) throw new ArgumentNullException(nameof(transaction));
 
-            var domain = transaction.ToEntity();
-            domain.CreatedOn = DateTime.UtcNow;
+            var entity = transaction.ToEntity();
+            entity.CreatedOn = DateTime.UtcNow;
 
-            Context.Transactions.Add(domain);
+            Context.Transactions.Add(entity);
 
             await Context.SaveChangesAsync(cancellationToken);
 
-            transaction.Id = domain.Id;
+            transaction.Id = entity.Id;
         }
 
         /// <inheritdoc />

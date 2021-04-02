@@ -89,7 +89,7 @@ namespace Parbad.Tests
             const string expectedKey = "key";
             const string expectedValue = "value";
 
-            _builder.AddAdditionalData(expectedKey, expectedValue);
+            _builder.AddProperty(expectedKey, expectedValue);
 
             var invoice = await _builder.BuildAsync();
 
@@ -103,8 +103,8 @@ namespace Parbad.Tests
         {
             const string key = "key";
 
-            _builder.AddAdditionalData(key, "");
-            _builder.AddAdditionalData(key, "");
+            _builder.AddProperty(key, "");
+            _builder.AddProperty(key, "");
 
             Assert.ThrowsAsync<ArgumentException>(() => _builder.BuildAsync());
         }
@@ -115,8 +115,8 @@ namespace Parbad.Tests
             const string expectedKey = "key";
             const string expectedValue = "value";
 
-            _builder.AddAdditionalData(expectedKey, "");
-            _builder.AddOrUpdateAdditionalData(expectedKey, expectedValue);
+            _builder.AddProperty(expectedKey, "");
+            _builder.AddOrUpdateProperty(expectedKey, expectedValue);
 
             var invoice = await _builder.BuildAsync();
 
