@@ -17,13 +17,13 @@ namespace Parbad.Tests
                 EnableLogging = false
             });
 
-            var logger = new TestLogger<LoggerTests>();
+            var fakeLogger = new FakeLogger<LoggerTests>();
 
-            IParbadLogger<LoggerTests> parbadLogger = new ParbadLogger<LoggerTests>(logger, options);
+            IParbadLogger<LoggerTests> parbadLogger = new ParbadLogger<LoggerTests>(fakeLogger, options);
 
             parbadLogger.Log(logging => logging.LogInformation("Test"));
 
-            Assert.IsFalse(logger.LogReceived);
+            Assert.IsFalse(fakeLogger.LogReceived);
         }
 
         [Test]
@@ -34,17 +34,17 @@ namespace Parbad.Tests
                 EnableLogging = true
             });
 
-            var logger = new TestLogger<LoggerTests>();
+            var fakeLogger = new FakeLogger<LoggerTests>();
 
-            IParbadLogger<LoggerTests> parbadLogger = new ParbadLogger<LoggerTests>(logger, options);
+            IParbadLogger<LoggerTests> parbadLogger = new ParbadLogger<LoggerTests>(fakeLogger, options);
 
             parbadLogger.Log(logging => logging.LogInformation("Test"));
 
-            Assert.IsTrue(logger.LogReceived);
+            Assert.IsTrue(fakeLogger.LogReceived);
         }
     }
 
-    internal class TestLogger<T> : ILogger<T>, IDisposable
+    internal class FakeLogger<T> : ILogger<T>, IDisposable
     {
         public bool LogReceived { get; private set; }
 
