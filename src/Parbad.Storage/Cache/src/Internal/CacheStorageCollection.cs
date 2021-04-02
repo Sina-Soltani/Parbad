@@ -1,10 +1,10 @@
 ﻿// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
+using Parbad.Storage.Abstractions.Models;
+using Parbad.Storage.Cache.Abstractions;
 using System;
 using System.Collections.Generic;
-using Parbad.Storage.Abstractions;
-using Parbad.Storage.Cache.Abstractions;
 
 namespace Parbad.Storage.Cache.Internal
 {

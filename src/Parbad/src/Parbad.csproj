@@ -80,4 +80,10 @@ Code improvement.</PackageReleaseNotes>
     <None Include="Parbad.xml" pack="true" Visible="false" PackagePath="" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Parbad.Storage\Abstractions\Parbad.Storage.Abstractions.csproj" />
+  </ItemGroup>
+
+  <Import Project="..\..\Parbad.Shared\Parbad.Shared.projitems" Label="Shared" />
+
 </Project>

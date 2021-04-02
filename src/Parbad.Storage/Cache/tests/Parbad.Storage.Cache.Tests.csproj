@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <LangVersion>9</LangVersion>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
@@ -13,7 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Parbad\src\Parbad.csproj" />
     <ProjectReference Include="..\src\Parbad.Storage.Cache.csproj" />
   </ItemGroup>
 

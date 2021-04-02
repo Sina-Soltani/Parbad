@@ -2,7 +2,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
-using Parbad.Storage.Abstractions;
+using Parbad.Storage.Abstractions.Models;
 using Parbad.Storage.Cache.DistributedCache;
 using System.Linq;
 using System.Threading.Tasks;

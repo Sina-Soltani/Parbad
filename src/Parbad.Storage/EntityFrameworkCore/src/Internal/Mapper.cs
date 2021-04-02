@@ -1,14 +1,14 @@
 ﻿// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
-using Parbad.Storage.Abstractions;
+using Parbad.Storage.Abstractions.Models;
 using Parbad.Storage.EntityFrameworkCore.Domain;
 
 namespace Parbad.Storage.EntityFrameworkCore.Internal
 {
-    internal static class DomainMapper
+    internal static class Mapper
     {
-        public static PaymentEntity ToDomain(this Payment payment)
+        public static PaymentEntity ToEntity(this Payment payment)
         {
             return new PaymentEntity
             {
@@ -23,7 +23,19 @@ namespace Parbad.Storage.EntityFrameworkCore.Internal
             };
         }
 
-        public static Payment ToData(this PaymentEntity payment)
+        public static void ToEntity(Payment dataRecord, PaymentEntity dbRecord)
+        {
+            dbRecord.TrackingNumber = dataRecord.TrackingNumber;
+            dbRecord.Amount = dataRecord.Amount;
+            dbRecord.Token = dataRecord.Token;
+            dbRecord.TransactionCode = dataRecord.TransactionCode;
+            dbRecord.GatewayName = dataRecord.GatewayName;
+            dbRecord.GatewayAccountName = dataRecord.GatewayAccountName;
+            dbRecord.IsCompleted = dataRecord.IsCompleted;
+            dbRecord.IsPaid = dataRecord.IsPaid;
+        }
+
+        public static Payment ToModel(this PaymentEntity payment)
         {
             return new Payment
             {
@@ -38,7 +50,7 @@ namespace Parbad.Storage.EntityFrameworkCore.Internal
             };
         }
 
-        public static TransactionEntity ToDomain(this Transaction transaction)
+        public static TransactionEntity ToEntity(this Transaction transaction)
         {
             return new TransactionEntity
             {
@@ -51,7 +63,16 @@ namespace Parbad.Storage.EntityFrameworkCore.Internal
             };
         }
 
-        public static Transaction ToData(this TransactionEntity transaction)
+        public static void ToEntity(Transaction dataRecord, TransactionEntity dbRecord)
+        {
+            dbRecord.Amount = dataRecord.Amount;
+            dbRecord.Type = dataRecord.Type;
+            dbRecord.IsSucceed = dataRecord.IsSucceed;
+            dbRecord.Message = dataRecord.Message;
+            dbRecord.AdditionalData = dataRecord.AdditionalData;
+        }
+
+        public static Transaction ToModel(this TransactionEntity transaction)
         {
             return new Transaction
             {
@@ -62,27 +83,6 @@ namespace Parbad.Storage.EntityFrameworkCore.Internal
                 AdditionalData = transaction.AdditionalData,
                 PaymentId = transaction.PaymentId
             };
-        }
-
-        public static void MapPayment(PaymentEntity dbRecord, Payment dataRecord)
-        {
-            dbRecord.TrackingNumber = dataRecord.TrackingNumber;
-            dbRecord.Amount = dataRecord.Amount;
-            dbRecord.Token = dataRecord.Token;
-            dbRecord.TransactionCode = dataRecord.TransactionCode;
-            dbRecord.GatewayName = dataRecord.GatewayName;
-            dbRecord.GatewayAccountName = dataRecord.GatewayAccountName;
-            dbRecord.IsCompleted = dataRecord.IsCompleted;
-            dbRecord.IsPaid = dataRecord.IsPaid;
-        }
-
-        public static void MapTransaction(TransactionEntity dbRecord, Transaction dataRecord)
-        {
-            dbRecord.Amount = dataRecord.Amount;
-            dbRecord.Type = dataRecord.Type;
-            dbRecord.IsSucceed = dataRecord.IsSucceed;
-            dbRecord.Message = dataRecord.Message;
-            dbRecord.AdditionalData = dataRecord.AdditionalData;
         }
     }
 }

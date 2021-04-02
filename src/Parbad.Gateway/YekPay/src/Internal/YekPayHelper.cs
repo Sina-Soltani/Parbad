@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 using Parbad.Abstraction;
 using Parbad.Internal;
 using Parbad.Options;
-using Parbad.Storage.Abstractions;
+using Parbad.Storage.Abstractions.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -7,7 +7,7 @@ using Parbad.Gateway.Pasargad.Internal.Models;
 using Parbad.Http;
 using Parbad.Internal;
 using Parbad.Options;
-using Parbad.Storage.Abstractions;
+using Parbad.Storage.Abstractions.Models;
 using Parbad.Utilities;
 using System;
 using System.Collections.Generic;

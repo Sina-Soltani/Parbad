@@ -4,7 +4,7 @@
         <name>Parbad.Storage.EntityFrameworkCore</name>
     </assembly>
     <members>
-        <member name="M:Parbad.Storage.EntityFrameworkCore.Builder.EntityFrameworkStorageBuilderExtensions.UseEfCore(Parbad.Storage.Builder.IStorageBuilder,System.Action{Parbad.Storage.EntityFrameworkCore.Options.EntityFrameworkCoreOptions})">
+        <member name="M:Parbad.Storage.EntityFrameworkCore.Builder.EntityFrameworkStorageBuilderExtensions.UseEfCore(Parbad.Storage.Abstractions.IStorageBuilder,System.Action{Parbad.Storage.EntityFrameworkCore.Options.EntityFrameworkCoreOptions})">
             <summary>
             Uses the EntityFramework Core as a storage for saving and loading data.
             <para>
@@ -89,25 +89,25 @@
         </member>
         <member name="P:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorage.Context">
             <summary>
-            Parbad db context.
+            Parbad DbContext.
             </summary>
         </member>
-        <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorage.CreatePaymentAsync(Parbad.Storage.Abstractions.Payment,System.Threading.CancellationToken)">
+        <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorage.CreatePaymentAsync(Parbad.Storage.Abstractions.Models.Payment,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorage.UpdatePaymentAsync(Parbad.Storage.Abstractions.Payment,System.Threading.CancellationToken)">
+        <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorage.UpdatePaymentAsync(Parbad.Storage.Abstractions.Models.Payment,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorage.DeletePaymentAsync(Parbad.Storage.Abstractions.Payment,System.Threading.CancellationToken)">
+        <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorage.DeletePaymentAsync(Parbad.Storage.Abstractions.Models.Payment,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorage.CreateTransactionAsync(Parbad.Storage.Abstractions.Transaction,System.Threading.CancellationToken)">
+        <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorage.CreateTransactionAsync(Parbad.Storage.Abstractions.Models.Transaction,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorage.UpdateTransactionAsync(Parbad.Storage.Abstractions.Transaction,System.Threading.CancellationToken)">
+        <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorage.UpdateTransactionAsync(Parbad.Storage.Abstractions.Models.Transaction,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorage.DeleteTransactionAsync(Parbad.Storage.Abstractions.Transaction,System.Threading.CancellationToken)">
+        <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorage.DeleteTransactionAsync(Parbad.Storage.Abstractions.Models.Transaction,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
         <member name="T:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorageManager">
@@ -121,13 +121,13 @@
             </summary>
             <param name="storage"></param>
         </member>
-        <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorageManager.CreatePaymentAsync(Parbad.Storage.Abstractions.Payment,System.Threading.CancellationToken)">
+        <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorageManager.CreatePaymentAsync(Parbad.Storage.Abstractions.Models.Payment,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorageManager.UpdatePaymentAsync(Parbad.Storage.Abstractions.Payment,System.Threading.CancellationToken)">
+        <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorageManager.UpdatePaymentAsync(Parbad.Storage.Abstractions.Models.Payment,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorageManager.CreateTransactionAsync(Parbad.Storage.Abstractions.Transaction,System.Threading.CancellationToken)">
+        <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorageManager.CreateTransactionAsync(Parbad.Storage.Abstractions.Models.Transaction,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
         <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorageManager.GetPaymentByTrackingNumberAsync(System.Int64,System.Threading.CancellationToken)">
@@ -142,7 +142,7 @@
         <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorageManager.DoesPaymentExistAsync(System.String,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorageManager.GetTransactionsAsync(Parbad.Storage.Abstractions.Payment,System.Threading.CancellationToken)">
+        <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorageManager.GetTransactionsAsync(Parbad.Storage.Abstractions.Models.Payment,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
         <member name="T:Parbad.Storage.EntityFrameworkCore.Options.EntityFrameworkCoreOptions">

@@ -18,8 +18,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Authors>Sina Soltani</Authors>
     <Product>Parbad.Storage.EntityframeworkCore</Product>
-    <PackageReleaseNotes>Supporting the netstandard2.1 is added.
-Obsolete classes, interfaces and methods are removed.</PackageReleaseNotes>
+    <PackageReleaseNotes></PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -35,7 +34,7 @@ Obsolete classes, interfaces and methods are removed.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Parbad\src\Parbad.csproj" />
+    <ProjectReference Include="..\..\Abstractions\Parbad.Storage.Abstractions.csproj" />
   </ItemGroup>
 
   <ItemGroup>

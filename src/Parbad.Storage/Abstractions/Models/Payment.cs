@@ -3,7 +3,7 @@
 
 using System;
 
-namespace Parbad.Storage.Abstractions
+namespace Parbad.Storage.Abstractions.Models
 {
     [Serializable]
     public class Payment

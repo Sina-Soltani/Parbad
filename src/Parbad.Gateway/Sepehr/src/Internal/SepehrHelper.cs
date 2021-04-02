@@ -7,7 +7,7 @@ using Parbad.Abstraction;
 using Parbad.Http;
 using Parbad.Internal;
 using Parbad.Options;
-using Parbad.Storage.Abstractions;
+using Parbad.Storage.Abstractions.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

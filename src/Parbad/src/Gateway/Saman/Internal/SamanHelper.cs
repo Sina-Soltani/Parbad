@@ -1,12 +1,6 @@
 // Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
@@ -17,8 +11,14 @@ using Parbad.Http;
 using Parbad.Internal;
 using Parbad.Net;
 using Parbad.Options;
-using Parbad.Storage.Abstractions;
+using Parbad.Storage.Abstractions.Models;
 using Parbad.Utilities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Parbad.Gateway.Saman.Internal
 {
