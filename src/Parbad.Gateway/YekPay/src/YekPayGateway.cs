@@ -69,6 +69,14 @@ namespace Parbad.Gateway.YekPay
         }
 
         /// <inheritdoc />
+        public override Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default)
+        {
+            IPaymentFetchResult result = PaymentFetchResult.ReadyForVerifying();
+
+            return Task.FromResult(result);
+        }
+
+        /// <inheritdoc />
         public override async Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));

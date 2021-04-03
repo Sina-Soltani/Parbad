@@ -7,6 +7,9 @@
         <member name="M:Parbad.Gateway.PayIr.PayIrGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
+        <member name="M:Parbad.Gateway.PayIr.PayIrGateway.FetchAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
         <member name="M:Parbad.Gateway.PayIr.PayIrGateway.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>

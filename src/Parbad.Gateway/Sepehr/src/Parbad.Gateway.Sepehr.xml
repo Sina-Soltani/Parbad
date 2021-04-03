@@ -17,6 +17,9 @@
         <member name="M:Parbad.Gateway.Sepehr.SepehrGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
+        <member name="M:Parbad.Gateway.Sepehr.SepehrGateway.FetchAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
         <member name="M:Parbad.Gateway.Sepehr.SepehrGateway.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>

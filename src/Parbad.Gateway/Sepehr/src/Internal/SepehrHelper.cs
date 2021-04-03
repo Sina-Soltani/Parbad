@@ -93,32 +93,34 @@ namespace Parbad.Gateway.Sepehr.Internal
             var cardNumberParam = await httpRequest.TryGetParamAsync("cardnumber", cancellationToken).ConfigureAwaitFalse();
 
             bool isSucceed;
-            IPaymentVerifyResult verifyResult = null;
             long traceNumber = 0;
             long rrn = 0;
+            string message;
 
             if (!respCodeParam.Exists)
             {
-                verifyResult = PaymentVerifyResult.Failed(messages.InvalidDataReceivedFromGateway);
+                message = messages.InvalidDataReceivedFromGateway;
+
                 isSucceed = false;
             }
             else
             {
                 if (!int.TryParse(respCodeParam.Value, out var responseCode))
                 {
-                    verifyResult = PaymentVerifyResult.Failed(messages.InvalidDataReceivedFromGateway);
+                    message = messages.InvalidDataReceivedFromGateway;
+
                     isSucceed = false;
                 }
                 else if (responseCode != 0)
                 {
-                    var message = respMsgParam.Exists ? (string)respMsgParam.Value : messages.PaymentFailed;
-                    verifyResult = PaymentVerifyResult.Failed(message);
+                    message = respMsgParam.Exists ? (string)respMsgParam.Value : messages.PaymentFailed;
+
                     isSucceed = false;
                 }
                 else
                 {
                     var isValid = true;
-                    var message = messages.InvalidDataReceivedFromGateway;
+                    message = messages.InvalidDataReceivedFromGateway;
 
                     if (!invoiceIdParam.Exists || !string.Equals(invoiceIdParam.Value, context.Payment.TrackingNumber.ToString(), StringComparison.InvariantCultureIgnoreCase))
                     {
@@ -164,11 +166,6 @@ namespace Parbad.Gateway.Sepehr.Internal
                         message += " DigitalReceipt doesn't exist.";
                     }
 
-                    if (!isValid)
-                    {
-                        verifyResult = PaymentVerifyResult.Failed(message);
-                    }
-
                     isSucceed = isValid;
                 }
             }
@@ -176,11 +173,11 @@ namespace Parbad.Gateway.Sepehr.Internal
             return new CallbackResultModel
             {
                 IsSucceed = isSucceed,
-                Result = verifyResult,
                 TraceNumber = traceNumber,
                 Rrn = rrn,
                 DigitalReceipt = digitalReceiptParam.Value,
-                CardNumber = cardNumberParam.Value
+                CardNumber = cardNumberParam.Value,
+                Message = message
             };
         }
 

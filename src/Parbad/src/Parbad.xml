@@ -21,6 +21,9 @@
         <member name="M:Parbad.Abstraction.GatewayBase`1.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
+        <member name="M:Parbad.Abstraction.GatewayBase`1.FetchAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
         <member name="M:Parbad.Abstraction.GatewayBase`1.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
@@ -53,6 +56,14 @@
             Performs a payment request using the given <paramref name="invoice"/>.
             </summary>
             <param name="invoice">The invoice which must be pay.</param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="M:Parbad.Abstraction.IGateway.FetchAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
+            <summary>
+            Fetches the invoice from current request.
+            This method must be called when the users come back from gateways to your website.
+            </summary>
+            <param name="context"></param>
             <param name="cancellationToken"></param>
         </member>
         <member name="M:Parbad.Abstraction.IGateway.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
@@ -474,6 +485,9 @@
         <member name="M:Parbad.Gateway.AsanPardakht.AsanPardakhtGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
+        <member name="M:Parbad.Gateway.AsanPardakht.AsanPardakhtGateway.FetchAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
         <member name="M:Parbad.Gateway.AsanPardakht.AsanPardakhtGateway.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
@@ -519,6 +533,9 @@
         <member name="M:Parbad.Gateway.IranKish.IranKishGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
+        <member name="M:Parbad.Gateway.IranKish.IranKishGateway.FetchAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
         <member name="M:Parbad.Gateway.IranKish.IranKishGateway.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
@@ -557,6 +574,9 @@
             <param name="builder"></param>
         </member>
         <member name="M:Parbad.Gateway.Mellat.MellatGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Gateway.Mellat.MellatGateway.FetchAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
         <member name="M:Parbad.Gateway.Mellat.MellatGateway.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
@@ -610,6 +630,9 @@
         <member name="M:Parbad.Gateway.Melli.MelliGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
+        <member name="M:Parbad.Gateway.Melli.MelliGateway.FetchAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
         <member name="M:Parbad.Gateway.Melli.MelliGateway.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
@@ -661,6 +684,9 @@
         <member name="M:Parbad.Gateway.ParbadVirtual.ParbadVirtualGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
+        <member name="M:Parbad.Gateway.ParbadVirtual.ParbadVirtualGateway.FetchAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
         <member name="M:Parbad.Gateway.ParbadVirtual.ParbadVirtualGateway.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
@@ -706,6 +732,9 @@
         <member name="M:Parbad.Gateway.Parsian.ParsianGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
+        <member name="M:Parbad.Gateway.Parsian.ParsianGateway.FetchAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
         <member name="M:Parbad.Gateway.Parsian.ParsianGateway.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
@@ -746,6 +775,9 @@
         <member name="M:Parbad.Gateway.Pasargad.PasargadGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
+        <member name="M:Parbad.Gateway.Pasargad.PasargadGateway.FetchAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
         <member name="M:Parbad.Gateway.Pasargad.PasargadGateway.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
@@ -779,6 +811,9 @@
             <param name="builder"></param>
         </member>
         <member name="M:Parbad.Gateway.Saman.SamanGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Gateway.Saman.SamanGateway.FetchAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
         <member name="M:Parbad.Gateway.Saman.SamanGateway.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
@@ -1220,7 +1255,8 @@
         </member>
         <member name="M:Parbad.IOnlinePayment.VerifyAsync(System.Int64,System.Threading.CancellationToken)">
             <summary>
-            Verifies the given invoice.
+            Verifies the requested payment to check whether or not the invoice was paid in the gateway by the client.
+            This method must be called when the fetch result equals to <see cref="F:Parbad.PaymentFetchResultStatus.ReadyForVerifying"/>.
             </summary>
             <param name="trackingNumber">The tracking number of the invoice which must be verified.</param>
             <param name="cancellationToken"></param>
@@ -1284,6 +1320,11 @@
         <member name="F:Parbad.PaymentFetchResultStatus.AlreadyProcessed">
             <summary>
             The invoice is already processed before.
+            </summary>
+        </member>
+        <member name="F:Parbad.PaymentFetchResultStatus.Failed">
+            <summary>
+            Payment is failed.
             </summary>
         </member>
         <member name="T:Parbad.IPaymentFetchResult">
@@ -1380,8 +1421,10 @@
             <summary>
             The amount of the payment.
             <para>Examples:</para>
-            <para>long a = result.Amount;</para>
-            <para>decimal a = result.Amount;</para>
+            <para>decimal a = new Money(1000)</para>
+            <para>long a = new Money(1000)</para>
+            <para>Money m = 1000.55m</para>
+            <para>Money m = 1000</para>
             </summary>
         </member>
         <member name="P:Parbad.IPaymentResult.IsSucceed">

@@ -60,6 +60,7 @@ namespace Parbad.Gateway.Saman
             return result;
         }
 
+        /// <inheritdoc />
         public override async Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));

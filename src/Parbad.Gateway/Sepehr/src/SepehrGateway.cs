@@ -69,6 +69,29 @@ namespace Parbad.Gateway.Sepehr
         }
 
         /// <inheritdoc />
+        public override async Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default)
+        {
+            if (context == null) throw new ArgumentNullException(nameof(context));
+
+            var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
+
+            var callbackResult = await SepehrHelper.CreateCallbackResultAsync(
+                    context,
+                    _httpContextAccessor.HttpContext.Request,
+                    account,
+                    _options.Messages,
+                    cancellationToken)
+                .ConfigureAwaitFalse();
+
+            if (callbackResult.IsSucceed)
+            {
+                return PaymentFetchResult.ReadyForVerifying();
+            }
+
+            return PaymentFetchResult.Failed(callbackResult.Message);
+        }
+
+        /// <inheritdoc />
         public override async Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
@@ -85,7 +108,7 @@ namespace Parbad.Gateway.Sepehr
 
             if (!callbackResult.IsSucceed)
             {
-                return callbackResult.Result;
+                return PaymentVerifyResult.Failed(callbackResult.Message);
             }
 
             var data = SepehrHelper.CreateVerifyData(callbackResult, account);

@@ -52,6 +52,7 @@ namespace Parbad.Gateway.Pasargad
             return PasargadHelper.CreateRequestResult(invoice, _httpContextAccessor.HttpContext, account, _crypto, _gatewayOptions);
         }
 
+        /// <inheritdoc />
         public override async Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
