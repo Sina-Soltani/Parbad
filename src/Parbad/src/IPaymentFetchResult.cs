@@ -16,7 +16,12 @@ namespace Parbad
         /// <summary>
         /// The invoice is already processed before.
         /// </summary>
-        AlreadyProcessed
+        AlreadyProcessed,
+
+        /// <summary>
+        /// Payment is failed.
+        /// </summary>
+        Failed
     }
 
     /// <summary>

@@ -82,7 +82,7 @@ namespace Parbad.Gateway.Pasargad.Internal
             var transactionId = await httpRequest.TryGetParamAsync("tref", cancellationToken).ConfigureAwaitFalse();
 
             var isSucceed = true;
-            PaymentVerifyResult verifyResult = null;
+            string message = null;
 
             if (string.IsNullOrWhiteSpace(invoiceNumber.Value) ||
                 string.IsNullOrWhiteSpace(invoiceDate.Value) ||
@@ -90,7 +90,7 @@ namespace Parbad.Gateway.Pasargad.Internal
             {
                 isSucceed = false;
 
-                verifyResult = PaymentVerifyResult.Failed(messagesOptions.InvalidDataReceivedFromGateway);
+                message = messagesOptions.InvalidDataReceivedFromGateway;
             }
 
             var data = new[] { new KeyValuePair<string, string>("invoiceUID", transactionId.Value) };
@@ -102,7 +102,7 @@ namespace Parbad.Gateway.Pasargad.Internal
                 InvoiceDate = invoiceDate.Value,
                 TransactionId = transactionId.Value,
                 CallbackCheckData = data,
-                Result = verifyResult
+                Message = message
             };
         }
 

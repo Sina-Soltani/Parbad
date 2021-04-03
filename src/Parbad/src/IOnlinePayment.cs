@@ -47,7 +47,8 @@ namespace Parbad
         Task<IPaymentFetchResult> FetchAsync(long trackingNumber, CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Verifies the given invoice.
+        /// Verifies the requested payment to check whether or not the invoice was paid in the gateway by the client.
+        /// This method must be called when the fetch result equals to <see cref="PaymentFetchResultStatus.ReadyForVerifying"/>.
         /// </summary>
         /// <param name="trackingNumber">The tracking number of the invoice which must be verified.</param>
         /// <param name="cancellationToken"></param>

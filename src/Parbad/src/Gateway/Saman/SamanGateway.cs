@@ -1,10 +1,6 @@
 // Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
-using System;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Parbad.Abstraction;
@@ -13,6 +9,10 @@ using Parbad.GatewayBuilders;
 using Parbad.Internal;
 using Parbad.Net;
 using Parbad.Options;
+using System;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Parbad.Gateway.Saman
 {
@@ -60,6 +60,24 @@ namespace Parbad.Gateway.Saman
             return result;
         }
 
+        public override async Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default)
+        {
+            if (context == null) throw new ArgumentNullException(nameof(context));
+
+            var callbackResult = await SamanHelper.CreateCallbackResultAsync(
+                    _httpContextAccessor.HttpContext.Request,
+                    _messageOptions,
+                    cancellationToken)
+                .ConfigureAwaitFalse();
+
+            if (callbackResult.IsSucceed)
+            {
+                return PaymentFetchResult.ReadyForVerifying();
+            }
+
+            return PaymentFetchResult.Failed(callbackResult.Message);
+        }
+
         /// <inheritdoc />
         public override async Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default)
         {
@@ -73,7 +91,7 @@ namespace Parbad.Gateway.Saman
 
             if (!callbackResult.IsSucceed)
             {
-                return callbackResult.Result;
+                return PaymentVerifyResult.Failed(callbackResult.Message);
             }
 
             var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();

@@ -1,10 +1,6 @@
 // Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
-using System;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Parbad.Abstraction;
@@ -13,6 +9,10 @@ using Parbad.GatewayBuilders;
 using Parbad.Internal;
 using Parbad.Net;
 using Parbad.Options;
+using System;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Parbad.Gateway.Pasargad
 {
@@ -52,6 +52,24 @@ namespace Parbad.Gateway.Pasargad
             return PasargadHelper.CreateRequestResult(invoice, _httpContextAccessor.HttpContext, account, _crypto, _gatewayOptions);
         }
 
+        public override async Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default)
+        {
+            if (context == null) throw new ArgumentNullException(nameof(context));
+
+            var callbackResult = await PasargadHelper.CreateCallbackResult(
+                    _httpContextAccessor.HttpContext.Request,
+                    _messageOptions.Value,
+                    cancellationToken)
+                .ConfigureAwaitFalse();
+
+            if (callbackResult.IsSucceed)
+            {
+                return PaymentFetchResult.ReadyForVerifying();
+            }
+
+            return PaymentFetchResult.Failed(callbackResult.Message);
+        }
+
         /// <inheritdoc />
         public override async Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default)
         {
@@ -65,7 +83,7 @@ namespace Parbad.Gateway.Pasargad
 
             if (!callbackResult.IsSucceed)
             {
-                return callbackResult.Result;
+                return PaymentVerifyResult.Failed(callbackResult.Message);
             }
 
             var responseMessage = await _httpClient.PostFormAsync(

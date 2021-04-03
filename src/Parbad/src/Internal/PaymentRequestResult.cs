@@ -16,16 +16,6 @@ namespace Parbad.Internal
 
         public override bool IsSucceed => Status == PaymentRequestResultStatus.Succeed;
 
-        public static PaymentRequestResult Succeed(IGatewayTransporter gatewayTransporter, string gatewayAccountName)
-        {
-            return new PaymentRequestResult
-            {
-                GatewayAccountName = gatewayAccountName,
-                GatewayTransporter = gatewayTransporter,
-                Status = PaymentRequestResultStatus.Succeed
-            };
-        }
-
         public static PaymentRequestResult SucceedWithPost(
             string gatewayAccountName,
             HttpContext httpContext,
@@ -36,12 +26,7 @@ namespace Parbad.Internal
 
             var transporter = new DefaultGatewayTransporter(httpContext, descriptor);
 
-            return new PaymentRequestResult
-            {
-                GatewayAccountName = gatewayAccountName,
-                GatewayTransporter = transporter,
-                Status = PaymentRequestResultStatus.Succeed
-            };
+            return Succeed(transporter, gatewayAccountName);
         }
 
         public static PaymentRequestResult SucceedWithRedirect(
@@ -53,10 +38,15 @@ namespace Parbad.Internal
 
             var transporter = new DefaultGatewayTransporter(httpContext, descriptor);
 
+            return Succeed(transporter, gatewayAccountName);
+        }
+
+        public static PaymentRequestResult Succeed(IGatewayTransporter gatewayTransporter, string gatewayAccountName)
+        {
             return new PaymentRequestResult
             {
                 GatewayAccountName = gatewayAccountName,
-                GatewayTransporter = transporter,
+                GatewayTransporter = gatewayTransporter,
                 Status = PaymentRequestResultStatus.Succeed
             };
         }

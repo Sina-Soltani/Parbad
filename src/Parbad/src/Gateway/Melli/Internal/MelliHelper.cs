@@ -86,7 +86,7 @@ namespace Parbad.Gateway.Melli.Internal
                 return new MelliCallbackResult
                 {
                     IsSucceed = false,
-                    Result = PaymentVerifyResult.Failed(messagesOptions.PaymentFailed)
+                    Message = messagesOptions.PaymentFailed
                 };
             }
 
@@ -99,7 +99,7 @@ namespace Parbad.Gateway.Melli.Internal
                 {
                     IsSucceed = false,
                     Token = apiToken.Value,
-                    Result = PaymentVerifyResult.Failed(messagesOptions.InvalidDataReceivedFromGateway)
+                    Message = messagesOptions.InvalidDataReceivedFromGateway
                 };
             }
 

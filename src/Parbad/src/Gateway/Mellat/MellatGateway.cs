@@ -58,6 +58,23 @@ namespace Parbad.Gateway.Mellat
         }
 
         /// <inheritdoc />
+        public override async Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default)
+        {
+            if (context == null) throw new ArgumentNullException(nameof(context));
+
+            var callbackResult = await MellatHelper
+                .CrateCallbackResultAsync(_httpContextAccessor.HttpContext.Request, _messagesOptions.Value, cancellationToken)
+                .ConfigureAwaitFalse();
+
+            if (callbackResult.IsSucceed)
+            {
+                return PaymentFetchResult.ReadyForVerifying();
+            }
+
+            return PaymentFetchResult.Failed(callbackResult.Message);
+        }
+
+        /// <inheritdoc />
         public override async Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
@@ -68,7 +85,7 @@ namespace Parbad.Gateway.Mellat
 
             if (!callbackResult.IsSucceed)
             {
-                return callbackResult.Result;
+                return PaymentVerifyResult.Failed(callbackResult.Message);
             }
 
             var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();

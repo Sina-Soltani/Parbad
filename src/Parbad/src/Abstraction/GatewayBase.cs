@@ -24,6 +24,9 @@ namespace Parbad.Abstraction
         public abstract Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default);
 
         /// <inheritdoc />
+        public abstract Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default);
+
+        /// <inheritdoc />
         public abstract Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default);
 
         /// <inheritdoc />

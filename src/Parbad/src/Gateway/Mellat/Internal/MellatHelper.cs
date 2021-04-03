@@ -70,7 +70,8 @@ namespace Parbad.Gateway.Mellat.Internal
                 });
         }
 
-        public static async Task<MellatCallbackResult> CrateCallbackResultAsync(HttpRequest httpRequest,
+        public static async Task<MellatCallbackResult> CrateCallbackResultAsync(
+            HttpRequest httpRequest,
             MessagesOptions messagesOptions,
             CancellationToken cancellationToken)
         {
@@ -81,7 +82,7 @@ namespace Parbad.Gateway.Mellat.Internal
                 return new MellatCallbackResult
                 {
                     IsSucceed = false,
-                    Result = PaymentVerifyResult.Failed(messagesOptions.InvalidDataReceivedFromGateway)
+                    Message = messagesOptions.InvalidDataReceivedFromGateway
                 };
             }
 
@@ -93,22 +94,19 @@ namespace Parbad.Gateway.Mellat.Internal
 
             var isSucceed = resCode.Value == OkResult;
 
-            PaymentVerifyResult result = null;
+            string message = null;
 
             if (!isSucceed)
             {
-                var message = MellatGatewayResultTranslator.Translate(resCode.Value, messagesOptions);
-
-                result = PaymentVerifyResult.Failed(message);
+                message = MellatGatewayResultTranslator.Translate(resCode.Value, messagesOptions);
             }
-
 
             return new MellatCallbackResult
             {
                 IsSucceed = isSucceed,
                 RefId = refId.Value,
                 SaleReferenceId = saleReferenceId.Value,
-                Result = result
+                Message = message
             };
         }
 

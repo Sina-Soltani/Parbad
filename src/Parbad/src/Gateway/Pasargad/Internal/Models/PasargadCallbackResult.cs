@@ -2,7 +2,6 @@
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
 using System.Collections.Generic;
-using Parbad.Internal;
 
 namespace Parbad.Gateway.Pasargad.Internal.Models
 {
@@ -21,6 +20,6 @@ namespace Parbad.Gateway.Pasargad.Internal.Models
 
         public IEnumerable<KeyValuePair<string, string>> CallbackCheckData { get; set; }
 
-        public PaymentVerifyResult Result { get; set; }
+        public string Message { get; set; }
     }
 }

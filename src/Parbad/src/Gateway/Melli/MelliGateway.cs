@@ -72,13 +72,13 @@ namespace Parbad.Gateway.Melli
         }
 
         /// <inheritdoc />
-        public override async Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default)
+        public override async Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
             var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 
-            var data = await MelliHelper.CreateCallbackResultAsync(
+            var callbackResult = await MelliHelper.CreateCallbackResultAsync(
                 context,
                 _httpContextAccessor.HttpContext.Request,
                 account,
@@ -86,12 +86,35 @@ namespace Parbad.Gateway.Melli
                 _messageOptions.Value,
                 cancellationToken);
 
-            if (!data.IsSucceed)
+            if (callbackResult.IsSucceed)
             {
-                return data.Result;
+                return PaymentFetchResult.ReadyForVerifying();
             }
 
-            var result = await PostJsonAsync<MelliApiVerifyResult>(_gatewayOptions.ApiVerificationUrl, data.JsonDataToVerify, cancellationToken).ConfigureAwaitFalse();
+            return PaymentFetchResult.Failed(callbackResult.Message);
+        }
+
+        /// <inheritdoc />
+        public override async Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default)
+        {
+            if (context == null) throw new ArgumentNullException(nameof(context));
+
+            var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
+
+            var callbackResult = await MelliHelper.CreateCallbackResultAsync(
+                context,
+                _httpContextAccessor.HttpContext.Request,
+                account,
+                _crypto,
+                _messageOptions.Value,
+                cancellationToken);
+
+            if (!callbackResult.IsSucceed)
+            {
+                return PaymentVerifyResult.Failed(callbackResult.Message);
+            }
+
+            var result = await PostJsonAsync<MelliApiVerifyResult>(_gatewayOptions.ApiVerificationUrl, callbackResult.JsonDataToVerify, cancellationToken).ConfigureAwaitFalse();
 
             return MelliHelper.CreateVerifyResult(result, _messageOptions.Value);
         }

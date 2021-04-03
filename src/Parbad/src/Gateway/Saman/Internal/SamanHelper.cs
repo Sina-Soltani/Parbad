@@ -50,7 +50,7 @@ namespace Parbad.Gateway.Saman.Internal
             CancellationToken cancellationToken)
         {
             var isSuccess = false;
-            PaymentVerifyResult verifyResult = null;
+            string message = null;
             StringValues referenceId = "";
             StringValues transactionId = "";
 
@@ -63,7 +63,7 @@ namespace Parbad.Gateway.Saman.Internal
 
             if (!state.Exists || state.Value.IsNullOrEmpty())
             {
-                verifyResult = PaymentVerifyResult.Failed(messagesOptions.InvalidDataReceivedFromGateway);
+                message = messagesOptions.InvalidDataReceivedFromGateway;
             }
             else
             {
@@ -77,9 +77,7 @@ namespace Parbad.Gateway.Saman.Internal
 
                 if (!isSuccess)
                 {
-                    var message = SamanStateTranslator.Translate(state.Value, messagesOptions);
-
-                    verifyResult = PaymentVerifyResult.Failed(message);
+                    message = SamanStateTranslator.Translate(state.Value, messagesOptions);
                 }
             }
 
@@ -92,7 +90,7 @@ namespace Parbad.Gateway.Saman.Internal
                 Cid = cid.Value,
                 TraceNo = traceNo.Value,
                 Rrn = rrn.Value,
-                Result = verifyResult
+                Message = message
             };
         }
 

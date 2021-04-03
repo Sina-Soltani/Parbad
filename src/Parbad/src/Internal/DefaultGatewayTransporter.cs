@@ -28,7 +28,7 @@ namespace Parbad.Internal
         public GatewayTransporterDescriptor Descriptor { get; }
 
         /// <inheritdoc />
-        public Task TransportAsync(CancellationToken cancellationToken = default)
+        public virtual Task TransportAsync(CancellationToken cancellationToken = default)
         {
             if (Descriptor.Type == GatewayTransporterDescriptor.TransportType.Post)
             {

@@ -134,18 +134,11 @@ namespace Parbad.Gateway.Parsian.Internal
                 }
             }
 
-            PaymentVerifyResult verifyResult = null;
-
-            if (!isSucceed)
-            {
-                verifyResult = PaymentVerifyResult.Failed(message);
-            }
-
             return new ParsianCallbackResult
             {
                 IsSucceed = isSucceed,
                 Token = token,
-                Result = verifyResult
+                Message = message
             };
         }
 
