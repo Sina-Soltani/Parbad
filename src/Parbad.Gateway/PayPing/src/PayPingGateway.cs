@@ -30,7 +30,6 @@ namespace Parbad.Gateway.PayPing
     [Gateway(Name)]
     public class PayPingGateway : GatewayBase<PayPingGatewayAccount>
     {
-        private readonly IStorageManager _storageManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<PayPingGateway> _logger;
         private readonly HttpClient _httpClient;
@@ -39,16 +38,10 @@ namespace Parbad.Gateway.PayPing
 
         public const string Name = "PayPing";
 
-        private static JsonSerializerSettings DefaultSerializerSettings => new JsonSerializerSettings
-        {
-            ContractResolver = new CamelCasePropertyNamesContractResolver()
-        };
-
         /// <summary>
         /// Initializes an instance of <see cref="PayPingGateway"/>.
         /// </summary>
         public PayPingGateway(
-            IStorageManager storageManager,
             IGatewayAccountProvider<PayPingGatewayAccount> accountProvider,
             IHttpContextAccessor httpContextAccessor,
             IHttpClientFactory httpClientFactory,
@@ -56,7 +49,6 @@ namespace Parbad.Gateway.PayPing
             IOptions<PayPingGatewayOptions> gatewayOptions,
             IOptions<ParbadOptions> options) : base(accountProvider)
         {
-            _storageManager = storageManager;
             _httpContextAccessor = httpContextAccessor;
             _logger = logger;
             _httpClient = httpClientFactory.CreateClient(this);

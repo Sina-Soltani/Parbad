@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.0;net5.0</TargetFrameworks>
         <VersionPrefix>1.0.0</VersionPrefix>
@@ -14,34 +13,23 @@
         <Description>PayPing Gateway for Parbad project.
 
             For more information see: https://github.com/Sina-Soltani/Parbad</Description>
-        <PackageReleaseNotes>Supporting the netstandard2.1, netcoreapp3.1 and net5.0 is added.</PackageReleaseNotes>
     </PropertyGroup>
 
     <PropertyGroup>
         <NoWarn>1701;1702;1591</NoWarn>
     </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|AnyCPU'">
-        <DocumentationFile>Parbad.Gateway.PayPing.xml</DocumentationFile>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|AnyCPU'">
-        <DocumentationFile>Parbad.Gateway.PayPing.xml</DocumentationFile>
-    </PropertyGroup>
-
     <ItemGroup>
-        <ProjectReference Include="..\..\..\Parbad\src\Parbad.csproj" />
+        <None Include="icon.png" pack="true" Visible="false" PackagePath="" />
+        <None Include="readme.txt" />
+        <None Include="Parbad.Gateway.PayPing.xml" pack="true" Visible="false" PackagePath="" />
     </ItemGroup>
+    
+
+    
 
     <ItemGroup>
-        <None Update="icon.png">
-            <pack>true</pack>
-            <Visible>false</Visible>
-        </None>
-        <None Update="Parbad.Gateway.PayPing.xml">
-            <pack>true</pack>
-            <Visible>false</Visible>
-        </None>
+      <ProjectReference Include="..\..\..\Parbad\src\Parbad.csproj" />
     </ItemGroup>
 
 </Project>
