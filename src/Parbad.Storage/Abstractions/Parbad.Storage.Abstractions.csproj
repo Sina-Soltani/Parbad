@@ -5,11 +5,12 @@
     <Product>Parbad.Storage.Abstractions</Product>
     <VersionPrefix>1.0.0</VersionPrefix>
     <LangVersion>9</LangVersion>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.0;netcoreapp3.1;net5.0</TargetFrameworks>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
-    <Description>Parbad Storage is responsible for saving and loading the data.</Description>
+    <Description>Parbad Storage is responsible for saving and loading payments and transactions.
+More information: https://github.com/Sina-Soltani/Parbad</Description>
     <PackageProjectUrl>https://github.com/Sina-Soltani/Parbad</PackageProjectUrl>
     <PackageIcon>icon.png</PackageIcon>
     <PackageIconUrl>https://raw.githubusercontent.com/Sina-Soltani/Parbad/master/images/Parbad-128x128.png</PackageIconUrl>
