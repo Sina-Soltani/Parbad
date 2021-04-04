@@ -1,11 +1,10 @@
 // Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
-using System;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Parbad.Options;
+using System;
 
 namespace Parbad.Builder
 {
@@ -22,23 +21,6 @@ namespace Parbad.Builder
             if (setupOptions == null) throw new ArgumentNullException(nameof(setupOptions));
 
             builder.Services.Configure(setupOptions);
-
-            RegisterMessagesOptions(builder);
-
-            return builder;
-        }
-
-        /// <summary>
-        /// Configures the Parbad options with the given <see cref="IConfiguration"/>.
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="configuration"></param>
-        public static IParbadBuilder ConfigureOptions(this IParbadBuilder builder, IConfiguration configuration)
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-            if (configuration == null) throw new ArgumentNullException(nameof(configuration));
-
-            builder.Services.Configure<ParbadOptions>(configuration);
 
             RegisterMessagesOptions(builder);
 

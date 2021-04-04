@@ -239,13 +239,6 @@
             <param name="builder"></param>
             <param name="setupOptions"></param>
         </member>
-        <member name="M:Parbad.Builder.ParbadOptionsExtensions.ConfigureOptions(Parbad.Builder.IParbadBuilder,Microsoft.Extensions.Configuration.IConfiguration)">
-            <summary>
-            Configures the Parbad options with the given <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/>.
-            </summary>
-            <param name="builder"></param>
-            <param name="configuration"></param>
-        </member>
         <member name="M:Parbad.Builder.PaymentTokenProviderExtensions.ConfigurePaymentToken(Parbad.Builder.IParbadBuilder,System.Action{Parbad.PaymentTokenProviders.IPaymentTokenBuilder})">
             <summary>
             Configures the <see cref="T:Parbad.PaymentTokenProviders.IPaymentTokenProvider"/> required by Parbad to create
@@ -276,25 +269,6 @@
             <param name="builder"></param>
             <param name="configureOptions">A delegate to configure the <see cref="T:Parbad.PaymentTokenProviders.QueryStringPaymentTokenOptions"/>.</param>
         </member>
-        <member name="M:Parbad.Builder.QueryStringPaymentTokenProviderExtensions.UseGuidQueryStringPaymentTokenProvider(Parbad.PaymentTokenProviders.IPaymentTokenBuilder,Microsoft.Extensions.Configuration.IConfiguration)">
-            <summary>
-            Uses the <see cref="T:Parbad.Internal.GuidQueryStringPaymentTokenProvider"/> as <see cref="T:Parbad.PaymentTokenProviders.IPaymentTokenProvider"/>.
-            It generates a unique <see cref="T:System.Guid"/> as a token for each payments and puts it inside the query string
-            of the URL. The generated token will be retrieved from the query string when the client
-            comes back from the gateway.
-            <para>Note: This is the default <see cref="T:Parbad.PaymentTokenProviders.IPaymentTokenProvider"/>, which means you don't need to call this.</para>
-            </summary>
-            <param name="builder"></param>
-            <param name="configuration">The configuration section for <see cref="T:Parbad.PaymentTokenProviders.QueryStringPaymentTokenOptions"/>.
-            The default key is Parbad:PaymentTokenProvider:QueryString</param>
-        </member>
-        <member name="M:Parbad.Builder.QueryStringPaymentTokenProviderExtensions.GetQueryStringPaymentTokenProviderConfiguration(Microsoft.Extensions.Configuration.IConfiguration)">
-            <summary>
-            Retrieves the <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/> section of <see cref="T:Parbad.PaymentTokenProviders.QueryStringPaymentTokenOptions"/> using <see cref="F:Parbad.PaymentTokenProviders.QueryStringPaymentTokenOptions.ConfigurationKey"/>.
-            </summary>
-            <param name="configuration"></param>
-            <returns></returns>
-        </member>
         <member name="M:Parbad.Builder.StorageBuilderExtensions.ConfigureStorage(Parbad.Builder.IParbadBuilder,System.Action{Parbad.Storage.Abstractions.IStorageBuilder})">
             <summary>
             Configures the storage which required by Parbad for saving and loading data.
@@ -307,11 +281,6 @@
             Uses the default implementation of <see cref="T:Parbad.Storage.Abstractions.IStorageManager"/>.
             </summary>
             <param name="builder"></param>
-        </member>
-        <member name="M:Parbad.Builder.AutoTrackingNumberOptionsExtensions.GetAutoTrackingNumberOptionsConfiguration(Microsoft.Extensions.Configuration.IConfiguration)">
-            <summary>
-            Retrieves the <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/> section of <see cref="T:Parbad.TrackingNumberProviders.AutoTrackingNumberOptions"/> using <see cref="F:Parbad.TrackingNumberProviders.AutoTrackingNumberOptions.ConfigurationKey"/>.
-            </summary>
         </member>
         <member name="T:Parbad.CallbackUrl">
             <summary>
