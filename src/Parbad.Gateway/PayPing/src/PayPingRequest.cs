@@ -6,7 +6,9 @@ namespace Parbad.Gateway.PayPing
     public class PayPingRequest
     {
         public string PayerName { get; set; }
+
         public string Mobile { get; set; }
+
         public string Description { get; set; }
     }
 }

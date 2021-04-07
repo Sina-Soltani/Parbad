@@ -19,7 +19,7 @@ Configuration
             accounts.AddInMemory(account =>
             {
                 account.Name = "PayPing"; // optional if there is only 1 account for this gateway
-                account.BearerToken = <Your Bearer Token>;   // https://app.payping.ir/token
+                account.AcessToken = <Your Bearer Token>;
             });
         });
 })
@@ -30,13 +30,19 @@ Making a request
 
 var result = _onlinePayment.RequestAsync(invoice => 
 {
-	invoice.SetAmount(viewModel.Amount)
+	invoice
+        .SetAmount(viewModel.Amount)
         .SetCallbackUrl(callbackUrl)
-        .SetPayPingData(payPingRequest => // optional
+        .SetPayPingData(payPing =>
         {
-            // for example Mobile for save card number and etc on ipgs  // https://github.com/Sina-Soltani/Parbad/issues/159
-        });
-})
+            // optional
+        })
+        .SetGateway("PayPing");
+
+        // OR
+
+        .UsePayPing();
+});
 
 
 Do you like Parbad? Then don't forget to **Star** the Parbad on GitHub.
