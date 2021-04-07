@@ -1,35 +1,45 @@
 <Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.0;net5.0</TargetFrameworks>
-        <VersionPrefix>1.0.0</VersionPrefix>
-        <LangVersion>9</LangVersion>
-        <Authors>Ali Zaferany</Authors>
-        <PackageProjectUrl>https://github.com/Sina-Soltani/Parbad</PackageProjectUrl>
-        <PackageIcon>icon.png</PackageIcon>
-        <PackageIconUrl>https://raw.githubusercontent.com/Sina-Soltani/Parbad/master/images/Parbad-128x128.png</PackageIconUrl>
-        <RepositoryUrl>https://github.com/Sina-Soltani/Parbad</RepositoryUrl>
-        <PackageTags>parbad Payment Gateway Bank Iran Shetab payping پرداخت درگاه بانک ایران شتاب پی پینگ</PackageTags>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <Description>PayPing Gateway for Parbad project.
+  <PropertyGroup>
+    <PackageId>Parbad.Gateway.PayPing</PackageId>
+    <Product>Parbad.Gateway.PayPing</Product>
+    <VersionPrefix>1.0.0</VersionPrefix>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.0;net5.0</TargetFrameworks>
+    <LangVersion>9</LangVersion>
+    <Authors>Ali Zaferany</Authors>
+    <Copyright>Copyright © Parbad 2016</Copyright>
+    <PackageProjectUrl>https://github.com/Sina-Soltani/Parbad</PackageProjectUrl>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageIconUrl>https://raw.githubusercontent.com/Sina-Soltani/Parbad/master/images/Parbad-128x128.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/Sina-Soltani/Parbad</RepositoryUrl>
+    <PackageTags>parbad Payment Gateway Bank Iran Shetab payping پرداخت درگاه بانک ایران شتاب پی پینگ</PackageTags>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Description>PayPing Gateway for Parbad project.
+For more information see: https://github.com/Sina-Soltani/Parbad</Description>
+  </PropertyGroup>
 
-            For more information see: https://github.com/Sina-Soltani/Parbad</Description>
-    </PropertyGroup>
+  <PropertyGroup>
+    <NoWarn>1701;1702;1591</NoWarn>
+  </PropertyGroup>
 
-    <PropertyGroup>
-        <NoWarn>1701;1702;1591</NoWarn>
-    </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>Parbad.Gateway.PayPing.xml</DocumentationFile>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <None Include="icon.png" pack="true" Visible="false" PackagePath="" />
-        <None Include="readme.txt" />
-        <None Include="Parbad.Gateway.PayPing.xml" pack="true" Visible="false" PackagePath="" />
-    </ItemGroup>
-    
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>Parbad.Gateway.PayPing.xml</DocumentationFile>
+  </PropertyGroup>
 
-    
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Parbad\src\Parbad.csproj" />
+  </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\..\..\Parbad\src\Parbad.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <None Include="icon.png" pack="true" Visible="false" PackagePath="" />
+    <None Include="readme.txt" />
+    <None Include="Parbad.Gateway.PayPing.xml" pack="true" Visible="false" PackagePath="" />
+  </ItemGroup>
 
 </Project>
