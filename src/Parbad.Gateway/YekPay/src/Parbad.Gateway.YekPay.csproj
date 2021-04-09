@@ -19,7 +19,6 @@
     <Description>YekPay Gateway for Parbad project.
 
 For more information see: https://www.nuget.org/packages/Parbad/</Description>
-    <PackageReleaseNotes>Supporting the netstandard2.1, netcoreapp3.1 and net5.0 is added.</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup>

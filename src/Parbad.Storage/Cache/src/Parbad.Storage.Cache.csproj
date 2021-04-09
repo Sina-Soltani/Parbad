@@ -19,7 +19,6 @@ More information: https://github.com/Sina-Soltani/Parbad</Description>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Authors>Sina Soltani</Authors>
     <Product>Parbad.Storage.Cache</Product>
-    <PackageReleaseNotes>Supporting the netcoreapp3.1 and net5.0 is added.</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup>

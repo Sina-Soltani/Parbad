@@ -4,29 +4,6 @@
         <name>Parbad.Storage.Abstractions</name>
     </assembly>
     <members>
-        <member name="M:Parbad.Storage.Abstractions.BuilderExtensions.AddStorageManager``1(Parbad.Storage.Abstractions.IStorageBuilder,Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
-            <summary>
-            Adds an implementation of <see cref="T:Parbad.Storage.Abstractions.IStorageManager"/> which required by Parbad for managing the storage operations.
-            </summary>
-            <typeparam name="TManager"></typeparam>
-            <param name="builder"></param>
-            <param name="lifetime">The lifetime of given StorageManager.</param>
-        </member>
-        <member name="M:Parbad.Storage.Abstractions.BuilderExtensions.AddStorageManager(Parbad.Storage.Abstractions.IStorageBuilder,Parbad.Storage.Abstractions.IStorageManager)">
-            <summary>
-            Adds an implementation of <see cref="T:Parbad.Storage.Abstractions.IStorageManager"/> which required by Parbad for managing the storage operations.
-            </summary>
-            <param name="builder"></param>
-            <param name="storageManager"></param>
-        </member>
-        <member name="M:Parbad.Storage.Abstractions.BuilderExtensions.AddStorageManager(Parbad.Storage.Abstractions.IStorageBuilder,System.Func{System.IServiceProvider,Parbad.Storage.Abstractions.IStorageManager},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
-            <summary>
-            Adds an implementation of <see cref="T:Parbad.Storage.Abstractions.IStorageManager"/> which required by Parbad for managing the storage operations.
-            </summary>
-            <param name="builder"></param>
-            <param name="factory"></param>
-            <param name="lifetime">The lifetime of given StorageManager.</param>
-        </member>
         <member name="T:Parbad.Storage.Abstractions.IStorage">
             <summary>
             A storage which used by Parbad for saving and loading data.
@@ -179,6 +156,29 @@
             <summary>
             Type of transaction.
             </summary>
+        </member>
+        <member name="M:Parbad.Storage.Abstractions.StorageBuilderExtensions.AddStorageManager``1(Parbad.Storage.Abstractions.IStorageBuilder,Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds an implementation of <see cref="T:Parbad.Storage.Abstractions.IStorageManager"/> which required by Parbad for managing the storage operations.
+            </summary>
+            <typeparam name="TManager"></typeparam>
+            <param name="builder"></param>
+            <param name="lifetime">The lifetime of given StorageManager.</param>
+        </member>
+        <member name="M:Parbad.Storage.Abstractions.StorageBuilderExtensions.AddStorageManager(Parbad.Storage.Abstractions.IStorageBuilder,Parbad.Storage.Abstractions.IStorageManager)">
+            <summary>
+            Adds an implementation of <see cref="T:Parbad.Storage.Abstractions.IStorageManager"/> which required by Parbad for managing the storage operations.
+            </summary>
+            <param name="builder"></param>
+            <param name="storageManager"></param>
+        </member>
+        <member name="M:Parbad.Storage.Abstractions.StorageBuilderExtensions.AddStorageManager(Parbad.Storage.Abstractions.IStorageBuilder,System.Func{System.IServiceProvider,Parbad.Storage.Abstractions.IStorageManager},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Adds an implementation of <see cref="T:Parbad.Storage.Abstractions.IStorageManager"/> which required by Parbad for managing the storage operations.
+            </summary>
+            <param name="builder"></param>
+            <param name="factory"></param>
+            <param name="lifetime">The lifetime of given StorageManager.</param>
         </member>
     </members>
 </doc>

@@ -4,7 +4,7 @@ using System;
 
 namespace Parbad.Storage.Abstractions
 {
-    public static class BuilderExtensions
+    public static class StorageBuilderExtensions
     {
         /// <summary>
         /// Adds an implementation of <see cref="IStorageManager"/> which required by Parbad for managing the storage operations.

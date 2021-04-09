@@ -21,7 +21,7 @@ namespace Parbad.Tests
 
             IParbadLogger<LoggerTests> parbadLogger = new ParbadLogger<LoggerTests>(fakeLogger, options);
 
-            parbadLogger.Log(logging => logging.LogInformation("Test"));
+            parbadLogger.LogInformation("Test");
 
             Assert.IsFalse(fakeLogger.LogReceived);
         }
@@ -38,7 +38,7 @@ namespace Parbad.Tests
 
             IParbadLogger<LoggerTests> parbadLogger = new ParbadLogger<LoggerTests>(fakeLogger, options);
 
-            parbadLogger.Log(logging => logging.LogInformation("Test"));
+            parbadLogger.LogInformation("Test");
 
             Assert.IsTrue(fakeLogger.LogReceived);
         }

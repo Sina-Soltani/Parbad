@@ -580,6 +580,13 @@
             </summary>
             <param name="builder"></param>
         </member>
+        <member name="M:Parbad.Gateway.Mellat.MellatGatewayInvoiceBuilderExtensions.SetMellatMobileNumber(Parbad.InvoiceBuilder.IInvoiceBuilder,System.String)">
+            <summary>
+            Sets the Mobile Number for the current invoice to sent to Mellat Gateway.
+            </summary>
+            <param name="builder"></param>
+            <param name="mobileNumber"></param>
+        </member>
         <member name="T:Parbad.Gateway.Melli.MelliGateway">
             <summary>
             Melli Gateway.
@@ -735,6 +742,13 @@
             The invoice will be sent to Parsian gateway.
             </summary>
             <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.Gateway.Parsian.ParsianGatewayInvoiceBuilderExtensions.SetParsianAdditionalData(Parbad.InvoiceBuilder.IInvoiceBuilder,Parbad.Gateway.Parsian.ParsianGatewayAdditionalDataRequest)">
+            <summary>
+            Sets some additional data for Parsian Gateway.
+            </summary>
+            <param name="builder"></param>
+            <param name="additionalData"></param>
         </member>
         <member name="P:Parbad.Gateway.Pasargad.Internal.Models.PasargadCallbackResult.InvoiceNumber">
             <summary>
@@ -1267,7 +1281,7 @@
         </member>
         <member name="T:Parbad.IParbadLogger`1">
             <summary>
-            Parbad internal Logger controls the logging.
+            Parbad Logger is a Proxy for Microsoft Logging.
             </summary>
             <typeparam name="TCategoryName"></typeparam>
         </member>
