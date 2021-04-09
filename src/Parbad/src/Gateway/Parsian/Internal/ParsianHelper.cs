@@ -18,6 +18,8 @@ namespace Parbad.Gateway.Parsian.Internal
     {
         public static string CreateRequestData(ParsianGatewayAccount account, Invoice invoice)
         {
+            var additionalData = invoice.GetParsianAdditionalData();
+
             return
                 "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:sal=\"https://pec.Shaparak.ir/NewIPGServices/Sale/SaleService\">" +
                 "<soapenv:Header/>" +
@@ -32,9 +34,9 @@ namespace Parbad.Gateway.Parsian.Internal
                 "<!--Optional:-->" +
                 $"<sal:CallBackUrl>{XmlHelper.EncodeXmlValue(invoice.CallbackUrl)}</sal:CallBackUrl>" +
                 "<!--Optional:-->" +
-                "<sal:AdditionalData></sal:AdditionalData>" +
+                $"<sal:AdditionalData>{additionalData?.AdditionalData}</sal:AdditionalData>" +
                 "<!--Optional:-->" +
-                "<sal:Originator></sal:Originator>" +
+                $"<sal:Originator>{additionalData?.Originator}</sal:Originator>" +
                 "</sal:requestData>" +
                 "</sal:SalePaymentRequest> " +
                 "</soapenv:Body> " +

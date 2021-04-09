@@ -37,6 +37,7 @@ namespace Parbad.Gateway.Mellat.Internal
 
         public static PaymentRequestResult CreateRequestResult(
             string webServiceResponse,
+            Invoice invoice,
             HttpContext httpContext,
             MellatGatewayOptions gatewayOptions,
             MessagesOptions messagesOptions,
@@ -60,14 +61,22 @@ namespace Parbad.Gateway.Mellat.Internal
                 return PaymentRequestResult.Failed(message, account.Name);
             }
 
+            var form = new Dictionary<string, string>
+            {
+                {"RefId", refId}
+            };
+
+            var mobileNumber = invoice.GetMellatMobileNumber();
+            if (!string.IsNullOrEmpty(mobileNumber))
+            {
+                form.Add("mobileNo", mobileNumber);
+            }
+
             return PaymentRequestResult.SucceedWithPost(
                 account.Name,
                 httpContext,
                 gatewayOptions.PaymentPageUrl,
-                new Dictionary<string, string>
-                {
-                    {"RefId", refId}
-                });
+                form);
         }
 
         public static async Task<MellatCallbackResult> CrateCallbackResultAsync(

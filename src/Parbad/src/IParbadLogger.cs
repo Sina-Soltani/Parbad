@@ -2,16 +2,14 @@
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
 using Microsoft.Extensions.Logging;
-using System;
 
 namespace Parbad
 {
     /// <summary>
-    /// Parbad internal Logger controls the logging.
+    /// Parbad Logger is a Proxy for Microsoft Logging.
     /// </summary>
     /// <typeparam name="TCategoryName"></typeparam>
-    public interface IParbadLogger<out TCategoryName>
+    public interface IParbadLogger<out TCategoryName> : ILogger<TCategoryName>
     {
-        void Log(Action<ILogger<TCategoryName>> logger);
     }
 }

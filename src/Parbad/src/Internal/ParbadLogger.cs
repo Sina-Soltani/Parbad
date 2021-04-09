@@ -21,11 +21,21 @@ namespace Parbad.Internal
             _options = options.Value;
         }
 
-        public virtual void Log(Action<ILogger<TCategoryName>> logger)
+        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
             if (!_options.EnableLogging) return;
 
-            logger(_logger);
+            _logger.Log(logLevel, eventId, state, exception, formatter);
+        }
+
+        public bool IsEnabled(LogLevel logLevel)
+        {
+            return _options.EnableLogging;
+        }
+
+        public IDisposable BeginScope<TState>(TState state)
+        {
+            return _logger.BeginScope(state);
         }
     }
 }

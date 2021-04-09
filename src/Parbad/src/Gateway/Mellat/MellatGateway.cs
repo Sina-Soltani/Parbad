@@ -54,7 +54,13 @@ namespace Parbad.Gateway.Mellat
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
-            return MellatHelper.CreateRequestResult(response, _httpContextAccessor.HttpContext, _gatewayOptions, _messagesOptions.Value, account);
+            return MellatHelper.CreateRequestResult(
+                response,
+                invoice,
+                _httpContextAccessor.HttpContext,
+                _gatewayOptions,
+                _messagesOptions.Value,
+                account);
         }
 
         /// <inheritdoc />
