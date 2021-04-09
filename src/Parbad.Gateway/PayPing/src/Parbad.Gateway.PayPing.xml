@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Parbad.Gateway.PayPing</name>
+    </assembly>
+    <members>
+        <member name="T:Parbad.Gateway.PayPing.PayPingGateway">
+            <summary>
+            PayPing Gateway.
+            </summary>
+        </member>
+        <member name="M:Parbad.Gateway.PayPing.PayPingGateway.#ctor(Parbad.GatewayBuilders.IGatewayAccountProvider{Parbad.Gateway.PayPing.PayPingGatewayAccount},Microsoft.AspNetCore.Http.IHttpContextAccessor,System.Net.Http.IHttpClientFactory,Microsoft.Extensions.Options.IOptions{Parbad.Gateway.PayPing.PayPingGatewayOptions},Microsoft.Extensions.Options.IOptions{Parbad.Options.ParbadOptions})">
+            <summary>
+            Initializes an instance of <see cref="T:Parbad.Gateway.PayPing.PayPingGateway"/>.
+            </summary>
+        </member>
+        <member name="M:Parbad.Gateway.PayPing.PayPingGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Gateway.PayPing.PayPingGateway.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Gateway.PayPing.PayPingGateway.RefundAsync(Parbad.InvoiceContext,Parbad.Money,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Gateway.PayPing.PayPingGatewayBuilderExtensions.AddPayPing(Parbad.GatewayBuilders.IGatewayBuilder)">
+            <summary>
+            Adds the PayPing Gateway to Parbad services.
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.Gateway.PayPing.PayPingGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.PayPing.PayPingGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.Gateway.PayPing.PayPingGatewayAccount}})">
+            <summary>
+            Configures the accounts for PayPing gateway.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureAccounts">Configures the accounts.</param>
+        </member>
+        <member name="M:Parbad.Gateway.PayPing.PayPingGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.PayPing.PayPingGateway},System.Action{Parbad.Gateway.PayPing.PayPingGatewayOptions})">
+            <summary>
+            Configures the options for PayPing Gateway.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureOptions">Configuration</param>
+        </member>
+        <member name="M:Parbad.Gateway.PayPing.PayPingGatewayInvoiceBuilderExtensions.UsePayPing(Parbad.InvoiceBuilder.IInvoiceBuilder)">
+            <summary>
+            The invoice will be sent to PayPing gateway.
+            </summary>
+        </member>
+        <member name="M:Parbad.Gateway.PayPing.PayPingGatewayInvoiceBuilderExtensions.SetPayPingData(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Action{Parbad.Gateway.PayPing.PayPingRequest})">
+            <summary>
+            Sets the additional data for PayPing Gateway.
+            </summary>
+        </member>
+        <member name="M:Parbad.Gateway.PayPing.PayPingGatewayInvoiceBuilderExtensions.SetPayPingData(Parbad.InvoiceBuilder.IInvoiceBuilder,Parbad.Gateway.PayPing.PayPingRequest)">
+            <summary>
+            Sets the additional data for PayPing Gateway.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.PayPing.PayPingGatewayOptions.ApiRequestUrl">
+            <summary>
+            https://api.payping.ir/v2/pay
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.PayPing.PayPingGatewayOptions.ApiVerificationUrl">
+            <summary>
+            https://api.payping.ir/v2/pay/verify
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.PayPing.PayPingGatewayOptions.PaymentPageUrl">
+            <summary>
+            https://api.payping.ir/v2/pay/gotoipg/{Code}
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -31,6 +31,7 @@ Parbad is a free and open-source integrated online payment library which helps d
   * [IDPay.ir](https://www.nuget.org/packages/Parbad.Gateway.IdPay/)
   * [YekPay](https://www.nuget.org/packages/Parbad.Gateway.YekPay/)
   * [Pardakht Novin (Eghtesad Novin)](https://www.nuget.org/packages/PardakhtNovin.Parbad.Gateway/)
+  * [PayPing](https://www.nuget.org/packages/Parbad.Gateway.PayPing/)
 
 # How it works?
 ![image](https://raw.githubusercontent.com/Sina-Soltani/Parbad/master/images/How-it-works.png)
