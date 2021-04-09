@@ -7,7 +7,6 @@ using Newtonsoft.Json;
 using Parbad.Abstraction;
 using Parbad.Gateway.PayPing.Internal;
 using Parbad.GatewayBuilders;
-using Parbad.Http;
 using Parbad.Internal;
 using Parbad.Net;
 using Parbad.Options;
@@ -87,58 +86,43 @@ namespace Parbad.Gateway.PayPing
         }
 
         /// <inheritdoc />
+        public override async Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default)
+        {
+            if (context == null) throw new ArgumentNullException(nameof(context));
+
+            var callbackResult = await PayPingGatewayHelper.GetCallbackResult(
+                _httpContextAccessor.HttpContext.Request,
+                context,
+                _options.Messages,
+                cancellationToken);
+
+            if (callbackResult.IsSucceed)
+            {
+                return PaymentFetchResult.ReadyForVerifying();
+            }
+
+            return PaymentFetchResult.Failed(callbackResult.Message);
+        }
+
+        /// <inheritdoc />
         public override async Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
             var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 
-            var request = _httpContextAccessor.HttpContext.Request;
+            var callbackResult = await PayPingGatewayHelper.GetCallbackResult(
+                _httpContextAccessor.HttpContext.Request,
+                context,
+                _options.Messages,
+                cancellationToken);
 
-            var refId = await request.TryGetParamAsync("refid", cancellationToken);
-            var amount = await request.TryGetParamAsAsync<long>("amount", cancellationToken);
-            var clientRefId = await request.TryGetParamAsync("clientrefid", cancellationToken);
-            var isValid = true;
-            var message = "";
-
-            if (!refId.Exists)
+            if (!callbackResult.IsSucceed)
             {
-                isValid = false;
-                message += "RefId isn't received.";
+                return PaymentVerifyResult.Failed(callbackResult.Message);
             }
 
-            if (!amount.Exists)
-            {
-                isValid = false;
-                message += "Amount isn't received.";
-            }
-
-            if (!clientRefId.Exists)
-            {
-                isValid = false;
-                message += "ClientRefId isn't received.";
-            }
-            else
-            {
-                if (clientRefId.Value != context.Payment.TrackingNumber.ToString())
-                {
-                    isValid = false;
-                    message += "ClientRefId isn't valid.";
-                }
-            }
-
-            if (!isValid)
-            {
-                message = $"{_options.Messages.InvalidDataReceivedFromGateway}{message}";
-
-                return PaymentVerifyResult.Failed(message);
-            }
-
-            var verificationModel = new VerifyPayRequestModel
-            {
-                Amount = (long)context.Payment.Amount,
-                RefId = refId.Value
-            };
+            var verificationModel = PayPingGatewayHelper.CreateVerificationModel(context, callbackResult);
 
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", account.AccessToken);
 
@@ -158,12 +142,12 @@ namespace Parbad.Gateway.PayPing
 
             if (responseModel.Amount != (long)context.Payment.Amount)
             {
-                message = $"{_options.Messages.PaymentFailed} Amount is not valid.";
+                var message = $"{_options.Messages.PaymentFailed} Amount is not valid.";
 
                 return PaymentVerifyResult.Failed(message);
             }
 
-            return PaymentVerifyResult.Succeed(refId.Value, _options.Messages.PaymentSucceed);
+            return PaymentVerifyResult.Succeed(callbackResult.RefId, _options.Messages.PaymentSucceed);
         }
 
         /// <inheritdoc />

@@ -87,6 +87,10 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Parbad.Shared", "src\Parbad
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{3A9942B1-EC71-4A9A-971B-CFE0DEFEF531}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PayPing", "PayPing", "{B87006DA-9F5B-41D7-B23C-184B0ED567D3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parbad.Gateway.PayPing", "src\Parbad.Gateway\PayPing\src\Parbad.Gateway.PayPing.csproj", "{85D2588A-2990-4100-BB73-871F253BB7FC}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		src\Parbad.Shared\Parbad.Shared.projitems*{2e124fc2-6fa6-45e1-9912-edca1c19cef7}*SharedItemsImports = 13
@@ -166,6 +170,10 @@ Global
 		{9B56707D-95BE-4D78-A4B2-511E2636BDF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9B56707D-95BE-4D78-A4B2-511E2636BDF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9B56707D-95BE-4D78-A4B2-511E2636BDF3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{85D2588A-2990-4100-BB73-871F253BB7FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{85D2588A-2990-4100-BB73-871F253BB7FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{85D2588A-2990-4100-BB73-871F253BB7FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{85D2588A-2990-4100-BB73-871F253BB7FC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -204,6 +212,8 @@ Global
 		{9B56707D-95BE-4D78-A4B2-511E2636BDF3} = {523D0310-410D-4E42-9668-4D42636094CB}
 		{2E124FC2-6FA6-45E1-9912-EDCA1C19CEF7} = {3A9942B1-EC71-4A9A-971B-CFE0DEFEF531}
 		{3A9942B1-EC71-4A9A-971B-CFE0DEFEF531} = {571BD034-8370-432B-9B18-4C6FA697121C}
+		{B87006DA-9F5B-41D7-B23C-184B0ED567D3} = {B1447D20-66E0-46FB-B0DB-BCBEBA7B337A}
+		{85D2588A-2990-4100-BB73-871F253BB7FC} = {B87006DA-9F5B-41D7-B23C-184B0ED567D3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CBDDB699-C14A-4235-B0AE-32725230B4ED}

@@ -43,7 +43,7 @@ namespace Parbad.Gateway.PayPing
             if (builder == null) throw new ArgumentNullException(nameof(builder));
             if (payPingRequest == null) throw new ArgumentNullException(nameof(payPingRequest));
 
-            builder.AddOrUpdateAdditionalData(PayPingRequestKey, payPingRequest);
+            builder.AddOrUpdateProperty(PayPingRequestKey, payPingRequest);
 
             return builder;
         }
@@ -52,9 +52,9 @@ namespace Parbad.Gateway.PayPing
         {
             if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-            if (invoice.AdditionalData.ContainsKey(PayPingRequestKey))
+            if (invoice.Properties.ContainsKey(PayPingRequestKey))
             {
-                return (PayPingRequest)invoice.AdditionalData[PayPingRequestKey];
+                return (PayPingRequest)invoice.Properties[PayPingRequestKey];
             }
 
             return null;
