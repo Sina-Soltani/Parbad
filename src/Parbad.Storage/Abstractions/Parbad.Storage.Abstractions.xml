@@ -152,6 +152,16 @@
             <param name="payment"></param>
             <param name="cancellationToken"></param>
         </member>
+        <member name="P:Parbad.Storage.Abstractions.Models.Payment.IsCompleted">
+            <summary>
+            Determines if this payment is completed, regardless of whether it is successful or not.
+            </summary>
+        </member>
+        <member name="P:Parbad.Storage.Abstractions.Models.Payment.IsPaid">
+            <summary>
+            Determines whether this payment is successful or not.
+            </summary>
+        </member>
         <member name="T:Parbad.Storage.Abstractions.Models.TransactionType">
             <summary>
             Type of transaction.
