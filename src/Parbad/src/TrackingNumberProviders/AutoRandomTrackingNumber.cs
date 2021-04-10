@@ -27,7 +27,7 @@ namespace Parbad.TrackingNumberProviders
             _options = options.Value;
         }
 
-        public Task FormatAsync(Invoice invoice, CancellationToken cancellationToken = default)
+        public virtual Task FormatAsync(Invoice invoice, CancellationToken cancellationToken = default)
         {
             var trackingNumbers = _storage.Payments.Select(model => model.TrackingNumber).ToList();
 
