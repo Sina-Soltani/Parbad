@@ -17,6 +17,9 @@
         <member name="M:Parbad.Gateway.PayPing.PayPingGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
+        <member name="M:Parbad.Gateway.PayPing.PayPingGateway.FetchAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
         <member name="M:Parbad.Gateway.PayPing.PayPingGateway.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>

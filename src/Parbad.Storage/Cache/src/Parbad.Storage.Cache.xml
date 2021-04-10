@@ -20,31 +20,31 @@
             A collection for holding the data.
             </summary>
         </member>
-        <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.CreatePaymentAsync(Parbad.Storage.Abstractions.Payment,System.Threading.CancellationToken)">
+        <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.CreatePaymentAsync(Parbad.Storage.Abstractions.Models.Payment,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.UpdatePaymentAsync(Parbad.Storage.Abstractions.Payment,System.Threading.CancellationToken)">
+        <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.UpdatePaymentAsync(Parbad.Storage.Abstractions.Models.Payment,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.DeletePaymentAsync(Parbad.Storage.Abstractions.Payment,System.Threading.CancellationToken)">
+        <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.DeletePaymentAsync(Parbad.Storage.Abstractions.Models.Payment,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.CreateTransactionAsync(Parbad.Storage.Abstractions.Transaction,System.Threading.CancellationToken)">
+        <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.CreateTransactionAsync(Parbad.Storage.Abstractions.Models.Transaction,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.UpdateTransactionAsync(Parbad.Storage.Abstractions.Transaction,System.Threading.CancellationToken)">
+        <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.UpdateTransactionAsync(Parbad.Storage.Abstractions.Models.Transaction,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.DeleteTransactionAsync(Parbad.Storage.Abstractions.Transaction,System.Threading.CancellationToken)">
+        <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.DeleteTransactionAsync(Parbad.Storage.Abstractions.Models.Transaction,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.FindPayment(Parbad.Storage.Abstractions.Payment)">
+        <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.FindPayment(Parbad.Storage.Abstractions.Models.Payment)">
             <summary>
             Finds a payment in storage.
             </summary>
             <param name="payment"></param>
         </member>
-        <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.FindTransaction(Parbad.Storage.Abstractions.Transaction)">
+        <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.FindTransaction(Parbad.Storage.Abstractions.Models.Transaction)">
             <summary>
             Finds a transaction in storage.
             </summary>
@@ -163,20 +163,20 @@
             Represents the cache options applied to an entry of the <see cref="T:Microsoft.Extensions.Caching.Memory.IMemoryCache"/> instance.
             </summary>
         </member>
-        <member name="M:Parbad.Builder.DistributedCacheStorageBuilderExtensions.UseDistributedCache(Parbad.Storage.Builder.IStorageBuilder)">
+        <member name="M:Parbad.Builder.DistributedCacheStorageBuilderExtensions.UseDistributedCache(Parbad.Storage.Abstractions.IStorageBuilder)">
             <summary>
             Uses <see cref="T:Microsoft.Extensions.Caching.Distributed.IDistributedCache"/> for saving and loading data.
             </summary>
             <param name="builder"></param>
         </member>
-        <member name="M:Parbad.Builder.DistributedCacheStorageBuilderExtensions.UseDistributedCache(Parbad.Storage.Builder.IStorageBuilder,System.Action{Parbad.Storage.Cache.DistributedCache.DistributedCacheStorageOptions})">
+        <member name="M:Parbad.Builder.DistributedCacheStorageBuilderExtensions.UseDistributedCache(Parbad.Storage.Abstractions.IStorageBuilder,System.Action{Parbad.Storage.Cache.DistributedCache.DistributedCacheStorageOptions})">
             <summary>
             Uses <see cref="T:Microsoft.Extensions.Caching.Distributed.IDistributedCache"/> for saving and loading data.
             </summary>
             <param name="builder"></param>
             <param name="configureOptions"></param>
         </member>
-        <member name="M:Parbad.Builder.MemoryCacheStorageBuilderExtensions.UseMemoryCache(Parbad.Storage.Builder.IStorageBuilder)">
+        <member name="M:Parbad.Builder.MemoryCacheStorageBuilderExtensions.UseMemoryCache(Parbad.Storage.Abstractions.IStorageBuilder)">
             <summary>
             Uses <see cref="T:Microsoft.Extensions.Caching.Memory.IMemoryCache"/> for saving and loading data.
             <para>Note: The information inside the memory will be removed
@@ -184,7 +184,7 @@
             </summary>
             <param name="builder"></param>
         </member>
-        <member name="M:Parbad.Builder.MemoryCacheStorageBuilderExtensions.UseMemoryCache(Parbad.Storage.Builder.IStorageBuilder,System.Action{Parbad.Storage.Cache.MemoryCache.MemoryCacheStorageOptions})">
+        <member name="M:Parbad.Builder.MemoryCacheStorageBuilderExtensions.UseMemoryCache(Parbad.Storage.Abstractions.IStorageBuilder,System.Action{Parbad.Storage.Cache.MemoryCache.MemoryCacheStorageOptions})">
             <summary>
             Uses <see cref="T:Microsoft.Extensions.Caching.Memory.IMemoryCache"/> for saving and loading data.
             <para>Note: The information inside the memory will be removed

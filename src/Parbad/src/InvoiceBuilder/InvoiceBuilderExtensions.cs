@@ -1,12 +1,12 @@
 // Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Parbad.Abstraction;
 using Parbad.Exceptions;
 using Parbad.InvoiceBuilder;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Parbad
 {
@@ -82,24 +82,24 @@ namespace Parbad
         /// <param name="builder"></param>
         /// <param name="key">Key of the data</param>
         /// <param name="value">Value of the data</param>
-        public static IInvoiceBuilder AddAdditionalData(this IInvoiceBuilder builder, string key, object value)
-            => ChangeAdditionalData(builder, additionalData => additionalData.Add(key, value));
+        public static IInvoiceBuilder AddProperty(this IInvoiceBuilder builder, string key, object value)
+            => ChangeProperties(builder, properties => properties.Add(key, value));
 
         /// <summary>
-        /// Appends the given dictionary to the additional data of the invoice.
+        /// Appends the given dictionary to the properties of the invoice.
         /// </summary>
         /// <param name="builder"></param>
-        /// <param name="additionalData"></param>
-        public static IInvoiceBuilder AddAdditionalData(this IInvoiceBuilder builder, IDictionary<string, object> additionalData)
+        /// <param name="properties"></param>
+        public static IInvoiceBuilder AddProperties(this IInvoiceBuilder builder, IDictionary<string, object> properties)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
-            if (additionalData == null) throw new ArgumentNullException(nameof(additionalData));
+            if (properties == null) throw new ArgumentNullException(nameof(properties));
 
-            ChangeAdditionalData(builder, invoiceAdditionalData =>
+            ChangeProperties(builder, invoiceProperties =>
             {
-                foreach (var data in additionalData)
+                foreach (var data in properties)
                 {
-                    invoiceAdditionalData.Add(data.Key, data.Value);
+                    invoiceProperties.Add(data.Key, data.Value);
                 }
             });
 
@@ -112,30 +112,30 @@ namespace Parbad
         /// <param name="builder"></param>
         /// <param name="key">Key of the data</param>
         /// <param name="value">Value of the data</param>
-        public static IInvoiceBuilder AddOrUpdateAdditionalData(this IInvoiceBuilder builder, string key, object value)
-            => AddOrUpdateAdditionalData(builder, new Dictionary<string, object> { { key, value } });
+        public static IInvoiceBuilder AddOrUpdateProperty(this IInvoiceBuilder builder, string key, object value)
+            => AddOrUpdateProperties(builder, new Dictionary<string, object> { { key, value } });
 
         /// <summary>
-        /// Adds or updates the given dictionary to the additional data of the invoice.
+        /// Adds or updates the given dictionary to the properties of the invoice.
         /// </summary>
         /// <param name="builder"></param>
-        /// <param name="additionalData"></param>
-        public static IInvoiceBuilder AddOrUpdateAdditionalData(this IInvoiceBuilder builder, IDictionary<string, object> additionalData)
+        /// <param name="properties"></param>
+        public static IInvoiceBuilder AddOrUpdateProperties(this IInvoiceBuilder builder, IDictionary<string, object> properties)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
-            if (additionalData == null) throw new ArgumentNullException(nameof(additionalData));
+            if (properties == null) throw new ArgumentNullException(nameof(properties));
 
-            ChangeAdditionalData(builder, invoiceAdditionalData =>
+            ChangeProperties(builder, invoiceProperties =>
             {
-                foreach (var data in additionalData)
+                foreach (var data in properties)
                 {
-                    if (invoiceAdditionalData.ContainsKey(data.Key))
+                    if (invoiceProperties.ContainsKey(data.Key))
                     {
-                        invoiceAdditionalData[data.Key] = data.Value;
+                        invoiceProperties[data.Key] = data.Value;
                     }
                     else
                     {
-                        invoiceAdditionalData.Add(data.Key, data.Value);
+                        invoiceProperties.Add(data.Key, data.Value);
                     }
                 }
             });
@@ -144,15 +144,15 @@ namespace Parbad
         }
 
         /// <summary>
-        /// Changes the additional data.
+        /// Changes the properties.
         /// </summary>
         /// <param name="builder"></param>
-        /// <param name="onChange">An action to perform on the additional data.</param>
-        public static IInvoiceBuilder ChangeAdditionalData(this IInvoiceBuilder builder, Action<IDictionary<string, object>> onChange)
+        /// <param name="onChange">An action to perform on the properties.</param>
+        public static IInvoiceBuilder ChangeProperties(this IInvoiceBuilder builder, Action<IDictionary<string, object>> onChange)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            return AddFormatter(builder, invoice => onChange(invoice.AdditionalData));
+            return AddFormatter(builder, invoice => onChange(invoice.Properties));
         }
 
         /// <summary>

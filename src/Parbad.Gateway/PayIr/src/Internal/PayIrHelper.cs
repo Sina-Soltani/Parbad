@@ -1,15 +1,15 @@
 ﻿// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Parbad.Abstraction;
 using Parbad.Http;
 using Parbad.Internal;
 using Parbad.Options;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Parbad.Gateway.PayIr.Internal
 {
@@ -48,22 +48,19 @@ namespace Parbad.Gateway.PayIr.Internal
             var token = await httpRequest.TryGetParamAsync("Token", cancellationToken).ConfigureAwaitFalse();
             var status = await httpRequest.TryGetParamAsync("Status", cancellationToken).ConfigureAwaitFalse();
 
-            IPaymentVerifyResult verifyResult = null;
-
             var isSucceed = status.Exists && string.Equals(status.Value, OkResult, StringComparison.InvariantCultureIgnoreCase);
+            string message = null;
 
             if (!isSucceed)
             {
-                var message = $"Error {status}";
-
-                verifyResult = PaymentVerifyResult.Failed(message);
+                message = $"Error {status}";
             }
 
             return new PayIrCallbackResult
             {
                 Token = token.Value,
                 IsSucceed = isSucceed,
-                Result = verifyResult
+                Message = message
             };
         }
 

@@ -1,10 +1,10 @@
 // Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
-using System;
-using Microsoft.AspNetCore.WebUtilities;
 using Parbad.Exceptions;
-using Parbad.Utilities;
+using System;
+using System.Text;
+using System.Text.Encodings.Web;
 
 namespace Parbad
 {
@@ -50,9 +50,33 @@ namespace Parbad
         /// <param name="value"></param>
         public CallbackUrl AddQueryString(string name, string value)
         {
-            var url = QueryHelpers.AddQueryString(Url, name, value);
+            if (name == null) throw new ArgumentNullException(nameof(name));
+            if (value == null) throw new ArgumentNullException(nameof(value));
 
-            return new CallbackUrl(url);
+            var anchorIndex = Url.IndexOf('#');
+            var uriToBeAppended = Url;
+            var anchorText = "";
+
+            if (anchorIndex != -1)
+            {
+                anchorText = Url.Substring(anchorIndex);
+                uriToBeAppended = Url.Substring(0, anchorIndex);
+            }
+
+            var queryIndex = uriToBeAppended.IndexOf('?');
+            var hasQuery = queryIndex != -1;
+
+            var generatedUrl = new StringBuilder();
+
+            generatedUrl.Append(uriToBeAppended);
+            generatedUrl.Append(hasQuery ? '&' : '?');
+            generatedUrl.Append(UrlEncoder.Default.Encode(name));
+            generatedUrl.Append('=');
+            generatedUrl.Append(UrlEncoder.Default.Encode(value));
+
+            generatedUrl.Append(anchorText);
+
+            return new CallbackUrl(generatedUrl.ToString());
         }
 
         public int CompareTo(CallbackUrl other)

@@ -9,6 +9,6 @@ namespace Parbad.Gateway.ZarinPal.Internal
 
         public string Authority { get; set; }
 
-        public IPaymentVerifyResult Result { get; set; }
+        public string Message { get; set; }
     }
 }

@@ -1,17 +1,17 @@
 ﻿// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
+using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
+using Parbad.Abstraction;
+using Parbad.Http;
+using Parbad.Internal;
+using Parbad.Net;
+using Parbad.Options;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
-using Parbad.Abstraction;
-using Parbad.Internal;
-using Parbad.Options;
-using Parbad.Http;
-using Parbad.Net;
 
 namespace Parbad.Gateway.IdPay.Internal
 {
@@ -66,18 +66,11 @@ namespace Parbad.Gateway.IdPay.Internal
 
             var (isSucceed, message) = CheckCallback(status.Value, orderId.Value, id.Value, trackId.Value, amount.Value, context, messagesOptions);
 
-            IPaymentVerifyResult verifyResult = null;
-
-            if (!isSucceed)
-            {
-                verifyResult = PaymentVerifyResult.Failed(message);
-            }
-
             return new IdPayCallbackResult
             {
                 Id = id.Value,
                 IsSucceed = isSucceed,
-                Result = verifyResult
+                Message = message
             };
         }
 

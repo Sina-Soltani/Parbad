@@ -1,16 +1,16 @@
 // Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
-using System;
-using System.Globalization;
-using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Parbad.Abstraction;
 using Parbad.Gateway.Parsian.Internal.Models;
 using Parbad.Internal;
 using Parbad.Options;
-using Parbad.Storage.Abstractions;
+using Parbad.Storage.Abstractions.Models;
 using Parbad.Utilities;
+using System;
+using System.Globalization;
+using System.Linq;
 
 namespace Parbad.Gateway.Parsian.Internal
 {
@@ -18,6 +18,8 @@ namespace Parbad.Gateway.Parsian.Internal
     {
         public static string CreateRequestData(ParsianGatewayAccount account, Invoice invoice)
         {
+            var additionalData = invoice.GetParsianAdditionalData();
+
             return
                 "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:sal=\"https://pec.Shaparak.ir/NewIPGServices/Sale/SaleService\">" +
                 "<soapenv:Header/>" +
@@ -32,9 +34,9 @@ namespace Parbad.Gateway.Parsian.Internal
                 "<!--Optional:-->" +
                 $"<sal:CallBackUrl>{XmlHelper.EncodeXmlValue(invoice.CallbackUrl)}</sal:CallBackUrl>" +
                 "<!--Optional:-->" +
-                "<sal:AdditionalData></sal:AdditionalData>" +
+                $"<sal:AdditionalData>{additionalData?.AdditionalData}</sal:AdditionalData>" +
                 "<!--Optional:-->" +
-                "<sal:Originator></sal:Originator>" +
+                $"<sal:Originator>{additionalData?.Originator}</sal:Originator>" +
                 "</sal:requestData>" +
                 "</sal:SalePaymentRequest> " +
                 "</soapenv:Body> " +
@@ -134,18 +136,11 @@ namespace Parbad.Gateway.Parsian.Internal
                 }
             }
 
-            PaymentVerifyResult verifyResult = null;
-
-            if (!isSucceed)
-            {
-                verifyResult = PaymentVerifyResult.Failed(message);
-            }
-
             return new ParsianCallbackResult
             {
                 IsSucceed = isSucceed,
                 Token = token,
-                Result = verifyResult
+                Message = message
             };
         }
 

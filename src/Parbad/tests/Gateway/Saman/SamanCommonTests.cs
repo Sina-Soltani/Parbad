@@ -1,11 +1,11 @@
 ﻿using Moq;
 using NUnit.Framework;
+using Parbad.Gateway.Saman;
 using Parbad.Gateway.Saman.Internal;
 using Parbad.Internal;
 using Parbad.InvoiceBuilder;
 using System;
 using System.Threading.Tasks;
-using Parbad.Gateway.Saman;
 
 namespace Parbad.Tests.Gateway.Saman
 {
@@ -42,10 +42,10 @@ namespace Parbad.Tests.Gateway.Saman
 
             Assert.IsNotNull(invoice);
 
-            Assert.IsNotNull(invoice.AdditionalData);
-            Assert.IsTrue(invoice.AdditionalData.ContainsKey(SamanHelper.MobileGatewayKey));
-            Assert.IsInstanceOf<bool>(invoice.AdditionalData[SamanHelper.MobileGatewayKey]);
-            Assert.AreEqual(true, invoice.AdditionalData[SamanHelper.MobileGatewayKey]);
+            Assert.IsNotNull(invoice.Properties);
+            Assert.IsTrue(invoice.Properties.ContainsKey(SamanHelper.MobileGatewayKey));
+            Assert.IsInstanceOf<bool>(invoice.Properties[SamanHelper.MobileGatewayKey]);
+            Assert.AreEqual(true, invoice.Properties[SamanHelper.MobileGatewayKey]);
         }
 
         [Test]
@@ -57,10 +57,10 @@ namespace Parbad.Tests.Gateway.Saman
 
             Assert.IsNotNull(invoice);
 
-            Assert.IsNotNull(invoice.AdditionalData);
-            Assert.IsTrue(invoice.AdditionalData.ContainsKey(SamanHelper.MobileGatewayKey));
-            Assert.IsInstanceOf<bool>(invoice.AdditionalData[SamanHelper.MobileGatewayKey]);
-            Assert.AreEqual(false, invoice.AdditionalData[SamanHelper.MobileGatewayKey]);
+            Assert.IsNotNull(invoice.Properties);
+            Assert.IsTrue(invoice.Properties.ContainsKey(SamanHelper.MobileGatewayKey));
+            Assert.IsInstanceOf<bool>(invoice.Properties[SamanHelper.MobileGatewayKey]);
+            Assert.AreEqual(false, invoice.Properties[SamanHelper.MobileGatewayKey]);
         }
     }
 }

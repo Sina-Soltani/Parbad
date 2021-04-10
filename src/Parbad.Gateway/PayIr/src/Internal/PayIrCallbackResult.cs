@@ -9,6 +9,6 @@ namespace Parbad.Gateway.PayIr.Internal
 
         public bool IsSucceed { get; set; }
 
-        public IPaymentVerifyResult Result { get; set; }
+        public string Message { get; set; }
     }
 }

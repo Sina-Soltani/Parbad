@@ -3,7 +3,7 @@
 
 using System;
 
-namespace Parbad.Storage.Abstractions
+namespace Parbad.Storage.Abstractions.Models
 {
     [Serializable]
     public class Payment
@@ -22,8 +22,14 @@ namespace Parbad.Storage.Abstractions
 
         public string GatewayAccountName { get; set; }
 
+        /// <summary>
+        /// Determines if this payment is completed, regardless of whether it is successful or not.
+        /// </summary>
         public bool IsCompleted { get; set; }
 
+        /// <summary>
+        /// Determines whether this payment is successful or not.
+        /// </summary>
         public bool IsPaid { get; set; }
     }
 }

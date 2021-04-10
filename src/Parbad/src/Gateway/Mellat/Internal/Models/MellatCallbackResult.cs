@@ -11,6 +11,6 @@ namespace Parbad.Gateway.Mellat.Internal.Models
 
         public string SaleReferenceId { get; set; }
 
-        public IPaymentVerifyResult Result { get; set; }
+        public string Message { get; set; }
     }
 }

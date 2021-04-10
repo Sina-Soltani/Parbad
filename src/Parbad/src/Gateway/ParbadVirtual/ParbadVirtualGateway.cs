@@ -61,35 +61,52 @@ namespace Parbad.Gateway.ParbadVirtual
         }
 
         /// <inheritdoc />
+        public override async Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default)
+        {
+            var callbackResult = await GetCallbackResult(cancellationToken);
+
+            if (callbackResult.IsSucceed)
+            {
+                return PaymentFetchResult.ReadyForVerifying();
+            }
+
+            return PaymentFetchResult.Failed(callbackResult.Message);
+        }
+
+        /// <inheritdoc />
         public override async Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default)
         {
             var request = _httpContextAccessor.HttpContext.Request;
 
-            var result = await request.TryGetParamAsync("result", cancellationToken);
+            var callbackResult = await GetCallbackResult(cancellationToken);
 
-            if (!result.Exists)
+            if (!callbackResult.IsSucceed)
             {
-                return PaymentVerifyResult.Failed(_messageOptions.Value.InvalidDataReceivedFromGateway);
+                return PaymentVerifyResult.Failed(callbackResult.Message);
             }
 
             var transactionCode = await request.TryGetParamAsync("TransactionCode", cancellationToken).ConfigureAwaitFalse();
 
-            var isSucceed = result.Value.Equals("true", StringComparison.OrdinalIgnoreCase);
-
-            var message = isSucceed ? _messageOptions.Value.PaymentSucceed : _messageOptions.Value.PaymentFailed;
-
-            return new PaymentVerifyResult
-            {
-                Status = isSucceed ? PaymentVerifyResultStatus.Succeed : PaymentVerifyResultStatus.Failed,
-                TransactionCode = transactionCode.Value,
-                Message = message
-            };
+            return PaymentVerifyResult.Succeed(transactionCode.Value, _messageOptions.Value.PaymentSucceed);
         }
 
         /// <inheritdoc />
         public override Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default)
         {
             return PaymentRefundResult.Succeed().ToInterfaceAsync();
+        }
+
+        private async Task<(bool IsSucceed, string Message)> GetCallbackResult(CancellationToken cancellationToken)
+        {
+            var request = _httpContextAccessor.HttpContext.Request;
+
+            var result = await request.TryGetParamAsync("result", cancellationToken);
+
+            var isSucceed = result.Exists && result.Value.Equals("true", StringComparison.OrdinalIgnoreCase);
+
+            var message = isSucceed ? _messageOptions.Value.PaymentSucceed : _messageOptions.Value.PaymentFailed;
+
+            return (isSucceed, message);
         }
     }
 }

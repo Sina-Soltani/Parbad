@@ -1,42 +1,11 @@
-﻿// Copyright (c) Parbad. All rights reserved.
-// Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
-
-using System;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Parbad.Internal;
-using Parbad.Storage;
-using Parbad.Storage.Abstractions;
-using Parbad.Storage.Builder;
+using System;
 
-namespace Parbad.Builder
+namespace Parbad.Storage.Abstractions
 {
     public static class StorageBuilderExtensions
     {
-        /// <summary>
-        /// Configures the storage which required by Parbad for saving and loading data.
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="configureStorage"></param>
-        public static IParbadBuilder ConfigureStorage(this IParbadBuilder builder, Action<IStorageBuilder> configureStorage)
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-            if (configureStorage == null) throw new ArgumentNullException(nameof(configureStorage));
-
-            configureStorage(new StorageBuilder(builder.Services).UseDefaultStorageManager());
-
-            return builder;
-        }
-
-        /// <summary>
-        /// Uses the default implementation of <see cref="IStorageManager"/>.
-        /// </summary>
-        /// <param name="builder"></param>
-        public static IStorageBuilder UseDefaultStorageManager(this IStorageBuilder builder)
-        {
-            return AddStorageManager<StorageManager>(builder, ServiceLifetime.Transient);
-        }
-
         /// <summary>
         /// Adds an implementation of <see cref="IStorageManager"/> which required by Parbad for managing the storage operations.
         /// </summary>

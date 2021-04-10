@@ -1,11 +1,11 @@
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
-using Parbad.Storage.Abstractions;
+using Parbad.Storage.Abstractions.Models;
 using Parbad.Storage.Cache.MemoryCache;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Parbad.Storage.Cache.Tests
 {

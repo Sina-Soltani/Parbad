@@ -21,6 +21,9 @@
         <member name="M:Parbad.Abstraction.GatewayBase`1.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
+        <member name="M:Parbad.Abstraction.GatewayBase`1.FetchAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
         <member name="M:Parbad.Abstraction.GatewayBase`1.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
@@ -53,6 +56,14 @@
             Performs a payment request using the given <paramref name="invoice"/>.
             </summary>
             <param name="invoice">The invoice which must be pay.</param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="M:Parbad.Abstraction.IGateway.FetchAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
+            <summary>
+            Fetches the invoice from current request.
+            This method must be called when the users come back from gateways to your website.
+            </summary>
+            <param name="context"></param>
             <param name="cancellationToken"></param>
         </member>
         <member name="M:Parbad.Abstraction.IGateway.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
@@ -117,9 +128,9 @@
             Gets or sets the name of the gateway which the invoice must be paid in.
             </summary>
         </member>
-        <member name="P:Parbad.Abstraction.Invoice.AdditionalData">
+        <member name="P:Parbad.Abstraction.Invoice.Properties">
             <summary>
-            Gets or sets the additional data of the invoice.
+            Gets or sets the properties of the invoice.
             </summary>
         </member>
         <member name="T:Parbad.Builder.IParbadBuilder">
@@ -228,13 +239,6 @@
             <param name="builder"></param>
             <param name="setupOptions"></param>
         </member>
-        <member name="M:Parbad.Builder.ParbadOptionsExtensions.ConfigureOptions(Parbad.Builder.IParbadBuilder,Microsoft.Extensions.Configuration.IConfiguration)">
-            <summary>
-            Configures the Parbad options with the given <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/>.
-            </summary>
-            <param name="builder"></param>
-            <param name="configuration"></param>
-        </member>
         <member name="M:Parbad.Builder.PaymentTokenProviderExtensions.ConfigurePaymentToken(Parbad.Builder.IParbadBuilder,System.Action{Parbad.PaymentTokenProviders.IPaymentTokenBuilder})">
             <summary>
             Configures the <see cref="T:Parbad.PaymentTokenProviders.IPaymentTokenProvider"/> required by Parbad to create
@@ -265,65 +269,18 @@
             <param name="builder"></param>
             <param name="configureOptions">A delegate to configure the <see cref="T:Parbad.PaymentTokenProviders.QueryStringPaymentTokenOptions"/>.</param>
         </member>
-        <member name="M:Parbad.Builder.QueryStringPaymentTokenProviderExtensions.UseGuidQueryStringPaymentTokenProvider(Parbad.PaymentTokenProviders.IPaymentTokenBuilder,Microsoft.Extensions.Configuration.IConfiguration)">
-            <summary>
-            Uses the <see cref="T:Parbad.Internal.GuidQueryStringPaymentTokenProvider"/> as <see cref="T:Parbad.PaymentTokenProviders.IPaymentTokenProvider"/>.
-            It generates a unique <see cref="T:System.Guid"/> as a token for each payments and puts it inside the query string
-            of the URL. The generated token will be retrieved from the query string when the client
-            comes back from the gateway.
-            <para>Note: This is the default <see cref="T:Parbad.PaymentTokenProviders.IPaymentTokenProvider"/>, which means you don't need to call this.</para>
-            </summary>
-            <param name="builder"></param>
-            <param name="configuration">The configuration section for <see cref="T:Parbad.PaymentTokenProviders.QueryStringPaymentTokenOptions"/>.
-            The default key is Parbad:PaymentTokenProvider:QueryString</param>
-        </member>
-        <member name="M:Parbad.Builder.QueryStringPaymentTokenProviderExtensions.GetQueryStringPaymentTokenProviderConfiguration(Microsoft.Extensions.Configuration.IConfiguration)">
-            <summary>
-            Retrieves the <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/> section of <see cref="T:Parbad.PaymentTokenProviders.QueryStringPaymentTokenOptions"/> using <see cref="F:Parbad.PaymentTokenProviders.QueryStringPaymentTokenOptions.ConfigurationKey"/>.
-            </summary>
-            <param name="configuration"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Parbad.Builder.StorageBuilderExtensions.ConfigureStorage(Parbad.Builder.IParbadBuilder,System.Action{Parbad.Storage.Builder.IStorageBuilder})">
+        <member name="M:Parbad.Builder.StorageBuilderExtensions.ConfigureStorage(Parbad.Builder.IParbadBuilder,System.Action{Parbad.Storage.Abstractions.IStorageBuilder})">
             <summary>
             Configures the storage which required by Parbad for saving and loading data.
             </summary>
             <param name="builder"></param>
             <param name="configureStorage"></param>
         </member>
-        <member name="M:Parbad.Builder.StorageBuilderExtensions.UseDefaultStorageManager(Parbad.Storage.Builder.IStorageBuilder)">
+        <member name="M:Parbad.Builder.StorageBuilderExtensions.UseDefaultStorageManager(Parbad.Storage.Abstractions.IStorageBuilder)">
             <summary>
             Uses the default implementation of <see cref="T:Parbad.Storage.Abstractions.IStorageManager"/>.
             </summary>
             <param name="builder"></param>
-        </member>
-        <member name="M:Parbad.Builder.StorageBuilderExtensions.AddStorageManager``1(Parbad.Storage.Builder.IStorageBuilder,Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
-            <summary>
-            Adds an implementation of <see cref="T:Parbad.Storage.Abstractions.IStorageManager"/> which required by Parbad for managing the storage operations.
-            </summary>
-            <typeparam name="TManager"></typeparam>
-            <param name="builder"></param>
-            <param name="lifetime">The lifetime of given StorageManager.</param>
-        </member>
-        <member name="M:Parbad.Builder.StorageBuilderExtensions.AddStorageManager(Parbad.Storage.Builder.IStorageBuilder,Parbad.Storage.Abstractions.IStorageManager)">
-            <summary>
-            Adds an implementation of <see cref="T:Parbad.Storage.Abstractions.IStorageManager"/> which required by Parbad for managing the storage operations.
-            </summary>
-            <param name="builder"></param>
-            <param name="storageManager"></param>
-        </member>
-        <member name="M:Parbad.Builder.StorageBuilderExtensions.AddStorageManager(Parbad.Storage.Builder.IStorageBuilder,System.Func{System.IServiceProvider,Parbad.Storage.Abstractions.IStorageManager},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
-            <summary>
-            Adds an implementation of <see cref="T:Parbad.Storage.Abstractions.IStorageManager"/> which required by Parbad for managing the storage operations.
-            </summary>
-            <param name="builder"></param>
-            <param name="factory"></param>
-            <param name="lifetime">The lifetime of given StorageManager.</param>
-        </member>
-        <member name="M:Parbad.Builder.AutoTrackingNumberOptionsExtensions.GetAutoTrackingNumberOptionsConfiguration(Microsoft.Extensions.Configuration.IConfiguration)">
-            <summary>
-            Retrieves the <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/> section of <see cref="T:Parbad.TrackingNumberProviders.AutoTrackingNumberOptions"/> using <see cref="F:Parbad.TrackingNumberProviders.AutoTrackingNumberOptions.ConfigurationKey"/>.
-            </summary>
         </member>
         <member name="T:Parbad.CallbackUrl">
             <summary>
@@ -359,7 +316,7 @@
         </member>
         <member name="F:Parbad.GatewayAccountInvoiceExtensions.GatewayAccountKeyName">
             <summary>
-            Gateway Account key in <see cref="P:Parbad.Abstraction.Invoice.AdditionalData"/> property.
+            Gateway Account key in <see cref="P:Parbad.Abstraction.Invoice.Properties"/> property.
             </summary>
         </member>
         <member name="M:Parbad.GatewayAccountInvoiceExtensions.UseAccount(Parbad.InvoiceBuilder.IInvoiceBuilder,System.String)">
@@ -497,6 +454,9 @@
         <member name="M:Parbad.Gateway.AsanPardakht.AsanPardakhtGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
+        <member name="M:Parbad.Gateway.AsanPardakht.AsanPardakhtGateway.FetchAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
         <member name="M:Parbad.Gateway.AsanPardakht.AsanPardakhtGateway.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
@@ -542,6 +502,9 @@
         <member name="M:Parbad.Gateway.IranKish.IranKishGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
+        <member name="M:Parbad.Gateway.IranKish.IranKishGateway.FetchAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
         <member name="M:Parbad.Gateway.IranKish.IranKishGateway.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
@@ -582,16 +545,14 @@
         <member name="M:Parbad.Gateway.Mellat.MellatGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
+        <member name="M:Parbad.Gateway.Mellat.MellatGateway.FetchAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
         <member name="M:Parbad.Gateway.Mellat.MellatGateway.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
         <member name="M:Parbad.Gateway.Mellat.MellatGateway.RefundAsync(Parbad.InvoiceContext,Parbad.Money,System.Threading.CancellationToken)">
             <inheritdoc />
-        </member>
-        <member name="P:Parbad.Gateway.Mellat.MellatGatewayAccount.IsTestTerminal">
-            <summary>
-            The requests will be sent to the test terminal of Mellat Gateway.
-            </summary>
         </member>
         <member name="M:Parbad.Gateway.Mellat.MellatGatewayBuilderExtensions.AddMellat(Parbad.GatewayBuilders.IGatewayBuilder)">
             <summary>
@@ -619,6 +580,13 @@
             </summary>
             <param name="builder"></param>
         </member>
+        <member name="M:Parbad.Gateway.Mellat.MellatGatewayInvoiceBuilderExtensions.SetMellatMobileNumber(Parbad.InvoiceBuilder.IInvoiceBuilder,System.String)">
+            <summary>
+            Sets the Mobile Number for the current invoice to sent to Mellat Gateway.
+            </summary>
+            <param name="builder"></param>
+            <param name="mobileNumber"></param>
+        </member>
         <member name="T:Parbad.Gateway.Melli.MelliGateway">
             <summary>
             Melli Gateway.
@@ -636,6 +604,9 @@
             <param name="messageOptions"></param>
         </member>
         <member name="M:Parbad.Gateway.Melli.MelliGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Gateway.Melli.MelliGateway.FetchAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
         <member name="M:Parbad.Gateway.Melli.MelliGateway.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
@@ -689,6 +660,9 @@
         <member name="M:Parbad.Gateway.ParbadVirtual.ParbadVirtualGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
+        <member name="M:Parbad.Gateway.ParbadVirtual.ParbadVirtualGateway.FetchAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
         <member name="M:Parbad.Gateway.ParbadVirtual.ParbadVirtualGateway.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
@@ -734,6 +708,9 @@
         <member name="M:Parbad.Gateway.Parsian.ParsianGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
+        <member name="M:Parbad.Gateway.Parsian.ParsianGateway.FetchAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
         <member name="M:Parbad.Gateway.Parsian.ParsianGateway.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
@@ -766,12 +743,22 @@
             </summary>
             <param name="builder"></param>
         </member>
+        <member name="M:Parbad.Gateway.Parsian.ParsianGatewayInvoiceBuilderExtensions.SetParsianAdditionalData(Parbad.InvoiceBuilder.IInvoiceBuilder,Parbad.Gateway.Parsian.ParsianGatewayAdditionalDataRequest)">
+            <summary>
+            Sets some additional data for Parsian Gateway.
+            </summary>
+            <param name="builder"></param>
+            <param name="additionalData"></param>
+        </member>
         <member name="P:Parbad.Gateway.Pasargad.Internal.Models.PasargadCallbackResult.InvoiceNumber">
             <summary>
             Equals to ReferenceID in Parbad system.
             </summary>
         </member>
         <member name="M:Parbad.Gateway.Pasargad.PasargadGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Gateway.Pasargad.PasargadGateway.FetchAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
         <member name="M:Parbad.Gateway.Pasargad.PasargadGateway.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
@@ -807,6 +794,9 @@
             <param name="builder"></param>
         </member>
         <member name="M:Parbad.Gateway.Saman.SamanGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Gateway.Saman.SamanGateway.FetchAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
         <member name="M:Parbad.Gateway.Saman.SamanGateway.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
@@ -912,7 +902,7 @@
         <member name="T:Parbad.Internal.DefaultOnlinePayment">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.Internal.DefaultOnlinePayment.#ctor(System.IServiceProvider,Parbad.Storage.Abstractions.IStorageManager,Parbad.PaymentTokenProviders.IPaymentTokenProvider,Parbad.Abstraction.IGatewayProvider,Microsoft.Extensions.Options.IOptions{Parbad.Options.ParbadOptions},Microsoft.Extensions.Logging.ILogger{Parbad.Internal.DefaultOnlinePayment})">
+        <member name="M:Parbad.Internal.DefaultOnlinePayment.#ctor(System.IServiceProvider,Parbad.Storage.Abstractions.IStorageManager,Parbad.PaymentTokenProviders.IPaymentTokenProvider,Parbad.Abstraction.IGatewayProvider,Microsoft.Extensions.Options.IOptions{Parbad.Options.ParbadOptions},Parbad.IParbadLogger{Parbad.Internal.DefaultOnlinePayment})">
             <summary>
             Initializes an instance of <see cref="T:Parbad.Internal.DefaultOnlinePayment"/>.
             </summary>
@@ -1137,7 +1127,7 @@
             <exception cref="T:Parbad.Exceptions.GatewayNotFoundException"></exception>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
-        <member name="M:Parbad.InvoiceBuilderExtensions.AddAdditionalData(Parbad.InvoiceBuilder.IInvoiceBuilder,System.String,System.Object)">
+        <member name="M:Parbad.InvoiceBuilderExtensions.AddProperty(Parbad.InvoiceBuilder.IInvoiceBuilder,System.String,System.Object)">
             <summary>
             Adds the given key and value to the invoice.
             </summary>
@@ -1145,14 +1135,14 @@
             <param name="key">Key of the data</param>
             <param name="value">Value of the data</param>
         </member>
-        <member name="M:Parbad.InvoiceBuilderExtensions.AddAdditionalData(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Collections.Generic.IDictionary{System.String,System.Object})">
+        <member name="M:Parbad.InvoiceBuilderExtensions.AddProperties(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Collections.Generic.IDictionary{System.String,System.Object})">
             <summary>
-            Appends the given dictionary to the additional data of the invoice.
+            Appends the given dictionary to the properties of the invoice.
             </summary>
             <param name="builder"></param>
-            <param name="additionalData"></param>
+            <param name="properties"></param>
         </member>
-        <member name="M:Parbad.InvoiceBuilderExtensions.AddOrUpdateAdditionalData(Parbad.InvoiceBuilder.IInvoiceBuilder,System.String,System.Object)">
+        <member name="M:Parbad.InvoiceBuilderExtensions.AddOrUpdateProperty(Parbad.InvoiceBuilder.IInvoiceBuilder,System.String,System.Object)">
             <summary>
             Adds or updates the given key and value to the invoice.
             </summary>
@@ -1160,19 +1150,19 @@
             <param name="key">Key of the data</param>
             <param name="value">Value of the data</param>
         </member>
-        <member name="M:Parbad.InvoiceBuilderExtensions.AddOrUpdateAdditionalData(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Collections.Generic.IDictionary{System.String,System.Object})">
+        <member name="M:Parbad.InvoiceBuilderExtensions.AddOrUpdateProperties(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Collections.Generic.IDictionary{System.String,System.Object})">
             <summary>
-            Adds or updates the given dictionary to the additional data of the invoice.
+            Adds or updates the given dictionary to the properties of the invoice.
             </summary>
             <param name="builder"></param>
-            <param name="additionalData"></param>
+            <param name="properties"></param>
         </member>
-        <member name="M:Parbad.InvoiceBuilderExtensions.ChangeAdditionalData(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Action{System.Collections.Generic.IDictionary{System.String,System.Object}})">
+        <member name="M:Parbad.InvoiceBuilderExtensions.ChangeProperties(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Action{System.Collections.Generic.IDictionary{System.String,System.Object}})">
             <summary>
-            Changes the additional data.
+            Changes the properties.
             </summary>
             <param name="builder"></param>
-            <param name="onChange">An action to perform on the additional data.</param>
+            <param name="onChange">An action to perform on the properties.</param>
         </member>
         <member name="M:Parbad.InvoiceBuilderExtensions.AddFormatter(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Action{Parbad.Abstraction.Invoice})">
             <summary>
@@ -1193,7 +1183,7 @@
             Describes the payment and transactions of a specific invoice.
             </summary>
         </member>
-        <member name="M:Parbad.InvoiceContext.#ctor(Parbad.Storage.Abstractions.Payment,System.Collections.Generic.IEnumerable{Parbad.Storage.Abstractions.Transaction})">
+        <member name="M:Parbad.InvoiceContext.#ctor(Parbad.Storage.Abstractions.Models.Payment,System.Collections.Generic.IEnumerable{Parbad.Storage.Abstractions.Models.Transaction})">
             <summary>
             Initializes an instance of <see cref="T:Parbad.InvoiceContext"/>.
             </summary>
@@ -1248,7 +1238,8 @@
         </member>
         <member name="M:Parbad.IOnlinePayment.VerifyAsync(System.Int64,System.Threading.CancellationToken)">
             <summary>
-            Verifies the given invoice.
+            Verifies the requested payment to check whether or not the invoice was paid in the gateway by the client.
+            This method must be called when the fetch result equals to <see cref="F:Parbad.PaymentFetchResultStatus.ReadyForVerifying"/>.
             </summary>
             <param name="trackingNumber">The tracking number of the invoice which must be verified.</param>
             <param name="cancellationToken"></param>
@@ -1288,6 +1279,12 @@
             </summary>
             <exception cref="T:Parbad.Exceptions.ParbadServiceNotInitializedException"></exception>
         </member>
+        <member name="T:Parbad.IParbadLogger`1">
+            <summary>
+            Parbad Logger is a Proxy for Microsoft Logging.
+            </summary>
+            <typeparam name="TCategoryName"></typeparam>
+        </member>
         <member name="T:Parbad.IPaymentCancelResult">
             <summary>
             Describes the result of the Cancel operation.
@@ -1306,6 +1303,11 @@
         <member name="F:Parbad.PaymentFetchResultStatus.AlreadyProcessed">
             <summary>
             The invoice is already processed before.
+            </summary>
+        </member>
+        <member name="F:Parbad.PaymentFetchResultStatus.Failed">
+            <summary>
+            Payment is failed.
             </summary>
         </member>
         <member name="T:Parbad.IPaymentFetchResult">
@@ -1402,8 +1404,10 @@
             <summary>
             The amount of the payment.
             <para>Examples:</para>
-            <para>long a = result.Amount;</para>
-            <para>decimal a = result.Amount;</para>
+            <para>decimal a = new Money(1000)</para>
+            <para>long a = new Money(1000)</para>
+            <para>Money m = 1000.55m</para>
+            <para>Money m = 1000</para>
             </summary>
         </member>
         <member name="P:Parbad.IPaymentResult.IsSucceed">
@@ -1475,8 +1479,10 @@
             as <see cref="T:System.Int64"/> by Parbad.
             </para>
             <para>Examples:
-            <para>decimal a = Money</para>
-            <para>long a = Money</para>
+            <para>decimal a = new Money(1000)</para>
+            <para>long a = new Money(1000)</para>
+            <para>Money m = 1000.55m</para>
+            <para>Money m = 1000</para>
             </para>
             </summary>
         </member>
@@ -1782,11 +1788,6 @@
             Retrieves the token.
             </summary>
         </member>
-        <member name="F:Parbad.PaymentTokenProviders.QueryStringPaymentTokenOptions.ConfigurationKey">
-            <summary>
-            The specific key for <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/>
-            </summary>
-        </member>
         <member name="P:Parbad.PaymentTokenProviders.QueryStringPaymentTokenOptions.QueryName">
             <summary>
             The default value is "paymentToken".
@@ -1863,159 +1864,6 @@
             </summary>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
-        <member name="T:Parbad.Storage.Abstractions.IStorage">
-            <summary>
-            A storage which used by Parbad for saving and loading data.
-            </summary>
-        </member>
-        <member name="P:Parbad.Storage.Abstractions.IStorage.Payments">
-            <summary>
-            Gets a list of <see cref="T:Parbad.Storage.Abstractions.Payment"/>.
-            </summary>
-        </member>
-        <member name="P:Parbad.Storage.Abstractions.IStorage.Transactions">
-            <summary>
-            Gets a list of <see cref="T:Parbad.Storage.Abstractions.Transaction"/>.
-            </summary>
-        </member>
-        <member name="M:Parbad.Storage.Abstractions.IStorage.CreatePaymentAsync(Parbad.Storage.Abstractions.Payment,System.Threading.CancellationToken)">
-            <summary>
-            Creates a new payment.
-            </summary>
-            <param name="payment"></param>
-            <param name="cancellationToken"></param>
-        </member>
-        <member name="M:Parbad.Storage.Abstractions.IStorage.UpdatePaymentAsync(Parbad.Storage.Abstractions.Payment,System.Threading.CancellationToken)">
-            <summary>
-            Updates the given <paramref name="payment"/>.
-            </summary>
-            <param name="payment"></param>
-            <param name="cancellationToken"></param>
-        </member>
-        <member name="M:Parbad.Storage.Abstractions.IStorage.DeletePaymentAsync(Parbad.Storage.Abstractions.Payment,System.Threading.CancellationToken)">
-            <summary>
-            Deletes the given <paramref name="payment"/>.
-            </summary>
-            <param name="payment"></param>
-            <param name="cancellationToken"></param>
-        </member>
-        <member name="M:Parbad.Storage.Abstractions.IStorage.CreateTransactionAsync(Parbad.Storage.Abstractions.Transaction,System.Threading.CancellationToken)">
-            <summary>
-            Creates a new transaction.
-            </summary>
-            <param name="transaction"></param>
-            <param name="cancellationToken"></param>
-        </member>
-        <member name="M:Parbad.Storage.Abstractions.IStorage.UpdateTransactionAsync(Parbad.Storage.Abstractions.Transaction,System.Threading.CancellationToken)">
-            <summary>
-            Updates the given <paramref name="transaction"/>.
-            </summary>
-            <param name="transaction"></param>
-            <param name="cancellationToken"></param>
-        </member>
-        <member name="M:Parbad.Storage.Abstractions.IStorage.DeleteTransactionAsync(Parbad.Storage.Abstractions.Transaction,System.Threading.CancellationToken)">
-            <summary>
-            Deletes the given <paramref name="transaction"/>.
-            </summary>
-            <param name="transaction"></param>
-            <param name="cancellationToken"></param>
-        </member>
-        <member name="T:Parbad.Storage.Abstractions.IStorageManager">
-            <summary>
-            Provides the APIs for managing payment and transaction in a persistence store.
-            </summary>
-        </member>
-        <member name="M:Parbad.Storage.Abstractions.IStorageManager.CreatePaymentAsync(Parbad.Storage.Abstractions.Payment,System.Threading.CancellationToken)">
-            <summary>
-            Creates a new payment.
-            </summary>
-            <param name="payment"></param>
-            <param name="cancellationToken"></param>
-        </member>
-        <member name="M:Parbad.Storage.Abstractions.IStorageManager.UpdatePaymentAsync(Parbad.Storage.Abstractions.Payment,System.Threading.CancellationToken)">
-            <summary>
-            Updates the given <paramref name="payment"/>.
-            </summary>
-            <param name="payment"></param>
-            <param name="cancellationToken"></param>
-        </member>
-        <member name="M:Parbad.Storage.Abstractions.IStorageManager.CreateTransactionAsync(Parbad.Storage.Abstractions.Transaction,System.Threading.CancellationToken)">
-            <summary>
-            Creates a new transaction.
-            </summary>
-            <param name="transaction"></param>
-            <param name="cancellationToken"></param>
-        </member>
-        <member name="M:Parbad.Storage.Abstractions.IStorageManager.GetPaymentByTrackingNumberAsync(System.Int64,System.Threading.CancellationToken)">
-            <summary>
-            Gets a payment by its tracking number.
-            </summary>
-            <param name="trackingNumber"></param>
-            <param name="cancellationToken"></param>
-        </member>
-        <member name="M:Parbad.Storage.Abstractions.IStorageManager.GetPaymentByTokenAsync(System.String,System.Threading.CancellationToken)">
-            <summary>
-            Gets a payment by its token.
-            </summary>
-            <param name="paymentToken"></param>
-            <param name="cancellationToken"></param>
-        </member>
-        <member name="M:Parbad.Storage.Abstractions.IStorageManager.DoesPaymentExistAsync(System.Int64,System.Threading.CancellationToken)">
-            <summary>
-            Checks whether a payment exists with the given <paramref name="trackingNumber"/>.
-            </summary>
-            <param name="trackingNumber"></param>
-            <param name="cancellationToken"></param>
-        </member>
-        <member name="M:Parbad.Storage.Abstractions.IStorageManager.DoesPaymentExistAsync(System.String,System.Threading.CancellationToken)">
-            <summary>
-            Checks whether a payment exists with the given <paramref name="paymentToken"/>.
-            </summary>
-            <param name="paymentToken"></param>
-            <param name="cancellationToken"></param>
-        </member>
-        <member name="M:Parbad.Storage.Abstractions.IStorageManager.GetTransactionsAsync(Parbad.Storage.Abstractions.Payment,System.Threading.CancellationToken)">
-            <summary>
-            Gets a list of transactions of the given <paramref name="payment"/>.
-            </summary>
-            <param name="payment"></param>
-            <param name="cancellationToken"></param>
-        </member>
-        <member name="T:Parbad.Storage.Abstractions.TransactionType">
-            <summary>
-            Type of transaction.
-            </summary>
-        </member>
-        <member name="T:Parbad.Storage.Builder.IStorageBuilder">
-            <summary>
-            A builder for building the Parbad storage.
-            </summary>
-        </member>
-        <member name="P:Parbad.Storage.Builder.IStorageBuilder.Services">
-            <summary>
-            Specifies the contract for a collection of service descriptors.
-            </summary>
-        </member>
-        <member name="M:Parbad.Storage.Builder.IStorageBuilder.AddStorage``1(Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
-            <summary>
-            Adds the given storage to Parbad services.
-            </summary>
-            <typeparam name="TStorage"></typeparam>
-            <param name="lifetime">Lifetime of the given storage.</param>
-        </member>
-        <member name="M:Parbad.Storage.Builder.IStorageBuilder.AddStorage(Parbad.Storage.Abstractions.IStorage)">
-            <summary>
-            Adds the given storage to Parbad services as singleton.
-            </summary>
-            <param name="storage"></param>
-        </member>
-        <member name="M:Parbad.Storage.Builder.IStorageBuilder.AddStorage(System.Func{System.IServiceProvider,Parbad.Storage.Abstractions.IStorage},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
-            <summary>
-            Adds the given storage to Parbad services.
-            </summary>
-            <param name="factory"></param>
-            <param name="lifetime">Lifetime of the given storage.</param>
-        </member>
         <member name="T:Parbad.Storage.StorageManager">
             <inheritdoc />
         </member>
@@ -2030,13 +1878,13 @@
             Gets an instance of <see cref="T:Parbad.Storage.Abstractions.IStorage"/>.
             </summary>
         </member>
-        <member name="M:Parbad.Storage.StorageManager.CreatePaymentAsync(Parbad.Storage.Abstractions.Payment,System.Threading.CancellationToken)">
+        <member name="M:Parbad.Storage.StorageManager.CreatePaymentAsync(Parbad.Storage.Abstractions.Models.Payment,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.Storage.StorageManager.UpdatePaymentAsync(Parbad.Storage.Abstractions.Payment,System.Threading.CancellationToken)">
+        <member name="M:Parbad.Storage.StorageManager.UpdatePaymentAsync(Parbad.Storage.Abstractions.Models.Payment,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.Storage.StorageManager.CreateTransactionAsync(Parbad.Storage.Abstractions.Transaction,System.Threading.CancellationToken)">
+        <member name="M:Parbad.Storage.StorageManager.CreateTransactionAsync(Parbad.Storage.Abstractions.Models.Transaction,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
         <member name="M:Parbad.Storage.StorageManager.GetPaymentByTrackingNumberAsync(System.Int64,System.Threading.CancellationToken)">
@@ -2051,12 +1899,41 @@
         <member name="M:Parbad.Storage.StorageManager.DoesPaymentExistAsync(System.String,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="M:Parbad.Storage.StorageManager.GetTransactionsAsync(Parbad.Storage.Abstractions.Payment,System.Threading.CancellationToken)">
+        <member name="M:Parbad.Storage.StorageManager.GetTransactionsAsync(Parbad.Storage.Abstractions.Models.Payment,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="F:Parbad.TrackingNumberProviders.AutoTrackingNumberOptions.ConfigurationKey">
+        <member name="T:Parbad.TrackingNumberProviders.AutoIncrementTrackingNumber">
             <summary>
-            The specific key for <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/>
+            An Invoice Formatter which generates automatically and incrementally a Tracking Number
+            depending on <see cref="T:Parbad.Storage.Abstractions.IStorage"/> and <see cref="T:Parbad.TrackingNumberProviders.AutoIncrementTrackingNumberOptions"/>.
+            </summary>
+        </member>
+        <member name="M:Parbad.TrackingNumberProviders.AutoIncrementTrackingNumber.FormatAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
+            <summary>
+            Generates the Tracking Number.
+            </summary>
+            <param name="invoice"></param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="P:Parbad.TrackingNumberProviders.AutoIncrementTrackingNumberOptions.MinimumValue">
+            <summary>
+            The default value equals to 1000.
+            </summary>
+        </member>
+        <member name="P:Parbad.TrackingNumberProviders.AutoIncrementTrackingNumberOptions.Increment">
+            <summary>
+            The Tracking Number increments by this property. The default value equals to 1.
+            </summary>
+        </member>
+        <member name="T:Parbad.TrackingNumberProviders.AutoRandomTrackingNumber">
+            <summary>
+            An Invoice Formatter which generates automatically and randomly a Tracking Number
+            depending on <see cref="T:Parbad.Storage.Abstractions.IStorage"/> and <see cref="T:Parbad.TrackingNumberProviders.AutoRandomTrackingNumberOptions"/>.
+            </summary>
+        </member>
+        <member name="P:Parbad.TrackingNumberProviders.AutoRandomTrackingNumberOptions.MinimumValue">
+            <summary>
+            The default value equals to 1000.
             </summary>
         </member>
         <member name="M:Parbad.TrackingNumberProviderExtensions.UseAutoIncrementTrackingNumber(Parbad.InvoiceBuilder.IInvoiceBuilder)">

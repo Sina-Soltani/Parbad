@@ -2,13 +2,14 @@
 
   <PropertyGroup>
     <PackageId>Parbad.Storage.EntityFrameworkCore</PackageId>
-    <VersionPrefix>1.2.0</VersionPrefix>
+    <VersionPrefix>1.3.0</VersionPrefix>
     <LangVersion>9</LangVersion>
     <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
-    <Description>Entity Framework Core implementation of Parbad storage.</Description>
+    <Description>Entity Framework Core implementation of Parbad storage.
+More information: https://github.com/Sina-Soltani/Parbad</Description>
     <PackageProjectUrl>https://github.com/Sina-Soltani/Parbad</PackageProjectUrl>
     <PackageIcon>icon.png</PackageIcon>
     <PackageIconUrl>https://raw.githubusercontent.com/Sina-Soltani/Parbad/master/images/Parbad-128x128.png</PackageIconUrl>
@@ -18,8 +19,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Authors>Sina Soltani</Authors>
     <Product>Parbad.Storage.EntityframeworkCore</Product>
-    <PackageReleaseNotes>Supporting the netstandard2.1 is added.
-Obsolete classes, interfaces and methods are removed.</PackageReleaseNotes>
+    <PackageReleaseNotes></PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -35,7 +35,7 @@ Obsolete classes, interfaces and methods are removed.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Parbad\src\Parbad.csproj" />
+    <ProjectReference Include="..\..\Abstractions\Parbad.Storage.Abstractions.csproj" />
   </ItemGroup>
 
   <ItemGroup>

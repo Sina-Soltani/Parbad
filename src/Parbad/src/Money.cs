@@ -14,8 +14,10 @@ namespace Parbad
     /// as <see cref="Int64"/> by Parbad.
     /// </para>
     /// <para>Examples:
-    /// <para>decimal a = Money</para>
-    /// <para>long a = Money</para>
+    /// <para>decimal a = new Money(1000)</para>
+    /// <para>long a = new Money(1000)</para>
+    /// <para>Money m = 1000.55m</para>
+    /// <para>Money m = 1000</para>
     /// </para>
     /// </summary>
     public readonly struct Money : IComparable<Money>, IEquatable<Money>, IEquatable<decimal>, IEquatable<long>

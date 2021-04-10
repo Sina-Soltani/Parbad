@@ -1,7 +1,10 @@
-﻿using System;
+﻿// Copyright (c) Parbad. All rights reserved.
+// Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
+
 using Parbad.Abstraction;
 using Parbad.Gateway.Saman.Internal;
 using Parbad.InvoiceBuilder;
+using System;
 
 namespace Parbad.Gateway.Saman
 {
@@ -27,7 +30,7 @@ namespace Parbad.Gateway.Saman
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            builder.AddOrUpdateAdditionalData(SamanHelper.MobileGatewayKey, enable);
+            builder.AddOrUpdateProperty(SamanHelper.MobileGatewayKey, enable);
 
             return builder;
         }
@@ -36,8 +39,8 @@ namespace Parbad.Gateway.Saman
         {
             if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-            return invoice.AdditionalData.ContainsKey(SamanHelper.MobileGatewayKey) &&
-                   (bool)invoice.AdditionalData[SamanHelper.MobileGatewayKey];
+            return invoice.Properties.ContainsKey(SamanHelper.MobileGatewayKey) &&
+                   (bool)invoice.Properties[SamanHelper.MobileGatewayKey];
         }
     }
 }

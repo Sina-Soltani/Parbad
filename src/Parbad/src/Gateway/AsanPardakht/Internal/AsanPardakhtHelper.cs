@@ -85,26 +85,23 @@ namespace Parbad.Gateway.AsanPardakht.Internal
             httpRequest.Form.TryGetValue("ReturningParams", out var returningParams);
 
             var isSucceed = false;
-            PaymentVerifyResult verifyResult = null;
+            string message = null;
             string payGateTranId = null;
             string rrn = null;
             string lastFourDigitOfPAN = null;
 
             if (returningParams.IsNullOrEmpty())
             {
-                verifyResult = new PaymentVerifyResult
-                {
-                    TrackingNumber = context.Payment.TrackingNumber,
-                    IsSucceed = false,
-                    Message = messagesOptions.InvalidDataReceivedFromGateway
-                };
+                isSucceed = false;
+
+                message = messagesOptions.InvalidDataReceivedFromGateway;
             }
             else
             {
                 var decryptedResult = crypto.Decrypt(returningParams, account.Key, account.IV);
 
                 var splitedResult = decryptedResult.Split(',');
-                
+
                 var amount = splitedResult[0];
                 var preInvoiceID = splitedResult[1];
                 var token = splitedResult[2];
@@ -115,7 +112,6 @@ namespace Parbad.Gateway.AsanPardakht.Internal
                 lastFourDigitOfPAN = splitedResult[7];
 
                 isSucceed = resCode == "0" || resCode == "00";
-                string message = null;
 
                 if (!isSucceed)
                 {
@@ -139,17 +135,6 @@ namespace Parbad.Gateway.AsanPardakht.Internal
                         message = "مبلغ پرداخت شده نامشخص است.";
                     }
                 }
-
-                if (!isSucceed)
-                {
-                    verifyResult = new PaymentVerifyResult
-                    {
-                        Status = PaymentVerifyResultStatus.Failed,
-                        TrackingNumber = context.Payment.TrackingNumber,
-                        TransactionCode = rrn,
-                        Message = message
-                    };
-                }
             }
 
             return new AsanPardakhtCallbackResult
@@ -158,7 +143,7 @@ namespace Parbad.Gateway.AsanPardakht.Internal
                 PayGateTranId = payGateTranId,
                 Rrn = rrn,
                 LastFourDigitOfPAN = lastFourDigitOfPAN,
-                Result = verifyResult
+                Message = message
             };
         }
 
@@ -189,6 +174,15 @@ namespace Parbad.Gateway.AsanPardakht.Internal
             AsanPardakhtCallbackResult callbackResult,
             MessagesOptions messagesOptions)
         {
+            if (!callbackResult.IsSucceed)
+            {
+                return new AsanPardakhtVerifyResult
+                {
+                    IsSucceed = false,
+                    Result = PaymentVerifyResult.Failed(callbackResult.Message)
+                };
+            }
+
             var result = XmlHelper.GetNodeValueFromXml(response, "RequestVerificationResult", "http://tempuri.org/");
 
             var isSucceed = result == "500";
@@ -199,7 +193,7 @@ namespace Parbad.Gateway.AsanPardakht.Internal
             {
                 var message = AsanPardakhtResultTranslator.TranslateVerification(result, messagesOptions);
 
-                verifyResult = callbackResult.Result;
+                verifyResult = PaymentVerifyResult.Failed(message);
                 verifyResult.Message = message;
             }
 

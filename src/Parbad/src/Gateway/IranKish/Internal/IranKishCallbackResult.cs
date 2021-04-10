@@ -19,6 +19,6 @@ namespace Parbad.Gateway.IranKish.Internal
         /// </summary>
         public string ReferenceId { get; set; }
 
-        public IPaymentVerifyResult Result { get; set; }
+        public string Message { get; set; }
     }
 }

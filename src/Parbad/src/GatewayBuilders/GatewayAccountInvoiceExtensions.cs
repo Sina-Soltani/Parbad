@@ -1,17 +1,17 @@
 ﻿// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
-using System;
 using Parbad.Abstraction;
 using Parbad.Internal;
 using Parbad.InvoiceBuilder;
+using System;
 
 namespace Parbad
 {
     public static class GatewayAccountInvoiceExtensions
     {
         /// <summary>
-        /// Gateway Account key in <see cref="Invoice.AdditionalData"/> property.
+        /// Gateway Account key in <see cref="Invoice.Properties"/> property.
         /// </summary>
         public const string GatewayAccountKeyName = "AccountName";
 
@@ -25,7 +25,7 @@ namespace Parbad
             if (builder == null) throw new ArgumentNullException(nameof(builder));
             if (accountName.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(accountName));
 
-            builder.AddAdditionalData(GatewayAccountKeyName, accountName);
+            builder.AddProperty(GatewayAccountKeyName, accountName);
 
             return builder;
         }
@@ -38,9 +38,9 @@ namespace Parbad
         {
             if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-            if (!invoice.AdditionalData.ContainsKey(GatewayAccountKeyName)) return null;
+            if (!invoice.Properties.ContainsKey(GatewayAccountKeyName)) return null;
 
-            return (string)invoice.AdditionalData[GatewayAccountKeyName];
+            return (string)invoice.Properties[GatewayAccountKeyName];
         }
     }
 }

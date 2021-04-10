@@ -1,13 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿// Copyright (c) Parbad. All rights reserved.
+// Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
+
+using Parbad.Abstraction;
 using Parbad.Gateway.Mellat.Internal;
 using Parbad.InvoiceBuilder;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Parbad.Gateway.Mellat
 {
     public static class MellatGatewayInvoiceBuilderExtensions
     {
+        private static string MobileNumberKey => "MellatAdditionalData";
+
         /// <summary>
         /// The invoice will be sent to Mellat gateway.
         /// </summary>
@@ -39,7 +45,7 @@ namespace Parbad.Gateway.Mellat
 
             List<MellatCumulativeDynamicAccount> allAccounts = null;
 
-            builder.ChangeAdditionalData(data =>
+            builder.ChangeProperties(data =>
             {
                 if (data.ContainsKey(MellatHelper.CumulativeAccountsKey))
                 {
@@ -53,9 +59,36 @@ namespace Parbad.Gateway.Mellat
                 allAccounts.AddRange(accounts);
             });
 
-            builder.AddAdditionalData(MellatHelper.CumulativeAccountsKey, allAccounts);
+            builder.AddProperty(MellatHelper.CumulativeAccountsKey, allAccounts);
 
             return builder;
+        }
+
+        /// <summary>
+        /// Sets the Mobile Number for the current invoice to sent to Mellat Gateway.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="mobileNumber"></param>
+        public static IInvoiceBuilder SetMellatMobileNumber(this IInvoiceBuilder builder, string mobileNumber)
+        {
+            if (builder == null) throw new ArgumentNullException(nameof(builder));
+            if (mobileNumber == null) throw new ArgumentNullException(nameof(mobileNumber));
+
+            builder.AddOrUpdateProperty(MobileNumberKey, mobileNumber);
+
+            return builder;
+        }
+
+        internal static string GetMellatMobileNumber(this Invoice invoice)
+        {
+            if (invoice == null) throw new ArgumentNullException(nameof(invoice));
+
+            if (invoice.Properties.ContainsKey(MobileNumberKey))
+            {
+                return (string)invoice.Properties[MobileNumberKey];
+            }
+
+            return null;
         }
     }
 }

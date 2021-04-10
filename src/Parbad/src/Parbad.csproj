@@ -1,9 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <PackageId>Parbad</PackageId>
+    <Product>Parbad</Product>
+    <VersionPrefix>3.7.0</VersionPrefix>
     <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.0;netcoreapp3.1;net5.0</TargetFrameworks>
     <LangVersion>9</LangVersion>
-    <VersionPrefix>3.6.0</VersionPrefix>
     <Authors>Parbad Sina Soltani</Authors>
     <Description>Parbad is a free, open-source, integrated and extensible library which connects your web applications to online payment gateways. Gateways can be added or developed by you.
 The Virtual Gateway also simulates the online payment process, which helps the application development.
@@ -21,10 +23,6 @@ More information: https://github.com/Sina-Soltani/Parbad
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageTags>parbad Payment Gateway virtual virtual-gateway Bank Iran Shetab IranKish Mellat Melli Sadad Parsian Pasargad Saman Asan-Pardakht پرداخت درگاه بانک ایران شتاب ایران-کیش ملت ملی سداد پارسیان پاسارگاد سامان آسان-پرداخت</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <PackageReleaseNotes>Supporting the netstandard2.1, netcoreapp3.1 and net5.0 is added.
-New Fetch method is added.
-New Invoice.AddOrUpdateAdditionalData method is added.
-Code improvement.</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -44,10 +42,8 @@ Code improvement.</PackageReleaseNotes>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1' ">
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.2.0" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.0' or '$(TargetFramework)' == 'netcoreapp3.1' or '$(TargetFramework)' == 'net5.0' ">
@@ -79,5 +75,11 @@ Code improvement.</PackageReleaseNotes>
     <None Include="icon.png" pack="true" Visible="false" PackagePath="" />
     <None Include="Parbad.xml" pack="true" Visible="false" PackagePath="" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Parbad.Storage\Abstractions\Parbad.Storage.Abstractions.csproj" />
+  </ItemGroup>
+
+  <Import Project="..\..\Parbad.Shared\Parbad.Shared.projitems" Label="Shared" />
 
 </Project>

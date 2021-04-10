@@ -23,8 +23,8 @@ namespace Parbad.Gateway.ZarinPal.Internal
 
         public static string CreateRequestData(ZarinPalGatewayAccount account, Invoice invoice)
         {
-            if (!invoice.AdditionalData.ContainsKey(ZarinPalRequestAdditionalKeyName) ||
-                !(invoice.AdditionalData[ZarinPalRequestAdditionalKeyName] is ZarinPalInvoice zarinPalInvoice))
+            if (!invoice.Properties.ContainsKey(ZarinPalRequestAdditionalKeyName) ||
+                !(invoice.Properties[ZarinPalRequestAdditionalKeyName] is ZarinPalInvoice zarinPalInvoice))
             {
                 throw new InvalidOperationException("Request failed. ZarinPal Gateway needs invoice information. Please use the SetZarinPalData method to add the data.");
             }
@@ -73,28 +73,26 @@ namespace Parbad.Gateway.ZarinPal.Internal
             return PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, paymentPageUrl);
         }
 
-        public static async Task<ZarinPalCallbackResult> CreateCallbackResultAsync(HttpRequest httpRequest,
+        public static async Task<ZarinPalCallbackResult> CreateCallbackResultAsync(
+            HttpRequest httpRequest,
             CancellationToken cancellationToken)
         {
             var authority = await httpRequest.TryGetParamAsync("Authority", cancellationToken).ConfigureAwaitFalse();
             var status = await httpRequest.TryGetParamAsync("Status", cancellationToken).ConfigureAwaitFalse();
-
-            IPaymentVerifyResult verifyResult = null;
+            string message = null;
 
             var isSucceed = status.Exists && string.Equals(status.Value, StringOkResult, StringComparison.InvariantCultureIgnoreCase);
 
             if (!isSucceed)
             {
-                var message = $"Error {status}";
-
-                verifyResult = PaymentVerifyResult.Failed(message);
+                message = $"Error {status}";
             }
 
             return new ZarinPalCallbackResult
             {
                 Authority = authority.Value,
                 IsSucceed = isSucceed,
-                Result = verifyResult
+                Message = message
             };
         }
 

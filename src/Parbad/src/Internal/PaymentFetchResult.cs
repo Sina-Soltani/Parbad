@@ -10,5 +10,22 @@ namespace Parbad.Internal
         public bool IsAlreadyVerified { get; set; }
 
         public override bool IsSucceed => Status == PaymentFetchResultStatus.ReadyForVerifying;
+
+        public static PaymentFetchResult Failed(string message)
+        {
+            return new PaymentFetchResult
+            {
+                Status = PaymentFetchResultStatus.Failed,
+                Message = message
+            };
+        }
+
+        public static PaymentFetchResult ReadyForVerifying()
+        {
+            return new PaymentFetchResult
+            {
+                Status = PaymentFetchResultStatus.ReadyForVerifying
+            };
+        }
     }
 }

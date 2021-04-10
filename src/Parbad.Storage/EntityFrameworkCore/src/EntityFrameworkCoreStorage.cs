@@ -1,14 +1,15 @@
 ﻿// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
+using Microsoft.EntityFrameworkCore;
+using Parbad.Storage.Abstractions;
+using Parbad.Storage.Abstractions.Models;
+using Parbad.Storage.EntityFrameworkCore.Context;
+using Parbad.Storage.EntityFrameworkCore.Internal;
 using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Parbad.Storage.Abstractions;
-using Parbad.Storage.EntityFrameworkCore.Context;
-using Parbad.Storage.EntityFrameworkCore.Internal;
 
 namespace Parbad.Storage.EntityFrameworkCore
 {
@@ -27,13 +28,13 @@ namespace Parbad.Storage.EntityFrameworkCore
         }
 
         /// <inheritdoc />
-        public virtual IQueryable<Payment> Payments => Context.Payments.AsNoTracking();
+        public virtual IQueryable<Payment> Payments => Context.Payments.AsNoTracking().Select(Mapper.ToModel).AsQueryable();
 
         /// <inheritdoc />
-        public virtual IQueryable<Transaction> Transactions => Context.Transactions.AsNoTracking();
+        public virtual IQueryable<Transaction> Transactions => Context.Transactions.AsNoTracking().Select(Mapper.ToModel).AsQueryable();
 
         /// <summary>
-        /// Parbad db context.
+        /// Parbad DbContext.
         /// </summary>
         protected ParbadDataContext Context { get; }
 
@@ -42,16 +43,16 @@ namespace Parbad.Storage.EntityFrameworkCore
         {
             if (payment == null) throw new ArgumentNullException(nameof(payment));
 
-            var domain = payment.ToDomain();
-            domain.CreatedOn = DateTime.UtcNow;
+            var entity = payment.ToEntity();
+            entity.CreatedOn = DateTime.UtcNow;
 
-            Context.Payments.Add(domain);
+            Context.Payments.Add(entity);
 
             await Context.SaveChangesAsync(cancellationToken);
 
-            Context.Entry(domain).State = EntityState.Detached;
+            Context.Entry(entity).State = EntityState.Detached;
 
-            payment.Id = domain.Id;
+            payment.Id = entity.Id;
         }
 
         /// <inheritdoc />
@@ -66,7 +67,7 @@ namespace Parbad.Storage.EntityFrameworkCore
 
             if (record == null) throw new InvalidOperationException($"No payment records found in database with id {payment.Id}");
 
-            DomainMapper.MapPayment(record, payment);
+            Mapper.ToEntity(payment, record);
             record.UpdatedOn = DateTime.UtcNow;
 
             Context.Payments.Update(record);
@@ -96,14 +97,14 @@ namespace Parbad.Storage.EntityFrameworkCore
         {
             if (transaction == null) throw new ArgumentNullException(nameof(transaction));
 
-            var domain = transaction.ToDomain();
-            domain.CreatedOn = DateTime.UtcNow;
+            var entity = transaction.ToEntity();
+            entity.CreatedOn = DateTime.UtcNow;
 
-            Context.Transactions.Add(domain);
+            Context.Transactions.Add(entity);
 
             await Context.SaveChangesAsync(cancellationToken);
 
-            transaction.Id = domain.Id;
+            transaction.Id = entity.Id;
         }
 
         /// <inheritdoc />
@@ -117,7 +118,7 @@ namespace Parbad.Storage.EntityFrameworkCore
 
             if (record == null) throw new InvalidOperationException($"No transaction records found in database with id {transaction.Id}");
 
-            DomainMapper.MapTransaction(record, transaction);
+            Mapper.ToEntity(transaction, record);
             record.UpdatedOn = DateTime.UtcNow;
 
             Context.Transactions.Update(record);

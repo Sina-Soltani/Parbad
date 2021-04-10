@@ -1,12 +1,12 @@
 ﻿// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
+using Parbad.GatewayBuilders;
+using Parbad.Internal;
+using Parbad.Storage.Abstractions.Models;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Parbad.GatewayBuilders;
-using Parbad.Internal;
-using Parbad.Storage.Abstractions;
 
 namespace Parbad.Abstraction
 {
@@ -22,6 +22,9 @@ namespace Parbad.Abstraction
 
         /// <inheritdoc />
         public abstract Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default);
+
+        /// <inheritdoc />
+        public abstract Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default);
 
         /// <inheritdoc />
         public abstract Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default);

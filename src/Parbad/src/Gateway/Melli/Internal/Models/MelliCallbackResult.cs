@@ -11,6 +11,6 @@ namespace Parbad.Gateway.Melli.Internal.Models
 
         public object JsonDataToVerify { get; set; }
 
-        public IPaymentVerifyResult Result { get; set; }
+        public string Message { get; set; }
     }
 }

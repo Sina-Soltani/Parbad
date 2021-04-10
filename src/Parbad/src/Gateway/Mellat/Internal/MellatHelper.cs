@@ -27,7 +27,7 @@ namespace Parbad.Gateway.Mellat.Internal
 
         public static string CreateRequestData(Invoice invoice, MellatGatewayAccount account)
         {
-            if (invoice.AdditionalData == null || !invoice.AdditionalData.ContainsKey(CumulativeAccountsKey))
+            if (invoice.Properties == null || !invoice.Properties.ContainsKey(CumulativeAccountsKey))
             {
                 return CreateSimpleRequestData(invoice, account);
             }
@@ -37,6 +37,7 @@ namespace Parbad.Gateway.Mellat.Internal
 
         public static PaymentRequestResult CreateRequestResult(
             string webServiceResponse,
+            Invoice invoice,
             HttpContext httpContext,
             MellatGatewayOptions gatewayOptions,
             MessagesOptions messagesOptions,
@@ -60,17 +61,26 @@ namespace Parbad.Gateway.Mellat.Internal
                 return PaymentRequestResult.Failed(message, account.Name);
             }
 
+            var form = new Dictionary<string, string>
+            {
+                {"RefId", refId}
+            };
+
+            var mobileNumber = invoice.GetMellatMobileNumber();
+            if (!string.IsNullOrEmpty(mobileNumber))
+            {
+                form.Add("mobileNo", mobileNumber);
+            }
+
             return PaymentRequestResult.SucceedWithPost(
                 account.Name,
                 httpContext,
                 gatewayOptions.PaymentPageUrl,
-                new Dictionary<string, string>
-                {
-                    {"RefId", refId}
-                });
+                form);
         }
 
-        public static async Task<MellatCallbackResult> CrateCallbackResultAsync(HttpRequest httpRequest,
+        public static async Task<MellatCallbackResult> CrateCallbackResultAsync(
+            HttpRequest httpRequest,
             MessagesOptions messagesOptions,
             CancellationToken cancellationToken)
         {
@@ -81,7 +91,7 @@ namespace Parbad.Gateway.Mellat.Internal
                 return new MellatCallbackResult
                 {
                     IsSucceed = false,
-                    Result = PaymentVerifyResult.Failed(messagesOptions.InvalidDataReceivedFromGateway)
+                    Message = messagesOptions.InvalidDataReceivedFromGateway
                 };
             }
 
@@ -93,22 +103,19 @@ namespace Parbad.Gateway.Mellat.Internal
 
             var isSucceed = resCode.Value == OkResult;
 
-            PaymentVerifyResult result = null;
+            string message = null;
 
             if (!isSucceed)
             {
-                var message = MellatGatewayResultTranslator.Translate(resCode.Value, messagesOptions);
-
-                result = PaymentVerifyResult.Failed(message);
+                message = MellatGatewayResultTranslator.Translate(resCode.Value, messagesOptions);
             }
-
 
             return new MellatCallbackResult
             {
                 IsSucceed = isSucceed,
                 RefId = refId.Value,
                 SaleReferenceId = saleReferenceId.Value,
-                Result = result
+                Message = message
             };
         }
 
@@ -257,7 +264,7 @@ namespace Parbad.Gateway.Mellat.Internal
 
         private static string CreateCumulativeRequestData(Invoice invoice, MellatGatewayAccount account)
         {
-            var cumulativeAccounts = (List<MellatCumulativeDynamicAccount>)invoice.AdditionalData[CumulativeAccountsKey];
+            var cumulativeAccounts = (List<MellatCumulativeDynamicAccount>)invoice.Properties[CumulativeAccountsKey];
 
             if (cumulativeAccounts.Count > 10)
             {

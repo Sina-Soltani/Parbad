@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.WebUtilities;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Parbad.Exceptions;
 using System;
 
@@ -37,14 +36,13 @@ namespace Parbad.Tests
 
             var instance = new CallbackUrl(ExpectedUrl);
 
-            var instance2 = instance.AddQueryString("test", "test");
+            var instance2 = instance.AddQueryString(expectedQueryName, expectedQueryValue);
 
             var uri = new Uri(instance2.Url);
-            var query = QueryHelpers.ParseQuery(uri.Query);
+            var query = uri.Query;
 
             Assert.IsNotNull(query);
-            Assert.IsTrue(query.ContainsKey(expectedQueryName));
-            Assert.AreEqual(expectedQueryValue, (string)query[expectedQueryName]);
+            Assert.IsTrue(query.Contains($"{expectedQueryName}={expectedQueryValue}"));
         }
 
         [Test]

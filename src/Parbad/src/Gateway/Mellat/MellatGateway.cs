@@ -49,12 +49,35 @@ namespace Parbad.Gateway.Mellat
             var data = MellatHelper.CreateRequestData(invoice, account);
 
             var responseMessage = await _httpClient
-                .PostXmlAsync(GetApiUrl(account), data, cancellationToken)
+                .PostXmlAsync(_gatewayOptions.ApiUrl, data, cancellationToken)
                 .ConfigureAwaitFalse();
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
-            return MellatHelper.CreateRequestResult(response, _httpContextAccessor.HttpContext, _gatewayOptions, _messagesOptions.Value, account);
+            return MellatHelper.CreateRequestResult(
+                response,
+                invoice,
+                _httpContextAccessor.HttpContext,
+                _gatewayOptions,
+                _messagesOptions.Value,
+                account);
+        }
+
+        /// <inheritdoc />
+        public override async Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default)
+        {
+            if (context == null) throw new ArgumentNullException(nameof(context));
+
+            var callbackResult = await MellatHelper
+                .CrateCallbackResultAsync(_httpContextAccessor.HttpContext.Request, _messagesOptions.Value, cancellationToken)
+                .ConfigureAwaitFalse();
+
+            if (callbackResult.IsSucceed)
+            {
+                return PaymentFetchResult.ReadyForVerifying();
+            }
+
+            return PaymentFetchResult.Failed(callbackResult.Message);
         }
 
         /// <inheritdoc />
@@ -68,7 +91,7 @@ namespace Parbad.Gateway.Mellat
 
             if (!callbackResult.IsSucceed)
             {
-                return callbackResult.Result;
+                return PaymentVerifyResult.Failed(callbackResult.Message);
             }
 
             var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
@@ -76,7 +99,7 @@ namespace Parbad.Gateway.Mellat
             var data = MellatHelper.CreateVerifyData(context, account, callbackResult);
 
             var responseMessage = await _httpClient
-                .PostXmlAsync(GetApiUrl(account), data, cancellationToken)
+                .PostXmlAsync(_gatewayOptions.ApiUrl, data, cancellationToken)
                 .ConfigureAwaitFalse();
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
@@ -91,7 +114,7 @@ namespace Parbad.Gateway.Mellat
             data = MellatHelper.CreateSettleData(context, callbackResult, account);
 
             responseMessage = await _httpClient
-                .PostXmlAsync(GetApiUrl(account), data, cancellationToken)
+                .PostXmlAsync(_gatewayOptions.ApiUrl, data, cancellationToken)
                 .ConfigureAwaitFalse();
 
             response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
@@ -109,19 +132,12 @@ namespace Parbad.Gateway.Mellat
             var data = MellatHelper.CreateRefundData(context, account);
 
             var responseMessage = await _httpClient
-                .PostXmlAsync(GetApiUrl(account), data, cancellationToken)
+                .PostXmlAsync(_gatewayOptions.ApiUrl, data, cancellationToken)
                 .ConfigureAwaitFalse();
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
             return MellatHelper.CreateRefundResult(response, _messagesOptions.Value);
-        }
-
-        private string GetApiUrl(MellatGatewayAccount account)
-        {
-            return account.IsTestTerminal
-                ? _gatewayOptions.ApiTestUrl
-                : _gatewayOptions.ApiUrl;
         }
     }
 }

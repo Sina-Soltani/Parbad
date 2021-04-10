@@ -19,6 +19,14 @@ namespace Parbad.Abstraction
         Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default);
 
         /// <summary>
+        /// Fetches the invoice from current request.
+        /// This method must be called when the users come back from gateways to your website.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="cancellationToken"></param>
+        Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default);
+
+        /// <summary>
         /// Verifies the requested payment to check whether or not the invoice has was paid in the gateway by the client.
         /// </summary>
         /// <param name="context"></param>

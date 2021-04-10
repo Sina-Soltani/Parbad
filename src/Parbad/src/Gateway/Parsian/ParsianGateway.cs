@@ -1,10 +1,6 @@
 // Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
-using System;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Parbad.Abstraction;
@@ -13,6 +9,10 @@ using Parbad.GatewayBuilders;
 using Parbad.Internal;
 using Parbad.Net;
 using Parbad.Options;
+using System;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Parbad.Gateway.Parsian
 {
@@ -22,7 +22,7 @@ namespace Parbad.Gateway.Parsian
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
         private readonly ParsianGatewayOptions _gatewayOptions;
-        private readonly IOptions<MessagesOptions> _messageOptions;
+        private readonly MessagesOptions _messageOptions;
 
         public const string Name = "Parsian";
 
@@ -36,7 +36,7 @@ namespace Parbad.Gateway.Parsian
             _httpContextAccessor = httpContextAccessor;
             _httpClient = httpClientFactory.CreateClient(this);
             _gatewayOptions = gatewayOptions.Value;
-            _messageOptions = messageOptions;
+            _messageOptions = messageOptions.Value;
         }
 
         /// <inheritdoc />
@@ -54,7 +54,28 @@ namespace Parbad.Gateway.Parsian
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
-            return ParsianHelper.CreateRequestResult(response, _httpContextAccessor.HttpContext, account, _gatewayOptions, _messageOptions.Value);
+            return ParsianHelper.CreateRequestResult(response, _httpContextAccessor.HttpContext, account, _gatewayOptions, _messageOptions);
+        }
+
+        /// <inheritdoc />
+        public override Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default)
+        {
+            if (context == null) throw new ArgumentNullException(nameof(context));
+
+            var callbackResult = ParsianHelper.CreateCallbackResult(_httpContextAccessor.HttpContext.Request, context, _messageOptions);
+
+            IPaymentFetchResult result;
+
+            if (callbackResult.IsSucceed)
+            {
+                result = PaymentFetchResult.ReadyForVerifying();
+            }
+            else
+            {
+                result = PaymentFetchResult.Failed(callbackResult.Message);
+            }
+
+            return Task.FromResult(result);
         }
 
         /// <inheritdoc />
@@ -62,11 +83,11 @@ namespace Parbad.Gateway.Parsian
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
-            var callbackResult = ParsianHelper.CreateCallbackResult(_httpContextAccessor.HttpContext.Request, context, _messageOptions.Value);
+            var callbackResult = ParsianHelper.CreateCallbackResult(_httpContextAccessor.HttpContext.Request, context, _messageOptions);
 
             if (!callbackResult.IsSucceed)
             {
-                return callbackResult.Result;
+                return PaymentVerifyResult.Failed(callbackResult.Message);
             }
 
             var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
@@ -79,7 +100,7 @@ namespace Parbad.Gateway.Parsian
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
-            return ParsianHelper.CreateVerifyResult(response, _messageOptions.Value);
+            return ParsianHelper.CreateVerifyResult(response, _messageOptions);
         }
 
         /// <inheritdoc />
@@ -97,7 +118,7 @@ namespace Parbad.Gateway.Parsian
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
-            return ParsianHelper.CreateRefundResult(response, _messageOptions.Value);
+            return ParsianHelper.CreateRefundResult(response, _messageOptions);
         }
     }
 }

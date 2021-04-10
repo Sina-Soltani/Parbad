@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
+using NUnit.Framework;
 using Parbad.Builder;
 using Parbad.Gateway.Mellat;
 using Parbad.Tests.Helpers;
 using RichardSzalay.MockHttp;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using NUnit.Framework;
 
 namespace Parbad.Tests.Gateway.Mellat
 {
@@ -41,7 +41,6 @@ namespace Parbad.Tests.Gateway.Mellat
                         .WithOptions(options =>
                         {
                             options.ApiUrl = apiUrl;
-                            options.ApiTestUrl = apiUrl;
                             options.PaymentPageUrl = paymentPageUrl;
                         });
 

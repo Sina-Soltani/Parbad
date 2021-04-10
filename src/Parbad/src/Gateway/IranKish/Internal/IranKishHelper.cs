@@ -92,7 +92,6 @@ namespace Parbad.Gateway.IranKish.Internal
 
             var isSucceed = true;
             var message = messagesOptions.InvalidDataReceivedFromGateway;
-            PaymentVerifyResult verifyResult = null;
 
             if (!resultCode.Exists)
             {
@@ -128,32 +127,11 @@ namespace Parbad.Gateway.IranKish.Internal
                 message += "No Token is received or it was null.";
             }
 
-            if (!isSucceed)
-            {
-                verifyResult = new PaymentVerifyResult
-                {
-                    TrackingNumber = invoiceNumber.Value,
-                    TransactionCode = referenceId.Value,
-                    Status = PaymentVerifyResultStatus.Failed,
-                    Message = message
-                };
-            }
-            else
+            if (isSucceed)
             {
                 isSucceed = resultCode.Value == OkResult;
 
-                var translatedMessage = IranKishGatewayResultTranslator.Translate(resultCode.Value, messagesOptions);
-
-                if (!isSucceed)
-                {
-                    verifyResult = new PaymentVerifyResult
-                    {
-                        TrackingNumber = invoiceNumber.Value,
-                        TransactionCode = referenceId.Value,
-                        Status = PaymentVerifyResultStatus.Failed,
-                        Message = translatedMessage
-                    };
-                }
+                message = IranKishGatewayResultTranslator.Translate(resultCode.Value, messagesOptions);
             }
 
             return new IranKishCallbackResult
@@ -162,7 +140,7 @@ namespace Parbad.Gateway.IranKish.Internal
                 Token = token.Value,
                 InvoiceNumber = invoiceNumber.Value,
                 ReferenceId = referenceId.Value,
-                Result = verifyResult
+                Message = message
             };
         }
 

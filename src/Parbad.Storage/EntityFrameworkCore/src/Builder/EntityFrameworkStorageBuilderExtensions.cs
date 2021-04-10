@@ -2,8 +2,7 @@
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
 using Microsoft.Extensions.DependencyInjection;
-using Parbad.Builder;
-using Parbad.Storage.Builder;
+using Parbad.Storage.Abstractions;
 using Parbad.Storage.EntityFrameworkCore.Context;
 using Parbad.Storage.EntityFrameworkCore.Options;
 using System;
