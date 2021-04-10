@@ -21,7 +21,10 @@ namespace Parbad.Builder
             if (builder == null) throw new ArgumentNullException(nameof(builder));
             if (configureStorage == null) throw new ArgumentNullException(nameof(configureStorage));
 
-            configureStorage(new StorageBuilder(builder.Services).UseDefaultStorageManager());
+            var storageBuilder = new StorageBuilder(builder.Services);
+            storageBuilder.UseDefaultStorageManager();
+
+            configureStorage(storageBuilder);
 
             return builder;
         }
@@ -32,6 +35,8 @@ namespace Parbad.Builder
         /// <param name="builder"></param>
         public static IStorageBuilder UseDefaultStorageManager(this IStorageBuilder builder)
         {
+            if (builder == null) throw new ArgumentNullException(nameof(builder));
+
             return builder.AddStorageManager<StorageManager>(ServiceLifetime.Transient);
         }
     }
