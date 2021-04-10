@@ -13,7 +13,7 @@ namespace Parbad.Tests
     public class AutoRandomTrackingNumberTests
     {
         private IStorage _storage;
-        private IOptions<AutoTrackingNumberOptions> _options;
+        private IOptions<AutoRandomTrackingNumberOptions> _options;
         private AutoRandomTrackingNumber _instance;
         private Invoice _invoice;
 
@@ -28,7 +28,7 @@ namespace Parbad.Tests
             var memoryCacheOptions = new OptionsWrapper<MemoryCacheStorageOptions>(new MemoryCacheStorageOptions());
             _storage = new MemoryCacheStorage(memoryCache, memoryCacheOptions);
 
-            _options = new OptionsWrapper<AutoTrackingNumberOptions>(new AutoTrackingNumberOptions());
+            _options = new OptionsWrapper<AutoRandomTrackingNumberOptions>(new AutoRandomTrackingNumberOptions());
 
             _instance = new AutoRandomTrackingNumber(_storage, _options);
 
@@ -52,19 +52,7 @@ namespace Parbad.Tests
 
             await _instance.FormatAsync(_invoice);
 
-            Assert.IsTrue(_invoice.TrackingNumber > _options.Value.MinimumValue);
-        }
-
-        [Test]
-        public async Task TrackingNumber_Must_Be_Less_Than_MaximumNumber()
-        {
-            const long expectedMinimumNumber = 5;
-
-            _options.Value.MinimumValue = expectedMinimumNumber;
-
-            await _instance.FormatAsync(_invoice);
-
-            Assert.IsTrue(_invoice.TrackingNumber < _options.Value.MaximumValue);
+            Assert.IsTrue(_invoice.TrackingNumber >= _options.Value.MinimumValue);
         }
     }
 }

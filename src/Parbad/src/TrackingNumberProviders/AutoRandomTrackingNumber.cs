@@ -1,23 +1,27 @@
 // Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Parbad.Abstraction;
 using Parbad.Internal;
 using Parbad.InvoiceBuilder;
 using Parbad.Storage.Abstractions;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Parbad.TrackingNumberProviders
 {
+    /// <summary>
+    /// An Invoice Formatter which generates automatically and randomly a Tracking Number
+    /// depending on <see cref="IStorage"/> and <see cref="AutoRandomTrackingNumberOptions"/>.
+    /// </summary>
     public class AutoRandomTrackingNumber : IInvoiceFormatter
     {
         private readonly IStorage _storage;
-        private readonly AutoTrackingNumberOptions _options;
+        private readonly AutoRandomTrackingNumberOptions _options;
 
-        public AutoRandomTrackingNumber(IStorage storage, IOptions<AutoTrackingNumberOptions> options)
+        public AutoRandomTrackingNumber(IStorage storage, IOptions<AutoRandomTrackingNumberOptions> options)
         {
             _storage = storage;
             _options = options.Value;
@@ -28,24 +32,22 @@ namespace Parbad.TrackingNumberProviders
             var trackingNumbers = _storage.Payments.Select(model => model.TrackingNumber).ToList();
 
             var minimumValue = _options.MinimumValue;
-            var maximumValue = _options.MaximumValue;
 
-            var newNumber = 0L;
+            var trackingNumber = 0L;
 
             while (true)
             {
                 if (cancellationToken.IsCancellationRequested) break;
 
-                newNumber = RandomNumberGenerator.Next();
+                trackingNumber = RandomNumberGenerator.Next();
 
-                if (newNumber < minimumValue) continue;
-
-                if (trackingNumbers.Count > 0 && !trackingNumbers.Contains(newNumber)) break;
-
-                if (newNumber >= minimumValue && newNumber <= maximumValue) break;
+                if (trackingNumber >= minimumValue && !trackingNumbers.Contains(trackingNumber))
+                {
+                    break;
+                }
             }
 
-            invoice.TrackingNumber = newNumber;
+            invoice.TrackingNumber = trackingNumber;
 
             return Task.CompletedTask;
         }

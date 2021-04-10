@@ -9,8 +9,20 @@ namespace Parbad.Builder
 {
     public static class AutoTrackingNumberOptionsExtensions
     {
-        public static IParbadBuilder ConfigureAutoTrackingNumber(this IParbadBuilder builder,
-            Action<AutoTrackingNumberOptions> configureOptions)
+        public static IParbadBuilder ConfigureAutoIncrementTrackingNumber(
+            this IParbadBuilder builder,
+            Action<AutoIncrementTrackingNumberOptions> configureOptions)
+        {
+            if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+            builder.Services.Configure(configureOptions);
+
+            return builder;
+        }
+
+        public static IParbadBuilder ConfigureAutoRandomTrackingNumber(
+            this IParbadBuilder builder,
+            Action<AutoRandomTrackingNumberOptions> configureOptions)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 

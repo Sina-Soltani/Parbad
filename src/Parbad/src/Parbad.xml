@@ -1788,11 +1788,6 @@
             Retrieves the token.
             </summary>
         </member>
-        <member name="F:Parbad.PaymentTokenProviders.QueryStringPaymentTokenOptions.ConfigurationKey">
-            <summary>
-            The specific key for <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/>
-            </summary>
-        </member>
         <member name="P:Parbad.PaymentTokenProviders.QueryStringPaymentTokenOptions.QueryName">
             <summary>
             The default value is "paymentToken".
@@ -1907,9 +1902,38 @@
         <member name="M:Parbad.Storage.StorageManager.GetTransactionsAsync(Parbad.Storage.Abstractions.Models.Payment,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="F:Parbad.TrackingNumberProviders.AutoTrackingNumberOptions.ConfigurationKey">
+        <member name="T:Parbad.TrackingNumberProviders.AutoIncrementTrackingNumber">
             <summary>
-            The specific key for <see cref="T:Microsoft.Extensions.Configuration.IConfiguration"/>
+            An Invoice Formatter which generates automatically and incrementally a Tracking Number
+            depending on <see cref="T:Parbad.Storage.Abstractions.IStorage"/> and <see cref="T:Parbad.TrackingNumberProviders.AutoIncrementTrackingNumberOptions"/>.
+            </summary>
+        </member>
+        <member name="M:Parbad.TrackingNumberProviders.AutoIncrementTrackingNumber.FormatAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
+            <summary>
+            Generates the Tracking Number.
+            </summary>
+            <param name="invoice"></param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="P:Parbad.TrackingNumberProviders.AutoIncrementTrackingNumberOptions.MinimumValue">
+            <summary>
+            The default value equals to 1000.
+            </summary>
+        </member>
+        <member name="P:Parbad.TrackingNumberProviders.AutoIncrementTrackingNumberOptions.Increment">
+            <summary>
+            The Tracking Number increments by this property. The default value equals to 1.
+            </summary>
+        </member>
+        <member name="T:Parbad.TrackingNumberProviders.AutoRandomTrackingNumber">
+            <summary>
+            An Invoice Formatter which generates automatically and randomly a Tracking Number
+            depending on <see cref="T:Parbad.Storage.Abstractions.IStorage"/> and <see cref="T:Parbad.TrackingNumberProviders.AutoRandomTrackingNumberOptions"/>.
+            </summary>
+        </member>
+        <member name="P:Parbad.TrackingNumberProviders.AutoRandomTrackingNumberOptions.MinimumValue">
+            <summary>
+            The default value equals to 1000.
             </summary>
         </member>
         <member name="M:Parbad.TrackingNumberProviderExtensions.UseAutoIncrementTrackingNumber(Parbad.InvoiceBuilder.IInvoiceBuilder)">
