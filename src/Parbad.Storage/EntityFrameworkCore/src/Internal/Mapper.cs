@@ -3,12 +3,14 @@
 
 using Parbad.Storage.Abstractions.Models;
 using Parbad.Storage.EntityFrameworkCore.Domain;
+using System;
+using System.Linq.Expressions;
 
 namespace Parbad.Storage.EntityFrameworkCore.Internal
 {
     internal static class Mapper
     {
-        public static PaymentEntity ToEntity(this Payment model)
+        public static PaymentEntity ToPaymentEntity(this Payment model)
         {
             return new PaymentEntity
             {
@@ -23,7 +25,7 @@ namespace Parbad.Storage.EntityFrameworkCore.Internal
             };
         }
 
-        public static void ToEntity(Payment model, PaymentEntity entity)
+        public static void ToPaymentEntity(Payment model, PaymentEntity entity)
         {
             entity.TrackingNumber = model.TrackingNumber;
             entity.Amount = model.Amount;
@@ -35,9 +37,9 @@ namespace Parbad.Storage.EntityFrameworkCore.Internal
             entity.IsPaid = model.IsPaid;
         }
 
-        public static Payment ToModel(this PaymentEntity entity)
+        public static Expression<Func<PaymentEntity, Payment>> ToPaymentModel()
         {
-            return new Payment
+            return entity => new Payment
             {
                 Id = entity.Id,
                 TrackingNumber = entity.TrackingNumber,
@@ -51,7 +53,7 @@ namespace Parbad.Storage.EntityFrameworkCore.Internal
             };
         }
 
-        public static TransactionEntity ToEntity(this Transaction model)
+        public static TransactionEntity ToTransactionEntity(this Transaction model)
         {
             return new TransactionEntity
             {
@@ -64,7 +66,7 @@ namespace Parbad.Storage.EntityFrameworkCore.Internal
             };
         }
 
-        public static void ToEntity(Transaction model, TransactionEntity entity)
+        public static void ToTransactionEntity(Transaction model, TransactionEntity entity)
         {
             entity.Amount = model.Amount;
             entity.Type = model.Type;
@@ -73,9 +75,9 @@ namespace Parbad.Storage.EntityFrameworkCore.Internal
             entity.AdditionalData = model.AdditionalData;
         }
 
-        public static Transaction ToModel(this TransactionEntity entity)
+        public static Expression<Func<TransactionEntity, Transaction>> ToTransactionModel()
         {
-            return new Transaction
+            return entity => new Transaction
             {
                 Id = entity.Id,
                 Amount = entity.Amount,

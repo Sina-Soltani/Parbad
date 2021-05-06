@@ -1,5 +1,6 @@
+using KellermanSoftware.CompareNetObjects;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Parbad.Storage.Abstractions.Models;
 using Parbad.Storage.EntityFrameworkCore.Context;
@@ -10,12 +11,12 @@ using System.Threading.Tasks;
 
 namespace Parbad.Storage.EntityFrameworkCore.Tests
 {
-    public class Tests
+    public class EntityFrameworkCoreStorageTests
     {
-        private ServiceProvider _services;
+        private ParbadDataContext _context;
         private EntityFrameworkCoreStorage _storage;
 
-        private static Payment PaymentTestData => new Payment
+        private static readonly Payment PaymentTestData = new Payment
         {
             TrackingNumber = 1,
             Amount = 1000,
@@ -27,7 +28,7 @@ namespace Parbad.Storage.EntityFrameworkCore.Tests
             IsCompleted = false
         };
 
-        private static Transaction TransactionTestData => new Transaction
+        private static readonly Transaction TransactionTestData = new Transaction
         {
             PaymentId = 1,
             Amount = 1000,
@@ -40,20 +41,21 @@ namespace Parbad.Storage.EntityFrameworkCore.Tests
         [SetUp]
         public void Setup()
         {
-            _services = new ServiceCollection()
-                .Configure<EntityFrameworkCoreOptions>(options => { })
-                .AddDbContext<ParbadDataContext>(builder => builder.UseInMemoryDatabase(Guid.NewGuid().ToString()))
-                .BuildServiceProvider();
+            var contextOptions = new DbContextOptionsBuilder<ParbadDataContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .Options;
 
-            var context = _services.GetRequiredService<ParbadDataContext>();
+            var efCoreOptions = new OptionsWrapper<EntityFrameworkCoreOptions>(new EntityFrameworkCoreOptions());
 
-            _storage = new EntityFrameworkCoreStorage(context);
+            _context = new ParbadDataContext(contextOptions, efCoreOptions);
+
+            _storage = new EntityFrameworkCoreStorage(_context);
         }
 
         [TearDown]
         public ValueTask Cleanup()
         {
-            return _services.DisposeAsync();
+            return _context.DisposeAsync();
         }
 
         [Test]
@@ -66,15 +68,7 @@ namespace Parbad.Storage.EntityFrameworkCore.Tests
             Assert.IsNotNull(payment);
             Assert.AreEqual(1, _storage.Payments.Count());
 
-            Assert.AreEqual(1, payment.Id);
-            Assert.AreEqual(PaymentTestData.TrackingNumber, payment.TrackingNumber);
-            Assert.AreEqual(PaymentTestData.Amount, payment.Amount);
-            Assert.AreEqual(PaymentTestData.TransactionCode, payment.TransactionCode);
-            Assert.AreEqual(PaymentTestData.GatewayName, payment.GatewayName);
-            Assert.AreEqual(PaymentTestData.GatewayAccountName, payment.GatewayAccountName);
-            Assert.AreEqual(PaymentTestData.Token, payment.Token);
-            Assert.AreEqual(PaymentTestData.IsPaid, payment.IsPaid);
-            Assert.AreEqual(PaymentTestData.IsCompleted, payment.IsCompleted);
+            payment.ShouldCompare(PaymentTestData);
         }
 
         [Test]
@@ -83,6 +77,9 @@ namespace Parbad.Storage.EntityFrameworkCore.Tests
             await _storage.CreatePaymentAsync(PaymentTestData);
 
             var payment = _storage.Payments.SingleOrDefault();
+
+            Assert.IsNotNull(payment);
+
             payment.TrackingNumber = 2;
             payment.Amount = 2000;
             payment.Token = "NewToken";
@@ -97,15 +94,7 @@ namespace Parbad.Storage.EntityFrameworkCore.Tests
             var newPayment = _storage.Payments.SingleOrDefault();
 
             Assert.IsNotNull(newPayment);
-            Assert.AreEqual(1, newPayment.Id);
-            Assert.AreEqual(payment.TrackingNumber, newPayment.TrackingNumber);
-            Assert.AreEqual(payment.Amount, newPayment.Amount);
-            Assert.AreEqual(payment.TransactionCode, newPayment.TransactionCode);
-            Assert.AreEqual(payment.GatewayName, newPayment.GatewayName);
-            Assert.AreEqual(payment.GatewayAccountName, newPayment.GatewayAccountName);
-            Assert.AreEqual(payment.Token, newPayment.Token);
-            Assert.AreEqual(payment.IsPaid, newPayment.IsPaid);
-            Assert.AreEqual(payment.IsCompleted, newPayment.IsCompleted);
+            newPayment.ShouldCompare(payment);
         }
 
         [Test]
@@ -127,6 +116,8 @@ namespace Parbad.Storage.EntityFrameworkCore.Tests
 
             var payment = _storage.Payments.SingleOrDefault();
 
+            Assert.IsNotNull(payment);
+
             TransactionTestData.PaymentId = payment.Id;
 
             await _storage.CreateTransactionAsync(TransactionTestData);
@@ -136,13 +127,7 @@ namespace Parbad.Storage.EntityFrameworkCore.Tests
             Assert.IsNotNull(transaction);
             Assert.AreEqual(1, _storage.Transactions.Count());
 
-            Assert.AreEqual(1, transaction.Id);
-            Assert.AreEqual(payment.Id, transaction.PaymentId);
-            Assert.AreEqual(TransactionTestData.Amount, transaction.Amount);
-            Assert.AreEqual(TransactionTestData.AdditionalData, transaction.AdditionalData);
-            Assert.AreEqual(TransactionTestData.IsSucceed, transaction.IsSucceed);
-            Assert.AreEqual(TransactionTestData.Type, transaction.Type);
-            Assert.AreEqual(TransactionTestData.Message, transaction.Message);
+            transaction.ShouldCompare(TransactionTestData);
         }
 
         [Test]
@@ -152,11 +137,16 @@ namespace Parbad.Storage.EntityFrameworkCore.Tests
 
             var payment = _storage.Payments.SingleOrDefault();
 
+            Assert.IsNotNull(payment);
+
             TransactionTestData.PaymentId = payment.Id;
 
             await _storage.CreateTransactionAsync(TransactionTestData);
 
             var transaction = _storage.Transactions.SingleOrDefault();
+
+            Assert.IsNotNull(transaction);
+
             transaction.Amount = 2000;
             transaction.IsSucceed = true;
             transaction.Message = "NewMessage";
@@ -170,13 +160,7 @@ namespace Parbad.Storage.EntityFrameworkCore.Tests
             Assert.IsNotNull(newTransaction);
             Assert.AreEqual(1, _storage.Transactions.Count());
 
-            Assert.AreEqual(1, transaction.Id);
-            Assert.AreEqual(transaction.Id, newTransaction.PaymentId);
-            Assert.AreEqual(transaction.Amount, newTransaction.Amount);
-            Assert.AreEqual(transaction.AdditionalData, newTransaction.AdditionalData);
-            Assert.AreEqual(transaction.IsSucceed, newTransaction.IsSucceed);
-            Assert.AreEqual(transaction.Type, newTransaction.Type);
-            Assert.AreEqual(transaction.Message, newTransaction.Message);
+            newTransaction.ShouldCompare(transaction);
         }
 
         [Test]
@@ -185,6 +169,8 @@ namespace Parbad.Storage.EntityFrameworkCore.Tests
             await _storage.CreatePaymentAsync(PaymentTestData);
 
             var payment = _storage.Payments.SingleOrDefault();
+
+            Assert.IsNotNull(payment);
 
             TransactionTestData.PaymentId = payment.Id;
 
