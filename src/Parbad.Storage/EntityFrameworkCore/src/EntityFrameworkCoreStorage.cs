@@ -28,10 +28,10 @@ namespace Parbad.Storage.EntityFrameworkCore
         }
 
         /// <inheritdoc />
-        public virtual IQueryable<Payment> Payments => Context.Payments.AsNoTracking().Select(Mapper.ToModel).AsQueryable();
+        public virtual IQueryable<Payment> Payments => Context.Payments.Select(Mapper.ToPaymentModel());
 
         /// <inheritdoc />
-        public virtual IQueryable<Transaction> Transactions => Context.Transactions.AsNoTracking().Select(Mapper.ToModel).AsQueryable();
+        public virtual IQueryable<Transaction> Transactions => Context.Transactions.Select(Mapper.ToTransactionModel());
 
         /// <summary>
         /// Parbad DbContext.
@@ -43,7 +43,7 @@ namespace Parbad.Storage.EntityFrameworkCore
         {
             if (payment == null) throw new ArgumentNullException(nameof(payment));
 
-            var entity = payment.ToEntity();
+            var entity = payment.ToPaymentEntity();
             entity.CreatedOn = DateTime.UtcNow;
 
             Context.Payments.Add(entity);
@@ -67,7 +67,7 @@ namespace Parbad.Storage.EntityFrameworkCore
 
             if (record == null) throw new InvalidOperationException($"No payment records found in database with id {payment.Id}");
 
-            Mapper.ToEntity(payment, record);
+            Mapper.ToPaymentEntity(payment, record);
             record.UpdatedOn = DateTime.UtcNow;
 
             Context.Payments.Update(record);
@@ -97,7 +97,7 @@ namespace Parbad.Storage.EntityFrameworkCore
         {
             if (transaction == null) throw new ArgumentNullException(nameof(transaction));
 
-            var entity = transaction.ToEntity();
+            var entity = transaction.ToTransactionEntity();
             entity.CreatedOn = DateTime.UtcNow;
 
             Context.Transactions.Add(entity);
@@ -118,7 +118,7 @@ namespace Parbad.Storage.EntityFrameworkCore
 
             if (record == null) throw new InvalidOperationException($"No transaction records found in database with id {transaction.Id}");
 
-            Mapper.ToEntity(transaction, record);
+            Mapper.ToTransactionEntity(transaction, record);
             record.UpdatedOn = DateTime.UtcNow;
 
             Context.Transactions.Update(record);
