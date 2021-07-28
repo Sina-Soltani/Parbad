@@ -45,21 +45,21 @@ namespace Parbad.Gateway.Mellat
 
             List<MellatCumulativeDynamicAccount> allAccounts = null;
 
-            builder.ChangeProperties(data =>
+            builder.ChangeProperties(properties =>
             {
-                if (data.ContainsKey(MellatHelper.CumulativeAccountsKey))
+                if (properties.ContainsKey(MellatHelper.CumulativeAccountsKey))
                 {
-                    allAccounts = (List<MellatCumulativeDynamicAccount>)data[MellatHelper.CumulativeAccountsKey];
+                    allAccounts = (List<MellatCumulativeDynamicAccount>)properties[MellatHelper.CumulativeAccountsKey];
                 }
                 else
                 {
                     allAccounts = new List<MellatCumulativeDynamicAccount>();
+
+                    properties.Add(MellatHelper.CumulativeAccountsKey, allAccounts);
                 }
 
                 allAccounts.AddRange(accounts);
             });
-
-            builder.AddProperty(MellatHelper.CumulativeAccountsKey, allAccounts);
 
             return builder;
         }
