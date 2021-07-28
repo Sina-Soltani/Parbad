@@ -3,7 +3,7 @@
   <PropertyGroup>
     <PackageId>Parbad</PackageId>
     <Product>Parbad</Product>
-    <VersionPrefix>3.7.1-beta1</VersionPrefix>
+    <VersionPrefix>3.7.1-beta2</VersionPrefix>
     <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.0;netcoreapp3.1;net5.0</TargetFrameworks>
     <LangVersion>9</LangVersion>
     <Authors>Parbad Sina Soltani</Authors>
@@ -27,7 +27,7 @@ More information: https://github.com/Sina-Soltani/Parbad
 
   <PropertyGroup>
     <NoWarn>1701;1702;1591</NoWarn>
-    <PackageReleaseNotes>Fixed: Sending the mobile number to Mellat Gateway.</PackageReleaseNotes>
+    <PackageReleaseNotes>Fixed: Mellat Gateway Cumulative Accounts.</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
