@@ -1,11 +1,43 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <PackageId>Parbad.Gateway.FanAva</PackageId>
+    <Product>Parbad.Gateway.FanAva</Product>
+    <VersionPrefix>1.0.0</VersionPrefix>
+    <TargetFrameworks>net5.0</TargetFrameworks>
+    <Authors>Mohammad Mokhtari</Authors>
+    <Copyright>Copyright © Parbad 2016</Copyright>
+    <PackageProjectUrl>https://github.com/Sina-Soltani/Parbad</PackageProjectUrl>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageIconUrl>https://raw.githubusercontent.com/Sina-Soltani/Parbad/master/images/Parbad-128x128.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/Sina-Soltani/Parbad</RepositoryUrl>
+    <PackageTags>parbad Payment Gateway FanAva پرداخت درگاه فن آوا</PackageTags>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Description>
+      FanAva Gateway for Parbad project.
+      For more information see: https://github.com/Sina-Soltani/Parbad
+    </Description>
+  </PropertyGroup>
+
+
+  <ItemGroup>
+    <None Include="icon.png" pack="true" Visible="false" PackagePath="" />
+    <None Include="readme.txt" />
+    <None Include="Parbad.Gateway.FanAva.xml" pack="true" Visible="false" PackagePath="" />
+  </ItemGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>Parbad.Gateway.FanAva.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>Parbad.Gateway.FanAva.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Parbad" Version="3.7.0" />
+    <ProjectReference Include="..\..\..\Parbad\src\Parbad.csproj" />
   </ItemGroup>
-
 </Project>
