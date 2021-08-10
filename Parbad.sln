@@ -91,6 +91,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PayPing", "PayPing", "{B870
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parbad.Gateway.PayPing", "src\Parbad.Gateway\PayPing\src\Parbad.Gateway.PayPing.csproj", "{85D2588A-2990-4100-BB73-871F253BB7FC}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FanAva", "FanAva", "{05CE4791-3EB8-4DA6-A0C3-4379878BBDAA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parbad.Gateway.FanAva", "src\Parbad.Gateway\FanAva\src\Parbad.Gateway.FanAva.csproj", "{195B34C2-DF07-4CE0-80F9-A3FBA8A8EF68}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parbad.Gateway.FanAva.Test", "Parbad.Gateway.FanAva.Test\Parbad.Gateway.FanAva.Test.csproj", "{D1F5CF0A-BD88-4B12-B58D-E286690D147C}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		src\Parbad.Shared\Parbad.Shared.projitems*{2e124fc2-6fa6-45e1-9912-edca1c19cef7}*SharedItemsImports = 13
@@ -174,6 +180,14 @@ Global
 		{85D2588A-2990-4100-BB73-871F253BB7FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{85D2588A-2990-4100-BB73-871F253BB7FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{85D2588A-2990-4100-BB73-871F253BB7FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{195B34C2-DF07-4CE0-80F9-A3FBA8A8EF68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{195B34C2-DF07-4CE0-80F9-A3FBA8A8EF68}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{195B34C2-DF07-4CE0-80F9-A3FBA8A8EF68}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{195B34C2-DF07-4CE0-80F9-A3FBA8A8EF68}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1F5CF0A-BD88-4B12-B58D-E286690D147C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1F5CF0A-BD88-4B12-B58D-E286690D147C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1F5CF0A-BD88-4B12-B58D-E286690D147C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1F5CF0A-BD88-4B12-B58D-E286690D147C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -214,6 +228,9 @@ Global
 		{3A9942B1-EC71-4A9A-971B-CFE0DEFEF531} = {571BD034-8370-432B-9B18-4C6FA697121C}
 		{B87006DA-9F5B-41D7-B23C-184B0ED567D3} = {B1447D20-66E0-46FB-B0DB-BCBEBA7B337A}
 		{85D2588A-2990-4100-BB73-871F253BB7FC} = {B87006DA-9F5B-41D7-B23C-184B0ED567D3}
+		{05CE4791-3EB8-4DA6-A0C3-4379878BBDAA} = {B1447D20-66E0-46FB-B0DB-BCBEBA7B337A}
+		{195B34C2-DF07-4CE0-80F9-A3FBA8A8EF68} = {05CE4791-3EB8-4DA6-A0C3-4379878BBDAA}
+		{D1F5CF0A-BD88-4B12-B58D-E286690D147C} = {05CE4791-3EB8-4DA6-A0C3-4379878BBDAA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CBDDB699-C14A-4235-B0AE-32725230B4ED}

@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Parbad.Gateway.FanAva</name>
+    </assembly>
+    <members>
+        <member name="M:Parbad.Gateway.FanAva.FanAvaGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Gateway.FanAva.FanAvaGateway.FetchAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Gateway.FanAva.FanAvaGateway.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Gateway.FanAva.FanAvaGateway.RefundAsync(Parbad.InvoiceContext,Parbad.Money,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Gateway.FanAva.FanAvaGatewayBuilderExtensions.AddFanAva(Parbad.GatewayBuilders.IGatewayBuilder)">
+            <summary>
+            Adds FanAva gateway to Parbad services.
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.Gateway.FanAva.FanAvaGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.FanAva.FanAvaGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.Gateway.FanAva.FanAvaGatewayAccount}})">
+            <summary>
+            Configures the accounts for <see cref="T:Parbad.Gateway.FanAva.FanAvaGateway"/>.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureAccounts">Configures the accounts.</param>
+            
+        </member>
+        <member name="M:Parbad.Gateway.FanAva.FanAvaGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.FanAva.FanAvaGateway},System.Action{Parbad.Gateway.FanAva.FanAvaGatewayOptions})">
+            <summary>
+            Configures the options for FanAva Gateway.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureOptions">Configuration</param>
+        </member>
+        <member name="M:Parbad.Gateway.FanAva.FanAvaGatewayInvoiceBuilderExtensions.UseFanAva(Parbad.InvoiceBuilder.IInvoiceBuilder)">
+            <summary>
+            The invoice will be sent to FanAva gateway.
+            </summary>
+            <param name="builder"></param>
+        </member>
+    </members>
+</doc>
