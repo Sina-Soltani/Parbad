@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
 using Newtonsoft.Json;
 using Parbad.Abstraction;
@@ -12,8 +6,11 @@ using Parbad.Gateway.FanAva.Internal.Models;
 using Parbad.Http;
 using Parbad.Internal;
 using Parbad.Options;
-using Parbad.Utilities;
-using JsonSerializer = System.Text.Json.JsonSerializer;
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Parbad.Gateway.FanAva.Internal
 {
@@ -21,23 +18,40 @@ namespace Parbad.Gateway.FanAva.Internal
     {
         internal static FanAvaRequestModel CreateRequestModel(Invoice invoice, FanAvaGatewayAccount account)
         {
+            var additionalData = invoice.GetFanAvaAdditionalData();
 
-            return new FanAvaRequestModel()
+            string transType;
+
+            if (additionalData == null)
             {
-                WSContext = new FanAvaRequestModel.WSContextModel()
+                transType = "EN_GOODS";
+            }
+            else
+            {
+                transType = additionalData.Type == FanAvaGatewayAdditionalDataRequestType.Goods
+                    ? "EN_GOODS"
+                    : "EN_BILL_PAY";
+            }
+
+            return new FanAvaRequestModel
+            {
+                WSContext = new FanAvaRequestModel.WSContextModel
                 {
                     UserId = account.UserId,
                     Password = account.Password
                 },
-                TransType = "EN_GOODS",
+                TransType = transType,
                 ReserveNum = invoice.TrackingNumber.ToString(),
                 Amount = invoice.Amount,
                 RedirectUrl = invoice.CallbackUrl,
-                UserId = invoice.Properties[nameof(FanAvaRequestModel.UserId)]?.ToString() ?? "",
-                Email = invoice.Properties[nameof(FanAvaRequestModel.Email)]?.ToString() ?? "",
-                MobileNo = invoice.Properties[nameof(FanAvaRequestModel.MobileNo)]?.ToString() ?? ""
+                Email = additionalData?.Email,
+                MobileNo = additionalData?.Email,
+                GoodsReferenceId = additionalData?.GoodsReferenceId,
+                MerchantGoodReferenceId = additionalData?.MerchantGoodReferenceId,
+                ApportionmentAccountList = additionalData?.ApportionmentAccountList
             };
         }
+
         internal static async Task<PaymentRequestResult> CreateRequestResult(
             HttpResponseMessage responseMessage,
             HttpContext httpContext,
@@ -51,14 +65,15 @@ namespace Parbad.Gateway.FanAva.Internal
                 return PaymentRequestResult.Failed(response.ToString(), account.Name);
             }
 
-            var result = JsonSerializer.Deserialize<FanAvaRequestResultModel>(response);
+            var result = JsonConvert.DeserializeObject<FanAvaRequestResultModel>(response);
+
             var url = QueryHelpers.AddQueryString(gatewayOptions.PaymentPageUrl, new Dictionary<string, string>{
                 {"token", result.Token},
                 {"lang", "fa"}
             });
+
             return PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, url);
         }
-
 
         internal static async Task<FanAvaCallbackResultModel> CreateCallbackResult(
             HttpRequest httpRequest,
@@ -66,39 +81,38 @@ namespace Parbad.Gateway.FanAva.Internal
             FanAvaGatewayAccount gatewayAccount,
             CancellationToken cancellationToken)
         {
-
             var state = await httpRequest.TryGetParamAsAsync<string>("State", cancellationToken).ConfigureAwaitFalse();
+
             if (!state.Exists || state.Value != "ok")
             {
-                var message = messagesOptions.InvalidDataReceivedFromGateway;
-                return new FanAvaCallbackResultModel()
+                return new FanAvaCallbackResultModel
                 {
                     IsSucceed = false,
-                    Message = message
+                    Message = messagesOptions.InvalidDataReceivedFromGateway
                 };
             }
+
             var invoiceNumber = await httpRequest.TryGetParamAsAsync<string>("RefNum", cancellationToken).ConfigureAwaitFalse();
             var token = await httpRequest.TryGetParamAsAsync<string>("token", cancellationToken).ConfigureAwaitFalse();
 
-            var data = new FanAvaCheckRequestModel()
+            var data = new FanAvaCheckRequestModel
             {
-                WSContext = new FanAvaRequestModel.WSContextModel()
+                WSContext = new FanAvaRequestModel.WSContextModel
                 {
                     UserId = gatewayAccount.UserId,
                     Password = gatewayAccount.Password
                 },
-                Token = token.Value,
-
-
+                Token = token.Value
             };
 
-            return new FanAvaCallbackResultModel()
+            return new FanAvaCallbackResultModel
             {
                 IsSucceed = true,
                 InvoiceNumber = invoiceNumber.Value,
                 CallbackCheckData = data
             };
         }
+
         internal static async Task<FanAvaCheckResultModel> CreateCheckResult(HttpResponseMessage responseMessage, FanAvaGatewayAccount account, FanAvaCallbackResultModel callbackResult, MessagesOptions messagesOptions)
         {
             var result = await responseMessage.Content.ReadFromJsonAsync<FanAvaCheckResultModel>();
@@ -118,11 +132,11 @@ namespace Parbad.Gateway.FanAva.Internal
 
                 if (!isSucceed)
                 {
-                    verifyResult = PaymentVerifyResult.Failed("پرداخت موفقيت آميز نبود و يا توسط خريدار کنسل شده است");
+                    verifyResult = PaymentVerifyResult.Failed(messagesOptions.PaymentFailed);
                 }
             }
 
-            return new FanAvaCheckResultModel()
+            return new FanAvaCheckResultModel
             {
                 IsSucceed = isSucceed,
                 VerifyResult = verifyResult
@@ -132,7 +146,7 @@ namespace Parbad.Gateway.FanAva.Internal
 
         internal static FanAvaVerifyRequestModel CreateVerifyRequest(InvoiceContext context, FanAvaCallbackResultModel callbackResult, FanAvaCheckResultModel checkResult)
         {
-            return new FanAvaVerifyRequestModel()
+            return new FanAvaVerifyRequestModel
             {
                 WSContext = callbackResult.CallbackCheckData.WSContext,
                 Token = callbackResult.CallbackCheckData.Token,
@@ -140,15 +154,19 @@ namespace Parbad.Gateway.FanAva.Internal
                 InvoiceNumber = callbackResult.InvoiceNumber
             };
         }
+
         internal static async Task<IPaymentVerifyResult> CreateVerifyResult(HttpResponseMessage responseMessage, FanAvaCallbackResultModel callbackResult, MessagesOptions messagesOptions)
         {
             var verifyResult = await responseMessage.Content.ReadFromJsonAsync<FanAvaVerifyResultModel>()
                 .ConfigureAwaitFalse();
+
             var isSucceed = verifyResult.Result == "erSucceed";
+
             if (!isSucceed)
             {
                 return PaymentVerifyResult.Failed(messagesOptions.InvalidDataReceivedFromGateway);
             }
+
             return new PaymentVerifyResult
             {
                 IsSucceed = verifyResult.Result == "erSucceed",
@@ -160,7 +178,7 @@ namespace Parbad.Gateway.FanAva.Internal
 
         internal static FanAvaVerifyRequestModel CreateRefundRequest(InvoiceContext context, FanAvaCallbackResultModel callbackResult, FanAvaCheckResultModel checkResult)
         {
-            return new FanAvaVerifyRequestModel()
+            return new FanAvaVerifyRequestModel
             {
                 WSContext = callbackResult.CallbackCheckData.WSContext,
                 Token = callbackResult.CallbackCheckData.Token,
@@ -174,10 +192,12 @@ namespace Parbad.Gateway.FanAva.Internal
                 .ConfigureAwaitFalse();
 
             var isSucceed = refundResult.Result == "erSucceed";
+
             if (!isSucceed)
             {
                 return PaymentRefundResult.Failed(messagesOptions.InvalidDataReceivedFromGateway);
             }
+
             return new PaymentRefundResult
             {
                 IsSucceed = isSucceed,

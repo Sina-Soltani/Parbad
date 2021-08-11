@@ -1,23 +1,22 @@
-﻿using System.Text.Json.Serialization;
-using Parbad.Internal;
+﻿using Newtonsoft.Json;
 
 namespace Parbad.Gateway.FanAva.Internal.Models
 {
     internal class FanAvaCheckResultModel
     {
-
         [JsonIgnore]
         public bool IsSucceed { get; set; }
+
         [JsonIgnore]
         public IPaymentVerifyResult VerifyResult { get; set; }
 
-
-
-        [JsonPropertyName("Result")]
+        [JsonProperty("Result")]
         public string Result { get; set; }
-        [JsonPropertyName("ReferenceNum")]
+
+        [JsonProperty("ReferenceNum")]
         public string InvoiceNumber { get; set; }
-        [JsonPropertyName("Amount")]
-        public Money Amount { get; set; }
+
+        [JsonProperty("Amount")]
+        public decimal Amount { get; set; }
     }
 }
