@@ -1,7 +1,6 @@
 ﻿// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
-using System;
 using System.Collections.Generic;
 
 namespace Parbad
@@ -11,27 +10,30 @@ namespace Parbad
     /// </summary>
     public class GatewayTransporterDescriptor
     {
-        public GatewayTransporterDescriptor(TransportType type, string url, IEnumerable<KeyValuePair<string, string>> form)
-        {
-            Type = type;
-            Url = url ?? throw new ArgumentNullException(nameof(url));
-            Form = form;
-        }
+        public TransportType Type { get; set; }
 
-        public TransportType Type { get; }
+        public string Url { get; set; }
 
-        public string Url { get; }
-
-        public IEnumerable<KeyValuePair<string, string>> Form { get; }
+        public IEnumerable<KeyValuePair<string, string>> Form { get; set; }
 
         public static GatewayTransporterDescriptor CreateRedirect(string url)
         {
-            return new GatewayTransporterDescriptor(TransportType.Redirect, url, null);
+            return new GatewayTransporterDescriptor
+            {
+                Type = TransportType.Redirect,
+                Url = url,
+                Form = null
+            };
         }
 
         public static GatewayTransporterDescriptor CreatePost(string url, IEnumerable<KeyValuePair<string, string>> form)
         {
-            return new GatewayTransporterDescriptor(TransportType.Post, url, form);
+            return new GatewayTransporterDescriptor
+            {
+                Type = TransportType.Post,
+                Url = url,
+                Form = form
+            };
         }
 
         public enum TransportType
