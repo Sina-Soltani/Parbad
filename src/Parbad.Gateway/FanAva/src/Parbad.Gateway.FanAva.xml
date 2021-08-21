@@ -18,7 +18,7 @@
         </member>
         <member name="M:Parbad.Gateway.FanAva.FanAvaGatewayBuilderExtensions.AddFanAva(Parbad.GatewayBuilders.IGatewayBuilder)">
             <summary>
-            Adds FanAva gateway to Parbad services.
+            Adds <see cref="T:Parbad.Gateway.FanAva.FanAvaGateway"/> to Parbad services.
             </summary>
             <param name="builder"></param>
         </member>
@@ -28,20 +28,30 @@
             </summary>
             <param name="builder"></param>
             <param name="configureAccounts">Configures the accounts.</param>
-            
         </member>
         <member name="M:Parbad.Gateway.FanAva.FanAvaGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.FanAva.FanAvaGateway},System.Action{Parbad.Gateway.FanAva.FanAvaGatewayOptions})">
             <summary>
-            Configures the options for FanAva Gateway.
+            Configures the options for <see cref="T:Parbad.Gateway.FanAva.FanAvaGateway"/>.
             </summary>
             <param name="builder"></param>
             <param name="configureOptions">Configuration</param>
         </member>
         <member name="M:Parbad.Gateway.FanAva.FanAvaGatewayInvoiceBuilderExtensions.UseFanAva(Parbad.InvoiceBuilder.IInvoiceBuilder)">
             <summary>
-            The invoice will be sent to FanAva gateway.
+            The invoice will be sent to <see cref="T:Parbad.Gateway.FanAva.FanAvaGateway"/>.
+            </summary>
+        </member>
+        <member name="M:Parbad.Gateway.FanAva.FanAvaGatewayInvoiceBuilderExtensions.SetFanAvaAdditionalData(Parbad.InvoiceBuilder.IInvoiceBuilder,Parbad.Gateway.FanAva.FanAvaGatewayAdditionalDataRequestType,System.String,System.String,System.String,System.String,System.Collections.Generic.IEnumerable{Parbad.Gateway.FanAva.FanAvaGatewayApportionmentAccount})">
+            <summary>
+            Sets the additional data for <see cref="T:Parbad.Gateway.FanAva.FanAvaGateway"/>.
+            </summary>
+        </member>
+        <member name="M:Parbad.Gateway.FanAva.FanAvaGatewayInvoiceBuilderExtensions.SetFanAvaAdditionalData(Parbad.InvoiceBuilder.IInvoiceBuilder,Parbad.Gateway.FanAva.FanAvaGatewayAdditionalDataRequest)">
+            <summary>
+            Sets the additional data for <see cref="T:Parbad.Gateway.FanAva.FanAvaGateway"/>.
             </summary>
             <param name="builder"></param>
+            <param name="additionalData"></param>
         </member>
     </members>
 </doc>

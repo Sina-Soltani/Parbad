@@ -95,7 +95,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FanAva", "FanAva", "{05CE47
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parbad.Gateway.FanAva", "src\Parbad.Gateway\FanAva\src\Parbad.Gateway.FanAva.csproj", "{195B34C2-DF07-4CE0-80F9-A3FBA8A8EF68}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parbad.Gateway.FanAva.Test", "Parbad.Gateway.FanAva.Test\Parbad.Gateway.FanAva.Test.csproj", "{D1F5CF0A-BD88-4B12-B58D-E286690D147C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parbad.Gateway.FanAva.Tests", "src\Parbad.Gateway\FanAva\tests\Parbad.Gateway.FanAva.Tests.csproj", "{D1F5CF0A-BD88-4B12-B58D-E286690D147C}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution

@@ -1,8 +1,8 @@
 // Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
 
 namespace Parbad.Internal
 {
@@ -16,6 +16,13 @@ namespace Parbad.Internal
 
         public override bool IsSucceed => Status == PaymentRequestResultStatus.Succeed;
 
+        /// <summary>
+        /// Creates an instance of <see cref="PaymentRequestResult"/> which indicates a successful result and a Gateway Transporter with type of Post.
+        /// </summary>
+        /// <param name="gatewayAccountName"></param>
+        /// <param name="httpContext"></param>
+        /// <param name="url">Page URL.</param>
+        /// <param name="form">Form to post.</param>
         public static PaymentRequestResult SucceedWithPost(
             string gatewayAccountName,
             HttpContext httpContext,
@@ -29,6 +36,12 @@ namespace Parbad.Internal
             return Succeed(transporter, gatewayAccountName);
         }
 
+        /// <summary>
+        /// Creates an instance of <see cref="PaymentRequestResult"/> which indicates a successful result and a Gateway Transporter with type of Redirect.
+        /// </summary>
+        /// <param name="gatewayAccountName"></param>
+        /// <param name="httpContext"></param>
+        /// <param name="url">Page URL.</param>
         public static PaymentRequestResult SucceedWithRedirect(
             string gatewayAccountName,
             HttpContext httpContext,

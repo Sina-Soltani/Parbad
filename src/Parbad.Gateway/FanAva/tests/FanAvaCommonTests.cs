@@ -28,7 +28,7 @@ namespace Parbad.Gateway.FanAva.Tests
 
             Assert.IsNotNull(invoice);
             Assert.IsNotNull(invoice.GatewayName);
-            Assert.IsTrue(invoice.GatewayName.Equals("FanAva", StringComparison.OrdinalIgnoreCase));
+            Assert.AreEqual(FanAvaGateway.Name, invoice.GatewayName);
         }
     }
 }
