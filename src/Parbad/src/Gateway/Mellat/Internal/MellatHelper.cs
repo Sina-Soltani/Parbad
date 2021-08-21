@@ -259,7 +259,7 @@ namespace Parbad.Gateway.Mellat.Internal
                 "<!--Optional:-->" +
                 $"<localTime>{DateTime.Now:HHmmss}</localTime>" +
                 "<!--Optional:-->" +
-                $"<additionalData>{additionalData.AdditionalData}</additionalData>" +
+                $"<additionalData>{additionalData?.AdditionalData}</additionalData>" +
                 "<!--Optional:-->" +
                 $"<callBackUrl>{XmlHelper.EncodeXmlValue(invoice.CallbackUrl)}</callBackUrl>" +
                 $"<payerId>{payerId}</payerId>" +
