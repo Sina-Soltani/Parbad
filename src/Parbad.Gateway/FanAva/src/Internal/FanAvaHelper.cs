@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.WebUtilities;
 using Newtonsoft.Json;
 using Parbad.Abstraction;
 using Parbad.Gateway.FanAva.Internal.Models;
 using Parbad.Http;
 using Parbad.Internal;
 using Parbad.Options;
+using Parbad.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -67,12 +67,13 @@ namespace Parbad.Gateway.FanAva.Internal
 
             var result = JsonConvert.DeserializeObject<FanAvaRequestResultModel>(response);
 
-            var url = QueryHelpers.AddQueryString(gatewayOptions.PaymentPageUrl, new Dictionary<string, string>{
+            var paymentPageUrl = QueryHelper.AddQueryString(gatewayOptions.PaymentPageUrl, new Dictionary<string, string>
+            {
                 {"token", result.Token},
                 {"lang", "fa"}
             });
 
-            return PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, url);
+            return PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, paymentPageUrl);
         }
 
         internal static async Task<FanAvaCallbackResultModel> CreateCallbackResult(
@@ -115,7 +116,9 @@ namespace Parbad.Gateway.FanAva.Internal
 
         internal static async Task<FanAvaCheckResultModel> CreateCheckResult(HttpResponseMessage responseMessage, FanAvaGatewayAccount account, FanAvaCallbackResultModel callbackResult, MessagesOptions messagesOptions)
         {
-            var result = await responseMessage.Content.ReadFromJsonAsync<FanAvaCheckResultModel>();
+            var response = await responseMessage.Content.ReadAsStringAsync();
+
+            var result = JsonConvert.DeserializeObject<FanAvaCheckResultModel>(response);
 
             bool isSucceed;
             PaymentVerifyResult verifyResult = null;
@@ -143,7 +146,6 @@ namespace Parbad.Gateway.FanAva.Internal
             };
         }
 
-
         internal static FanAvaVerifyRequestModel CreateVerifyRequest(InvoiceContext context, FanAvaCallbackResultModel callbackResult, FanAvaCheckResultModel checkResult)
         {
             return new FanAvaVerifyRequestModel
@@ -157,12 +159,11 @@ namespace Parbad.Gateway.FanAva.Internal
 
         internal static async Task<IPaymentVerifyResult> CreateVerifyResult(HttpResponseMessage responseMessage, FanAvaCallbackResultModel callbackResult, MessagesOptions messagesOptions)
         {
-            var verifyResult = await responseMessage.Content.ReadFromJsonAsync<FanAvaVerifyResultModel>()
-                .ConfigureAwaitFalse();
+            var response = await responseMessage.Content.ReadAsStringAsync();
 
-            var isSucceed = verifyResult.Result == "erSucceed";
+            var verifyResult = JsonConvert.DeserializeObject<FanAvaVerifyResultModel>(response);
 
-            if (!isSucceed)
+            if (!verifyResult.IsSucceed)
             {
                 return PaymentVerifyResult.Failed(messagesOptions.InvalidDataReceivedFromGateway);
             }
@@ -186,21 +187,21 @@ namespace Parbad.Gateway.FanAva.Internal
                 InvoiceNumber = callbackResult.InvoiceNumber
             };
         }
+
         internal static async Task<IPaymentRefundResult> CreateRefundResult(HttpResponseMessage responseMessage, FanAvaCallbackResultModel callbackResult, MessagesOptions messagesOptions)
         {
-            var refundResult = await responseMessage.Content.ReadFromJsonAsync<FanAvaVerifyResultModel>()
-                .ConfigureAwaitFalse();
+            var response = await responseMessage.Content.ReadAsStringAsync();
 
-            var isSucceed = refundResult.Result == "erSucceed";
+            var refundResult = JsonConvert.DeserializeObject<FanAvaVerifyResultModel>(response);
 
-            if (!isSucceed)
+            if (!refundResult.IsSucceed)
             {
                 return PaymentRefundResult.Failed(messagesOptions.InvalidDataReceivedFromGateway);
             }
 
             return new PaymentRefundResult
             {
-                IsSucceed = isSucceed,
+                IsSucceed = refundResult.IsSucceed,
                 Amount = Money.Parse(refundResult.Amount),
                 TrackingNumber = long.Parse(refundResult.InvoiceNumber),
                 Status = PaymentRefundResultStatus.Succeed

@@ -16,6 +16,14 @@ namespace Parbad.Internal
 
         public override bool IsSucceed => Status == PaymentRequestResultStatus.Succeed;
 
+        /// <summary>
+        /// Creates an instance of <see cref="PaymentRequestResult"/> which indicates a successful result and a Gateway Transporter with type of Post
+        /// </summary>
+        /// <param name="gatewayAccountName"></param>
+        /// <param name="httpContext"></param>
+        /// <param name="url"></param>
+        /// <param name="form"></param>
+        /// <returns></returns>
         public static PaymentRequestResult SucceedWithPost(
             string gatewayAccountName,
             HttpContext httpContext,

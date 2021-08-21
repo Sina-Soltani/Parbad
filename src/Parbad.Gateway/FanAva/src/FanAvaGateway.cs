@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Parbad.Abstraction;
 using Parbad.Gateway.FanAva.Internal;
 using Parbad.GatewayBuilders;
@@ -8,11 +10,8 @@ using Parbad.Net;
 using Parbad.Options;
 using System;
 using System.Net.Http;
-using System.Net.Http.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace Parbad.Gateway.FanAva
 {
@@ -99,7 +98,7 @@ namespace Parbad.Gateway.FanAva
                 return PaymentVerifyResult.Failed(callbackResult.Message);
             }
 
-            var responseMessage = await _httpClient.PostAsJsonAsync(
+            var responseMessage = await _httpClient.PostJsonAsync(
                     _gatewayOptions.ApiCheckPaymentUrl,
                     callbackResult.CallbackCheckData,
                     cancellationToken)
@@ -118,7 +117,7 @@ namespace Parbad.Gateway.FanAva
 
             var data = FanAvaHelper.CreateVerifyRequest(context, callbackResult, checkResult);
 
-            responseMessage = await _httpClient.PostAsJsonAsync(
+            responseMessage = await _httpClient.PostJsonAsync(
                     _gatewayOptions.ApiVerificationUrl,
                     data,
                     cancellationToken)
@@ -146,7 +145,7 @@ namespace Parbad.Gateway.FanAva
                 return PaymentRefundResult.Failed(callbackResult.Message);
             }
 
-            var responseMessage = await _httpClient.PostAsJsonAsync(
+            var responseMessage = await _httpClient.PostJsonAsync(
                     _gatewayOptions.ApiCheckPaymentUrl,
                     callbackResult.CallbackCheckData,
                     cancellationToken)
@@ -165,7 +164,7 @@ namespace Parbad.Gateway.FanAva
 
             var data = FanAvaHelper.CreateVerifyRequest(context, callbackResult, checkResult);
 
-            responseMessage = await _httpClient.PostAsJsonAsync(
+            responseMessage = await _httpClient.PostJsonAsync(
                     _gatewayOptions.ApiRefundUrl,
                     data,
                     cancellationToken)
