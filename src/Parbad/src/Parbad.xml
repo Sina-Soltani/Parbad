@@ -584,8 +584,11 @@
             <summary>
             Sets the Mobile Number for the current invoice to sent to Mellat Gateway.
             </summary>
-            <param name="builder"></param>
-            <param name="mobileNumber"></param>
+        </member>
+        <member name="M:Parbad.Gateway.Mellat.MellatGatewayInvoiceBuilderExtensions.SetMellatAdditionalData(Parbad.InvoiceBuilder.IInvoiceBuilder,Parbad.Gateway.Mellat.MellatGatewayAdditionalDataRequest)">
+            <summary>
+            Sets additional data for <see cref="T:Parbad.Gateway.Mellat.MellatGateway"/>.
+            </summary>
         </member>
         <member name="T:Parbad.Gateway.Melli.MelliGateway">
             <summary>
@@ -989,13 +992,20 @@
         </member>
         <member name="M:Parbad.Internal.PaymentRequestResult.SucceedWithPost(System.String,Microsoft.AspNetCore.Http.HttpContext,System.String,System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.String,System.String}})">
             <summary>
-            Creates an instance of <see cref="T:Parbad.Internal.PaymentRequestResult"/> which indicates a successful result and a Gateway Transporter with type of Post
+            Creates an instance of <see cref="T:Parbad.Internal.PaymentRequestResult"/> which indicates a successful result and a Gateway Transporter with type of Post.
             </summary>
             <param name="gatewayAccountName"></param>
             <param name="httpContext"></param>
-            <param name="url"></param>
-            <param name="form"></param>
-            <returns></returns>
+            <param name="url">Page URL.</param>
+            <param name="form">Form to post.</param>
+        </member>
+        <member name="M:Parbad.Internal.PaymentRequestResult.SucceedWithRedirect(System.String,Microsoft.AspNetCore.Http.HttpContext,System.String)">
+            <summary>
+            Creates an instance of <see cref="T:Parbad.Internal.PaymentRequestResult"/> which indicates a successful result and a Gateway Transporter with type of Redirect.
+            </summary>
+            <param name="gatewayAccountName"></param>
+            <param name="httpContext"></param>
+            <param name="url">Page URL.</param>
         </member>
         <member name="T:Parbad.Internal.PaymentResult">
             <inheritdoc />

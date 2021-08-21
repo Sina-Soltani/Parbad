@@ -12,8 +12,6 @@ namespace Parbad.Gateway.Mellat
 {
     public static class MellatGatewayInvoiceBuilderExtensions
     {
-        private static string MobileNumberKey => "MellatAdditionalData";
-
         /// <summary>
         /// The invoice will be sent to Mellat gateway.
         /// </summary>
@@ -67,25 +65,35 @@ namespace Parbad.Gateway.Mellat
         /// <summary>
         /// Sets the Mobile Number for the current invoice to sent to Mellat Gateway.
         /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="mobileNumber"></param>
+        [Obsolete("Please use the SetMellatAdditionalData method instead.")]
         public static IInvoiceBuilder SetMellatMobileNumber(this IInvoiceBuilder builder, string mobileNumber)
         {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-            if (mobileNumber == null) throw new ArgumentNullException(nameof(mobileNumber));
+            return SetMellatAdditionalData(builder, new MellatGatewayAdditionalDataRequest
+            {
+                MobileNumber = mobileNumber
+            });
+        }
 
-            builder.AddOrUpdateProperty(MobileNumberKey, mobileNumber);
+        /// <summary>
+        /// Sets additional data for <see cref="MellatGateway"/>.
+        /// </summary>
+        public static IInvoiceBuilder SetMellatAdditionalData(this IInvoiceBuilder builder, MellatGatewayAdditionalDataRequest request)
+        {
+            if (builder == null) throw new ArgumentNullException(nameof(builder));
+            if (request == null) throw new ArgumentNullException(nameof(request));
+
+            builder.AddOrUpdateProperty(MellatHelper.AdditionalDataKey, request);
 
             return builder;
         }
 
-        internal static string GetMellatMobileNumber(this Invoice invoice)
+        internal static MellatGatewayAdditionalDataRequest GetMellatAdditionalData(this Invoice invoice)
         {
             if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-            if (invoice.Properties.ContainsKey(MobileNumberKey))
+            if (invoice.Properties.ContainsKey(MellatHelper.AdditionalDataKey))
             {
-                return (string)invoice.Properties[MobileNumberKey];
+                return (MellatGatewayAdditionalDataRequest)invoice.Properties[MellatHelper.AdditionalDataKey];
             }
 
             return null;
