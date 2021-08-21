@@ -23,7 +23,8 @@ namespace Parbad.Gateway.Mellat.Internal
         private const string AlreadyVerifiedResult = "43";
         private const string SettleSuccess = "45";
 
-        internal const string CumulativeAccountsKey = "MellatCumulativeAccounts";
+        internal static string CumulativeAccountsKey => "MellatCumulativeAccounts";
+        internal static string AdditionalDataKey => "MellatAdditionalData";
 
         public static string CreateRequestData(Invoice invoice, MellatGatewayAccount account)
         {
@@ -66,10 +67,11 @@ namespace Parbad.Gateway.Mellat.Internal
                 {"RefId", refId}
             };
 
-            var mobileNumber = invoice.GetMellatMobileNumber();
-            if (!string.IsNullOrEmpty(mobileNumber))
+            var additionalData = invoice.GetMellatAdditionalData();
+
+            if (!string.IsNullOrWhiteSpace(additionalData?.MobileNumber))
             {
-                form.Add("MobileNo", mobileNumber);
+                form.Add("MobileNo", additionalData.MobileNumber);
             }
 
             return PaymentRequestResult.SucceedWithPost(
@@ -236,6 +238,10 @@ namespace Parbad.Gateway.Mellat.Internal
 
         private static string CreateSimpleRequestData(Invoice invoice, MellatGatewayAccount account)
         {
+            var additionalData = invoice.GetMellatAdditionalData();
+
+            var payerId = additionalData?.PayerId ?? "0";
+
             return
                 "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:int=\"http://interfaces.core.sw.bps.com/\">" +
                 "<soapenv:Header/>" +
@@ -253,10 +259,10 @@ namespace Parbad.Gateway.Mellat.Internal
                 "<!--Optional:-->" +
                 $"<localTime>{DateTime.Now:HHmmss}</localTime>" +
                 "<!--Optional:-->" +
-                "<additionalData></additionalData>" +
+                $"<additionalData>{additionalData.AdditionalData}</additionalData>" +
                 "<!--Optional:-->" +
                 $"<callBackUrl>{XmlHelper.EncodeXmlValue(invoice.CallbackUrl)}</callBackUrl>" +
-                "<payerId>0</payerId>" +
+                $"<payerId>{payerId}</payerId>" +
                 "'</int:bpPayRequest>" +
                 "</soapenv:Body>" +
                 "</soapenv:Envelope>";
@@ -270,15 +276,6 @@ namespace Parbad.Gateway.Mellat.Internal
             {
                 throw new Exception("Cannot use more than 10 accounts for each Cumulative payment request.");
             }
-
-            //var totalAmount = cumulativeAccounts.Sum(cumulativeAccount => cumulativeAccount.Amount);
-
-            //if (totalAmount != invoice.Amount)
-            //{
-            //    throw new Exception("The total amount of Mellat Cumulative accounts is not equals to the amount of the invoice." +
-            //                        $"Invoice amount: {invoice.Amount}." +
-            //                        $"Accounts total amount: {totalAmount}");
-            //}
 
             var additionalData = cumulativeAccounts.Aggregate("", (current, cumulativeAccount) => current + $"{cumulativeAccount};");
 
