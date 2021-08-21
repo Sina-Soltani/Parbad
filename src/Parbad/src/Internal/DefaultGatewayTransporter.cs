@@ -3,6 +3,7 @@
 
 using Microsoft.AspNetCore.Http;
 using System;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -36,7 +37,9 @@ namespace Parbad.Internal
 
                 var form = HtmlFormBuilder.CreateForm(Descriptor.Url, Descriptor.Form);
 
-                return _httpContext.Response.WriteAsync(form, cancellationToken);
+                var buffer = Encoding.UTF8.GetBytes(form);
+
+                return _httpContext.Response.Body.WriteAsync(buffer, 0, buffer.Length, cancellationToken);
             }
 
             HttpResponseUtilities.AddNecessaryContents(_httpContext);
