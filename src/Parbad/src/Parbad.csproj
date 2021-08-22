@@ -27,7 +27,7 @@ More information: https://github.com/Sina-Soltani/Parbad
 
   <PropertyGroup>
     <NoWarn>1701;1702;1591</NoWarn>
-    <PackageReleaseNotes>Fixed: Mellat Gateway Cumulative Accounts.</PackageReleaseNotes>
+    <PackageReleaseNotes>https://github.com/Sina-Soltani/Parbad/releases/tag/V3.8.0</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
