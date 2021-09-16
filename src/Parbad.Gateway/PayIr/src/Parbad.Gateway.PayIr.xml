@@ -42,5 +42,12 @@
             </summary>
             <param name="builder"></param>
         </member>
+        <member name="M:Parbad.Gateway.PayIr.PayIrGatewayInvoiceBuilderExtensions.SetPayIrAdditionalData(Parbad.InvoiceBuilder.IInvoiceBuilder,Parbad.Gateway.PayIr.PayIrRequestAdditionalData)">
+            <summary>
+            Sets additional data to the Invoice for <see cref="T:Parbad.Gateway.PayIr.PayIrGateway"/>.
+            </summary>
+            <param name="builder"></param>
+            <param name="data"></param>
+        </member>
     </members>
 </doc>
