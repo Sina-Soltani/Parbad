@@ -16,16 +16,24 @@ namespace Parbad.Gateway.PayIr.Internal
     internal static class PayIrHelper
     {
         public const string OkResult = "1";
+        public static string RequestAdditionalDataKey => nameof(RequestAdditionalDataKey);
 
         public static PayIrRequestModel CreateRequestData(PayIrGatewayAccount account, Invoice invoice)
         {
             var api = account.IsTestAccount ? "test" : account.Api;
 
+            var additionalData = invoice.GetPayIrAdditionalData();
+
             return new PayIrRequestModel
             {
                 Api = api,
                 Amount = invoice.Amount,
-                Redirect = invoice.CallbackUrl
+                Redirect = invoice.CallbackUrl,
+                NationalCode = additionalData?.NationalCode,
+                Description = additionalData?.Description,
+                FactorNumber = additionalData?.FactorNumber,
+                Mobile = additionalData?.Mobile,
+                ValidCardNumber = additionalData?.ValidCardNumber
             };
         }
 
