@@ -9,12 +9,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Parbad.Abstraction;
 using Parbad.Gateway.AsanPardakht.Internal;
-using Parbad.Gateway.AsanPardakht.Internal.Models;
 using Parbad.GatewayBuilders;
 using Parbad.Internal;
 using Parbad.Net;
 using Parbad.Options;
-using Parbad.Properties;
 
 namespace Parbad.Gateway.AsanPardakht
 {
@@ -70,12 +68,14 @@ namespace Parbad.Gateway.AsanPardakht
 
             var result = await AsanPardakhtHelper.GetTransResult(context, _httpClient, account, _gatewayOptions, _messageOptions, cancellationToken).ConfigureAwaitFalse();
 
-            if (result.IsSucceed)
+            var fetchResult = new PaymentFetchResult
             {
-                return PaymentFetchResult.ReadyForVerifying();
-            }
+                Status = result.IsSucceed ? PaymentFetchResultStatus.ReadyForVerifying : PaymentFetchResultStatus.Failed,
+                Message = result.FailedMessage
+            };
+            fetchResult.SetAsanPardakhtOriginalPaymentResult(result.TransModel);
 
-            return PaymentFetchResult.Failed(result.FailedMessage);
+            return fetchResult;
         }
 
         /// <inheritdoc />
@@ -93,9 +93,15 @@ namespace Parbad.Gateway.AsanPardakht
                 _messageOptions,
                 cancellationToken).ConfigureAwaitFalse();
 
+            var paymentVerifyResult = new PaymentVerifyResult();
+            paymentVerifyResult.SetAsanPardakhtOriginalPaymentResult(transResult.TransModel);
+
             if (!transResult.IsSucceed)
             {
-                return PaymentVerifyResult.Failed(transResult.FailedMessage);
+                paymentVerifyResult.Status = PaymentVerifyResultStatus.Failed;
+                paymentVerifyResult.Message = transResult.FailedMessage;
+
+                return paymentVerifyResult;
             }
 
             var verifyResult = await AsanPardakhtHelper.CompletionMethod(
@@ -109,7 +115,10 @@ namespace Parbad.Gateway.AsanPardakht
 
             if (!verifyResult.IsSucceed)
             {
-                return PaymentVerifyResult.Failed(verifyResult.FailedMeessage);
+                paymentVerifyResult.Status = PaymentVerifyResultStatus.Failed;
+                paymentVerifyResult.Message = verifyResult.FailedMessage;
+
+                return paymentVerifyResult;
             }
 
             var settleResult = await AsanPardakhtHelper.CompletionMethod(
@@ -123,10 +132,17 @@ namespace Parbad.Gateway.AsanPardakht
 
             if (!settleResult.IsSucceed)
             {
-                return PaymentVerifyResult.Failed(settleResult.FailedMeessage);
+                paymentVerifyResult.Status = PaymentVerifyResultStatus.Failed;
+                paymentVerifyResult.Message = settleResult.FailedMessage;
+
+                return paymentVerifyResult;
             }
 
-            return PaymentVerifyResult.Succeed(transResult.TransModel.Rrn, _messageOptions.PaymentSucceed);
+            paymentVerifyResult.Status = PaymentVerifyResultStatus.Succeed;
+            paymentVerifyResult.Message = _messageOptions.PaymentSucceed;
+            paymentVerifyResult.TransactionCode = transResult.TransModel.Rrn;
+
+            return paymentVerifyResult;
         }
 
         /// <inheritdoc />
@@ -160,7 +176,7 @@ namespace Parbad.Gateway.AsanPardakht
 
             if (!refundResult.IsSucceed)
             {
-                return PaymentRefundResult.Failed(refundResult.FailedMeessage);
+                return PaymentRefundResult.Failed(refundResult.FailedMessage);
             }
 
             return PaymentRefundResult.Succeed();

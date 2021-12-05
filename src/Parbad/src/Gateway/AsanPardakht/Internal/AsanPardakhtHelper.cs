@@ -9,8 +9,6 @@ using Parbad.Gateway.AsanPardakht.Internal.Models;
 using Parbad.Internal;
 using Parbad.Net;
 using Parbad.Options;
-using Parbad.Utilities;
-using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
@@ -103,7 +101,7 @@ namespace Parbad.Gateway.AsanPardakht.Internal
                 formData);
         }
 
-        public static async Task<(bool IsSucceed, AsanPardakhtGetTransModel TransModel, string FailedMessage)> GetTransResult(
+        public static async Task<(bool IsSucceed, AsanPardakhtPaymentResultModel TransModel, string FailedMessage)> GetTransResult(
             InvoiceContext context,
             HttpClient httpClient,
             AsanPardakhtGatewayAccount account,
@@ -130,7 +128,7 @@ namespace Parbad.Gateway.AsanPardakht.Internal
                 return (false, null, failedMessage);
             }
 
-            var transModel = JsonConvert.DeserializeObject<AsanPardakhtGetTransModel>(response);
+            var transModel = JsonConvert.DeserializeObject<AsanPardakhtPaymentResultModel>(response);
 
             return (true, transModel, null);
         }
@@ -138,7 +136,7 @@ namespace Parbad.Gateway.AsanPardakht.Internal
         /// <summary>
         /// This method is used for Verification, Settlement, Cancelling and Reversing a payment.
         /// </summary>
-        public static async Task<(bool IsSucceed, string FailedMeessage)> CompletionMethod(
+        public static async Task<(bool IsSucceed, string FailedMessage)> CompletionMethod(
             HttpClient httpClient,
             string apiUrl,
             long payGateTranId,

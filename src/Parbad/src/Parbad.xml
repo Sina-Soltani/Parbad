@@ -509,6 +509,16 @@
             </summary>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
+        <member name="M:Parbad.Gateway.AsanPardakht.AsanPardakhtPaymentResultExtensions.GetAsanPardakhtOriginalPaymentResult(Parbad.IPaymentFetchResult)">
+            <summary>
+            Gets the original payment result that is received from the Asan Pardakht gateway.
+            </summary>
+        </member>
+        <member name="M:Parbad.Gateway.AsanPardakht.AsanPardakhtPaymentResultExtensions.GetAsanPardakhtOriginalPaymentResult(Parbad.IPaymentVerifyResult)">
+            <summary>
+            Gets the original payment result that is received from the Asan Pardakht gateway.
+            </summary>
+        </member>
         <member name="M:Parbad.Gateway.AsanPardakht.Internal.AsanPardakhtHelper.CompletionMethod(System.Net.Http.HttpClient,System.String,System.Int64,Parbad.Gateway.AsanPardakht.AsanPardakhtGatewayAccount,Parbad.Gateway.AsanPardakht.AsanPardakhtGatewayOptions,Parbad.Options.MessagesOptions,System.Threading.CancellationToken)">
             <summary>
             This method is used for Verification, Settlement, Cancelling and Reversing a payment.
