@@ -41,6 +41,11 @@ namespace Parbad
         string GatewayAccountName { get; }
 
         /// <summary>
+        /// Gets the original response code (also known as Status Code) that recevied from the gateway.
+        /// </summary>
+        string GatewayResponseCode { get; set; }
+
+        /// <summary>
         /// A short message about the operation.
         /// </summary>
         string Message { get; }

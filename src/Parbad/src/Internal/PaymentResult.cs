@@ -33,6 +33,9 @@ namespace Parbad.Internal
         public string GatewayAccountName { get; set; }
 
         /// <inheritdoc />
+        public string GatewayResponseCode { get; set; }
+
+        /// <inheritdoc />
         public string Message { get; set; }
 
         /// <inheritdoc />
