@@ -5,6 +5,7 @@ using Parbad.InvoiceBuilder;
 using System;
 using System.Threading.Tasks;
 using Parbad.Gateway.AsanPardakht;
+using Parbad.Utilities;
 
 namespace Parbad.Tests.Gateway.AsanPardakht
 {

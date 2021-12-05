@@ -22,7 +22,7 @@ namespace Parbad.GatewayBuilders
         TAccount Get(string name);
 
         /// <summary>
-        /// Gets the default account.
+        /// Gets the first account.
         /// </summary>
         /// <returns></returns>
         TAccount GetDefaultAccount();

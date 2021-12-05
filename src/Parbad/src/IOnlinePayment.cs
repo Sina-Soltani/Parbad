@@ -27,6 +27,8 @@ namespace Parbad
         /// </summary>
         /// <param name="invoice">The invoice that must be paid.</param>
         /// <param name="cancellationToken"></param>
+        /// <exception cref="PaymentTokenProviderException"></exception>
+        /// <exception cref="ArgumentNullException"></exception>
         Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default);
 
         /// <summary>
@@ -38,7 +40,7 @@ namespace Parbad
         Task<IPaymentFetchResult> FetchAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Fetches the invoice by the given tracking number.
+        /// Fetches the invoice using the given tracking number.
         /// </summary>
         /// <param name="trackingNumber">Invoice's tracking number.</param>
         /// <param name="cancellationToken"></param>
@@ -48,7 +50,7 @@ namespace Parbad
 
         /// <summary>
         /// Verifies the requested payment to check whether or not the invoice was paid in the gateway by the client.
-        /// This method must be called when the fetch result equals to <see cref="PaymentFetchResultStatus.ReadyForVerifying"/>.
+        /// This method must be called when the result of Fetch methods equals to <see cref="PaymentFetchResultStatus.ReadyForVerifying"/>.
         /// </summary>
         /// <param name="trackingNumber">The tracking number of the invoice which must be verified.</param>
         /// <param name="cancellationToken"></param>
@@ -66,10 +68,12 @@ namespace Parbad
 
         /// <summary>
         /// Performs a refund request for the given invoice.
+        /// <para>Note: Pelase keep in mind that not all gateways support the Refund operation.</para>
         /// </summary>
         /// <param name="invoice">The invoice that must be refunded.</param>
         /// <param name="cancellationToken"></param>
         /// <exception cref="InvoiceNotFoundException"></exception>
+        /// <exception cref="ArgumentNullException"></exception>
         Task<IPaymentRefundResult> RefundAsync(RefundInvoice invoice, CancellationToken cancellationToken = default);
     }
 }

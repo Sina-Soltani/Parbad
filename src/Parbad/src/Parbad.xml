@@ -30,6 +30,20 @@
         <member name="M:Parbad.Abstraction.GatewayBase`1.RefundAsync(Parbad.InvoiceContext,Parbad.Money,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
+        <member name="M:Parbad.Abstraction.GatewayBase`1.GetAccountAsync(Parbad.Abstraction.Invoice)">
+            <summary>
+            Gets a gateway account using the specified account name in the given invoice. If no account is given on the invoice, the first account will be retrieved.
+            </summary>
+            <exception cref="T:System.ArgumentNullException"></exception>
+            <exception cref="T:System.Exception"></exception>
+        </member>
+        <member name="M:Parbad.Abstraction.GatewayBase`1.GetAccountAsync(Parbad.Storage.Abstractions.Models.Payment)">
+            <summary>
+            Gets a gateway account using the specified account name in the given <paramref name="payment"/>.
+            </summary>
+            <exception cref="T:System.ArgumentNullException"></exception>
+            <exception cref="T:System.Exception"></exception>
+        </member>
         <member name="T:Parbad.Abstraction.GatewayDescriptor">
             <summary>
             Describes the type of a gateway.
@@ -383,7 +397,7 @@
         </member>
         <member name="M:Parbad.GatewayBuilders.IGatewayAccountCollection`1.GetDefaultAccount">
             <summary>
-            Gets the default account.
+            Gets the first account.
             </summary>
             <returns></returns>
         </member>
@@ -488,6 +502,17 @@
             The invoice will be sent to Asan Pardakht gateway.
             </summary>
             <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.Gateway.AsanPardakht.AsanPardakhtGatewayInvoiceBuilderExtensions.SetAsanPardakhtData(Parbad.InvoiceBuilder.IInvoiceBuilder,Parbad.Gateway.AsanPardakht.AsanPardakhtRequestAdditionalData)">
+            <summary>
+            Sets some additional data to the invoice for <see cref="T:Parbad.Gateway.AsanPardakht.AsanPardakhtGateway"/>.
+            </summary>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="M:Parbad.Gateway.AsanPardakht.Internal.AsanPardakhtHelper.CompletionMethod(System.Net.Http.HttpClient,System.String,System.Int64,Parbad.Gateway.AsanPardakht.AsanPardakhtGatewayAccount,Parbad.Gateway.AsanPardakht.AsanPardakhtGatewayOptions,Parbad.Options.MessagesOptions,System.Threading.CancellationToken)">
+            <summary>
+            This method is used for Verification, Settlement, Cancelling and Reversing a payment.
+            </summary>
         </member>
         <member name="P:Parbad.Gateway.IranKish.Internal.IranKishCallbackResult.InvoiceNumber">
             <summary>
@@ -1030,6 +1055,9 @@
         <member name="P:Parbad.Internal.PaymentResult.GatewayAccountName">
             <inheritdoc />
         </member>
+        <member name="P:Parbad.Internal.PaymentResult.GatewayResponseCode">
+            <inheritdoc />
+        </member>
         <member name="P:Parbad.Internal.PaymentResult.Message">
             <inheritdoc />
         </member>
@@ -1238,6 +1266,8 @@
             </summary>
             <param name="invoice">The invoice that must be paid.</param>
             <param name="cancellationToken"></param>
+            <exception cref="T:Parbad.PaymentTokenProviders.PaymentTokenProviderException"></exception>
+            <exception cref="T:System.ArgumentNullException"></exception>
         </member>
         <member name="M:Parbad.IOnlinePayment.FetchAsync(System.Threading.CancellationToken)">
             <summary>
@@ -1249,7 +1279,7 @@
         </member>
         <member name="M:Parbad.IOnlinePayment.FetchAsync(System.Int64,System.Threading.CancellationToken)">
             <summary>
-            Fetches the invoice by the given tracking number.
+            Fetches the invoice using the given tracking number.
             </summary>
             <param name="trackingNumber">Invoice's tracking number.</param>
             <param name="cancellationToken"></param>
@@ -1259,7 +1289,7 @@
         <member name="M:Parbad.IOnlinePayment.VerifyAsync(System.Int64,System.Threading.CancellationToken)">
             <summary>
             Verifies the requested payment to check whether or not the invoice was paid in the gateway by the client.
-            This method must be called when the fetch result equals to <see cref="F:Parbad.PaymentFetchResultStatus.ReadyForVerifying"/>.
+            This method must be called when the result of Fetch methods equals to <see cref="F:Parbad.PaymentFetchResultStatus.ReadyForVerifying"/>.
             </summary>
             <param name="trackingNumber">The tracking number of the invoice which must be verified.</param>
             <param name="cancellationToken"></param>
@@ -1277,10 +1307,12 @@
         <member name="M:Parbad.IOnlinePayment.RefundAsync(Parbad.RefundInvoice,System.Threading.CancellationToken)">
             <summary>
             Performs a refund request for the given invoice.
+            <para>Note: Pelase keep in mind that not all gateways support the Refund operation.</para>
             </summary>
             <param name="invoice">The invoice that must be refunded.</param>
             <param name="cancellationToken"></param>
             <exception cref="T:Parbad.Exceptions.InvoiceNotFoundException"></exception>
+            <exception cref="T:System.ArgumentNullException"></exception>
         </member>
         <member name="T:Parbad.IOnlinePaymentAccessor">
             <summary>
@@ -1443,6 +1475,11 @@
         <member name="P:Parbad.IPaymentResult.GatewayAccountName">
             <summary>
             Name of the gateway account.
+            </summary>
+        </member>
+        <member name="P:Parbad.IPaymentResult.GatewayResponseCode">
+            <summary>
+            Gets the original response code (also known as Status Code) that recevied from the gateway.
             </summary>
         </member>
         <member name="P:Parbad.IPaymentResult.Message">

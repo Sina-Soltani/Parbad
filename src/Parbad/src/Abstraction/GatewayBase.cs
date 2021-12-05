@@ -32,6 +32,11 @@ namespace Parbad.Abstraction
         /// <inheritdoc />
         public abstract Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default);
 
+        /// <summary>
+        /// Gets a gateway account using the specified account name in the given invoice. If no account is given on the invoice, the first account will be retrieved.
+        /// </summary>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="Exception"></exception>
         protected virtual async Task<TAccount> GetAccountAsync(Invoice invoice)
         {
             var accountName = invoice.GetAccountName();
@@ -56,6 +61,11 @@ namespace Parbad.Abstraction
             return account;
         }
 
+        /// <summary>
+        /// Gets a gateway account using the specified account name in the given <paramref name="payment"/>.
+        /// </summary>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="Exception"></exception>
         protected virtual async Task<TAccount> GetAccountAsync(Payment payment)
         {
             if (payment == null) throw new ArgumentNullException(nameof(payment));

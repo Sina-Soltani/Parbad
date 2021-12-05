@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Parbad.Abstraction;
 using Parbad.Gateway.AsanPardakht.Internal;
+using Parbad.Gateway.AsanPardakht.Internal.Models;
 using Parbad.GatewayBuilders;
 using Parbad.Internal;
 using Parbad.Net;
@@ -22,9 +23,8 @@ namespace Parbad.Gateway.AsanPardakht
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
-        private readonly IAsanPardakhtCrypto _crypto;
         private readonly AsanPardakhtGatewayOptions _gatewayOptions;
-        private readonly IOptions<MessagesOptions> _messageOptions;
+        private readonly MessagesOptions _messageOptions;
 
         public const string Name = "AsanPardakht";
 
@@ -32,15 +32,13 @@ namespace Parbad.Gateway.AsanPardakht
             IHttpContextAccessor httpContextAccessor,
             IHttpClientFactory httpClientFactory,
             IGatewayAccountProvider<AsanPardakhtGatewayAccount> accountProvider,
-            IAsanPardakhtCrypto crypto,
             IOptions<AsanPardakhtGatewayOptions> gatewayOptions,
             IOptions<MessagesOptions> messageOptions) : base(accountProvider)
         {
             _httpContextAccessor = httpContextAccessor;
             _httpClient = httpClientFactory.CreateClient(this);
-            _crypto = crypto;
             _gatewayOptions = gatewayOptions.Value;
-            _messageOptions = messageOptions;
+            _messageOptions = messageOptions.Value;
         }
 
         /// <inheritdoc />
@@ -50,20 +48,17 @@ namespace Parbad.Gateway.AsanPardakht
 
             var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
 
-            var data = AsanPardakhtHelper.CreateRequestData(invoice, account, _crypto);
-
-            var responseMessage = await _httpClient
-                .PostXmlAsync(_gatewayOptions.ApiUrl, data, cancellationToken)
-                .ConfigureAwaitFalse();
-
-            var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
+            var tokenResult = await AsanPardakhtHelper.GetToken(_httpClient, invoice, account, _gatewayOptions, cancellationToken).ConfigureAwaitFalse();
 
             return AsanPardakhtHelper.CreateRequestResult(
-                response,
-                account,
+                tokenResult.Token,
+                tokenResult.IsSucceed,
+                tokenResult.ErrorModel,
                 _httpContextAccessor.HttpContext,
+                invoice,
+                account,
                 _gatewayOptions,
-                _messageOptions.Value);
+                _messageOptions);
         }
 
         /// <inheritdoc />
@@ -73,19 +68,14 @@ namespace Parbad.Gateway.AsanPardakht
 
             var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 
-            var callbackResult = AsanPardakhtHelper.CreateCallbackResult(
-                context,
-                account,
-                _httpContextAccessor.HttpContext.Request,
-                _crypto,
-                _messageOptions.Value);
+            var result = await AsanPardakhtHelper.GetTransResult(context, _httpClient, account, _gatewayOptions, _messageOptions, cancellationToken).ConfigureAwaitFalse();
 
-            if (callbackResult.IsSucceed)
+            if (result.IsSucceed)
             {
                 return PaymentFetchResult.ReadyForVerifying();
             }
 
-            return PaymentFetchResult.Failed(callbackResult.Message);
+            return PaymentFetchResult.Failed(result.FailedMessage);
         }
 
         /// <inheritdoc />
@@ -95,48 +85,85 @@ namespace Parbad.Gateway.AsanPardakht
 
             var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 
-            var callbackResult = AsanPardakhtHelper.CreateCallbackResult(
+            var transResult = await AsanPardakhtHelper.GetTransResult(
                 context,
+                _httpClient,
                 account,
-                _httpContextAccessor.HttpContext.Request,
-                _crypto,
-                _messageOptions.Value);
+                _gatewayOptions,
+                _messageOptions,
+                cancellationToken).ConfigureAwaitFalse();
 
-            if (!callbackResult.IsSucceed)
+            if (!transResult.IsSucceed)
             {
-                return PaymentVerifyResult.Failed(callbackResult.Message);
+                return PaymentVerifyResult.Failed(transResult.FailedMessage);
             }
 
-            var data = AsanPardakhtHelper.CreateVerifyData(callbackResult, account, _crypto);
-
-            var responseMessage = await _httpClient
-                .PostXmlAsync(_gatewayOptions.ApiUrl, data, cancellationToken)
-                .ConfigureAwaitFalse();
-
-            var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
-
-            var verifyResult = AsanPardakhtHelper.CheckVerifyResult(response, callbackResult, _messageOptions.Value);
+            var verifyResult = await AsanPardakhtHelper.CompletionMethod(
+                _httpClient,
+                _gatewayOptions.ApiVerifyUrl,
+                transResult.TransModel.PayGateTranID,
+                account,
+                _gatewayOptions,
+                _messageOptions,
+                cancellationToken);
 
             if (!verifyResult.IsSucceed)
             {
-                return verifyResult.Result;
+                return PaymentVerifyResult.Failed(verifyResult.FailedMeessage);
             }
 
-            data = AsanPardakhtHelper.CreateSettleData(callbackResult, account, _crypto);
+            var settleResult = await AsanPardakhtHelper.CompletionMethod(
+                _httpClient,
+                _gatewayOptions.ApiSettlementUrl,
+                transResult.TransModel.PayGateTranID,
+                account,
+                _gatewayOptions,
+                _messageOptions,
+                cancellationToken);
 
-            responseMessage = await _httpClient
-                .PostXmlAsync(_gatewayOptions.ApiUrl, data, cancellationToken)
-                .ConfigureAwaitFalse();
+            if (!settleResult.IsSucceed)
+            {
+                return PaymentVerifyResult.Failed(settleResult.FailedMeessage);
+            }
 
-            response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
-
-            return AsanPardakhtHelper.CreateSettleResult(response, callbackResult, _messageOptions.Value);
+            return PaymentVerifyResult.Succeed(transResult.TransModel.Rrn, _messageOptions.PaymentSucceed);
         }
 
         /// <inheritdoc />
-        public override Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default)
+        public override async Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default)
         {
-            return PaymentRefundResult.Failed(Resources.RefundNotSupports).ToInterfaceAsync();
+            if (context == null) throw new ArgumentNullException(nameof(context));
+
+            var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
+
+            var transResult = await AsanPardakhtHelper.GetTransResult(
+                context,
+                _httpClient,
+                account,
+                _gatewayOptions,
+                _messageOptions,
+                cancellationToken).ConfigureAwaitFalse();
+
+            if (!transResult.IsSucceed)
+            {
+                return PaymentRefundResult.Failed(transResult.FailedMessage);
+            }
+
+            var refundResult = await AsanPardakhtHelper.CompletionMethod(
+                _httpClient,
+                _gatewayOptions.ApiCancelUrl,
+                transResult.TransModel.PayGateTranID,
+                account,
+                _gatewayOptions,
+                _messageOptions,
+                cancellationToken);
+
+            if (!refundResult.IsSucceed)
+            {
+                return PaymentRefundResult.Failed(refundResult.FailedMeessage);
+            }
+
+            return PaymentRefundResult.Succeed();
         }
     }
 }

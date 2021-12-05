@@ -46,6 +46,28 @@ namespace Parbad.Net
             return httpClient.PostAsync(requestUri, new FormUrlEncodedContent(data), cancellationToken);
         }
 
+        public static async Task<TResult> PostJsonAsync<TResult>(this HttpClient httpClient, string requestUri, object data, CancellationToken cancellationToken = default)
+        {
+            if (httpClient == null) throw new ArgumentNullException(nameof(httpClient));
+
+            var json = JsonConvert.SerializeObject(data, Formatting.None);
+
+            var responseMessage = await httpClient.PostAsync(requestUri, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken);
+
+            var response = await responseMessage.Content.ReadAsStringAsync();
+
+            return JsonConvert.DeserializeObject<TResult>(response);
+        }
+
+        public static async Task<TResult> GetJsonAsync<TResult>(this HttpClient httpClient, string requestUri)
+        {
+            if (httpClient == null) throw new ArgumentNullException(nameof(httpClient));
+
+            var response = await httpClient.GetStringAsync(requestUri);
+
+            return JsonConvert.DeserializeObject<TResult>(response);
+        }
+
         public static void AddOrUpdate(this HttpRequestHeaders headers, string name, string value)
         {
             if (headers == null) throw new ArgumentNullException(nameof(headers));
