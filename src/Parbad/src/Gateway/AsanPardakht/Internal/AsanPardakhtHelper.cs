@@ -64,6 +64,11 @@ namespace Parbad.Gateway.AsanPardakht.Internal
 
             var errorModel = JsonConvert.DeserializeObject<AsanPardakhtApiErrorModel>(response);
 
+            if (string.IsNullOrEmpty(errorModel.Title))
+            {
+                errorModel.Title = response;
+            }
+
             return (null, false, errorModel);
         }
 
@@ -161,7 +166,7 @@ namespace Parbad.Gateway.AsanPardakht.Internal
             {
                 var errorModel = JsonConvert.DeserializeObject<AsanPardakhtApiErrorModel>(response);
 
-                var failedMessage = errorModel.Title ?? messagesOptions.PaymentFailed;
+                var failedMessage = errorModel.Title ?? $"{messagesOptions.PaymentFailed}. {response}";
 
                 return (false, failedMessage);
             }
