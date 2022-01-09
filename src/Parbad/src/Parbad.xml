@@ -477,22 +477,31 @@
         <member name="M:Parbad.Gateway.AsanPardakht.AsanPardakhtGateway.RefundAsync(Parbad.InvoiceContext,Parbad.Money,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
+        <member name="P:Parbad.Gateway.AsanPardakht.AsanPardakhtGatewayAccount.Key">
+            <summary>
+            The Key for encrypting/decrypting the data. You can ask Asan Pardakht Support to receive your key.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.AsanPardakht.AsanPardakhtGatewayAccount.IV">
+            <summary>
+            The IV for encrypting/decrypting the data. You can ask Asan Pardakht Support to receive your IV.
+            </summary>
+        </member>
         <member name="M:Parbad.Gateway.AsanPardakht.AsanPardakhtGatewayBuilderExtensions.AddAsanPardakht(Parbad.GatewayBuilders.IGatewayBuilder)">
             <summary>
-            Adds AsanPardakht gateway to Parbad services.
+            Adds Asan Pardakht gateway to Parbad services.
             </summary>
-            <param name="builder"></param>
         </member>
         <member name="M:Parbad.Gateway.AsanPardakht.AsanPardakhtGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.AsanPardakht.AsanPardakhtGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.Gateway.AsanPardakht.AsanPardakhtGatewayAccount}})">
             <summary>
-            Configures the accounts for <see cref="T:Parbad.Gateway.AsanPardakht.AsanPardakhtGateway"/>.
+            Configures the accounts for Asan Pardakht gateway.
             </summary>
             <param name="builder"></param>
             <param name="configureAccounts">Configures the accounts.</param>
         </member>
         <member name="M:Parbad.Gateway.AsanPardakht.AsanPardakhtGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.AsanPardakht.AsanPardakhtGateway},System.Action{Parbad.Gateway.AsanPardakht.AsanPardakhtGatewayOptions})">
             <summary>
-            Configures the options for AsanPardakht Gateway.
+            Configures the options for Asan Pardakht Gateway.
             </summary>
             <param name="builder"></param>
             <param name="configureOptions">Configuration</param>
@@ -500,28 +509,6 @@
         <member name="M:Parbad.Gateway.AsanPardakht.AsanPardakhtGatewayInvoiceBuilderExtensions.UseAsanPardakht(Parbad.InvoiceBuilder.IInvoiceBuilder)">
             <summary>
             The invoice will be sent to Asan Pardakht gateway.
-            </summary>
-            <param name="builder"></param>
-        </member>
-        <member name="M:Parbad.Gateway.AsanPardakht.AsanPardakhtGatewayInvoiceBuilderExtensions.SetAsanPardakhtData(Parbad.InvoiceBuilder.IInvoiceBuilder,Parbad.Gateway.AsanPardakht.AsanPardakhtRequestAdditionalData)">
-            <summary>
-            Sets some additional data to the invoice for <see cref="T:Parbad.Gateway.AsanPardakht.AsanPardakhtGateway"/>.
-            </summary>
-            <exception cref="T:System.ArgumentNullException"></exception>
-        </member>
-        <member name="M:Parbad.Gateway.AsanPardakht.AsanPardakhtPaymentResultExtensions.GetAsanPardakhtOriginalPaymentResult(Parbad.IPaymentFetchResult)">
-            <summary>
-            Gets the original payment result that is received from the Asan Pardakht gateway.
-            </summary>
-        </member>
-        <member name="M:Parbad.Gateway.AsanPardakht.AsanPardakhtPaymentResultExtensions.GetAsanPardakhtOriginalPaymentResult(Parbad.IPaymentVerifyResult)">
-            <summary>
-            Gets the original payment result that is received from the Asan Pardakht gateway.
-            </summary>
-        </member>
-        <member name="M:Parbad.Gateway.AsanPardakht.Internal.AsanPardakhtHelper.CompletionMethod(System.Net.Http.HttpClient,System.String,System.Int64,Parbad.Gateway.AsanPardakht.AsanPardakhtGatewayAccount,Parbad.Gateway.AsanPardakht.AsanPardakhtGatewayOptions,Parbad.Options.MessagesOptions,System.Threading.CancellationToken)">
-            <summary>
-            This method is used for Verification, Settlement, Cancelling and Reversing a payment.
             </summary>
         </member>
         <member name="P:Parbad.Gateway.IranKish.Internal.IranKishCallbackResult.InvoiceNumber">

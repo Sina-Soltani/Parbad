@@ -2,6 +2,7 @@
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
 using Microsoft.Extensions.DependencyInjection;
+using Parbad.Gateway.AsanPardakht.Internal;
 using Parbad.GatewayBuilders;
 using System;
 
@@ -15,6 +16,8 @@ namespace Parbad.Gateway.AsanPardakht
         public static IGatewayConfigurationBuilder<AsanPardakhtGateway> AddAsanPardakht(this IGatewayBuilder builder)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+            builder.Services.AddSingleton<IAsanPardakhtCrypto, AsanPardakhtCrypto>();
 
             return builder
                 .AddGateway<AsanPardakhtGateway>()
