@@ -1,7 +1,6 @@
-﻿using System;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
+﻿// Copyright (c) Parbad. All rights reserved.
+// Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
+
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Parbad.Abstraction;
@@ -10,6 +9,10 @@ using Parbad.GatewayBuilders;
 using Parbad.Internal;
 using Parbad.Net;
 using Parbad.Options;
+using System;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Parbad.Gateway.AsanPardakht
 {
@@ -20,7 +23,7 @@ namespace Parbad.Gateway.AsanPardakht
         private readonly HttpClient _httpClient;
         private readonly IAsanPardakhtCrypto _crypto;
         private readonly AsanPardakhtGatewayOptions _gatewayOptions;
-        private readonly IOptions<MessagesOptions> _messageOptions;
+        private readonly MessagesOptions _messageOptions;
 
         public const string Name = "AsanPardakht";
 
@@ -36,7 +39,7 @@ namespace Parbad.Gateway.AsanPardakht
             _httpClient = httpClientFactory.CreateClient(this);
             _crypto = crypto;
             _gatewayOptions = gatewayOptions.Value;
-            _messageOptions = messageOptions;
+            _messageOptions = messageOptions.Value;
         }
 
         /// <inheritdoc />
@@ -60,7 +63,7 @@ namespace Parbad.Gateway.AsanPardakht
                 account,
                 _httpContextAccessor.HttpContext,
                 _gatewayOptions,
-                _messageOptions.Value);
+                _messageOptions);
         }
 
         /// <inheritdoc />
@@ -75,7 +78,7 @@ namespace Parbad.Gateway.AsanPardakht
                 account,
                 _httpContextAccessor.HttpContext.Request,
                 _crypto,
-                _messageOptions.Value).ConfigureAwaitFalse();
+                _messageOptions).ConfigureAwaitFalse();
 
             if (callbackResult.IsSucceed)
             {
@@ -97,7 +100,7 @@ namespace Parbad.Gateway.AsanPardakht
                 account,
                 _httpContextAccessor.HttpContext.Request,
                 _crypto,
-                _messageOptions.Value);
+                _messageOptions);
 
             if (!callbackResult.IsSucceed)
             {
@@ -113,7 +116,7 @@ namespace Parbad.Gateway.AsanPardakht
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
-            var verifyResult = AsanPardakhtHelper.CheckVerifyResult(response, callbackResult, _messageOptions.Value);
+            var verifyResult = AsanPardakhtHelper.CheckVerifyResult(response, callbackResult, _messageOptions);
 
             if (!verifyResult.IsSucceed)
             {
@@ -129,7 +132,7 @@ namespace Parbad.Gateway.AsanPardakht
 
             response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
-            return AsanPardakhtHelper.CreateSettleResult(response, callbackResult, _messageOptions.Value);
+            return AsanPardakhtHelper.CreateSettleResult(response, callbackResult, _messageOptions);
         }
 
         /// <inheritdoc />
