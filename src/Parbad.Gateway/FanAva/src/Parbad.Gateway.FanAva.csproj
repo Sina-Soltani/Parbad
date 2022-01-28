@@ -3,7 +3,7 @@
   <PropertyGroup>
     <PackageId>Parbad.Gateway.FanAva</PackageId>
     <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.0;net5.0;net6.0</TargetFrameworks>
-    <VersionPrefix>1.0.0</VersionPrefix>
+    <VersionPrefix>1.1.0</VersionPrefix>
     <LangVersion>latest</LangVersion>
     <Authors>Mohammad Mokhtari</Authors>
     <Copyright>Copyright © Sina Soltani 2016</Copyright>

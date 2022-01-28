@@ -3,7 +3,7 @@
   <PropertyGroup>
     <PackageId>Parbad.Gateway.ZarinPal</PackageId>
     <Product>Parbad.Gateway.ZarinPal</Product>
-    <VersionPrefix>1.2.0</VersionPrefix>
+    <VersionPrefix>1.3.0</VersionPrefix>
     <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.0;net5.0;net6.0</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <Authors>Sina Soltani</Authors>
