@@ -3,8 +3,8 @@
     <PackageId>Parbad.Gateway.PayPing</PackageId>
     <Product>Parbad.Gateway.PayPing</Product>
     <VersionPrefix>1.1.0</VersionPrefix>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.0;net5.0</TargetFrameworks>
-    <LangVersion>9</LangVersion>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.0;net5.0;net6.0</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
     <Authors>Ali Zaferany</Authors>
     <Copyright>Copyright © Parbad 2016</Copyright>
     <PackageProjectUrl>https://github.com/Sina-Soltani/Parbad</PackageProjectUrl>
@@ -16,6 +16,7 @@
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+	<PackageReleaseNotes>Supporting net6.0 is added</PackageReleaseNotes>
     <Description>PayPing Gateway for Parbad project.
 For more information see: https://github.com/Sina-Soltani/Parbad</Description>
   </PropertyGroup>

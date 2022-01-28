@@ -3,8 +3,8 @@
   <PropertyGroup>
     <PackageId>Parbad.Storage.Cache</PackageId>
     <VersionPrefix>1.2.0</VersionPrefix>
-    <LangVersion>9</LangVersion>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.0;netcoreapp3.1;net5.0</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.0;netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
@@ -19,6 +19,7 @@ More information: https://github.com/Sina-Soltani/Parbad</Description>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Authors>Sina Soltani</Authors>
     <Product>Parbad.Storage.Cache</Product>
+	<PackageReleaseNotes>Supporting net6.0 is added</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup>

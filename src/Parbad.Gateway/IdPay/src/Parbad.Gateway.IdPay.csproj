@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.0;net5.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.0;net5.0;net6.0</TargetFrameworks>
     <VersionPrefix>1.2.0</VersionPrefix>
-    <LangVersion>9</LangVersion>
+    <LangVersion>latest</LangVersion>
     <Authors>Sina Soltani</Authors>
     <Copyright>Copyright © Sina Soltani 2016</Copyright>
     <PackageProjectUrl>https://github.com/Sina-Soltani/Parbad</PackageProjectUrl>
@@ -14,6 +14,7 @@
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageTags>parbad Payment Gateway Bank Iran Shetab idpay پرداخت درگاه بانک ایران شتاب</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+	<PackageReleaseNotes>Supporting net6.0 is added</PackageReleaseNotes>
     <Description>IDPay.ir Gateway for Parbad project.
 
 For more information see: https://www.nuget.org/packages/Parbad/</Description>
