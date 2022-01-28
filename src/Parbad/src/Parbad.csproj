@@ -3,7 +3,7 @@
   <PropertyGroup>
     <PackageId>Parbad</PackageId>
     <Product>Parbad</Product>
-    <VersionPrefix>3.8.1</VersionPrefix>
+    <VersionPrefix>3.8.2</VersionPrefix>
     <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.0;netcoreapp3.1;net5.0</TargetFrameworks>
     <LangVersion>9</LangVersion>
     <Authors>Parbad Sina Soltani</Authors>
