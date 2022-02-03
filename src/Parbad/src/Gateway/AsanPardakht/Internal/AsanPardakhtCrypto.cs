@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Parbad.Gateway.AsanPardakht.Internal
 {
-    public class AsanPardakhtCrypto : IAsanPardakhtCrypto
+    internal class AsanPardakhtCrypto : IAsanPardakhtCrypto
     {
         private readonly HttpClient _httpClient;
         private readonly AsanPardakhtGatewayOptions _gatewayOptions;

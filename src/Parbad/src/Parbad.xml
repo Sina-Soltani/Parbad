@@ -1029,6 +1029,26 @@
             <param name="httpContext"></param>
             <param name="url">Page URL.</param>
         </member>
+        <member name="M:Parbad.Internal.PaymentRequestResult.Succeed(Parbad.IGatewayTransporter,System.String)">
+            <summary>
+            Creates an instance of <see cref="T:Parbad.Internal.PaymentRequestResult"/> which indicates a successful result.
+            </summary>
+        </member>
+        <member name="M:Parbad.Internal.PaymentRequestResult.Failed(System.String)">
+            <summary>
+            Creates an instance of <see cref="T:Parbad.Internal.PaymentRequestResult"/> which indicates a failure result.
+            </summary>
+        </member>
+        <member name="M:Parbad.Internal.PaymentRequestResult.Failed(System.String,System.String)">
+            <summary>
+            Creates an instance of <see cref="T:Parbad.Internal.PaymentRequestResult"/> which indicates a failure result.
+            </summary>
+        </member>
+        <member name="M:Parbad.Internal.PaymentRequestResult.Failed(System.String,System.String,System.String)">
+            <summary>
+            Creates an instance of <see cref="T:Parbad.Internal.PaymentRequestResult"/> which indicates a failure result.
+            </summary>
+        </member>
         <member name="T:Parbad.Internal.PaymentResult">
             <inheritdoc />
         </member>
