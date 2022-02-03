@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Parbad.Gateway.AsanPardakht.Internal
 {
-    public class AsanPardakhtHelper
+    internal class AsanPardakhtHelper
     {
         public static string CreateEncryptData(string key, string iv, string input)
         {

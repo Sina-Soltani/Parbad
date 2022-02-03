@@ -3,7 +3,7 @@
 
 namespace Parbad.Gateway.AsanPardakht.Internal.Models
 {
-    public class AsanPardakhtCallbackResult
+    internal class AsanPardakhtCallbackResult
     {
         public bool IsSucceed { get; set; }
 

@@ -54,6 +54,9 @@ namespace Parbad.Internal
             return Succeed(transporter, gatewayAccountName);
         }
 
+        /// <summary>
+        /// Creates an instance of <see cref="PaymentRequestResult"/> which indicates a successful result.
+        /// </summary>
         public static PaymentRequestResult Succeed(IGatewayTransporter gatewayTransporter, string gatewayAccountName)
         {
             return new PaymentRequestResult
@@ -64,16 +67,19 @@ namespace Parbad.Internal
             };
         }
 
-        public static PaymentRequestResult Failed(string message)
-        {
-            return Failed(message, null);
-        }
+        /// <summary>
+        /// Creates an instance of <see cref="PaymentRequestResult"/> which indicates a failure result.
+        /// </summary>
+        public static PaymentRequestResult Failed(string message) => Failed(message, null);
 
-        public static PaymentRequestResult Failed(string message, string gatewayAccountName)
-        {
-            return Failed(message, gatewayAccountName);
-        }
+        /// <summary>
+        /// Creates an instance of <see cref="PaymentRequestResult"/> which indicates a failure result.
+        /// </summary>
+        public static PaymentRequestResult Failed(string message, string gatewayAccountName) => Failed(message, gatewayAccountName, null);
 
+        /// <summary>
+        /// Creates an instance of <see cref="PaymentRequestResult"/> which indicates a failure result.
+        /// </summary>
         public static PaymentRequestResult Failed(string message, string gatewayAccountName, string gatewayResponseCode)
         {
             return new PaymentRequestResult

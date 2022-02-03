@@ -5,7 +5,7 @@ using Parbad.Internal;
 
 namespace Parbad.Gateway.AsanPardakht.Internal.Models
 {
-    public class AsanPardakhtVerifyResult
+    internal class AsanPardakhtVerifyResult
     {
         public bool IsSucceed { get; internal set; }
 
