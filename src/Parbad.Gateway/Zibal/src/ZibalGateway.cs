@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) Parbad. All rights reserved.
+// Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
+
+using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,7 +19,7 @@ using Parbad.Options;
 namespace Parbad.Gateway.Zibal
 {
     [Gateway(Name)]
-    public class ZibalGateway: GatewayBase<ZibalGatewayAccount>
+    public class ZibalGateway : GatewayBase<ZibalGatewayAccount>
     {
         public const string Name = "Zibal";
 
@@ -24,10 +27,12 @@ namespace Parbad.Gateway.Zibal
         private readonly HttpClient _httpClient;
         private readonly ZibalGatewayOptions _gatewayOptions;
         private readonly ParbadOptions _options;
+
         private static JsonSerializerSettings DefaultSerializerSettings => new JsonSerializerSettings
         {
             ContractResolver = new CamelCasePropertyNamesContractResolver()
         };
+
         public ZibalGateway(
             IGatewayAccountProvider<ZibalGatewayAccount> accountProvider,
             IHttpContextAccessor httpContextAccessor,
@@ -40,7 +45,7 @@ namespace Parbad.Gateway.Zibal
             _gatewayOptions = gatewayOptions.Value;
             _options = options.Value;
         }
-    
+
 
         public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
         {
@@ -59,6 +64,8 @@ namespace Parbad.Gateway.Zibal
 
         public override Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default)
         {
+            //TODO: implement the Fetch
+
             IPaymentFetchResult result = PaymentFetchResult.ReadyForVerifying();
 
             return Task.FromResult(result);

@@ -1,32 +1,34 @@
-﻿using System;
+﻿// Copyright (c) Parbad. All rights reserved.
+// Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.Transactions;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Parbad.Abstraction;
 using Parbad.Internal;
 using Parbad.Options;
 using Parbad.Storage.Abstractions.Models;
-using Transaction = Parbad.Storage.Abstractions.Models.Transaction;
 
 namespace Parbad.Gateway.Zibal.Internal
 {
     internal static class ZibalHelper
     {
+        private const int SuccessCode = 100;
+
         public static string ZibalRequestAdditionalKeyName => "ZibalRequest";
         public static string TrackIdAdditionalDataKey => "TrackId";
-        private const int SuccessCode = 100;
 
         public static ZibalRequestModel CreateRequestData(Invoice invoice, ZibalGatewayAccount account)
         {
             var request = invoice.GetZibalRequest();
 
-            if (request == null) throw new Exception("ZibalRequest object not found. Make sure that you are using the UseZibal method.");
+            if (request == null) throw new Exception("ZibalRequest object not found. Make sure that you are using the SetZibalData method when creating an invoice.");
 
-            return new ZibalRequestModel()
+            return new ZibalRequestModel
             {
                 //if Merchant value is 'zibal' , Gateway mode is sandBox
                 Merchant = account.IsSandBox ? "zibal" : account.Merchant,
@@ -46,7 +48,7 @@ namespace Parbad.Gateway.Zibal.Internal
             HttpContext httpContext,
             ZibalGatewayAccount account,
             ZibalGatewayOptions gatewayOptions,
-            MessagesOptions optionsMessages)
+            MessagesOptions messagesOptions)
         {
             var message = await responseMessage.Content.ReadAsStringAsync();
 
@@ -54,31 +56,27 @@ namespace Parbad.Gateway.Zibal.Internal
 
             if (response == null)
             {
-                return PaymentRequestResult.Failed(optionsMessages.InvalidDataReceivedFromGateway, account.Name);
+                return PaymentRequestResult.Failed(messagesOptions.InvalidDataReceivedFromGateway, account.Name);
             }
 
             if (response.Result != SuccessCode)
             {
-                var failureMessage = ZibalTranslator.TranslateResult(response.Result) ?? response.Message;
+                var failureMessage = ZibalTranslator.TranslateResult(response.Result) ?? response.Message ?? messagesOptions.PaymentFailed;
+
                 return PaymentRequestResult.Failed(failureMessage, account.Name);
             }
 
-            var paymentPageUrl = response.PayLink 
-                                 ?? GetPaymentUrl(gatewayOptions.PaymentUrl, response.TrackId);
+            var paymentPageUrl = string.IsNullOrEmpty(response.PayLink)
+                                ? GetPaymentPageUrl(gatewayOptions.PaymentUrl, response.TrackId)
+                                : response.PayLink;
 
             var result = PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, paymentPageUrl);
+
             result.DatabaseAdditionalData.Add(TrackIdAdditionalDataKey, response.TrackId.ToString());
 
             return result;
         }
 
-        private static string GetPaymentUrl(string paymentUrl, long trackId)
-        {
-            if (paymentUrl.EndsWith('/'))
-                paymentUrl = paymentUrl.Substring(0, paymentUrl.Length - 1);
-
-            return $"{paymentUrl}/{trackId}";
-        }
         public static ZibalVerifyRequestModel CreateVerifyData(
             IEnumerable<Transaction> transactions,
             ZibalGatewayAccount account)
@@ -101,29 +99,41 @@ namespace Parbad.Gateway.Zibal.Internal
             };
         }
 
-        public static async Task<PaymentVerifyResult> CreateVerifyResult(HttpResponseMessage responseMessage, MessagesOptions optionsMessages)
+        public static async Task<PaymentVerifyResult> CreateVerifyResult(HttpResponseMessage responseMessage, MessagesOptions messagesOptions)
         {
             var message = await responseMessage.Content.ReadAsStringAsync();
 
             var response = JsonConvert.DeserializeObject<ZibalVerifyResponseModel>(message);
+
             if (response == null)
             {
-                return PaymentVerifyResult.Failed(optionsMessages.InvalidDataReceivedFromGateway);
+                return PaymentVerifyResult.Failed(messagesOptions.InvalidDataReceivedFromGateway);
             }
 
             if (response.Result != SuccessCode)
             {
-                var failureMessage = ZibalTranslator.TranslateResult(response.Result) ?? optionsMessages.PaymentFailed;
+                string failureMessage;
 
-                if (response.Status != null)
-                    failureMessage = ZibalTranslator.TranslateStatus((int)response.Status)
-                                     ?? optionsMessages.PaymentFailed;
+                if (response.Status == null)
+                {
+                    failureMessage = ZibalTranslator.TranslateResult(response.Result) ?? messagesOptions.PaymentFailed;
+                }
+                else
+                {
+                    failureMessage = ZibalTranslator.TranslateStatus((int)response.Status) ?? messagesOptions.PaymentFailed;
+                }
 
                 return PaymentVerifyResult.Failed(failureMessage);
             }
 
-            var successMessage = $"{optionsMessages.PaymentSucceed}-status is {response.Result}";
-            return PaymentVerifyResult.Succeed(response.RefNumber.ToString(), successMessage);
+            return PaymentVerifyResult.Succeed(response.RefNumber.ToString(), messagesOptions.PaymentSucceed);
+        }
+
+        private static string GetPaymentPageUrl(string paymentUrl, long trackId)
+        {
+            paymentUrl = paymentUrl.ToggleStringAtEnd("/", false);
+
+            return $"{paymentUrl}/{trackId}";
         }
     }
 }
