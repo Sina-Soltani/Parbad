@@ -14,7 +14,7 @@ namespace Parbad.Gateway.Zibal
         /// </summary>
         /// <param name="builder"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public static IInvoiceBuilder UseZibalPal(this IInvoiceBuilder builder)
+        public static IInvoiceBuilder UseZibal(this IInvoiceBuilder builder)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
@@ -27,15 +27,11 @@ namespace Parbad.Gateway.Zibal
         /// <param name="builder"></param>
         /// <param name="zarinPalInvoice">Describes an invoice for ZarinPal gateway.</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public static IInvoiceBuilder SetZibalData(this IInvoiceBuilder builder, Action<ZibalRequest> configureZibal)
+        public static IInvoiceBuilder SetZibalData(this IInvoiceBuilder builder, ZibalRequest zibalRequest)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
-            if (configureZibal == null) throw new ArgumentNullException(nameof(configureZibal));
 
-            var payPingRequest = new ZibalRequest();
-            configureZibal(payPingRequest);
-
-            builder.AddOrUpdateProperty(ZibalHelper.ZibalRequestAdditionalKeyName, payPingRequest);
+            builder.AddOrUpdateProperty(ZibalHelper.ZibalRequestAdditionalKeyName, zibalRequest);
             return builder;
         }
 
@@ -45,7 +41,16 @@ namespace Parbad.Gateway.Zibal
 
             if (invoice.Properties.ContainsKey(ZibalHelper.ZibalRequestAdditionalKeyName))
             {
-                return (ZibalRequestModel)invoice.Properties[ZibalHelper.ZibalRequestAdditionalKeyName];
+                var model =(ZibalRequest)  invoice.Properties[ZibalHelper.ZibalRequestAdditionalKeyName];
+                return new ZibalRequestModel()
+                {
+                    CustomerMobile = model.CustomerMobile,
+                    Description = model.Description,
+                    FeeMode = model.FeeMode,
+                    SendSms = model.SendSms,
+                    AllowedCards = model.AllowedCards,
+                    LinkToPay = model.LinkToPay,
+                };
             }
 
             return null;

@@ -4,6 +4,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using Parbad.Abstraction;
 using Parbad.Gateway.Zibal.Internal;
 using Parbad.GatewayBuilders;
@@ -22,7 +24,10 @@ namespace Parbad.Gateway.Zibal
         private readonly HttpClient _httpClient;
         private readonly ZibalGatewayOptions _gatewayOptions;
         private readonly ParbadOptions _options;
-
+        private static JsonSerializerSettings DefaultSerializerSettings => new JsonSerializerSettings
+        {
+            ContractResolver = new CamelCasePropertyNamesContractResolver()
+        };
         public ZibalGateway(
             IGatewayAccountProvider<ZibalGatewayAccount> accountProvider,
             IHttpContextAccessor httpContextAccessor,
@@ -46,7 +51,7 @@ namespace Parbad.Gateway.Zibal
             var data = ZibalHelper.CreateRequestData(invoice, account);
 
             var responseMessage = await _httpClient
-                .PostJsonAsync(_gatewayOptions.RequestURl, data, cancellationToken)
+                .PostJsonAsync(_gatewayOptions.RequestURl, data, DefaultSerializerSettings, cancellationToken)
                 .ConfigureAwaitFalse();
 
             return await ZibalHelper.CreateRequestResult(responseMessage, _httpContextAccessor.HttpContext, account, _gatewayOptions, _options.Messages);
@@ -68,7 +73,7 @@ namespace Parbad.Gateway.Zibal
             var data = ZibalHelper.CreateVerifyData(context.Transactions, account);
 
             var responseMessage = await _httpClient
-                .PostJsonAsync(_gatewayOptions.VerifyURl, data, cancellationToken)
+                .PostJsonAsync(_gatewayOptions.VerifyURl, data, DefaultSerializerSettings, cancellationToken)
                 .ConfigureAwaitFalse();
 
             return await ZibalHelper.CreateVerifyResult(responseMessage, _options.Messages);

@@ -2,7 +2,7 @@
 {
     internal static class ZibalTranslator
     {
-        public static string TranslateResult(int result)
+        public static string? TranslateResult(int result)
         {
             return result switch
             {
@@ -15,10 +15,10 @@
                 114 => "مبلغ تراکنش از سقف میزان تراکنش بیشتر است.",
                 107 => "percentMode نامعتبر می‌باشد.",
                 112 => "موجودی کیف‌پول اصلی شما جهت ثبت این سفارش کافی نمی‌باشد. (در صورتی که feeMode == 1 )",
-                _ => ""
+                _ => null
             };
         }
-        public static string TranslateStatus(int status)
+        public static string? TranslateStatus(int status)
         {
             return status switch
             {
@@ -36,7 +36,7 @@
                 10 => "‌صادرکننده‌ی کارت نامعتبر می‌باشد.",
                 11 => "‌خطای سوییچ",
                 12 => "کارت قابل دسترسی نمی‌باشد.",
-                _ => ""
+                _ => null
             };
         }
     }

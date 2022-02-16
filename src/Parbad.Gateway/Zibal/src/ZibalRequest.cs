@@ -15,6 +15,7 @@
         /// </summary>
         /// <value>0 - Deduction from the transaction | 1 - Deduction from the wallet | 2 - Add to payment amount</value>
         public int FeeMode { get; set; }
-
+        public string[]? AllowedCards { get; set; }
+        public bool LinkToPay { get; set; } = false;
     }
 }

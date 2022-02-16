@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Transactions;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Parbad.Abstraction;
 using Parbad.Internal;
 using Parbad.Options;
 using Parbad.Storage.Abstractions.Models;
+using Transaction = Parbad.Storage.Abstractions.Models.Transaction;
 
 namespace Parbad.Gateway.Zibal.Internal
 {
@@ -22,14 +24,15 @@ namespace Parbad.Gateway.Zibal.Internal
         {
             var request = invoice.GetZibalRequest();
 
-            if (request == null) throw new Exception("ZibalRequest object not found. Make sure that you are using the UseYekPay method.");
+            if (request == null) throw new Exception("ZibalRequest object not found. Make sure that you are using the UseZibal method.");
 
             return new ZibalRequestModel()
             {
-                MerchantId = account.Merchant,
+                //if Merchant value is 'zibal' , Gateway mode is sandBox
+                Merchant = account.IsSandBox ? "zibal" : account.Merchant,
                 Amount = invoice.Amount,
                 CustomerMobile = request.CustomerMobile,
-                OrderId = invoice.TrackingNumber.ToString(),
+                OrderId =  invoice.TrackingNumber.ToString(),
                 CallBackUrl = invoice.CallbackUrl,
                 Description = request.Description,
                 FeeMode = request.FeeMode,
@@ -56,12 +59,11 @@ namespace Parbad.Gateway.Zibal.Internal
 
             if (response.Result != SuccessCode)
             {
-                var failureMessage = response.Message;
-
+                var failureMessage = ZibalTranslator.TranslateResult(response.Result) ?? response.Message;
                 return PaymentRequestResult.Failed(failureMessage, account.Name);
             }
 
-            var paymentPageUrl = response.PayLink;
+            var paymentPageUrl = response.PayLink ?? gatewayOptions.PaymentUrl(response.TrackId);
 
             var result = PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, paymentPageUrl);
             result.DatabaseAdditionalData.Add(TrackIdAdditionalDataKey, response.TrackId.ToString());
@@ -96,7 +98,6 @@ namespace Parbad.Gateway.Zibal.Internal
             var message = await responseMessage.Content.ReadAsStringAsync();
 
             var response = JsonConvert.DeserializeObject<ZibalVerifyResponseModel>(message);
-
             if (response == null)
             {
                 return PaymentVerifyResult.Failed(optionsMessages.InvalidDataReceivedFromGateway);
@@ -104,12 +105,17 @@ namespace Parbad.Gateway.Zibal.Internal
 
             if (response.Result != SuccessCode)
             {
-                var failureMessage = response.Description ?? optionsMessages.PaymentFailed;
+                var failureMessage = ZibalTranslator.TranslateResult(response.Result) ?? optionsMessages.PaymentFailed;
+
+                if (response.Status != null)
+                    failureMessage = ZibalTranslator.TranslateStatus((int) response.Status)
+                                     ?? optionsMessages.PaymentFailed;
 
                 return PaymentVerifyResult.Failed(failureMessage);
             }
 
-            return PaymentVerifyResult.Succeed(response.RefNumber.ToString(), optionsMessages.PaymentSucceed);
+            var successMessage = $"{optionsMessages.PaymentSucceed}-status is {response.Result}";
+            return PaymentVerifyResult.Succeed(response.RefNumber.ToString(), successMessage);
         }
     }
 }
