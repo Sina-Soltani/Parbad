@@ -32,7 +32,7 @@ namespace Parbad.Gateway.Zibal.Internal
                 Merchant = account.IsSandBox ? "zibal" : account.Merchant,
                 Amount = invoice.Amount,
                 CustomerMobile = request.CustomerMobile,
-                OrderId =  invoice.TrackingNumber.ToString(),
+                OrderId = invoice.TrackingNumber.ToString(),
                 CallBackUrl = invoice.CallbackUrl,
                 Description = request.Description,
                 FeeMode = request.FeeMode,
@@ -63,7 +63,8 @@ namespace Parbad.Gateway.Zibal.Internal
                 return PaymentRequestResult.Failed(failureMessage, account.Name);
             }
 
-            var paymentPageUrl = response.PayLink ?? gatewayOptions.PaymentUrl(response.TrackId);
+            var paymentPageUrl = response.PayLink 
+                                 ?? GetPaymentUrl(gatewayOptions.PaymentUrl, response.TrackId);
 
             var result = PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, paymentPageUrl);
             result.DatabaseAdditionalData.Add(TrackIdAdditionalDataKey, response.TrackId.ToString());
@@ -71,6 +72,13 @@ namespace Parbad.Gateway.Zibal.Internal
             return result;
         }
 
+        private static string GetPaymentUrl(string paymentUrl, long trackId)
+        {
+            if (paymentUrl.EndsWith('/'))
+                paymentUrl = paymentUrl.Substring(0, paymentUrl.Length - 1);
+
+            return $"{paymentUrl}/{trackId}";
+        }
         public static ZibalVerifyRequestModel CreateVerifyData(
             IEnumerable<Transaction> transactions,
             ZibalGatewayAccount account)
@@ -108,7 +116,7 @@ namespace Parbad.Gateway.Zibal.Internal
                 var failureMessage = ZibalTranslator.TranslateResult(response.Result) ?? optionsMessages.PaymentFailed;
 
                 if (response.Status != null)
-                    failureMessage = ZibalTranslator.TranslateStatus((int) response.Status)
+                    failureMessage = ZibalTranslator.TranslateStatus((int)response.Status)
                                      ?? optionsMessages.PaymentFailed;
 
                 return PaymentVerifyResult.Failed(failureMessage);
