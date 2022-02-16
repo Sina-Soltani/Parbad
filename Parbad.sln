@@ -97,6 +97,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parbad.Gateway.FanAva", "sr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parbad.Gateway.FanAva.Tests", "src\Parbad.Gateway\FanAva\tests\Parbad.Gateway.FanAva.Tests.csproj", "{D1F5CF0A-BD88-4B12-B58D-E286690D147C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Zibal", "Zibal", "{3506EB66-92DD-4E0A-B0C1-B943FD4071AA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Parbad.Gateway.Zibal", "src\Parbad.Gateway\Zibal\src\Parbad.Gateway.Zibal.csproj", "{EF684245-CD65-46F8-84E3-4BF1D43E3146}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		src\Parbad.Shared\Parbad.Shared.projitems*{2e124fc2-6fa6-45e1-9912-edca1c19cef7}*SharedItemsImports = 13
@@ -188,6 +192,10 @@ Global
 		{D1F5CF0A-BD88-4B12-B58D-E286690D147C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D1F5CF0A-BD88-4B12-B58D-E286690D147C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D1F5CF0A-BD88-4B12-B58D-E286690D147C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF684245-CD65-46F8-84E3-4BF1D43E3146}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF684245-CD65-46F8-84E3-4BF1D43E3146}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF684245-CD65-46F8-84E3-4BF1D43E3146}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF684245-CD65-46F8-84E3-4BF1D43E3146}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -231,6 +239,8 @@ Global
 		{05CE4791-3EB8-4DA6-A0C3-4379878BBDAA} = {B1447D20-66E0-46FB-B0DB-BCBEBA7B337A}
 		{195B34C2-DF07-4CE0-80F9-A3FBA8A8EF68} = {05CE4791-3EB8-4DA6-A0C3-4379878BBDAA}
 		{D1F5CF0A-BD88-4B12-B58D-E286690D147C} = {05CE4791-3EB8-4DA6-A0C3-4379878BBDAA}
+		{3506EB66-92DD-4E0A-B0C1-B943FD4071AA} = {B1447D20-66E0-46FB-B0DB-BCBEBA7B337A}
+		{EF684245-CD65-46F8-84E3-4BF1D43E3146} = {3506EB66-92DD-4E0A-B0C1-B943FD4071AA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CBDDB699-C14A-4235-B0AE-32725230B4ED}
