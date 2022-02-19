@@ -16,7 +16,7 @@
     <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageTags>parbad Payment Gateway Bank Iran Shetab zibal پرداخت درگاه بانک ایران شتاب زیبال</PackageTags>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <Description>Zibal Gateway for Parbad project.
 
 For more information see: https://github.com/Sina-Soltani/Parbad</Description>
@@ -24,14 +24,6 @@ For more information see: https://github.com/Sina-Soltani/Parbad</Description>
 
   <PropertyGroup>
     <NoWarn>1701;1702;1591</NoWarn>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>Parbad.Gateway.Zibal.xml</DocumentationFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>Parbad.Gateway.Zibal.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
