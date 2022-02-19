@@ -9,6 +9,6 @@ namespace Parbad.Gateway.Zibal
     {
         public string? Merchant { get; set; }
 
-        public bool IsSandBox { get; set; }
+        public bool IsSandbox { get; set; }
     }
 }

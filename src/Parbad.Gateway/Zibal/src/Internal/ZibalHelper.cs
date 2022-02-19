@@ -20,6 +20,7 @@ namespace Parbad.Gateway.Zibal.Internal
     internal static class ZibalHelper
     {
         private const int SuccessCode = 100;
+        private const int PaymentAlreadyVerifiedCode = 201;
 
         public static string ZibalRequestAdditionalKeyName => "ZibalRequest";
         public static string TrackIdAdditionalDataKey => "TrackId";
@@ -31,7 +32,7 @@ namespace Parbad.Gateway.Zibal.Internal
             return new
             {
                 //if Merchant value is 'zibal' , Gateway mode is sandBox
-                Merchant = account.IsSandBox ? "zibal" : account.Merchant,
+                Merchant = account.IsSandbox ? "zibal" : account.Merchant,
                 Amount = invoice.Amount,
                 CustomerMobile = requestAdditionalData?.MobileNumber,
                 OrderId = invoice.TrackingNumber.ToString(),
@@ -63,7 +64,7 @@ namespace Parbad.Gateway.Zibal.Internal
             {
                 var failureMessage = ZibalTranslator.TranslateResult(response.Result) ?? response.Message ?? messagesOptions.PaymentFailed;
 
-                return PaymentRequestResult.Failed(failureMessage, account.Name);
+                return PaymentRequestResult.Failed(failureMessage, account.Name, response.Result.ToString());
             }
 
             var paymentPageUrl = string.IsNullOrEmpty(response.PayLink)
@@ -143,7 +144,15 @@ namespace Parbad.Gateway.Zibal.Internal
                     failureMessage = ZibalTranslator.TranslateStatus((int)response.Status) ?? messagesOptions.PaymentFailed;
                 }
 
-                return PaymentVerifyResult.Failed(failureMessage);
+                var verifyResult = PaymentVerifyResult.Failed(failureMessage);
+                verifyResult.GatewayResponseCode = response.Status.ToString();
+
+                if (response.Result == PaymentAlreadyVerifiedCode)
+                {
+                    verifyResult.Status = PaymentVerifyResultStatus.AlreadyVerified;
+                }
+
+                return verifyResult;
             }
 
             return PaymentVerifyResult.Succeed(response.RefNumber.ToString(), messagesOptions.PaymentSucceed);
@@ -151,6 +160,8 @@ namespace Parbad.Gateway.Zibal.Internal
 
         private static string GetPaymentPageUrl(string paymentUrl, long trackId)
         {
+            if (string.IsNullOrEmpty(paymentUrl)) throw new ArgumentNullException(nameof(paymentUrl), $"'{nameof(paymentUrl)}' cannot be null or empty.");
+
             paymentUrl = paymentUrl.ToggleStringAtEnd("/", false);
 
             return $"{paymentUrl}/{trackId}";
