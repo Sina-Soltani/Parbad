@@ -1,7 +1,6 @@
-﻿using System;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
+﻿// Copyright (c) Parbad. All rights reserved.
+// Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
+
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -12,11 +11,15 @@ using Parbad.GatewayBuilders;
 using Parbad.Internal;
 using Parbad.Net;
 using Parbad.Options;
+using System;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Parbad.Gateway.Zibal
 {
     [Gateway(Name)]
-    public class ZibalGateway: GatewayBase<ZibalGatewayAccount>
+    public class ZibalGateway : GatewayBase<ZibalGatewayAccount>
     {
         public const string Name = "Zibal";
 
@@ -24,10 +27,12 @@ namespace Parbad.Gateway.Zibal
         private readonly HttpClient _httpClient;
         private readonly ZibalGatewayOptions _gatewayOptions;
         private readonly ParbadOptions _options;
-        private static JsonSerializerSettings DefaultSerializerSettings => new JsonSerializerSettings
+
+        private static JsonSerializerSettings DefaultSerializerSettings => new()
         {
             ContractResolver = new CamelCasePropertyNamesContractResolver()
         };
+
         public ZibalGateway(
             IGatewayAccountProvider<ZibalGatewayAccount> accountProvider,
             IHttpContextAccessor httpContextAccessor,
@@ -40,7 +45,6 @@ namespace Parbad.Gateway.Zibal
             _gatewayOptions = gatewayOptions.Value;
             _options = options.Value;
         }
-    
 
         public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
         {
@@ -51,7 +55,7 @@ namespace Parbad.Gateway.Zibal
             var data = ZibalHelper.CreateRequestData(invoice, account);
 
             var responseMessage = await _httpClient
-                .PostJsonAsync(_gatewayOptions.RequestURl, data, DefaultSerializerSettings, cancellationToken)
+                .PostJsonAsync(_gatewayOptions.ApiRequestUrl, data, DefaultSerializerSettings, cancellationToken)
                 .ConfigureAwaitFalse();
 
             return await ZibalHelper.CreateRequestResult(responseMessage, _httpContextAccessor.HttpContext, account, _gatewayOptions, _options.Messages);
@@ -59,9 +63,12 @@ namespace Parbad.Gateway.Zibal
 
         public override Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default)
         {
-            IPaymentFetchResult result = PaymentFetchResult.ReadyForVerifying();
+            if (context == null) throw new ArgumentNullException(nameof(context));
 
-            return Task.FromResult(result);
+            return ZibalHelper.CreateFetchResult(_httpContextAccessor.HttpContext.Request,
+                                                                        context,
+                                                                        _options.Messages,
+                                                                        cancellationToken);
         }
 
         public override async Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default)
@@ -73,7 +80,7 @@ namespace Parbad.Gateway.Zibal
             var data = ZibalHelper.CreateVerifyData(context.Transactions, account);
 
             var responseMessage = await _httpClient
-                .PostJsonAsync(_gatewayOptions.VerifyURl, data, DefaultSerializerSettings, cancellationToken)
+                .PostJsonAsync(_gatewayOptions.ApiVerificationUrl, data, DefaultSerializerSettings, cancellationToken)
                 .ConfigureAwaitFalse();
 
             return await ZibalHelper.CreateVerifyResult(responseMessage, _options.Messages);
