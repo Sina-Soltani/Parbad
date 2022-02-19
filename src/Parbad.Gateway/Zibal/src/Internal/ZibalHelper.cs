@@ -67,7 +67,7 @@ namespace Parbad.Gateway.Zibal.Internal
             }
 
             var paymentPageUrl = string.IsNullOrEmpty(response.PayLink)
-                                ? GetPaymentPageUrl(gatewayOptions.PaymentUrl, response.TrackId)
+                                ? GetPaymentPageUrl(gatewayOptions.PaymentPageUrl, response.TrackId)
                                 : response.PayLink;
 
             var result = PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, paymentPageUrl);

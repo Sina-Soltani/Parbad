@@ -28,7 +28,7 @@ namespace Parbad.Gateway.Zibal
         private readonly ZibalGatewayOptions _gatewayOptions;
         private readonly ParbadOptions _options;
 
-        private static JsonSerializerSettings DefaultSerializerSettings => new JsonSerializerSettings
+        private static JsonSerializerSettings DefaultSerializerSettings => new()
         {
             ContractResolver = new CamelCasePropertyNamesContractResolver()
         };
@@ -46,7 +46,6 @@ namespace Parbad.Gateway.Zibal
             _options = options.Value;
         }
 
-
         public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
         {
             if (invoice == null) throw new ArgumentNullException(nameof(invoice));
@@ -56,7 +55,7 @@ namespace Parbad.Gateway.Zibal
             var data = ZibalHelper.CreateRequestData(invoice, account);
 
             var responseMessage = await _httpClient
-                .PostJsonAsync(_gatewayOptions.RequestURl, data, DefaultSerializerSettings, cancellationToken)
+                .PostJsonAsync(_gatewayOptions.ApiRequestUrl, data, DefaultSerializerSettings, cancellationToken)
                 .ConfigureAwaitFalse();
 
             return await ZibalHelper.CreateRequestResult(responseMessage, _httpContextAccessor.HttpContext, account, _gatewayOptions, _options.Messages);
@@ -81,7 +80,7 @@ namespace Parbad.Gateway.Zibal
             var data = ZibalHelper.CreateVerifyData(context.Transactions, account);
 
             var responseMessage = await _httpClient
-                .PostJsonAsync(_gatewayOptions.VerifyURl, data, DefaultSerializerSettings, cancellationToken)
+                .PostJsonAsync(_gatewayOptions.ApiVerificationUrl, data, DefaultSerializerSettings, cancellationToken)
                 .ConfigureAwaitFalse();
 
             return await ZibalHelper.CreateVerifyResult(responseMessage, _options.Messages);
