@@ -23,37 +23,26 @@ namespace Parbad.Gateway.Zibal
         }
 
         /// <summary>
-        /// Sets Zibal Gateway data.
+        /// Sets the additional data for <see cref="ZibalGateway"/>.
         /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="zarinPalInvoice">Describes an invoice for ZarinPal gateway.</param>
         /// <exception cref="ArgumentNullException"></exception>
-        public static IInvoiceBuilder SetZibalData(this IInvoiceBuilder builder, ZibalRequest zibalRequest)
+        public static IInvoiceBuilder SetZibalData(this IInvoiceBuilder builder, ZibalRequestAdditionalData zibalRequest)
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
             return builder.AddOrUpdateProperty(ZibalHelper.ZibalRequestAdditionalKeyName, zibalRequest);
         }
 
-        internal static ZibalRequestModel GetZibalRequest(this Invoice invoice)
+        internal static ZibalRequestAdditionalData? GetZibalRequestData(this Invoice invoice)
         {
             if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-            if (invoice.Properties.ContainsKey(ZibalHelper.ZibalRequestAdditionalKeyName))
+            if (!invoice.Properties.ContainsKey(ZibalHelper.ZibalRequestAdditionalKeyName))
             {
-                var model = (ZibalRequest)invoice.Properties[ZibalHelper.ZibalRequestAdditionalKeyName];
-                return new ZibalRequestModel()
-                {
-                    CustomerMobile = model.CustomerMobile,
-                    Description = model.Description,
-                    FeeMode = model.FeeMode,
-                    SendSms = model.SendSms,
-                    AllowedCards = model.AllowedCards,
-                    LinkToPay = model.LinkToPay,
-                };
+                return null;
             }
 
-            return null;
+            return (ZibalRequestAdditionalData)invoice.Properties[ZibalHelper.ZibalRequestAdditionalKeyName];
         }
     }
 }

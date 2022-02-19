@@ -64,11 +64,12 @@ namespace Parbad.Gateway.Zibal
 
         public override Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default)
         {
-            //TODO: implement the Fetch
+            if (context == null) throw new ArgumentNullException(nameof(context));
 
-            IPaymentFetchResult result = PaymentFetchResult.ReadyForVerifying();
-
-            return Task.FromResult(result);
+            return ZibalHelper.CreateFetchResult(_httpContextAccessor.HttpContext.Request,
+                                                                        context,
+                                                                        _options.Messages,
+                                                                        cancellationToken);
         }
 
         public override async Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default)
