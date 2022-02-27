@@ -29,14 +29,14 @@ namespace Parbad.Gateway.Zibal.Internal
         {
             var requestAdditionalData = invoice.GetZibalRequestData();
 
-            return new
+            return new ZibalPaymentRequestModel
             {
                 //if Merchant value is 'zibal' , Gateway mode is sandBox
                 Merchant = account.IsSandbox ? "zibal" : account.Merchant,
                 Amount = invoice.Amount,
-                CustomerMobile = requestAdditionalData?.MobileNumber,
+                Mobile = requestAdditionalData?.MobileNumber,
                 OrderId = invoice.TrackingNumber.ToString(),
-                CallBackUrl = invoice.CallbackUrl,
+                CallbackUrl = invoice.CallbackUrl,
                 Description = requestAdditionalData?.Description,
                 FeeMode = requestAdditionalData?.FeeMode,
                 Sms = requestAdditionalData?.SendPaymentLinkViaSms,
@@ -107,13 +107,13 @@ namespace Parbad.Gateway.Zibal.Internal
             };
         }
 
-        public static ZibalVerifyRequestModel CreateVerifyData(
+        public static ZibalPaymentVerifyModel CreateVerifyData(
             IEnumerable<Transaction> transactions,
             ZibalGatewayAccount account)
         {
             var trackId = GetTrackId(transactions);
 
-            return new ZibalVerifyRequestModel
+            return new ZibalPaymentVerifyModel
             {
                 Merchant = account.Merchant,
                 TrackId = trackId
@@ -124,7 +124,7 @@ namespace Parbad.Gateway.Zibal.Internal
         {
             var message = await responseMessage.Content.ReadAsStringAsync();
 
-            var response = JsonConvert.DeserializeObject<ZibalVerifyResponseModel>(message);
+            var response = JsonConvert.DeserializeObject<ZibalPaymentVerifyResponseModel>(message);
 
             if (response == null)
             {
@@ -133,19 +133,8 @@ namespace Parbad.Gateway.Zibal.Internal
 
             if (response.Result != SuccessCode)
             {
-                string failureMessage;
-
-                if (response.Status == null)
-                {
-                    failureMessage = ZibalTranslator.TranslateResult(response.Result) ?? messagesOptions.PaymentFailed;
-                }
-                else
-                {
-                    failureMessage = ZibalTranslator.TranslateStatus((int)response.Status) ?? messagesOptions.PaymentFailed;
-                }
-
-                var verifyResult = PaymentVerifyResult.Failed(failureMessage);
-                verifyResult.GatewayResponseCode = response.Status.ToString();
+                var verifyResult = PaymentVerifyResult.Failed(response.Message);
+                verifyResult.GatewayResponseCode = response.Result.ToString();
 
                 if (response.Result == PaymentAlreadyVerifiedCode)
                 {
