@@ -5,13 +5,11 @@ using System;
 
 namespace Parbad.Gateway.Zibal.Internal
 {
-    internal class ZibalVerifyResponseModel
+    internal class ZibalPaymentVerifyResponseModel
     {
         public DateTime? PaidAt { get; set; }
 
         public string? CardNumber { get; set; }
-
-        public int? Status { get; set; }
 
         public int Amount { get; set; }
 

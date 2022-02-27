@@ -3,7 +3,7 @@
 
 namespace Parbad.Gateway.Zibal.Internal
 {
-    internal class ZibalVerifyRequestModel
+    internal class ZibalPaymentVerifyModel
     {
         public string? Merchant { get; set; }
 
