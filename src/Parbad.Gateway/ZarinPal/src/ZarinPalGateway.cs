@@ -15,6 +15,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Parbad.Storage.Abstractions.Models;
@@ -28,6 +29,7 @@ namespace Parbad.Gateway.ZarinPal
         private readonly HttpClient _httpClient;
         private readonly ZarinPalGatewayOptions _gatewayOptions;
         private readonly MessagesOptions _messagesOptions;
+        private readonly IParbadLogger<ZarinPalGateway> _logger;
 
         public const string Name = "ZarinPal";
 
@@ -36,9 +38,11 @@ namespace Parbad.Gateway.ZarinPal
             IHttpContextAccessor httpContextAccessor,
             IHttpClientFactory httpClientFactory,
             IOptions<ZarinPalGatewayOptions> gatewayOptions,
-            IOptions<MessagesOptions> messagesOptions) : base(accountProvider)
+            IOptions<MessagesOptions> messagesOptions,
+            IParbadLogger<ZarinPalGateway> logger) : base(accountProvider)
         {
             _httpContextAccessor = httpContextAccessor;
+            _logger = logger;
             _httpClient = httpClientFactory.CreateClient(this);
             _gatewayOptions = gatewayOptions.Value;
             _messagesOptions = messagesOptions.Value;
@@ -56,6 +60,13 @@ namespace Parbad.Gateway.ZarinPal
             var apiUrl = ZarinPalHelper.GetApiRequestUrl(account.IsSandbox, _gatewayOptions);
 
             var responseMessage = await PostAsJson(_httpClient, apiUrl, requestModel);
+
+            if (!responseMessage.IsSuccessStatusCode)
+            {
+                _logger.LogError("ZarinPal HTTP request failed. Check the status code {StatusCode}", responseMessage.StatusCode);
+
+                return PaymentRequestResult.Failed($"ZarinPal HTTP request failed. Status code {responseMessage.StatusCode}", account.Name);
+            }
 
             var resultModel = await ReadFromJsonAsync<ZarinPalRequestResultModel>(responseMessage);
 
@@ -110,6 +121,18 @@ namespace Parbad.Gateway.ZarinPal
 
             var responseMessage = await PostAsJson(_httpClient, apiUrl, verificationModel);
 
+            if (!responseMessage.IsSuccessStatusCode)
+            {
+                _logger.LogError("ZarinPal HTTP request failed. Check the status code {StatusCode}", responseMessage.StatusCode);
+
+                return new PaymentVerifyResult
+                       {
+                           Status = PaymentVerifyResultStatus.Failed,
+                           GatewayAccountName = account.Name,
+                           Message = $"ZarinPal HTTP request failed. Status code {responseMessage.StatusCode}"
+                       };
+            }
+
             var resultModel = await ReadFromJsonAsync<ZarinPalVerificationResultModel>(responseMessage);
 
             var result = ZarinPalHelper.CreateVerifyResult(resultModel.Data, account, _messagesOptions);
@@ -143,6 +166,18 @@ namespace Parbad.Gateway.ZarinPal
             var apiUrl = ZarinPalHelper.GetApiRefundUrl(account.IsSandbox, _gatewayOptions);
 
             var responseMessage = await PostAsJson(_httpClient, apiUrl, refundModel);
+
+            if (!responseMessage.IsSuccessStatusCode)
+            {
+                _logger.LogError("ZarinPal HTTP request failed. Check the status code {StatusCode}", responseMessage.StatusCode);
+
+                return new PaymentRefundResult
+                       {
+                           Status = PaymentRefundResultStatus.Failed,
+                           GatewayAccountName = account.Name,
+                           Message = $"ZarinPal HTTP request failed. Status code {responseMessage.StatusCode}"
+                       };
+            }
 
             var resultModel = await ReadFromJsonAsync<ZarinPalRefundResultModel>(responseMessage);
 
