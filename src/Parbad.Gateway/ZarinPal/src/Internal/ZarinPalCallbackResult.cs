@@ -10,5 +10,7 @@ namespace Parbad.Gateway.ZarinPal.Internal
         public string Authority { get; set; }
 
         public string Message { get; set; }
+        
+        public int Status { get; set; }
     }
 }

@@ -1,153 +1,208 @@
 ﻿// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 using Parbad.Abstraction;
 using Parbad.Http;
 using Parbad.Internal;
 using Parbad.Options;
-using Parbad.Utilities;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
+using Parbad.Storage.Abstractions.Models;
 
 namespace Parbad.Gateway.ZarinPal.Internal
 {
     internal static class ZarinPalHelper
     {
-        public const string NumericOkResult = "100";
-        public const string StringOkResult = "OK";
-        public const string NumericAlreadyOkResult = "101";
+        private const int NumericOkResult = 100;
+        private const int NumericAlreadyOkResult = 101;
+        private const string AuthorityDatabaseKey = "Authority";
 
         public static string ZarinPalRequestAdditionalKeyName => "ZarinPalRequest";
 
-        public static string CreateRequestData(ZarinPalGatewayAccount account, Invoice invoice)
+        public static ZarinPalRequestModel CreateRequestModel(ZarinPalGatewayAccount account, Invoice invoice)
         {
             if (!invoice.Properties.ContainsKey(ZarinPalRequestAdditionalKeyName) ||
-                !(invoice.Properties[ZarinPalRequestAdditionalKeyName] is ZarinPalInvoice zarinPalInvoice))
+                invoice.Properties[ZarinPalRequestAdditionalKeyName] is not ZarinPalInvoice zarinPalInvoice)
             {
-                throw new InvalidOperationException("Request failed. ZarinPal Gateway needs invoice information. Please use the SetZarinPalData method to add the data.");
+                throw new
+                    InvalidOperationException("Request failed. ZarinPal Gateway needs invoice information. Please use the SetZarinPalData method of Invoice Builder to add the information.");
             }
 
-            var email = zarinPalInvoice.Email.IsNullOrEmpty() ? null : XmlHelper.EncodeXmlValue(zarinPalInvoice.Email);
-            var mobile = zarinPalInvoice.Mobile.IsNullOrEmpty() ? null : XmlHelper.EncodeXmlValue(zarinPalInvoice.Mobile);
-
-            return
-                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:zar=\"http://zarinpal.com/\">" +
-                "<soapenv:Header/>" +
-                "<soapenv:Body>" +
-                "<zar:PaymentRequest>" +
-                $"<zar:MerchantID>{account.MerchantId}</zar:MerchantID>" +
-                $"<zar:Amount>{(long)invoice.Amount}</zar:Amount>" +
-                $"<zar:Description>{XmlHelper.EncodeXmlValue(zarinPalInvoice.Description)}</zar:Description>" +
-                "<!--Optional:-->" +
-                $"<zar:Email>{email}</zar:Email>" +
-                "<!--Optional:-->" +
-                $"<zar:Mobile>{mobile}</zar:Mobile>" +
-                $"<zar:CallbackURL>{XmlHelper.EncodeXmlValue(invoice.CallbackUrl)}</zar:CallbackURL>" +
-                "</zar:PaymentRequest>" +
-                "</soapenv:Body>" +
-                "</soapenv:Envelope>";
+            return new()
+                   {
+                       MerchantId = account.MerchantId,
+                       Amount = invoice.Amount,
+                       CallbackUrl = invoice.CallbackUrl,
+                       Description = zarinPalInvoice.Description,
+                       Email = zarinPalInvoice.Email,
+                       Mobile = zarinPalInvoice.Mobile
+                   };
         }
 
-        public static PaymentRequestResult CreateRequestResult(string response,
-            HttpContext httpContext,
-            ZarinPalGatewayAccount account,
-            ZarinPalGatewayOptions gatewayOptions,
-            MessagesOptions messagesOptions)
+        public static PaymentRequestResult CreateRequestResult(ZarinPalRequestResultModel resultModel,
+                                                               HttpContext httpContext,
+                                                               ZarinPalGatewayAccount account,
+                                                               ZarinPalGatewayOptions gatewayOptions,
+                                                               MessagesOptions messagesOptions)
         {
-            var status = XmlHelper.GetNodeValueFromXml(response, "Status", "http://zarinpal.com/");
-            var authority = XmlHelper.GetNodeValueFromXml(response, "Authority", "http://zarinpal.com/");
-
-            var isSucceed = string.Equals(status, NumericOkResult, StringComparison.InvariantCultureIgnoreCase);
-
-            if (!isSucceed)
+            if (!IsSucceedResult(resultModel.Code))
             {
-                var message = ZarinPalStatusTranslator.Translate(status, messagesOptions);
+                var message = ZarinPalStatusTranslator.Translate(resultModel.Code, messagesOptions);
 
                 return PaymentRequestResult.Failed(message, account.Name);
             }
 
-            var paymentPageUrl = GetWebPageUrl(account.IsSandbox, gatewayOptions) + authority;
+            var paymentPageUrl = GetPaymentPageUrl(account.IsSandbox, gatewayOptions) + resultModel.Authority;
 
-            return PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, paymentPageUrl);
+            var result = PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, paymentPageUrl);
+
+            result.GatewayResponseCode = resultModel.Code.ToString();
+            result.DatabaseAdditionalData.Add(AuthorityDatabaseKey, resultModel.Authority);
+
+            return result;
         }
 
         public static async Task<ZarinPalCallbackResult> CreateCallbackResultAsync(
             HttpRequest httpRequest,
+            MessagesOptions messagesOptions,
             CancellationToken cancellationToken)
         {
             var authority = await httpRequest.TryGetParamAsync("Authority", cancellationToken).ConfigureAwaitFalse();
-            var status = await httpRequest.TryGetParamAsync("Status", cancellationToken).ConfigureAwaitFalse();
+            var status = await httpRequest.TryGetParamAsAsync<int>("Status", cancellationToken).ConfigureAwaitFalse();
             string message = null;
 
-            var isSucceed = status.Exists && string.Equals(status.Value, StringOkResult, StringComparison.InvariantCultureIgnoreCase);
+            var isSucceed = status.Exists && IsSucceedResult(status.Value);
 
             if (!isSucceed)
             {
-                message = $"Error {status}";
+                message = ZarinPalStatusTranslator.Translate(status.Value, messagesOptions);
             }
 
             return new ZarinPalCallbackResult
-            {
-                Authority = authority.Value,
-                IsSucceed = isSucceed,
-                Message = message
-            };
+                   {
+                       Authority = authority.Value,
+                       Status = status.Value,
+                       IsSucceed = isSucceed,
+                       Message = message
+                   };
         }
 
-        public static string CreateVerifyData(ZarinPalGatewayAccount account, ZarinPalCallbackResult callbackResult, Money amount)
+        public static ZarinPalVerificationModel CreateVerificationModel(ZarinPalGatewayAccount account, ZarinPalCallbackResult callbackResult, Money amount)
         {
-            return
-                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:zar=\"http://zarinpal.com/\">" +
-                "<soapenv:Header/>" +
-                "<soapenv:Body>" +
-                "<zar:PaymentVerification>" +
-                $"<zar:MerchantID>{account.MerchantId}</zar:MerchantID>" +
-                $"<zar:Authority>{callbackResult.Authority}</zar:Authority>" +
-                $"<zar:Amount>{(long)amount}</zar:Amount>" +
-                "</zar:PaymentVerification>" +
-                "</soapenv:Body>" +
-                "</soapenv:Envelope>";
+            return new()
+                   {
+                       MerchantId = account.MerchantId,
+                       Amount = amount,
+                       Authority = callbackResult.Authority
+                   };
         }
 
-        public static PaymentVerifyResult CreateVerifyResult(string response, MessagesOptions messagesOptions)
+        public static PaymentVerifyResult CreateVerifyResult(ZarinPalVerificationResultModel resultModel, ZarinPalGatewayAccount account, MessagesOptions messagesOptions)
         {
-            var status = XmlHelper.GetNodeValueFromXml(response, "Status", "http://zarinpal.com/");
-            var refId = XmlHelper.GetNodeValueFromXml(response, "RefID", "http://zarinpal.com/");
+            PaymentVerifyResult result;
 
-            var isSucceed = string.Equals(status, NumericOkResult, StringComparison.OrdinalIgnoreCase);
-
-            if (!isSucceed)
+            if (!IsSucceedResult(resultModel.Code))
             {
-                var message = ZarinPalStatusTranslator.Translate(status, messagesOptions);
+                var message = ZarinPalStatusTranslator.Translate(resultModel.Code, messagesOptions);
 
-                var verifyResultStatus = string.Equals(status, NumericAlreadyOkResult, StringComparison.OrdinalIgnoreCase)
-                        ? PaymentVerifyResultStatus.AlreadyVerified
-                        : PaymentVerifyResultStatus.Failed;
+                var verifyResultStatus = resultModel.Code == NumericAlreadyOkResult
+                    ? PaymentVerifyResultStatus.AlreadyVerified
+                    : PaymentVerifyResultStatus.Failed;
 
-                return new PaymentVerifyResult
-                {
-                    Status = verifyResultStatus,
-                    Message = message
-                };
+                result = new PaymentVerifyResult
+                         {
+                             Status = verifyResultStatus,
+                             Message = message,
+                             GatewayResponseCode = resultModel.Code.ToString()
+                         };
+
+                return result;
             }
 
-            return PaymentVerifyResult.Succeed(refId, messagesOptions.PaymentSucceed);
+            result = PaymentVerifyResult.Succeed(resultModel.RefId, messagesOptions.PaymentSucceed);
+            result.GatewayAccountName = account.Name;
+            result.GatewayResponseCode = resultModel.Code.ToString();
+
+            return result;
         }
 
-        public static string GetApiUrl(bool isSandbox, ZarinPalGatewayOptions gatewayOptions)
+        public static ZarinPalRefundModel CreateRefundModel(string authority, ZarinPalGatewayAccount account)
         {
-            var urlPrefix = isSandbox ? "sandbox" : "www";
-
-            return gatewayOptions.ApiUrl.Replace("#", urlPrefix);
+            return new()
+                   {
+                       MerchantId = account.MerchantId,
+                       Authority = authority
+                   };
         }
 
-        public static string GetWebPageUrl(bool isSandbox, ZarinPalGatewayOptions gatewayOptions)
+        public static PaymentRefundResult CreateRefundResult(ZarinPalRefundResultModel resultModel, ZarinPalGatewayAccount account, MessagesOptions messagesOptions)
         {
-            var urlPrefix = isSandbox ? "sandbox" : "www";
+            var result = new PaymentRefundResult
+                         {
+                             GatewayResponseCode = resultModel.Code.ToString(),
+                             GatewayAccountName = account.Name
+                         };
 
-            return gatewayOptions.PaymentPageUrl.Replace("#", urlPrefix);
+            if (IsSucceedResult(resultModel.Code))
+            {
+                result.Status = PaymentRefundResultStatus.Succeed;
+
+                result.Message = messagesOptions.PaymentSucceed;
+            }
+            else
+            {
+                result.Status = resultModel.Code == NumericAlreadyOkResult ? PaymentRefundResultStatus.AlreadyRefunded : PaymentRefundResultStatus.Failed;
+
+                result.Message = ZarinPalStatusTranslator.Translate(resultModel.Code, messagesOptions);
+            }
+
+            return result;
         }
+
+        public static string GetAuthorityFromAdditionalData(Transaction transaction)
+        {
+            var additionalData = JsonConvert.DeserializeObject<IDictionary<string, string>>(transaction.AdditionalData);
+
+            if (!additionalData.ContainsKey(AuthorityDatabaseKey))
+            {
+                return null;
+            }
+
+            return additionalData[AuthorityDatabaseKey];
+        }
+
+        public static string GetApiRequestUrl(bool isSandbox, ZarinPalGatewayOptions gatewayOptions)
+        {
+            return isSandbox
+                ? gatewayOptions.SandboxApiRequestUrl
+                : gatewayOptions.ApiRequestUrl;
+        }
+
+        public static string GetApiVerificationUrl(bool isSandbox, ZarinPalGatewayOptions gatewayOptions)
+        {
+            return isSandbox
+                ? gatewayOptions.SandboxApiVerificationUrl
+                : gatewayOptions.ApiVerificationUrl;
+        }
+
+        public static string GetApiRefundUrl(bool isSandbox, ZarinPalGatewayOptions gatewayOptions)
+        {
+            return isSandbox
+                ? gatewayOptions.SandboxApiRefundUrl
+                : gatewayOptions.ApiRefundUrl;
+        }
+
+        private static string GetPaymentPageUrl(bool isSandbox, ZarinPalGatewayOptions gatewayOptions)
+        {
+            return isSandbox
+                ? gatewayOptions.SandboxPaymentPageUrl
+                : gatewayOptions.PaymentPageUrl;
+        }
+
+        private static bool IsSucceedResult(int status) => status == NumericOkResult;
     }
 }

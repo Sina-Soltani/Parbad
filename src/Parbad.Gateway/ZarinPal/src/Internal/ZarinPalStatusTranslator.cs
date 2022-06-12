@@ -1,23 +1,15 @@
 ﻿// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
-using System;
 using Parbad.Options;
 
 namespace Parbad.Gateway.ZarinPal.Internal
 {
     internal static class ZarinPalStatusTranslator
     {
-        public static string Translate(string status, MessagesOptions options)
+        public static string Translate(int status, MessagesOptions options)
         {
-            if (status == null) throw new ArgumentNullException(nameof(status));
-
-            if (!int.TryParse(status, out var integerStatus))
-            {
-                throw new InvalidOperationException("ZarinPal error. The Status value is not an integer.");
-            }
-
-            return integerStatus switch
+            return status switch
             {
                 -1 => "اطلاعات ارسال شده ناقص است.",
                 -2 => "آی پی و يا مرچنت كد پذيرنده صحيح نيست",
