@@ -16,6 +16,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using Parbad.Storage.Abstractions.Models;
 
 namespace Parbad.Gateway.ZarinPal
@@ -58,7 +59,7 @@ namespace Parbad.Gateway.ZarinPal
 
             var resultModel = await ReadFromJsonAsync<ZarinPalRequestResultModel>(responseMessage);
 
-            var result = ZarinPalHelper.CreateRequestResult(resultModel, _httpContextAccessor.HttpContext, account, _gatewayOptions, _messagesOptions);
+            var result = ZarinPalHelper.CreateRequestResult(resultModel.Data, _httpContextAccessor.HttpContext, account, _gatewayOptions, _messagesOptions);
 
             return result;
         }
@@ -111,7 +112,7 @@ namespace Parbad.Gateway.ZarinPal
 
             var resultModel = await ReadFromJsonAsync<ZarinPalVerificationResultModel>(responseMessage);
 
-            var result = ZarinPalHelper.CreateVerifyResult(resultModel, account, _messagesOptions);
+            var result = ZarinPalHelper.CreateVerifyResult(resultModel.Data, account, _messagesOptions);
 
             return result;
         }
@@ -145,7 +146,7 @@ namespace Parbad.Gateway.ZarinPal
 
             var resultModel = await ReadFromJsonAsync<ZarinPalRefundResultModel>(responseMessage);
 
-            var result = ZarinPalHelper.CreateRefundResult(resultModel, account, _messagesOptions);
+            var result = ZarinPalHelper.CreateRefundResult(resultModel.Data, account, _messagesOptions);
 
             return result;
         }
@@ -163,16 +164,20 @@ namespace Parbad.Gateway.ZarinPal
 
         private static Task<HttpResponseMessage> PostAsJson(HttpClient httpClient, string url, object model)
         {
-            var json = JsonConvert.SerializeObject(model);
+            var json = JsonConvert.SerializeObject(model,
+                                                   new JsonSerializerSettings
+                                                   {
+                                                       ContractResolver = new CamelCasePropertyNamesContractResolver()
+                                                   });
 
             return httpClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"));
         }
 
-        private static async Task<T> ReadFromJsonAsync<T>(HttpResponseMessage httpResponseMessage)
+        private static async Task<ZarinPalResultModel<T>> ReadFromJsonAsync<T>(HttpResponseMessage httpResponseMessage) where T : class
         {
             var json = await httpResponseMessage.Content.ReadAsStringAsync();
 
-            return JsonConvert.DeserializeObject<T>(json);
+            return JsonConvert.DeserializeObject<ZarinPalResultModel<T>>(json);
         }
     }
 }
