@@ -30,8 +30,18 @@ Making a request
 
 var result = _onlinePayment.RequestAsync(invoice => 
 {
-	invoice.UseZarinPal("<Description>");
+    invoice
+    // other invoice data
+    .SetZarinPalData(...)
+	.UseZarinPal();
 })
 
+-------------
+Getting the original verification result
+-------------
+var result = _onlinePayment.VerifyAsync(invoice);
 
+var originalResult = result.GetZarinPalOriginalVerificationResult();
+
+------------------------------------------------------------------------
 Do you like Parbad? Then don't forget to **Star** the Parbad on GitHub.

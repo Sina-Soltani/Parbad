@@ -3,11 +3,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Parbad.Abstraction;
+using Parbad.Gateway.ZarinPal.Models;
 using Parbad.Http;
 using Parbad.Internal;
 using Parbad.Options;
@@ -51,7 +53,7 @@ namespace Parbad.Gateway.ZarinPal.Internal
         {
             if (!IsSucceedResult(resultModel.Code))
             {
-                var message = ZarinPalStatusTranslator.Translate(resultModel.Code, messagesOptions);
+                var message = ZarinPalCodeTranslator.Translate(resultModel.Code, messagesOptions);
 
                 return PaymentRequestResult.Failed(message, account.Name);
             }
@@ -79,7 +81,7 @@ namespace Parbad.Gateway.ZarinPal.Internal
 
             if (!isSucceed)
             {
-                message = ZarinPalStatusTranslator.Translate(status.Value, messagesOptions);
+                message = ZarinPalCodeTranslator.Translate(status.Value, messagesOptions);
             }
 
             return new ZarinPalCallbackResult
@@ -101,31 +103,32 @@ namespace Parbad.Gateway.ZarinPal.Internal
                    };
         }
 
-        public static PaymentVerifyResult CreateVerifyResult(ZarinPalVerificationResultModel resultModel, ZarinPalGatewayAccount account, MessagesOptions messagesOptions)
+        public static PaymentVerifyResult CreateVerifyResult(ZarinPalOriginalVerificationResult verificationResult, ZarinPalGatewayAccount account, MessagesOptions messagesOptions)
         {
             PaymentVerifyResult result;
 
-            if (!IsSucceedResult(resultModel.Code))
+            if (IsSucceedResult(verificationResult.Code))
             {
-                var message = ZarinPalStatusTranslator.Translate(resultModel.Code, messagesOptions);
+                result = PaymentVerifyResult.Succeed(verificationResult.RefId, messagesOptions.PaymentSucceed);
+            }
+            else
+            {
+                var message = ZarinPalCodeTranslator.Translate(verificationResult.Code, messagesOptions);
 
-                var verifyResultStatus = resultModel.Code == NumericAlreadyOkResult
+                var verifyResultStatus = verificationResult.Code == NumericAlreadyOkResult
                     ? PaymentVerifyResultStatus.AlreadyVerified
                     : PaymentVerifyResultStatus.Failed;
 
                 result = new PaymentVerifyResult
                          {
                              Status = verifyResultStatus,
-                             Message = message,
-                             GatewayResponseCode = resultModel.Code.ToString()
+                             Message = message
                          };
-
-                return result;
             }
 
-            result = PaymentVerifyResult.Succeed(resultModel.RefId, messagesOptions.PaymentSucceed);
             result.GatewayAccountName = account.Name;
-            result.GatewayResponseCode = resultModel.Code.ToString();
+            result.GatewayResponseCode = verificationResult.Code.ToString();
+            result.SetZarinPalOriginalVerificationResult(verificationResult);
 
             return result;
         }
@@ -157,7 +160,7 @@ namespace Parbad.Gateway.ZarinPal.Internal
             {
                 result.Status = resultModel.Code == NumericAlreadyOkResult ? PaymentRefundResultStatus.AlreadyRefunded : PaymentRefundResultStatus.Failed;
 
-                result.Message = ZarinPalStatusTranslator.Translate(resultModel.Code, messagesOptions);
+                result.Message = ZarinPalCodeTranslator.Translate(resultModel.Code, messagesOptions);
             }
 
             return result;
@@ -201,6 +204,26 @@ namespace Parbad.Gateway.ZarinPal.Internal
             return isSandbox
                 ? gatewayOptions.SandboxPaymentPageUrl
                 : gatewayOptions.PaymentPageUrl;
+        }
+
+        public static async Task<(int? Code, string Message)> TryGetError(HttpResponseMessage httpResponseMessage, MessagesOptions messagesOptions)
+        {
+            var json = await httpResponseMessage.Content.ReadAsStringAsync();
+
+            var failedResult = JsonConvert.DeserializeObject<ZarinPalFailedResult>(json);
+
+            string message;
+
+            if (failedResult?.Errors != null)
+            {
+                message = ZarinPalCodeTranslator.Translate(failedResult.Errors.Code, messagesOptions);
+            }
+            else
+            {
+                message = $"ZarinPal HTTP request failed. Status code {httpResponseMessage.StatusCode}";
+            }
+
+            return (failedResult?.Errors?.Code, message);
         }
 
         private static bool IsSucceedResult(int status) => status == NumericOkResult;

@@ -15,18 +15,9 @@ namespace Parbad.Gateway.ZarinPal
         /// Initializes an instance of <see cref="ZarinPalInvoice"/>.
         /// </summary>
         /// <param name="description">A short description about this invoice which is required by ZarinPal gateway.</param>
-        public ZarinPalInvoice(string description)
-            : this(description, null, null)
-        {
-        }
-
-        /// <summary>
-        /// Initializes an instance of <see cref="ZarinPalInvoice"/>.
-        /// </summary>
-        /// <param name="description">A short description about this invoice which is required by ZarinPal gateway.</param>
         /// <param name="email">Buyer's email.</param>
         /// <param name="mobile">Buyer's mobile.</param>
-        public ZarinPalInvoice(string description, string email, string mobile)
+        public ZarinPalInvoice(string description, string email = null, string mobile = null)
         {
             if (description.IsNullOrEmpty())
             {
