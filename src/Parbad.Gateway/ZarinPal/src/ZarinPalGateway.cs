@@ -63,7 +63,7 @@ namespace Parbad.Gateway.ZarinPal
 
             if (!responseMessage.IsSuccessStatusCode)
             {
-                _logger.LogError("ZarinPal HTTP request failed. Check the status code {StatusCode}", responseMessage.StatusCode);
+                await Log(responseMessage);
 
                 return PaymentRequestResult.Failed($"ZarinPal HTTP request failed. Status code {responseMessage.StatusCode}", account.Name);
             }
@@ -123,7 +123,7 @@ namespace Parbad.Gateway.ZarinPal
 
             if (!responseMessage.IsSuccessStatusCode)
             {
-                _logger.LogError("ZarinPal HTTP request failed. Check the status code {StatusCode}", responseMessage.StatusCode);
+                await Log(responseMessage);
 
                 return new PaymentVerifyResult
                        {
@@ -169,7 +169,7 @@ namespace Parbad.Gateway.ZarinPal
 
             if (!responseMessage.IsSuccessStatusCode)
             {
-                _logger.LogError("ZarinPal HTTP request failed. Check the status code {StatusCode}", responseMessage.StatusCode);
+                await Log(responseMessage);
 
                 return new PaymentRefundResult
                        {
@@ -213,6 +213,13 @@ namespace Parbad.Gateway.ZarinPal
             var json = await httpResponseMessage.Content.ReadAsStringAsync();
 
             return JsonConvert.DeserializeObject<ZarinPalResultModel<T>>(json);
+        }
+        
+        private async Task Log(HttpResponseMessage responseMessage)
+        {
+            var responseContent = await responseMessage.Content.ReadAsStringAsync();
+
+            _logger.LogError("ZarinPal HTTP request failed. Check the status code {StatusCode} and the HTTP response content {ResponseContent}", responseMessage.StatusCode, responseContent);
         }
     }
 }
