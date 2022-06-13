@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Parbad.Gateway.ZarinPal.Models;
 using Parbad.Storage.Abstractions.Models;
 
 namespace Parbad.Gateway.ZarinPal
@@ -65,7 +66,9 @@ namespace Parbad.Gateway.ZarinPal
             {
                 await Log(responseMessage);
 
-                return PaymentRequestResult.Failed($"ZarinPal HTTP request failed. Status code {responseMessage.StatusCode}", account.Name);
+                var error = await ZarinPalHelper.TryGetError(responseMessage, _messagesOptions);
+
+                return PaymentRequestResult.Failed(error.Message, account.Name, error.Code?.ToString());
             }
 
             var resultModel = await ReadFromJsonAsync<ZarinPalRequestResultModel>(responseMessage);
@@ -125,15 +128,18 @@ namespace Parbad.Gateway.ZarinPal
             {
                 await Log(responseMessage);
 
+                var error = await ZarinPalHelper.TryGetError(responseMessage, _messagesOptions);
+
                 return new PaymentVerifyResult
                        {
                            Status = PaymentVerifyResultStatus.Failed,
                            GatewayAccountName = account.Name,
-                           Message = $"ZarinPal HTTP request failed. Status code {responseMessage.StatusCode}"
+                           GatewayResponseCode = error.Code?.ToString(),
+                           Message = error.Message
                        };
             }
 
-            var resultModel = await ReadFromJsonAsync<ZarinPalVerificationResultModel>(responseMessage);
+            var resultModel = await ReadFromJsonAsync<ZarinPalOriginalVerificationResult>(responseMessage);
 
             var result = ZarinPalHelper.CreateVerifyResult(resultModel.Data, account, _messagesOptions);
 
@@ -171,11 +177,14 @@ namespace Parbad.Gateway.ZarinPal
             {
                 await Log(responseMessage);
 
+                var error = await ZarinPalHelper.TryGetError(responseMessage, _messagesOptions);
+
                 return new PaymentRefundResult
                        {
                            Status = PaymentRefundResultStatus.Failed,
                            GatewayAccountName = account.Name,
-                           Message = $"ZarinPal HTTP request failed. Status code {responseMessage.StatusCode}"
+                           GatewayResponseCode = error.Code?.ToString(),
+                           Message = error.Message
                        };
             }
 
@@ -214,12 +223,14 @@ namespace Parbad.Gateway.ZarinPal
 
             return JsonConvert.DeserializeObject<ZarinPalResultModel<T>>(json);
         }
-        
+
         private async Task Log(HttpResponseMessage responseMessage)
         {
             var responseContent = await responseMessage.Content.ReadAsStringAsync();
 
-            _logger.LogError("ZarinPal HTTP request failed. Check the status code {StatusCode} and the HTTP response content {ResponseContent}", responseMessage.StatusCode, responseContent);
+            _logger.LogError("ZarinPal HTTP request failed. Check the status code {StatusCode} and the HTTP response content {ResponseContent}",
+                             responseMessage.StatusCode,
+                             responseContent);
         }
     }
 }
