@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -218,6 +219,11 @@ namespace Parbad.Gateway.ZarinPal.Internal
 
         public static async Task<(int? Code, string Message)> TryGetError(HttpResponseMessage httpResponseMessage, MessagesOptions messagesOptions)
         {
+            if (httpResponseMessage.StatusCode == HttpStatusCode.InternalServerError)
+            {
+                return (null, messagesOptions.UnexpectedErrorText);
+            }
+
             var json = await httpResponseMessage.Content.ReadAsStringAsync();
 
             var failedResult = JsonConvert.DeserializeObject<ZarinPalFailedResult>(json);
