@@ -1,25 +1,23 @@
 ﻿// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
-using Parbad.Abstraction;
-using Parbad.Gateway.ZarinPal.Internal;
-using Parbad.GatewayBuilders;
-using Parbad.Internal;
-using Parbad.Net;
-using Parbad.Options;
 using System;
-using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Parbad.Abstraction;
+using Parbad.Gateway.ZarinPal.Internal;
 using Parbad.Gateway.ZarinPal.Models;
-using Parbad.Storage.Abstractions.Models;
+using Parbad.GatewayBuilders;
+using Parbad.Internal;
+using Parbad.Net;
+using Parbad.Options;
 
 namespace Parbad.Gateway.ZarinPal
 {
@@ -97,7 +95,7 @@ namespace Parbad.Gateway.ZarinPal
                 result = PaymentFetchResult.Failed(callbackResult.Message);
             }
 
-            result.GatewayResponseCode = callbackResult.Status.ToString();
+            result.GatewayResponseCode = callbackResult.Status;
 
             return result;
         }
@@ -118,7 +116,7 @@ namespace Parbad.Gateway.ZarinPal
 
             var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 
-            var verificationModel = ZarinPalHelper.CreateVerificationModel(account, callbackResult, context.Payment.Amount);
+            var verificationModel = ZarinPalHelper.CreateVerificationModel(account, context, context.Payment.Amount);
 
             var apiUrl = ZarinPalHelper.GetApiVerificationUrl(account.IsSandbox, _gatewayOptions);
 
@@ -153,19 +151,7 @@ namespace Parbad.Gateway.ZarinPal
 
             var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 
-            var transaction = context.Transactions.SingleOrDefault(_ => _.Type == TransactionType.Request);
-
-            if (transaction == null)
-            {
-                return CreateRefundFailedResult(amount, account, $"No transaction of type '{TransactionType.Request}' found for the given invoice.");
-            }
-
-            var authority = ZarinPalHelper.GetAuthorityFromAdditionalData(transaction);
-
-            if (string.IsNullOrEmpty(authority))
-            {
-                return CreateRefundFailedResult(amount, account, $"Authority not found in the Transaction record.");
-            }
+            var authority = ZarinPalHelper.GetAuthorityFromAdditionalData(context);
 
             var refundModel = ZarinPalHelper.CreateRefundModel(authority, account);
 
@@ -193,17 +179,6 @@ namespace Parbad.Gateway.ZarinPal
             var result = ZarinPalHelper.CreateRefundResult(resultModel.Data, account, _messagesOptions);
 
             return result;
-        }
-
-        private static PaymentRefundResult CreateRefundFailedResult(Money amount, GatewayAccount account, string message)
-        {
-            return new PaymentRefundResult
-                   {
-                       Status = PaymentRefundResultStatus.Failed,
-                       Message = message,
-                       Amount = amount,
-                       GatewayAccountName = account.Name
-                   };
         }
 
         private static Task<HttpResponseMessage> PostAsJson(HttpClient httpClient, string url, object model)

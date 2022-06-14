@@ -3,6 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -51,7 +53,7 @@ namespace Parbad.Gateway.ZarinPal.Internal
                                                                ZarinPalGatewayOptions gatewayOptions,
                                                                MessagesOptions messagesOptions)
         {
-            if (!IsSucceedResult(resultModel.Code))
+            if (!IsSucceedCode(resultModel.Code))
             {
                 var message = ZarinPalCodeTranslator.Translate(resultModel.Code, messagesOptions);
 
@@ -74,14 +76,14 @@ namespace Parbad.Gateway.ZarinPal.Internal
             CancellationToken cancellationToken)
         {
             var authority = await httpRequest.TryGetParamAsync("Authority", cancellationToken).ConfigureAwaitFalse();
-            var status = await httpRequest.TryGetParamAsAsync<int>("Status", cancellationToken).ConfigureAwaitFalse();
+            var status = await httpRequest.TryGetParamAsync("Status", cancellationToken).ConfigureAwaitFalse();
             string message = null;
 
             var isSucceed = status.Exists && IsSucceedResult(status.Value);
 
             if (!isSucceed)
             {
-                message = ZarinPalCodeTranslator.Translate(status.Value, messagesOptions);
+                message = messagesOptions.PaymentFailed;
             }
 
             return new ZarinPalCallbackResult
@@ -93,13 +95,15 @@ namespace Parbad.Gateway.ZarinPal.Internal
                    };
         }
 
-        public static ZarinPalVerificationModel CreateVerificationModel(ZarinPalGatewayAccount account, ZarinPalCallbackResult callbackResult, Money amount)
+        public static ZarinPalVerificationModel CreateVerificationModel(ZarinPalGatewayAccount account, InvoiceContext context, Money amount)
         {
+            var authority = GetAuthorityFromAdditionalData(context);
+
             return new()
                    {
                        MerchantId = account.MerchantId,
                        Amount = amount,
-                       Authority = callbackResult.Authority
+                       Authority = authority
                    };
         }
 
@@ -107,7 +111,7 @@ namespace Parbad.Gateway.ZarinPal.Internal
         {
             PaymentVerifyResult result;
 
-            if (IsSucceedResult(verificationResult.Code))
+            if (IsSucceedCode(verificationResult.Code))
             {
                 result = PaymentVerifyResult.Succeed(verificationResult.RefId, messagesOptions.PaymentSucceed);
             }
@@ -150,7 +154,7 @@ namespace Parbad.Gateway.ZarinPal.Internal
                              GatewayAccountName = account.Name
                          };
 
-            if (IsSucceedResult(resultModel.Code))
+            if (IsSucceedCode(resultModel.Code))
             {
                 result.Status = PaymentRefundResultStatus.Succeed;
 
@@ -166,13 +170,20 @@ namespace Parbad.Gateway.ZarinPal.Internal
             return result;
         }
 
-        public static string GetAuthorityFromAdditionalData(Transaction transaction)
+        public static string GetAuthorityFromAdditionalData(InvoiceContext context)
         {
+            var transaction = context.Transactions.SingleOrDefault(_ => _.Type == TransactionType.Request);
+
+            if (transaction == null)
+            {
+                throw new InvalidOperationException($"No transaction of type '{TransactionType.Request}' found for the given invoice.");
+            }
+
             var additionalData = JsonConvert.DeserializeObject<IDictionary<string, string>>(transaction.AdditionalData);
 
             if (!additionalData.ContainsKey(AuthorityDatabaseKey))
             {
-                return null;
+                throw new InvalidOperationException($"Authority not found in the Transaction record.");
             }
 
             return additionalData[AuthorityDatabaseKey];
@@ -208,6 +219,11 @@ namespace Parbad.Gateway.ZarinPal.Internal
 
         public static async Task<(int? Code, string Message)> TryGetError(HttpResponseMessage httpResponseMessage, MessagesOptions messagesOptions)
         {
+            if (httpResponseMessage.StatusCode == HttpStatusCode.InternalServerError)
+            {
+                return (null, messagesOptions.UnexpectedErrorText);
+            }
+
             var json = await httpResponseMessage.Content.ReadAsStringAsync();
 
             var failedResult = JsonConvert.DeserializeObject<ZarinPalFailedResult>(json);
@@ -226,6 +242,8 @@ namespace Parbad.Gateway.ZarinPal.Internal
             return (failedResult?.Errors?.Code, message);
         }
 
-        private static bool IsSucceedResult(int status) => status == NumericOkResult;
+        private static bool IsSucceedCode(int status) => status == NumericOkResult;
+
+        private static bool IsSucceedResult(string status) => string.Equals(status, "OK", StringComparison.OrdinalIgnoreCase);
     }
 }
