@@ -11,6 +11,6 @@ namespace Parbad.Gateway.ZarinPal.Internal
 
         public string Message { get; set; }
         
-        public int Status { get; set; }
+        public string Status { get; set; }
     }
 }
