@@ -12,6 +12,11 @@ namespace Parbad.Gateway.ZarinPal
     {
         public string MerchantId { get; set; }
 
+        /// <summary>
+        /// It's needed for refunding a payment.
+        /// </summary>
+        public string AuthorizationToken { get; set; }
+
         public bool IsSandbox { get; set; }
     }
 }
