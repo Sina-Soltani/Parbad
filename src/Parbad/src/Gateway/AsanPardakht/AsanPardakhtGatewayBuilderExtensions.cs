@@ -17,8 +17,6 @@ namespace Parbad.Gateway.AsanPardakht
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            builder.Services.AddSingleton<IAsanPardakhtCrypto, AsanPardakhtCrypto>();
-
             return builder
                 .AddGateway<AsanPardakhtGateway>()
                 .WithOptions(options => { })
