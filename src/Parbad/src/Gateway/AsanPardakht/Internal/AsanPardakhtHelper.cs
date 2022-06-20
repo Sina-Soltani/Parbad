@@ -3,6 +3,7 @@
 
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using Parbad.Abstraction;
 using Parbad.Gateway.AsanPardakht.Internal.Models;
 using Parbad.Internal;
@@ -22,6 +23,11 @@ namespace Parbad.Gateway.AsanPardakht.Internal
 {
     internal class AsanPardakhtHelper
     {
+        private static JsonSerializerSettings JsonSettings => new()
+        {
+            ContractResolver = new CamelCasePropertyNamesContractResolver()
+        };
+        
         private static async Task<(string Token, bool IsSucceed, AsanPardakhtApiErrorModel ErrorModel)> Token(HttpClient httpClient,
             Invoice invoice,
             AsanPardakhtGatewayAccount account,
@@ -47,7 +53,7 @@ namespace Parbad.Gateway.AsanPardakht.Internal
 
             AppendAuthenticationHeaders(httpClient, account);
 
-            var httpResponseMessage = await httpClient.PostJsonAsync(gatewayOptions.GetTokenUrl, data, cancellationToken);
+            var httpResponseMessage = await httpClient.PostJsonAsync(gatewayOptions.GetTokenUrl, data, JsonSettings, cancellationToken);
             var response = await httpResponseMessage.Content.ReadAsStringAsync();
             if (httpResponseMessage.IsSuccessStatusCode)
                 return (response.Replace("\"", ""), true, null);
@@ -99,10 +105,10 @@ namespace Parbad.Gateway.AsanPardakht.Internal
             try
             {
                 var apiUrl = new CallbackUrl(gatewayOptions.GetTransUrl);
-                apiUrl = apiUrl.AddQueryString("LocalInvoiceId", context.Payment.TrackingNumber.ToString());
-                apiUrl = apiUrl.AddQueryString("MerchantConfigurationId", account.MerchantConfigurationId.ToString());
+                apiUrl = apiUrl.AddQueryString("localInvoiceId", context.Payment.TrackingNumber.ToString());
+                apiUrl = apiUrl.AddQueryString("merchantConfigurationId", account.MerchantConfigurationId.ToString());
 
-                // AppendAuthenticationHeaders(httpClient, account);
+                AppendAuthenticationHeaders(httpClient, account);
                 
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(apiUrl);
                 request.Headers.Add("usr", account.UserName);
@@ -132,7 +138,7 @@ namespace Parbad.Gateway.AsanPardakht.Internal
 
                 // var responseMessage = httpClient.GetAsync(apiUrl.ToString()).Result;
 
-                // // var response = await responseMessage.Content.ReadAsStringAsync();
+                // var response = await responseMessage.Content.ReadAsStringAsync();
 
                 // if (!responseMessage.IsSuccessStatusCode)
                 // {
@@ -144,7 +150,7 @@ namespace Parbad.Gateway.AsanPardakht.Internal
                 // }
 
                 // var transModel = JsonConvert.DeserializeObject<AsanPardakhtPaymentResultModel>(response);
-
+                // return (true, transModel, null);
             }
             catch (Exception ex)
             {
@@ -172,7 +178,7 @@ namespace Parbad.Gateway.AsanPardakht.Internal
                 PayGateTranId = payGateTranId
             };
 
-            var responseMessage = await httpClient.PostJsonAsync(apiUrl, data, cancellationToken);
+            var responseMessage = await httpClient.PostJsonAsync(apiUrl, data, JsonSettings, cancellationToken);
 
             var response = await responseMessage.Content.ReadAsStringAsync();
 
@@ -187,118 +193,7 @@ namespace Parbad.Gateway.AsanPardakht.Internal
 
             return (true, null);
         }
-        //public static async Task<string> CreateVerifyData(
-        //    AsanPardakhtCallbackResult callbackResult,
-        //    AsanPardakhtGatewayAccount account,
-        //    IAsanPardakhtCrypto crypto)
-        //{
-        //    var requestToEncrypt = account.UserName + "," + account.Password;
-        //    var encryptedRequest = await crypto.Encrypt(requestToEncrypt, account.Key, account.IV);
-
-        //    return
-        //        "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tem=\"http://tempuri.org/\">" +
-        //        "<soapenv:Header/>" +
-        //        "<soapenv:Body>" +
-        //        "<tem:RequestVerification>" +
-        //        $"<tem:merchantConfigurationID>{account.MerchantConfigurationId}</tem:merchantConfigurationID>" +
-        //        "<!--Optional:-->" +
-        //        $"<tem:encryptedCredentials>{XmlHelper.EncodeXmlValue(encryptedRequest)}</tem:encryptedCredentials>" +
-        //        $"<tem:payGateTranID>{callbackResult.PayGateTranId}</tem:payGateTranID>" +
-        //        "</tem:RequestVerification>" +
-        //        "</soapenv:Body>" +
-        //        "</soapenv:Envelope>";
-        //}
-
-        //public static AsanPardakhtVerifyResult CheckVerifyResult(
-        //    string response,
-        //    AsanPardakhtCallbackResult callbackResult,
-        //    MessagesOptions messagesOptions)
-        //{
-        //    if (!callbackResult.IsSucceed)
-        //    {
-        //        return new AsanPardakhtVerifyResult
-        //        {
-        //            IsSucceed = false,
-        //            Result = PaymentVerifyResult.Failed(callbackResult.Message)
-        //        };
-        //    }
-
-        //    var result = XmlHelper.GetNodeValueFromXml(response, "RequestVerificationResult", "http://tempuri.org/");
-
-        //    var isSucceed = result == "500";
-
-        //    PaymentVerifyResult verifyResult = null;
-
-        //    if (!isSucceed)
-        //    {
-        //        var message = AsanPardakhtResultTranslator.TranslateVerification(result, messagesOptions);
-
-        //        verifyResult = PaymentVerifyResult.Failed(message);
-        //        verifyResult.Message = message;
-        //    }
-
-        //    return new AsanPardakhtVerifyResult
-        //    {
-        //        IsSucceed = isSucceed,
-        //        Result = verifyResult
-        //    };
-        //}
-
-        //public static async Task<string> CreateSettleData(
-        //    AsanPardakhtCallbackResult callbackResult,
-        //    AsanPardakhtGatewayAccount account,
-        //    IAsanPardakhtCrypto crypto)
-        //{
-        //    var requestToEncrypt = $"{account.UserName},{account.Password}";
-        //    var encryptedRequest = await crypto.Encrypt(requestToEncrypt, account.Key, account.IV);
-
-        //    return
-        //        "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tem=\"http://tempuri.org/\">" +
-        //        "<soapenv:Header/>" +
-        //        "<soapenv:Body>" +
-        //        "<tem:RequestReconciliation>" +
-        //        $"<tem:merchantConfigurationID>{account.MerchantConfigurationId}</tem:merchantConfigurationID>" +
-        //        "<!--Optional:-->" +
-        //        $"<tem:encryptedCredentials>{XmlHelper.EncodeXmlValue(encryptedRequest)}</tem:encryptedCredentials>" +
-        //        $"<tem:payGateTranID>{callbackResult.PayGateTranId}</tem:payGateTranID>" +
-        //        "</tem:RequestReconciliation>" +
-        //        "</soapenv:Body>" +
-        //        "</soapenv:Envelope>";
-        //}
-
-        //public static PaymentVerifyResult CreateSettleResult(
-        //    string response,
-        //    AsanPardakhtCallbackResult callbackResult,
-        //    MessagesOptions messagesOptions)
-        //{
-        //    var result = XmlHelper.GetNodeValueFromXml(response, "RequestReconciliationResult", "http://tempuri.org/");
-
-        //    var isSucceed = result == "600";
-        //    string message;
-
-        //    if (isSucceed)
-        //    {
-        //        message = messagesOptions.PaymentSucceed;
-        //    }
-        //    else
-        //    {
-        //        message = AsanPardakhtResultTranslator.TranslateReconcilation(result, messagesOptions) ??
-        //                  messagesOptions.PaymentFailed;
-        //    }
-
-        //    var verifyResult = new PaymentVerifyResult
-        //    {
-        //        Status = isSucceed ? PaymentVerifyResultStatus.Succeed : PaymentVerifyResultStatus.Failed,
-        //        TransactionCode = callbackResult.Rrn,
-        //        Message = message
-        //    };
-
-        //    verifyResult.DatabaseAdditionalData.Add("PayGateTranId", callbackResult.PayGateTranId);
-        //    verifyResult.DatabaseAdditionalData.Add("LastFourDigitOfPAN", callbackResult.LastFourDigitOfPAN);
-
-        //    return verifyResult;
-        //}
-
+        
         private static void AppendAuthenticationHeaders(HttpClient httpClient, AsanPardakhtGatewayAccount account)
         {
             httpClient.DefaultRequestHeaders.Clear();
