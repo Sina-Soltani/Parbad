@@ -4,7 +4,7 @@
     <PackageId>Parbad.Mvc5</PackageId>
     <Product>Parbad.Mvc5</Product>
     <VersionPrefix>2.2.0</VersionPrefix>
-    <TargetFramework>net462</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
     <LangVersion>9</LangVersion>
     <Authors>Sina Soltani</Authors>
     <Description>ASP.NET MVC 4 and 5 integration for Parbad project.

@@ -477,16 +477,6 @@
         <member name="M:Parbad.Gateway.AsanPardakht.AsanPardakhtGateway.RefundAsync(Parbad.InvoiceContext,Parbad.Money,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
-        <member name="P:Parbad.Gateway.AsanPardakht.AsanPardakhtGatewayAccount.Key">
-            <summary>
-            The Key for encrypting/decrypting the data. You can ask Asan Pardakht Support to receive your key.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.AsanPardakht.AsanPardakhtGatewayAccount.IV">
-            <summary>
-            The IV for encrypting/decrypting the data. You can ask Asan Pardakht Support to receive your IV.
-            </summary>
-        </member>
         <member name="M:Parbad.Gateway.AsanPardakht.AsanPardakhtGatewayBuilderExtensions.AddAsanPardakht(Parbad.GatewayBuilders.IGatewayBuilder)">
             <summary>
             Adds Asan Pardakht gateway to Parbad services.
@@ -509,6 +499,34 @@
         <member name="M:Parbad.Gateway.AsanPardakht.AsanPardakhtGatewayInvoiceBuilderExtensions.UseAsanPardakht(Parbad.InvoiceBuilder.IInvoiceBuilder)">
             <summary>
             The invoice will be sent to Asan Pardakht gateway.
+            </summary>
+        </member>
+        <member name="M:Parbad.Gateway.AsanPardakht.AsanPardakhtGatewayInvoiceBuilderExtensions.SetAsanPardakhtData(Parbad.InvoiceBuilder.IInvoiceBuilder,Parbad.Gateway.AsanPardakht.Internal.Models.AsanPardakhtRequestAdditionalData)">
+            <summary>
+            Sets some additional data to the invoice for <see cref="T:Parbad.Gateway.AsanPardakht.AsanPardakhtGateway"/>.
+            </summary>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="M:Parbad.Gateway.AsanPardakht.AsanPardakhtGatewayInvoiceBuilderExtensions.SetAsanPardakhtData(Parbad.InvoiceBuilder.IInvoiceBuilder,System.String,System.String,System.String,System.Collections.Generic.List{Parbad.Gateway.AsanPardakht.Internal.Models.AsanPardakhtSettlementPortionModel})">
+            <summary>
+            Sets some additional data to the invoice for <see cref="T:Parbad.Gateway.AsanPardakht.AsanPardakhtGateway"/>.
+            </summary>
+            <exception cref="T:System.ArgumentNullException"></exception>
+            <exception cref="T:System.Exception"></exception>
+        </member>
+        <member name="M:Parbad.Gateway.AsanPardakht.AsanPardakhtPaymentResultExtensions.GetAsanPardakhtOriginalPaymentResult(Parbad.IPaymentFetchResult)">
+            <summary>
+            Gets the original payment result that is received from the Asan Pardakht gateway.
+            </summary>
+        </member>
+        <member name="M:Parbad.Gateway.AsanPardakht.AsanPardakhtPaymentResultExtensions.GetAsanPardakhtOriginalPaymentResult(Parbad.IPaymentVerifyResult)">
+            <summary>
+            Gets the original payment result that is received from the Asan Pardakht gateway.
+            </summary>
+        </member>
+        <member name="M:Parbad.Gateway.AsanPardakht.Internal.AsanPardakhtHelper.CompletionMethod(System.Net.Http.HttpClient,System.String,System.Int64,Parbad.Gateway.AsanPardakht.AsanPardakhtGatewayAccount,Parbad.Gateway.AsanPardakht.AsanPardakhtGatewayOptions,Parbad.Options.MessagesOptions,System.Threading.CancellationToken)">
+            <summary>
+            This method is used for Verification, Settlement, Cancelling and Reversing a payment.
             </summary>
         </member>
         <member name="P:Parbad.Gateway.IranKish.Internal.IranKishCallbackResult.InvoiceNumber">

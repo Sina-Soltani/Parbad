@@ -7,10 +7,18 @@ namespace Parbad.Gateway.AsanPardakht
     {
         public string PaymentPageUrl { get; set; } = "https://asan.shaparak.ir/";
 
-        public string ApiUrl { get; set; } = "https://ipgsoap.asanpardakht.ir/paygate/merchantservices.asmx";
+        public string BaseApiUrl = "https://ipgrest.asanpardakht.ir/v1/";
 
-        public string EncryptUrl { get; set; } = "https://ipgsoap.asanpardakht.ir/paygate/internalutils.asmx?op=EncryptInAES";
+        public string GetTokenUrl => $"{BaseApiUrl}Token";
 
-        public string DecryptUrl { get; set; } = "https://ipgsoap.asanpardakht.ir/paygate/internalutils.asmx?op=DecryptInAES";
+        public string TimeUrl => $"{BaseApiUrl}Time";
+
+        public string GetTransUrl => $"{BaseApiUrl}TranResult";
+
+        public string VerifyUrl => $"{BaseApiUrl}Verify";
+
+        public string SettlementUrl => $"{BaseApiUrl}Settlement";
+
+        public string CancelUrl => $"{BaseApiUrl}Cancel";
     }
 }

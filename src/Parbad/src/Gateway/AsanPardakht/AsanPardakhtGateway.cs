@@ -21,7 +21,6 @@ namespace Parbad.Gateway.AsanPardakht
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly HttpClient _httpClient;
-        private readonly IAsanPardakhtCrypto _crypto;
         private readonly AsanPardakhtGatewayOptions _gatewayOptions;
         private readonly MessagesOptions _messageOptions;
 
@@ -31,13 +30,11 @@ namespace Parbad.Gateway.AsanPardakht
             IHttpContextAccessor httpContextAccessor,
             IHttpClientFactory httpClientFactory,
             IGatewayAccountProvider<AsanPardakhtGatewayAccount> accountProvider,
-            IAsanPardakhtCrypto crypto,
             IOptions<AsanPardakhtGatewayOptions> gatewayOptions,
             IOptions<MessagesOptions> messageOptions) : base(accountProvider)
         {
             _httpContextAccessor = httpContextAccessor;
             _httpClient = httpClientFactory.CreateClient(this);
-            _crypto = crypto;
             _gatewayOptions = gatewayOptions.Value;
             _messageOptions = messageOptions.Value;
         }
@@ -49,21 +46,14 @@ namespace Parbad.Gateway.AsanPardakht
 
             var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
 
-            var data = await AsanPardakhtHelper.CreateRequestData(invoice, account, _crypto)
-                .ConfigureAwaitFalse();
-
-            var responseMessage = await _httpClient
-                .PostXmlAsync(_gatewayOptions.ApiUrl, data, cancellationToken)
-                .ConfigureAwaitFalse();
-
-            var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
-
-            return AsanPardakhtHelper.CreateRequestResult(
-                response,
+            return await AsanPardakhtHelper.CreateRequestResult(
+                _httpClient,
+                invoice,
                 account,
                 _httpContextAccessor.HttpContext,
                 _gatewayOptions,
-                _messageOptions);
+                _messageOptions,
+                cancellationToken);
         }
 
         /// <inheritdoc />
@@ -73,19 +63,19 @@ namespace Parbad.Gateway.AsanPardakht
 
             var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 
-            var callbackResult = await AsanPardakhtHelper.CreateCallbackResult(
-                context,
-                account,
-                _httpContextAccessor.HttpContext.Request,
-                _crypto,
-                _messageOptions).ConfigureAwaitFalse();
+            _httpClient.Timeout = TimeSpan.FromSeconds(20);
+            
+            var result = await AsanPardakhtHelper.GetTransResult(context, _httpClient, account, _gatewayOptions, _messageOptions, 
+                cancellationToken);
 
-            if (callbackResult.IsSucceed)
+            var fetchResult = new PaymentFetchResult
             {
-                return PaymentFetchResult.ReadyForVerifying();
-            }
+                Status = result.IsSucceed ? PaymentFetchResultStatus.ReadyForVerifying : PaymentFetchResultStatus.Failed,
+                Message = result.FailedMessage
+            };
+            fetchResult.SetAsanPardakhtOriginalPaymentResult(result.TransModel);
 
-            return PaymentFetchResult.Failed(callbackResult.Message);
+            return fetchResult;
         }
 
         /// <inheritdoc />
@@ -95,50 +85,154 @@ namespace Parbad.Gateway.AsanPardakht
 
             var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 
-            var callbackResult = await AsanPardakhtHelper.CreateCallbackResult(
+            var transResult = await AsanPardakhtHelper.GetTransResult(
                 context,
+                _httpClient,
                 account,
-                _httpContextAccessor.HttpContext.Request,
-                _crypto,
-                _messageOptions);
+                _gatewayOptions,
+                _messageOptions,
+                cancellationToken).ConfigureAwaitFalse();
 
-            if (!callbackResult.IsSucceed)
+            var paymentVerifyResult = new PaymentVerifyResult();
+            paymentVerifyResult.SetAsanPardakhtOriginalPaymentResult(transResult.TransModel);
+
+            if (!transResult.IsSucceed)
             {
-                return PaymentVerifyResult.Failed(callbackResult.Message);
+                paymentVerifyResult.Status = PaymentVerifyResultStatus.Failed;
+                paymentVerifyResult.Message = transResult.FailedMessage;
+
+                return paymentVerifyResult;
             }
 
-            var data = await AsanPardakhtHelper.CreateVerifyData(callbackResult, account, _crypto)
-                .ConfigureAwaitFalse();
-
-            var responseMessage = await _httpClient
-                .PostXmlAsync(_gatewayOptions.ApiUrl, data, cancellationToken)
-                .ConfigureAwaitFalse();
-
-            var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
-
-            var verifyResult = AsanPardakhtHelper.CheckVerifyResult(response, callbackResult, _messageOptions);
+            var verifyResult = await AsanPardakhtHelper.CompletionMethod(
+                _httpClient,
+                _gatewayOptions.VerifyUrl,
+                transResult.TransModel.PayGateTranID,
+                account,
+                _gatewayOptions,
+                _messageOptions,
+                cancellationToken);
 
             if (!verifyResult.IsSucceed)
             {
-                return verifyResult.Result;
+                paymentVerifyResult.Status = PaymentVerifyResultStatus.Failed;
+                paymentVerifyResult.Message = verifyResult.FailedMessage;
+
+                return paymentVerifyResult;
             }
 
-            data = await AsanPardakhtHelper.CreateSettleData(callbackResult, account, _crypto)
-                .ConfigureAwaitFalse();
+            var settleResult = await AsanPardakhtHelper.CompletionMethod(
+                _httpClient,
+                _gatewayOptions.SettlementUrl,
+                transResult.TransModel.PayGateTranID,
+                account,
+                _gatewayOptions,
+                _messageOptions,
+                cancellationToken);
 
-            responseMessage = await _httpClient
-                .PostXmlAsync(_gatewayOptions.ApiUrl, data, cancellationToken)
-                .ConfigureAwaitFalse();
+            if (!settleResult.IsSucceed)
+            {
+                paymentVerifyResult.Status = PaymentVerifyResultStatus.Failed;
+                paymentVerifyResult.Message = settleResult.FailedMessage;
 
-            response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
+                return paymentVerifyResult;
+            }
 
-            return AsanPardakhtHelper.CreateSettleResult(response, callbackResult, _messageOptions);
+            paymentVerifyResult.Status = PaymentVerifyResultStatus.Succeed;
+            paymentVerifyResult.Message = _messageOptions.PaymentSucceed;
+            paymentVerifyResult.TransactionCode = transResult.TransModel.Rrn;
+
+            return paymentVerifyResult;
         }
 
         /// <inheritdoc />
-        public override Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default)
+        public override async Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default)
         {
-            return PaymentRefundResult.Failed("RefundNotSupports").ToInterfaceAsync();
+            if (context == null) throw new ArgumentNullException(nameof(context));
+
+            var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
+
+            var transResult = await AsanPardakhtHelper.GetTransResult(
+                context,
+                _httpClient,
+                account,
+                _gatewayOptions,
+                _messageOptions,
+                cancellationToken).ConfigureAwaitFalse();
+
+            if (!transResult.IsSucceed)
+            {
+                return PaymentRefundResult.Failed(transResult.FailedMessage);
+            }
+
+            var refundResult = await AsanPardakhtHelper.CompletionMethod(
+                _httpClient,
+                _gatewayOptions.CancelUrl,
+                transResult.TransModel.PayGateTranID,
+                account,
+                _gatewayOptions,
+                _messageOptions,
+                cancellationToken);
+
+            if (!refundResult.IsSucceed)
+            {
+                return PaymentRefundResult.Failed(refundResult.FailedMessage);
+            }
+
+            return PaymentRefundResult.Succeed();
         }
+
+        ///// <inheritdoc />
+        //public override async Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default)
+        //{
+        //    if (context == null) throw new ArgumentNullException(nameof(context));
+
+        //    var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
+
+        //    var callbackResult = await AsanPardakhtHelper.CreateCallbackResult(
+        //        context,
+        //        account,
+        //        _httpContextAccessor.HttpContext.Request,
+        //        _crypto,
+        //        _messageOptions);
+
+        //    if (!callbackResult.IsSucceed)
+        //    {
+        //        return PaymentVerifyResult.Failed(callbackResult.Message);
+        //    }
+
+        //    var data = await AsanPardakhtHelper.CreateVerifyData(callbackResult, account, _crypto)
+        //        .ConfigureAwaitFalse();
+
+        //    var responseMessage = await _httpClient
+        //        .PostXmlAsync(_gatewayOptions.ApiUrl, data, cancellationToken)
+        //        .ConfigureAwaitFalse();
+
+        //    var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
+
+        //    var verifyResult = AsanPardakhtHelper.CheckVerifyResult(response, callbackResult, _messageOptions);
+
+        //    if (!verifyResult.IsSucceed)
+        //    {
+        //        return verifyResult.Result;
+        //    }
+
+        //    data = await AsanPardakhtHelper.CreateSettleData(callbackResult, account, _crypto)
+        //        .ConfigureAwaitFalse();
+
+        //    responseMessage = await _httpClient
+        //        .PostXmlAsync(_gatewayOptions.ApiUrl, data, cancellationToken)
+        //        .ConfigureAwaitFalse();
+
+        //    response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
+
+        //    return AsanPardakhtHelper.CreateSettleResult(response, callbackResult, _messageOptions);
+        //}
+
+        ///// <inheritdoc />
+        //public override Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default)
+        //{
+        //    return PaymentRefundResult.Failed("RefundNotSupports").ToInterfaceAsync();
+        //}
     }
 }

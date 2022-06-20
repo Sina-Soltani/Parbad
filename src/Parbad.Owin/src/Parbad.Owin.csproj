@@ -3,7 +3,7 @@
   <PropertyGroup>
     <PackageId>Parbad.Owin</PackageId>
     <Product>Parbad.Owin</Product>
-    <TargetFramework>net462</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
     <VersionPrefix>1.2.0</VersionPrefix>
     <LangVersion>9</LangVersion>
     <Authors>Sina Soltani</Authors>
