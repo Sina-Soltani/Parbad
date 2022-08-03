@@ -34,7 +34,7 @@ For more information see: https://www.nuget.org/packages/Parbad/</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Owin" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Owin" Version="3.1.8" />
     <PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="4.0.1" />
   </ItemGroup>
 
