@@ -3,6 +3,8 @@
 
 using System;
 using Microsoft.Extensions.DependencyInjection;
+using Parbad.Abstraction;
+using Parbad.Gateway.IranKish.Internal;
 using Parbad.GatewayBuilders;
 
 namespace Parbad.Gateway.IranKish
@@ -49,6 +51,16 @@ namespace Parbad.Gateway.IranKish
             builder.Services.Configure(configureOptions);
 
             return builder;
+        }
+
+        internal static string GetCmsPreservationId(this Invoice invoice)
+        {
+            if (invoice == null) throw new ArgumentNullException(nameof(invoice));
+
+            if( invoice.Properties.ContainsKey(IranKishHelper.CmsPreservationIdKey))
+                return (string)invoice.Properties[IranKishHelper.CmsPreservationIdKey];
+
+            return null;
         }
     }
 }

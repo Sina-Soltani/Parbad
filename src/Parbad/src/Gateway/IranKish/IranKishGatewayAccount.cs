@@ -10,8 +10,12 @@ namespace Parbad.Gateway.IranKish
     /// </summary>
     public class IranKishGatewayAccount : GatewayAccount
     {
-        public string MerchantId { get; set; }
+        public string TerminalId { get; set; }
 
-        public string Sha1Key { get; set; }
+        public string AcceptorId { get; set; }
+
+        public string PassPhrase { get; set; }
+
+        public string PublicKey { get; set; }
     }
 }
