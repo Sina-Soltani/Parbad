@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Parbad.Abstraction;
 using Parbad.Gateway.IranKish.Internal;
+using Parbad.Gateway.IranKish.Internal.Models;
 using Parbad.GatewayBuilders;
 using Parbad.Internal;
 using Parbad.Net;
@@ -49,16 +50,11 @@ namespace Parbad.Gateway.IranKish
 
             var data = IranKishHelper.CreateRequestData(invoice, account);
 
-            _httpClient.DefaultRequestHeaders.Clear();
-            _httpClient.DefaultRequestHeaders.Add(IranKishHelper.HttpRequestHeader.Key, IranKishHelper.HttpRequestHeader.Value);
-
-            var responseMessage = await _httpClient
-                .PostXmlAsync(_gatewayOptions.ApiTokenUrl, data, cancellationToken)
+            var result = await _httpClient
+                .PostJsonAsync<IranKishTokenResult>(_gatewayOptions.ApiTokenUrl, data, cancellationToken)
                 .ConfigureAwaitFalse();
 
-            var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
-
-            return IranKishHelper.CreateRequestResult(response, account, _gatewayOptions, _httpContextAccessor.HttpContext, _messageOptions.Value);
+            return IranKishHelper.CreateRequestResult(result, _httpContextAccessor.HttpContext, account, _gatewayOptions, _messageOptions.Value);
         }
 
         /// <inheritdoc />
@@ -102,18 +98,19 @@ namespace Parbad.Gateway.IranKish
                 return PaymentVerifyResult.Failed(callbackResult.Message);
             }
 
-            var data = IranKishHelper.CreateVerifyData(callbackResult, account);
+            var data = new IranKishVerifyRequest
+            {
+                TerminalId = account.TerminalId,
+                RetrievalReferenceNumber = callbackResult.RetrievalReferenceNumber,
+                SystemTraceAuditNumber = callbackResult.SystemTraceAuditNumber,
+                TokenIdentity = callbackResult.Token,
+            };
 
-            _httpClient.DefaultRequestHeaders.Clear();
-            _httpClient.DefaultRequestHeaders.Add(IranKishHelper.HttpVerifyHeader.Key, IranKishHelper.HttpVerifyHeader.Value);
-
-            var responseMessage = await _httpClient
-                .PostXmlAsync(_gatewayOptions.ApiVerificationUrl, data, cancellationToken)
+            var result = await _httpClient
+                .PostJsonAsync<IranKishVerifyResult>(_gatewayOptions.ApiVerificationUrl, data, cancellationToken)
                 .ConfigureAwaitFalse();
 
-            var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
-
-            return IranKishHelper.CreateVerifyResult(response, context, callbackResult, _messageOptions.Value);
+            return IranKishHelper.CreateVerifyResult(result, _messageOptions.Value);
         }
 
         /// <inheritdoc />

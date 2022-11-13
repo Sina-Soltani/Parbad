@@ -1,4 +1,6 @@
 ﻿using System;
+using Parbad.Abstraction;
+using Parbad.Gateway.IranKish.Internal;
 using Parbad.InvoiceBuilder;
 
 namespace Parbad.Gateway.IranKish
@@ -14,6 +16,20 @@ namespace Parbad.Gateway.IranKish
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
             return builder.SetGateway(IranKishGateway.Name);
+        }
+
+        /// <summary>
+        /// Sets additional data for <see cref="IranKishGateway"/>.
+        /// </summary>
+        public static IInvoiceBuilder SetIranKishAdditionalData(this IInvoiceBuilder builder, IranKishGatewayAdditionalData data)
+        {
+            if (builder == null) throw new ArgumentNullException(nameof(builder));
+            if (data == null) throw new ArgumentNullException(nameof(data));
+
+            if (!string.IsNullOrWhiteSpace(data.MobileNumberOrEmail))
+                builder.AddOrUpdateProperty(IranKishHelper.CmsPreservationIdKey, data.MobileNumberOrEmail);
+
+            return builder;
         }
     }
 }

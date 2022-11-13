@@ -511,16 +511,6 @@
             The invoice will be sent to Asan Pardakht gateway.
             </summary>
         </member>
-        <member name="P:Parbad.Gateway.IranKish.Internal.IranKishCallbackResult.InvoiceNumber">
-            <summary>
-            Equals to TrackingNumber in Parbad system.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.IranKish.Internal.IranKishCallbackResult.ReferenceId">
-            <summary>
-            Equals to TransactionCode in Parbad system.
-            </summary>
-        </member>
         <member name="M:Parbad.Gateway.IranKish.IranKishGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
@@ -536,6 +526,12 @@
         <member name="T:Parbad.Gateway.IranKish.IranKishGatewayAccount">
             <summary>
             IranKish gateway account.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.IranKish.IranKishGatewayAdditionalData.MobileNumberOrEmail">
+            <summary>
+            To enable the card-recall feature of the gateway, set this additional data with user's
+            mobile-phone number (like "989123456789") or email.
             </summary>
         </member>
         <member name="M:Parbad.Gateway.IranKish.IranKishGatewayBuilderExtensions.AddIranKish(Parbad.GatewayBuilders.IGatewayBuilder)">
@@ -563,6 +559,11 @@
             The invoice will be sent to Iran Kish gateway.
             </summary>
             <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.Gateway.IranKish.IranKishGatewayInvoiceBuilderExtensions.SetIranKishAdditionalData(Parbad.InvoiceBuilder.IInvoiceBuilder,Parbad.Gateway.IranKish.IranKishGatewayAdditionalData)">
+            <summary>
+            Sets additional data for <see cref="T:Parbad.Gateway.IranKish.IranKishGateway"/>.
+            </summary>
         </member>
         <member name="M:Parbad.Gateway.Mellat.MellatGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
