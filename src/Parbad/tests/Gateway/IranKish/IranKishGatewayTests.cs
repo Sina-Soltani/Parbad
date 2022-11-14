@@ -6,24 +6,25 @@ using Parbad.Gateway.IranKish;
 using Parbad.Tests.Helpers;
 using RichardSzalay.MockHttp;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Parbad.Gateway.IranKish.Internal.Models;
 
 namespace Parbad.Tests.Gateway.IranKish
 {
     public class IranKishGatewayTests
     {
-        private const string ExpectedMerchantId = "test";
-        private const long ExpectedAmount = 1000;
-        private const string ExpectedTransactionCode = "test";
-        private const string ExpectedToken = "Token";
-
         [Test]
         public async Task Requesting_And_Verifying_Work()
         {
-            const string expectedRefId = "test";
+            const long expectedAmount = 1000;
+            const string expectedTransactionCode = "test";
+            const string expectedToken = "Token";
             const long expectedTrackingNumber = 1;
             const string expectedCallbackUrl = "http://www.mywebsite.com";
-            const string apiUrl = "http://localhost/";
+            const string apiTokenUrl = "http://localhost/token";
+            const string apiVerificationUrl = "http://localhost/verification";
             const string paymentPageUrl = "http://localhost/";
 
             await GatewayTestHelpers.TestGatewayAsync(
@@ -35,14 +36,21 @@ namespace Parbad.Tests.Gateway.IranKish
                         {
                             accounts.AddInMemory(account =>
                             {
-                                account.MerchantId = ExpectedMerchantId;
-                                account.Sha1Key = "testkey";
+                                account.TerminalId = "1234";
+                                account.AcceptorId = "4321";
+                                account.PassPhrase = "1234567890ABCDEF";
+                                account.PublicKey = @"-----BEGIN PUBLIC KEY-----
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDK29P6S5KBONx080Aq+j3jFoA5
+Zb9vPwJkCVyfPLCabXt26AghTkYVPaXK2/zLHeGOPoU7Er6kWPlAdN6JC4GHvJ6H
+neDEtA+O2B1lQSZnUL2xwrqajq8MeNQckXvwCeAbl4m9Ev7/RPYBeJb16i3xPsjh
+fS14GMsP5hVYVy4B7wIDAQAB
+-----END PUBLIC KEY-----";
                             });
                         })
                         .WithOptions(options =>
                         {
-                            options.ApiTokenUrl = apiUrl;
-                            options.ApiVerificationUrl = apiUrl;
+                            options.ApiTokenUrl = apiTokenUrl;
+                            options.ApiVerificationUrl = apiVerificationUrl;
                             options.PaymentPageUrl = paymentPageUrl;
                         });
 
@@ -52,31 +60,48 @@ namespace Parbad.Tests.Gateway.IranKish
                 {
                     invoice
                         .SetTrackingNumber(expectedTrackingNumber)
-                        .SetAmount(ExpectedAmount)
+                        .SetAmount(expectedAmount)
                         .SetCallbackUrl(expectedCallbackUrl)
                         .UseIranKish();
                 },
                 handler =>
                 {
                     handler
-                        .Expect(apiUrl)
-                        .WithPartialContent("MakeToken")
-                        .Respond(MediaTypes.Xml, GetRequestResponse());
+                        .Expect(HttpMethod.Post, apiTokenUrl)
+                        .Respond(MediaTypes.Json, JsonConvert.SerializeObject(new IranKishTokenResult
+                        {
+                            ResponseCode = "00",
+                            Status = true,
+                            Result = new IranKishTokenResultInfo
+                            {
+                                Token = expectedToken,
+                                TransactionType = "Purchase",
+                                BillInfo = new IranKishBillInfo()
+                            }
+                        }));
 
                     handler
-                        .Expect(apiUrl)
-                        .WithPartialContent("KicccPaymentsVerification")
-                        .Respond(MediaTypes.Xml, GetVerificationResponse());
+                        .Expect(HttpMethod.Post, apiVerificationUrl)
+                        .Respond(MediaTypes.Json, JsonConvert.SerializeObject(new IranKishVerifyResult
+                        {
+                            ResponseCode = "00",
+                            Status = true,
+                            Result = new IranKishVerifyResultInfo
+                            {
+                                ResponseCode = "00",
+                                RetrievalReferenceNumber = expectedTransactionCode,
+                                Amount = expectedAmount.ToString()
+                            }
+                        }));
                 },
                 context =>
                 {
                     context.Request.Query = new QueryCollection(new Dictionary<string, StringValues>
                     {
-                        {"ResultCode", "100"},
-                        {"Token", ExpectedToken},
-                        {"MerchantId", ExpectedMerchantId},
-                        {"InvoiceNumber", expectedTrackingNumber.ToString()},
-                        {"ReferenceId", ExpectedTransactionCode}
+                        {"ResponseCode", "00"},
+                        {"Token", expectedToken},
+                        {"RetrievalReferenceNumber", expectedTransactionCode},
+                        {"Amount", expectedAmount.ToString()}
                     });
                 },
                 result => GatewayOnResultHelper.OnRequestResult(
@@ -86,39 +111,10 @@ namespace Parbad.Tests.Gateway.IranKish
                     expectedPaymentPageUrl: paymentPageUrl,
                     expectedForm: new Dictionary<string, string>
                     {
-                        {"merchantid", expectedRefId},
-                        {"token", ExpectedToken}
+                        {"tokenIdentity", expectedToken}
                     }),
-                result => GatewayOnResultHelper.OnFetchResult(result, expectedTrackingNumber, ExpectedAmount, IranKishGateway.Name),
-                result => GatewayOnResultHelper.OnVerifyResult(result, expectedTrackingNumber, ExpectedAmount, IranKishGateway.Name, ExpectedTransactionCode));
-        }
-
-        private static string GetRequestResponse()
-        {
-            return
-                "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
-                "<s:Body>" +
-                "<MakeTokenResponse xmlns=\"http://tempuri.org/\">" +
-                "<MakeTokenResult xmlns:a=\"http://schemas.datacontract.org/2004/07/Token\" xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\">" +
-                "<a:message>909</a:message>" +
-                "<a:result>true</a:result>" +
-                $"<a:token>{ExpectedToken}</a:token>" +
-                "</MakeTokenResult>" +
-                "</MakeTokenResponse>" +
-                "</s:Body>" +
-                "</s:Envelope>";
-        }
-
-        private static string GetVerificationResponse()
-        {
-            return
-                "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
-                "<s:Body>" +
-                "<KicccPaymentsVerificationResponse xmlns=\"http://tempuri.org/\">" +
-                $"<KicccPaymentsVerificationResult>{ExpectedAmount}</KicccPaymentsVerificationResult>" +
-                "</KicccPaymentsVerificationResponse>" +
-                "</s:Body>" +
-                "</s:Envelope>";
+                result => GatewayOnResultHelper.OnFetchResult(result, expectedTrackingNumber, expectedAmount, IranKishGateway.Name),
+                result => GatewayOnResultHelper.OnVerifyResult(result, expectedTrackingNumber, expectedAmount, IranKishGateway.Name, expectedTransactionCode));
         }
     }
 }
