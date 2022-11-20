@@ -9,10 +9,11 @@ using Parbad.Tests.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Parbad.Tests
 {
+    [TestClass]
     public class PaymentTokenProviderTests
     {
         private IHttpContextAccessor _httpContextAccessor;
@@ -20,7 +21,7 @@ namespace Parbad.Tests
         private IPaymentTokenProvider _provider;
         private Invoice _invoice;
 
-        [SetUp]
+        [TestInitialize]
         public void Setup()
         {
             _invoice = new Invoice { CallbackUrl = CallbackUrl.Parse("http://www.mysite.com") };
@@ -32,7 +33,7 @@ namespace Parbad.Tests
             _provider = new GuidQueryStringPaymentTokenProvider(_httpContextAccessor, _options);
         }
 
-        [Test]
+        [TestMethod]
         public async Task Token_Must_Not_Be_Null()
         {
             var token = await _provider.ProvideTokenAsync(_invoice);
@@ -40,7 +41,7 @@ namespace Parbad.Tests
             Assert.IsNotNull(token);
         }
 
-        [Test]
+        [TestMethod]
         public async Task Token_Must_Be_Guid()
         {
             var token = await _provider.ProvideTokenAsync(_invoice);
@@ -48,7 +49,7 @@ namespace Parbad.Tests
             Assert.IsTrue(Guid.TryParse(token, out _));
         }
 
-        [Test]
+        [TestMethod]
         public async Task CallbackUrl_Must_Have_Default_TokenName()
         {
             await _provider.ProvideTokenAsync(_invoice);
@@ -60,7 +61,7 @@ namespace Parbad.Tests
             Assert.IsTrue(query.ContainsKey(QueryStringPaymentTokenOptions.DefaultQueryName));
         }
 
-        [Test]
+        [TestMethod]
         public async Task CallbackUrl_Must_Have_TokenName_From_Options()
         {
             const string expectedQueryName = "test";
@@ -76,7 +77,7 @@ namespace Parbad.Tests
             Assert.IsTrue(query.ContainsKey(expectedQueryName));
         }
 
-        [Test]
+        [TestMethod]
         public async Task CallbackUrl_Must_Have_Correct_TokenValue()
         {
             var token = await _provider.ProvideTokenAsync(_invoice);
@@ -90,7 +91,7 @@ namespace Parbad.Tests
             Assert.AreEqual(token, (string)query[QueryStringPaymentTokenOptions.DefaultQueryName]);
         }
 
-        [Test]
+        [TestMethod]
         public async Task Must_Provide_Unique_Tokens()
         {
             var token1 = await _provider.ProvideTokenAsync(_invoice);
@@ -99,7 +100,7 @@ namespace Parbad.Tests
             Assert.AreNotEqual(token2, token1);
         }
 
-        [Test]
+        [TestMethod]
         public async Task Must_Return_Null_When_No_Token_Exists()
         {
             var token = await _provider.RetrieveTokenAsync();
@@ -107,7 +108,7 @@ namespace Parbad.Tests
             Assert.IsNull(token);
         }
 
-        [Test]
+        [TestMethod]
         public async Task Must_Return_The_Token_From_QueryString()
         {
             const string expectedToken = "test";
@@ -123,7 +124,7 @@ namespace Parbad.Tests
             Assert.AreEqual(expectedToken, token);
         }
 
-        [Test]
+        [TestMethod]
         public async Task Must_Return_The_Token_From_QueryString_With_CustomQueryName()
         {
             const string expectedToken = "test";

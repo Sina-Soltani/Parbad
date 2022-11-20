@@ -44,7 +44,6 @@ namespace Parbad.Gateway.IranKish.Internal.Models
         public string TransactionType { get; set; }
 
         public List<KeyValuePair<string, string>> AdditionalParameters { get; set; }
-
     }
 
     internal class IranKishBillInfo
@@ -60,5 +59,4 @@ namespace Parbad.Gateway.IranKish.Internal.Models
 
         public int Amount { get; set; }
     }
-
 }

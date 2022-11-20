@@ -18,6 +18,11 @@ steps:
   inputs:
     versionSpec: 
     checkLatest: true
+- task: UseDotNet@2
+  displayName: Use Dotnet
+  inputs:
+    packageType: sdk
+    version: 7.x
 - task: NuGetCommand@2
   displayName: 'restoring'
   inputs:

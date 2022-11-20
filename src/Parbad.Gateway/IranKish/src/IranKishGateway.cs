@@ -14,7 +14,6 @@ using Parbad.GatewayBuilders;
 using Parbad.Internal;
 using Parbad.Net;
 using Parbad.Options;
-using Parbad.Properties;
 
 namespace Parbad.Gateway.IranKish
 {
@@ -51,8 +50,8 @@ namespace Parbad.Gateway.IranKish
             var data = IranKishHelper.CreateRequestData(invoice, account);
 
             var result = await _httpClient
-                .PostJsonAsync<IranKishTokenResult>(_gatewayOptions.ApiTokenUrl, data, cancellationToken)
-                .ConfigureAwaitFalse();
+                               .PostJsonAsync<IranKishTokenResult>(_gatewayOptions.ApiTokenUrl, data, cancellationToken)
+                               .ConfigureAwaitFalse();
 
             return IranKishHelper.CreateRequestResult(result, _httpContextAccessor.HttpContext, account, _gatewayOptions, _messageOptions.Value);
         }
@@ -65,11 +64,11 @@ namespace Parbad.Gateway.IranKish
             var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 
             var callbackResult = await IranKishHelper.CreateCallbackResultAsync(
-                context,
-                account,
-                _httpContextAccessor.HttpContext.Request,
-                _messageOptions.Value,
-                cancellationToken);
+                                                                                context,
+                                                                                account,
+                                                                                _httpContextAccessor.HttpContext.Request,
+                                                                                _messageOptions.Value,
+                                                                                cancellationToken);
 
             if (callbackResult.IsSucceed)
             {
@@ -87,11 +86,11 @@ namespace Parbad.Gateway.IranKish
             var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 
             var callbackResult = await IranKishHelper.CreateCallbackResultAsync(
-                context,
-                account,
-                _httpContextAccessor.HttpContext.Request,
-                _messageOptions.Value,
-                cancellationToken);
+                                                                                context,
+                                                                                account,
+                                                                                _httpContextAccessor.HttpContext.Request,
+                                                                                _messageOptions.Value,
+                                                                                cancellationToken);
 
             if (!callbackResult.IsSucceed)
             {
@@ -99,16 +98,16 @@ namespace Parbad.Gateway.IranKish
             }
 
             var data = new IranKishVerifyRequest
-            {
-                TerminalId = account.TerminalId,
-                RetrievalReferenceNumber = callbackResult.RetrievalReferenceNumber,
-                SystemTraceAuditNumber = callbackResult.SystemTraceAuditNumber,
-                TokenIdentity = callbackResult.Token,
-            };
+                       {
+                           TerminalId = account.TerminalId,
+                           RetrievalReferenceNumber = callbackResult.RetrievalReferenceNumber,
+                           SystemTraceAuditNumber = callbackResult.SystemTraceAuditNumber,
+                           TokenIdentity = callbackResult.Token,
+                       };
 
             var result = await _httpClient
-                .PostJsonAsync<IranKishVerifyResult>(_gatewayOptions.ApiVerificationUrl, data, cancellationToken)
-                .ConfigureAwaitFalse();
+                               .PostJsonAsync<IranKishVerifyResult>(_gatewayOptions.ApiVerificationUrl, data, cancellationToken)
+                               .ConfigureAwaitFalse();
 
             return IranKishHelper.CreateVerifyResult(result, _messageOptions.Value);
         }
@@ -116,7 +115,7 @@ namespace Parbad.Gateway.IranKish
         /// <inheritdoc />
         public override Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default)
         {
-            return PaymentRefundResult.Failed(Resources.RefundNotSupports).ToInterfaceAsync();
+            return PaymentRefundResult.Failed("The Refund operation is not supported by this gateway.").ToInterfaceAsync();
         }
     }
 }

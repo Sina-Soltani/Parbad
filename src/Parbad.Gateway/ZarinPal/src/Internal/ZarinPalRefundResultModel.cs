@@ -7,6 +7,11 @@ namespace Parbad.Gateway.ZarinPal.Internal
 {
     public class ZarinPalRefundResultModel
     {
+        public ZarinPalRefundResultModelData Data { get; set; }
+    }
+
+    public class ZarinPalRefundResultModelData
+    {
         public int Code { get; set; }
 
         public string Iban { get; set; }

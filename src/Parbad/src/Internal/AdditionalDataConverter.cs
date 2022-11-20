@@ -8,14 +8,14 @@ using System.Collections.Generic;
 
 namespace Parbad.Internal
 {
-    internal static class AdditionalDataConverter
+    public static class AdditionalDataConverter
     {
-        public static IDictionary<string, string> ToDictionary(Transaction transaction)
+        public static IDictionary<string, string> ToDictionary(this Transaction transaction)
         {
             return JsonConvert.DeserializeObject<IDictionary<string, string>>(transaction.AdditionalData);
         }
 
-        public static string ToJson(PaymentResult paymentResult)
+        internal static string ToJson(PaymentResult paymentResult)
         {
             if (paymentResult == null) throw new ArgumentNullException(nameof(paymentResult));
 

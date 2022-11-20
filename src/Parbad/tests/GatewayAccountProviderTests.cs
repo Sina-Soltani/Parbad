@@ -1,12 +1,13 @@
-﻿using NUnit.Framework;
-using Parbad.Internal;
+﻿using Parbad.Internal;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Parbad.Tests
 {
+    [TestClass]
     public class GatewayAccountProviderTests
     {
-        [Test]
+        [TestMethod]
         public async Task Must_Have_An_Account()
         {
             var source = new InMemoryGatewayAccountSource<TestableGatewayAccount>(new[]

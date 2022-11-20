@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\..\tests\Parbad.Tests.Helpers\Parbad.Tests.Helpers.csproj" />
+      <ProjectReference Include="..\..\..\Parbad\src\Parbad.csproj" />
+      <ProjectReference Include="..\src\Parbad.Gateway.IranKish.csproj" />
+    </ItemGroup>
+
+</Project>

@@ -511,60 +511,6 @@
             The invoice will be sent to Asan Pardakht gateway.
             </summary>
         </member>
-        <member name="M:Parbad.Gateway.IranKish.IranKishGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
-            <inheritdoc />
-        </member>
-        <member name="M:Parbad.Gateway.IranKish.IranKishGateway.FetchAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
-            <inheritdoc />
-        </member>
-        <member name="M:Parbad.Gateway.IranKish.IranKishGateway.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
-            <inheritdoc />
-        </member>
-        <member name="M:Parbad.Gateway.IranKish.IranKishGateway.RefundAsync(Parbad.InvoiceContext,Parbad.Money,System.Threading.CancellationToken)">
-            <inheritdoc />
-        </member>
-        <member name="T:Parbad.Gateway.IranKish.IranKishGatewayAccount">
-            <summary>
-            IranKish gateway account.
-            </summary>
-        </member>
-        <member name="P:Parbad.Gateway.IranKish.IranKishGatewayAdditionalData.MobileNumberOrEmail">
-            <summary>
-            To enable the card-recall feature of the gateway, set this additional data with user's
-            mobile-phone number (like "989123456789") or email.
-            </summary>
-        </member>
-        <member name="M:Parbad.Gateway.IranKish.IranKishGatewayBuilderExtensions.AddIranKish(Parbad.GatewayBuilders.IGatewayBuilder)">
-            <summary>
-            Adds IranKish gateway to Parbad services.
-            </summary>
-            <param name="builder"></param>
-        </member>
-        <member name="M:Parbad.Gateway.IranKish.IranKishGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.IranKish.IranKishGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.Gateway.IranKish.IranKishGatewayAccount}})">
-            <summary>
-            Configures the accounts for <see cref="T:Parbad.Gateway.IranKish.IranKishGateway"/>.
-            </summary>
-            <param name="builder"></param>
-            <param name="configureAccounts">Configures the accounts.</param>
-        </member>
-        <member name="M:Parbad.Gateway.IranKish.IranKishGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.IranKish.IranKishGateway},System.Action{Parbad.Gateway.IranKish.IranKishGatewayOptions})">
-            <summary>
-            Configures the options for IranKish Gateway.
-            </summary>
-            <param name="builder"></param>
-            <param name="configureOptions">Configuration</param>
-        </member>
-        <member name="M:Parbad.Gateway.IranKish.IranKishGatewayInvoiceBuilderExtensions.UseIranKish(Parbad.InvoiceBuilder.IInvoiceBuilder)">
-            <summary>
-            The invoice will be sent to Iran Kish gateway.
-            </summary>
-            <param name="builder"></param>
-        </member>
-        <member name="M:Parbad.Gateway.IranKish.IranKishGatewayInvoiceBuilderExtensions.SetIranKishAdditionalData(Parbad.InvoiceBuilder.IInvoiceBuilder,Parbad.Gateway.IranKish.IranKishGatewayAdditionalData)">
-            <summary>
-            Sets additional data for <see cref="T:Parbad.Gateway.IranKish.IranKishGateway"/>.
-            </summary>
-        </member>
         <member name="M:Parbad.Gateway.Mellat.MellatGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
@@ -602,11 +548,6 @@
             The invoice will be sent to Mellat gateway.
             </summary>
             <param name="builder"></param>
-        </member>
-        <member name="M:Parbad.Gateway.Mellat.MellatGatewayInvoiceBuilderExtensions.SetMellatMobileNumber(Parbad.InvoiceBuilder.IInvoiceBuilder,System.String)">
-            <summary>
-            Sets the Mobile Number for the current invoice to sent to Mellat Gateway.
-            </summary>
         </member>
         <member name="M:Parbad.Gateway.Mellat.MellatGatewayInvoiceBuilderExtensions.SetMellatAdditionalData(Parbad.InvoiceBuilder.IInvoiceBuilder,Parbad.Gateway.Mellat.MellatGatewayAdditionalDataRequest)">
             <summary>
@@ -1383,6 +1324,11 @@
         <member name="T:Parbad.IPaymentFetchResult">
             <summary>
             Describes the result of the Fetch operation.
+            </summary>
+        </member>
+        <member name="P:Parbad.IPaymentFetchResult.TransactionCode">
+            <summary>
+            Gets the transaction code from the gateway.
             </summary>
         </member>
         <member name="P:Parbad.IPaymentFetchResult.Status">

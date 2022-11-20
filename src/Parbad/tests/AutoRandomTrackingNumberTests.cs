@@ -1,15 +1,16 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using NUnit.Framework;
 using Parbad.Abstraction;
 using Parbad.Storage.Abstractions;
 using Parbad.Storage.Cache.MemoryCache;
 using Parbad.TrackingNumberProviders;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Parbad.Tests
 {
+    [TestClass]
     public class AutoRandomTrackingNumberTests
     {
         private IStorage _storage;
@@ -17,7 +18,7 @@ namespace Parbad.Tests
         private AutoRandomTrackingNumber _instance;
         private Invoice _invoice;
 
-        [SetUp]
+        [TestInitialize]
         public void Setup()
         {
             var services = new ServiceCollection()
@@ -35,7 +36,7 @@ namespace Parbad.Tests
             _invoice = new Invoice();
         }
 
-        [Test]
+        [TestCleanup]
         public async Task TrackingNumber_Must_Be_A_Positive_Number()
         {
             await _instance.FormatAsync(_invoice);
@@ -43,7 +44,7 @@ namespace Parbad.Tests
             Assert.IsTrue(_invoice.TrackingNumber > 0);
         }
 
-        [Test]
+        [TestMethod]
         public async Task TrackingNumber_Must_Be_Greater_Than_MinimumNumber()
         {
             const long expectedMinimumNumber = 5;

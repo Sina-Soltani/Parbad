@@ -5,6 +5,8 @@ namespace Parbad.Internal
 {
     public class PaymentFetchResult : PaymentResult, IPaymentFetchResult
     {
+        public string TransactionCode { get; set; }
+        
         public PaymentFetchResultStatus Status { get; set; }
 
         public bool IsAlreadyVerified { get; set; }

@@ -5,6 +5,11 @@ namespace Parbad.Gateway.ZarinPal.Internal
 {
     internal class ZarinPalRequestResultModel
     {
+        public ZarinPalRequestResultModelData Data { get; set; }
+    }
+    
+    internal class ZarinPalRequestResultModelData
+    {
         public string Authority { set; get; }
 
         public int Code { set; get; }

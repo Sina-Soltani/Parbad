@@ -1,6 +1,6 @@
-﻿---------------------------------------------------
+---------------------------------------------------
 Parbad - Online Payment Library for .NET developers
-				IDPay.ir Gateway
+IranKish Gateway
 ---------------------------------------------------
 
 GitHub: https://github.com/Sina-Soltani/Parbad
@@ -13,13 +13,12 @@ Configuration
 .ConfigureGateways(gateways =>
 {
     gateways
-        .AddIdPay()
+        .AddIranKish()
         .WithAccounts(accounts =>
         {
             accounts.AddInMemory(account =>
             {
-                account.Api = "<Your API>";
-                account.IsTestAccount = true | false;
+                account.TerminalId = <Your Terminal ID>;
             });
         });
 })
@@ -30,8 +29,11 @@ Making a request
 
 var result = _onlinePayment.RequestAsync(invoice => 
 {
-    invoice.SetIdPayData(...); // optional
-	invoice.UseIdPay();
+    invoice.SetGateway("IranKish");
+
+    // OR
+
+	invoice.UseIranKish();
 })
 
 

@@ -1,19 +1,20 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
-using NUnit.Framework;
 using Parbad.Builder;
 using Parbad.Gateway.IdPay.Internal;
 using Parbad.Tests.Helpers;
 using RichardSzalay.MockHttp;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Parbad.Gateway.IdPay.Tests
 {
+    [TestClass]
     public class IdPayGatewayTests
     {
-        [Test]
+        [TestMethod]
         public async Task Requesting_And_Verifying_Work()
         {
             const long expectedTrackingNumber = 1;

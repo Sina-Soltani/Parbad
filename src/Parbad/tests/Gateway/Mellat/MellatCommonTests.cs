@@ -1,5 +1,4 @@
 ﻿using Moq;
-using NUnit.Framework;
 using Parbad.Gateway.Mellat;
 using Parbad.Gateway.Mellat.Internal;
 using Parbad.Internal;
@@ -7,14 +6,16 @@ using Parbad.InvoiceBuilder;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Parbad.Tests.Gateway.Mellat
 {
+    [TestClass]
     public class MellatCommonTests
     {
         private IInvoiceBuilder _invoiceBuilder;
 
-        [SetUp]
+        [TestInitialize]
         public void Initialize()
         {
             var mockServiceProvider = new Mock<IServiceProvider>();
@@ -22,7 +23,7 @@ namespace Parbad.Tests.Gateway.Mellat
             _invoiceBuilder = new DefaultInvoiceBuilder(mockServiceProvider.Object);
         }
 
-        [Test]
+        [TestMethod]
         public async Task Invoice_Must_Have_Correct_GatewayName()
         {
             _invoiceBuilder.UseMellat();
@@ -34,7 +35,7 @@ namespace Parbad.Tests.Gateway.Mellat
             Assert.IsTrue(invoice.GatewayName.Equals("Mellat", StringComparison.OrdinalIgnoreCase));
         }
 
-        [Test]
+        [TestMethod]
         public async Task InvoiceProperties_Must_Contain_The_CumulativeAccounts()
         {
             _invoiceBuilder
@@ -62,7 +63,7 @@ namespace Parbad.Tests.Gateway.Mellat
             Assert.AreEqual(0, cumulativeAccounts[1].PayerId);
         }
 
-        [Test]
+        [TestMethod]
         public async Task InvoiceProperties_Must_Contain_AdditionalData()
         {
             var expectedAdditionalData = new MellatGatewayAdditionalDataRequest

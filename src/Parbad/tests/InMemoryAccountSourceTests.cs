@@ -1,14 +1,15 @@
-﻿using NUnit.Framework;
-using Parbad.GatewayBuilders;
+﻿using Parbad.GatewayBuilders;
 using Parbad.Internal;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Parbad.Tests
 {
+    [TestClass]
     public class InMemoryAccountSourceTests
     {
-        [Test]
+        [TestMethod]
         public async Task Must_Have_An_Account()
         {
             IGatewayAccountSource<TestableGatewayAccount> source = new InMemoryGatewayAccountSource<TestableGatewayAccount>(new[]
@@ -23,7 +24,7 @@ namespace Parbad.Tests
             Assert.IsTrue(accounts.Count == 1);
         }
 
-        [Test]
+        [TestMethod]
         public async Task Must_Have_The_Expected_Account()
         {
             const int expectedId = 1;

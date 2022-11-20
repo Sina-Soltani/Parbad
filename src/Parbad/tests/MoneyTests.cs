@@ -1,12 +1,13 @@
-﻿using NUnit.Framework;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Parbad.Tests
 {
+    [TestClass]
     public class MoneyTests
     {
         private const decimal ExpectedAmount = 1000;
 
-        [Test]
+        [TestMethod]
         public void Amount_Must_Be_Equal_With_ExpectedAmount()
         {
             var instance1 = new Money(ExpectedAmount);
@@ -18,7 +19,7 @@ namespace Parbad.Tests
             Assert.AreEqual(ExpectedAmount, instance3.Value);
         }
 
-        [Test]
+        [TestMethod]
         public void ToString_Value_Must_Be_Equal_With_Amount()
         {
             var instance = new Money(ExpectedAmount);
@@ -26,7 +27,7 @@ namespace Parbad.Tests
             Assert.AreEqual(ExpectedAmount.ToString(), instance.ToString());
         }
 
-        [Test]
+        [TestMethod]
         public void Casted_Value_Must_Be_Equal_With_Amount()
         {
             var amount = (long)new Money(ExpectedAmount);
@@ -34,7 +35,7 @@ namespace Parbad.Tests
             Assert.AreEqual(ExpectedAmount, amount);
         }
 
-        [Test]
+        [TestMethod]
         public void Added_Amount_Must_Be_Equal_With_2000()
         {
             var instance = new Money(ExpectedAmount).AddAmount(ExpectedAmount);
@@ -42,7 +43,7 @@ namespace Parbad.Tests
             Assert.AreEqual(ExpectedAmount * 2, (decimal)instance);
         }
 
-        [Test]
+        [TestMethod]
         public void Compare_Method_Works()
         {
             var instance = new Money(ExpectedAmount);
@@ -51,7 +52,7 @@ namespace Parbad.Tests
             Assert.AreEqual(0, instance.CompareTo(instance2));
         }
 
-        [Test]
+        [TestMethod]
         public void Equatable_Works()
         {
             var money = new Money(10);

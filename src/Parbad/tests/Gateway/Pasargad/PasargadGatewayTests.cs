@@ -3,16 +3,17 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Primitives;
 using Moq;
-using NUnit.Framework;
 using Parbad.Builder;
 using Parbad.Gateway.Pasargad;
 using Parbad.Tests.Helpers;
 using RichardSzalay.MockHttp;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Parbad.Tests.Gateway.Pasargad
 {
+    [TestClass]
     public class PasargadGatewayTests
     {
         private IPasargadCrypto _crypto;
@@ -25,7 +26,7 @@ namespace Parbad.Tests.Gateway.Pasargad
         private const string ExpectedActionNumber = "1003";
         private const string ExpectedSignedValue = "test";
 
-        [SetUp]
+        [TestInitialize]
         public void Setup()
         {
             var mockCrypto = new Mock<IPasargadCrypto>();
@@ -36,7 +37,7 @@ namespace Parbad.Tests.Gateway.Pasargad
             _crypto = mockCrypto.Object;
         }
 
-        [Test]
+        [TestMethod]
         public async Task Requesting_And_Verifying_Work()
         {
             const string expectedCallbackUrl = "http://www.mywebsite.com";

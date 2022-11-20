@@ -20,9 +20,9 @@ namespace Parbad.Gateway.IranKish
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
             return builder
-                .AddGateway<IranKishGateway>()
-                .WithHttpClient(clientBuilder => { })
-                .WithOptions(options => { });
+                   .AddGateway<IranKishGateway>()
+                   .WithHttpClient(_ => { })
+                   .WithOptions(_ => { });
         }
 
         /// <summary>
@@ -57,8 +57,10 @@ namespace Parbad.Gateway.IranKish
         {
             if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-            if( invoice.Properties.ContainsKey(IranKishHelper.CmsPreservationIdKey))
+            if (invoice.Properties.ContainsKey(IranKishHelper.CmsPreservationIdKey))
+            {
                 return (string)invoice.Properties[IranKishHelper.CmsPreservationIdKey];
+            }
 
             return null;
         }

@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -13,7 +12,6 @@ using Parbad.Gateway.IranKish.Internal.Models;
 using Parbad.Http;
 using Parbad.Internal;
 using Parbad.Options;
-using Parbad.Utilities;
 
 namespace Parbad.Gateway.IranKish.Internal
 {
@@ -26,23 +24,23 @@ namespace Parbad.Gateway.IranKish.Internal
         public static IranKishTokenRequest CreateRequestData(Invoice invoice, IranKishGatewayAccount account)
         {
             var requestInfo = new IranKishTokenRequestInfo
-            {
-                AcceptorId = account.AcceptorId,
-                Amount = invoice.Amount,
-                CmsPreservationId = invoice.GetCmsPreservationId(),
-                PaymentId = invoice.TrackingNumber.ToString(),
-                RequestId = Guid.NewGuid().ToString("N").Substring(0, 20),
-                RequestTimestamp = DateTimeOffset.Now.ToUnixTimeSeconds(),
-                RevertUri = invoice.CallbackUrl,
-                TerminalId = account.TerminalId,
-                TransactionType = "Purchase",
-            };
+                              {
+                                  AcceptorId = account.AcceptorId,
+                                  Amount = invoice.Amount,
+                                  CmsPreservationId = invoice.GetCmsPreservationId(),
+                                  PaymentId = invoice.TrackingNumber.ToString(),
+                                  RequestId = Guid.NewGuid().ToString("N").Substring(0, 20),
+                                  RequestTimestamp = DateTimeOffset.Now.ToUnixTimeSeconds(),
+                                  RevertUri = invoice.CallbackUrl,
+                                  TerminalId = account.TerminalId,
+                                  TransactionType = "Purchase",
+                              };
 
             return new IranKishTokenRequest
-            {
-                AuthenticationEnvelope = GetAuthenticationEnvelope(requestInfo, account),
-                Request = requestInfo
-            };
+                   {
+                       AuthenticationEnvelope = GetAuthenticationEnvelope(requestInfo, account),
+                       Request = requestInfo
+                   };
         }
 
         private static IranKishAuthenticationEnvelope GetAuthenticationEnvelope(IranKishTokenRequestInfo requestInfo, IranKishGatewayAccount account)
@@ -56,16 +54,17 @@ namespace Parbad.Gateway.IranKish.Internal
                 (isMultiplex ? "01" : "00") +
                 (isMultiplex
                     ? requestInfo.MultiplexParameters.Select(t =>
-                            $"{t.Iban.Replace("IR", "2718")}{t.Amount.ToString().PadLeft(12, '0')}")
-                        .Aggregate((a, b) => $"{a}{b}")
+                                                                 $"{t.Iban.Replace("IR", "2718")}{t.Amount.ToString().PadLeft(12, '0')}")
+                                 .Aggregate((a, b) => $"{a}{b}")
                     : string.Empty);
 
             var encryptedString = IranKishCrypto.EncryptAuthenticationEnvelope(baseString, account.PublicKey, out var iv);
+
             return new IranKishAuthenticationEnvelope
-            {
-                Data = encryptedString,
-                Iv = iv
-            };
+                   {
+                       Data = encryptedString,
+                       Iv = iv
+                   };
         }
 
         public static PaymentRequestResult CreateRequestResult(
@@ -90,15 +89,15 @@ namespace Parbad.Gateway.IranKish.Internal
             }
 
             var form = new Dictionary<string, string>
-            {
-                {"tokenIdentity", result.Result.Token}
-            };
+                       {
+                           { "tokenIdentity", result.Result.Token }
+                       };
 
             return PaymentRequestResult.SucceedWithPost(
-                account.Name,
-                httpContext,
-                gatewayOptions.PaymentPageUrl,
-                form);
+                                                        account.Name,
+                                                        httpContext,
+                                                        gatewayOptions.PaymentPageUrl,
+                                                        form);
         }
 
         public static async Task<IranKishCallbackResult> CreateCallbackResultAsync(
@@ -125,20 +124,20 @@ namespace Parbad.Gateway.IranKish.Internal
                 : IranKishGatewayResultTranslator.Translate(responseCode.Value, messagesOptions);
 
             return new IranKishCallbackResult
-            {
-                IsSucceed = isSucceed,
-                Message = message,
-                Token = token.Value,
-                AcceptorId = acceptorId.Value,
-                ResponseCode = responseCode.Value,
-                PaymentId = paymentId.Value,
-                RequestId = requestId.Value,
-                Sha256OfPan = sha256OfPan.Value,
-                RetrievalReferenceNumber = retrievalReferenceNumber.Value,
-                Amount = amount.Value,
-                MaskedPan = maskedPan.Value,
-                SystemTraceAuditNumber = systemTraceAuditNumber.Value
-            };
+                   {
+                       IsSucceed = isSucceed,
+                       Message = message,
+                       Token = token.Value,
+                       AcceptorId = acceptorId.Value,
+                       ResponseCode = responseCode.Value,
+                       PaymentId = paymentId.Value,
+                       RequestId = requestId.Value,
+                       Sha256OfPan = sha256OfPan.Value,
+                       RetrievalReferenceNumber = retrievalReferenceNumber.Value,
+                       Amount = amount.Value,
+                       MaskedPan = maskedPan.Value,
+                       SystemTraceAuditNumber = systemTraceAuditNumber.Value
+                   };
         }
 
         public static PaymentVerifyResult CreateVerifyResult(IranKishVerifyResult result, MessagesOptions messagesOptions)
@@ -163,11 +162,11 @@ namespace Parbad.Gateway.IranKish.Internal
             }
 
             return new PaymentVerifyResult
-            {
-                Status = status,
-                TransactionCode = result.Result.RetrievalReferenceNumber,
-                Message = message
-            };
+                   {
+                       Status = status,
+                       TransactionCode = result.Result.RetrievalReferenceNumber,
+                       Message = message
+                   };
         }
     }
 }

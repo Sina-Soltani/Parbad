@@ -22,15 +22,22 @@ namespace Parbad.Gateway.IdPay.Internal
         public const string SandBoxApiValue = "6a7f99eb-7c20-4412-a972-6dfb7cd253a4";
         public const string Succeed = "100";
         public const string ReadyForVerifying = "10";
+        public const string RequestAdditionalDataKey = "IdPayRequestAdditional";
 
         public static object CreateRequestData(Invoice invoice)
         {
+            var additionalData = invoice.GetIdPayAdditionalData();
+
             return new IdPayRequestModel
-            {
-                OrderId = invoice.TrackingNumber,
-                Amount = invoice.Amount,
-                Callback = invoice.CallbackUrl
-            };
+                   {
+                       OrderId = invoice.TrackingNumber,
+                       Amount = invoice.Amount,
+                       Name = additionalData?.Name,
+                       Phone = additionalData?.Phone,
+                       Email = additionalData?.Email,
+                       Desc = additionalData?.Desc,
+                       Callback = invoice.CallbackUrl
+                   };
         }
 
         public static async Task<PaymentRequestResult> CreateRequestResult(
@@ -67,20 +74,20 @@ namespace Parbad.Gateway.IdPay.Internal
             var (isSucceed, message) = CheckCallback(status.Value, orderId.Value, id.Value, trackId.Value, amount.Value, context, messagesOptions);
 
             return new IdPayCallbackResult
-            {
-                Id = id.Value,
-                IsSucceed = isSucceed,
-                Message = message
-            };
+                   {
+                       Id = id.Value,
+                       IsSucceed = isSucceed,
+                       Message = message
+                   };
         }
 
         public static IdPayVerifyModel CreateVerifyData(InvoiceContext context, IdPayCallbackResult callbackResult)
         {
             return new IdPayVerifyModel
-            {
-                Id = callbackResult.Id,
-                OrderId = context.Payment.TrackingNumber
-            };
+                   {
+                       Id = callbackResult.Id,
+                       OrderId = context.Payment.TrackingNumber
+                   };
         }
 
         public static async Task<PaymentVerifyResult> CreateVerifyResult(HttpResponseMessage responseMessage, MessagesOptions messagesOptions)
