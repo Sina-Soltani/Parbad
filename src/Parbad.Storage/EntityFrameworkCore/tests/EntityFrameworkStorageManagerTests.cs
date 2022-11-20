@@ -1,16 +1,17 @@
 using KellermanSoftware.CompareNetObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using NUnit.Framework;
 using Parbad.Storage.Abstractions.Models;
 using Parbad.Storage.EntityFrameworkCore.Context;
 using Parbad.Storage.EntityFrameworkCore.Options;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Parbad.Storage.EntityFrameworkCore.Tests
 {
+    [TestClass]
     public class EntityFrameworkStorageManagerTests
     {
         private ParbadDataContext _context;
@@ -28,7 +29,7 @@ namespace Parbad.Storage.EntityFrameworkCore.Tests
             TransactionCode = "code"
         };
 
-        [SetUp]
+        [TestInitialize]
         public void Setup()
         {
             var contextOptions = new DbContextOptionsBuilder<ParbadDataContext>()
@@ -44,13 +45,13 @@ namespace Parbad.Storage.EntityFrameworkCore.Tests
             _storageManager = new EntityFrameworkCoreStorageManager(storage);
         }
 
-        [TearDown]
+        [TestCleanup]
         public ValueTask Cleanup()
         {
             return _context.DisposeAsync();
         }
 
-        [Test]
+        [TestMethod]
         public async Task GetPaymentByTrackingNumber_Must_Be_Equal_With_Expected_Payment_Object()
         {
             await _storageManager.CreatePaymentAsync(PaymentTestData);
@@ -62,7 +63,7 @@ namespace Parbad.Storage.EntityFrameworkCore.Tests
             payment.ShouldCompare(PaymentTestData, "Payment is not equal with the expected Payment object.");
         }
 
-        [Test]
+        [TestMethod]
         public async Task GetPaymentByToken_Must_Be_Equal_With_Expected_Payment_Object()
         {
             await _storageManager.CreatePaymentAsync(PaymentTestData);
@@ -74,7 +75,7 @@ namespace Parbad.Storage.EntityFrameworkCore.Tests
             payment.ShouldCompare(PaymentTestData, "Payment is not equal with the expected Payment object.");
         }
 
-        [Test]
+        [TestMethod]
         public async Task DoesPaymentExists_By_Token_Must_Be_True()
         {
             await _storageManager.CreatePaymentAsync(PaymentTestData);
@@ -84,7 +85,7 @@ namespace Parbad.Storage.EntityFrameworkCore.Tests
             Assert.IsTrue(exist);
         }
 
-        [Test]
+        [TestMethod]
         public async Task DoesPaymentExists_By_TrackingNumber_Must_Be_True()
         {
             await _storageManager.CreatePaymentAsync(PaymentTestData);
@@ -94,7 +95,7 @@ namespace Parbad.Storage.EntityFrameworkCore.Tests
             Assert.IsTrue(exist);
         }
 
-        [Test]
+        [TestMethod]
         public async Task GetTransactions_Must_Be_Equal_With_Expected_Transactions()
         {
             await _storageManager.CreatePaymentAsync(PaymentTestData);

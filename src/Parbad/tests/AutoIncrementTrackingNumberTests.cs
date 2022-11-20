@@ -1,16 +1,17 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using NUnit.Framework;
 using Parbad.Abstraction;
 using Parbad.Storage.Abstractions;
 using Parbad.Storage.Abstractions.Models;
 using Parbad.Storage.Cache.MemoryCache;
 using Parbad.TrackingNumberProviders;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Parbad.Tests
 {
+    [TestClass]
     public class AutoIncrementTrackingNumberTests
     {
         private IStorage _storage;
@@ -18,12 +19,12 @@ namespace Parbad.Tests
         private AutoIncrementTrackingNumber _instance;
         private Invoice _invoice;
 
-        [SetUp]
+        [TestInitialize]
         public void Setup()
         {
             var services = new ServiceCollection()
-                .AddMemoryCache()
-                .BuildServiceProvider();
+                           .AddMemoryCache()
+                           .BuildServiceProvider();
 
             var memoryCache = services.GetRequiredService<IMemoryCache>();
             var memoryCacheOptions = new OptionsWrapper<MemoryCacheStorageOptions>(new MemoryCacheStorageOptions());
@@ -36,7 +37,7 @@ namespace Parbad.Tests
             _invoice = new Invoice();
         }
 
-        [Test]
+        [TestCleanup]
         public async Task TrackingNumber_Must_Be_A_Positive_Number()
         {
             await _instance.FormatAsync(_invoice);
@@ -44,22 +45,22 @@ namespace Parbad.Tests
             Assert.IsTrue(_invoice.TrackingNumber > 0);
         }
 
-        [Test]
+        [TestMethod]
         public async Task NewTrackingNumber_Must_Be_Greater_Than_Latest_Number()
         {
             var expectedNumber = AutoIncrementTrackingNumberOptions.DefaultMinimumNumber + 1;
 
             await _storage.CreatePaymentAsync(new Payment
-            {
-                TrackingNumber = AutoIncrementTrackingNumberOptions.DefaultMinimumNumber
-            });
+                                              {
+                                                  TrackingNumber = AutoIncrementTrackingNumberOptions.DefaultMinimumNumber
+                                              });
 
             await _instance.FormatAsync(_invoice);
 
             Assert.AreEqual(expectedNumber, _invoice.TrackingNumber);
         }
 
-        [Test]
+        [TestMethod]
         public async Task TrackingNumber_Must_Be_Equal_With_MinimumNumber()
         {
             const long expectedMinimumNumber = 5;
@@ -71,7 +72,7 @@ namespace Parbad.Tests
             Assert.AreEqual(expectedMinimumNumber, _invoice.TrackingNumber);
         }
 
-        [Test]
+        [TestMethod]
         public async Task TrackingNumber_Must_Increment_Correctly()
         {
             const long expectedNumber = 3;
@@ -80,9 +81,9 @@ namespace Parbad.Tests
             _options.Value.Increment = 2;
 
             await _storage.CreatePaymentAsync(new Payment
-            {
-                TrackingNumber = 1
-            });
+                                              {
+                                                  TrackingNumber = 1
+                                              });
 
             await _instance.FormatAsync(_invoice);
 

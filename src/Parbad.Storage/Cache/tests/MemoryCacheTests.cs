@@ -1,14 +1,15 @@
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using NUnit.Framework;
 using Parbad.Storage.Abstractions.Models;
 using Parbad.Storage.Cache.MemoryCache;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Parbad.Storage.Cache.Tests
 {
+    [TestClass]
     public class MemoryCacheTests
     {
         private ServiceProvider _services;
@@ -36,7 +37,7 @@ namespace Parbad.Storage.Cache.Tests
             AdditionalData = "test"
         };
 
-        [SetUp]
+        [TestInitialize]
         public void Setup()
         {
             _services = new ServiceCollection()
@@ -50,13 +51,13 @@ namespace Parbad.Storage.Cache.Tests
             _storage = new MemoryCacheStorage(memoryCache, options);
         }
 
-        [TearDown]
+        [TestCleanup]
         public ValueTask Cleanup()
         {
             return _services.DisposeAsync();
         }
 
-        [Test]
+        [TestMethod]
         public async Task Create_Payment_Works()
         {
             await _storage.CreatePaymentAsync(PaymentTestData);
@@ -77,7 +78,7 @@ namespace Parbad.Storage.Cache.Tests
             Assert.AreEqual(PaymentTestData.IsCompleted, payment.IsCompleted);
         }
 
-        [Test]
+        [TestMethod]
         public async Task Update_Payment_Works()
         {
             await _storage.CreatePaymentAsync(PaymentTestData);
@@ -108,7 +109,7 @@ namespace Parbad.Storage.Cache.Tests
             Assert.AreEqual(payment.IsCompleted, newPayment.IsCompleted);
         }
 
-        [Test]
+        [TestMethod]
         public async Task Delete_Payment_Works()
         {
             await _storage.CreatePaymentAsync(PaymentTestData);
@@ -120,7 +121,7 @@ namespace Parbad.Storage.Cache.Tests
             Assert.AreEqual(0, _storage.Payments.Count());
         }
 
-        [Test]
+        [TestMethod]
         public async Task Create_Transaction_Works()
         {
             await _storage.CreatePaymentAsync(PaymentTestData);
@@ -145,7 +146,7 @@ namespace Parbad.Storage.Cache.Tests
             Assert.AreEqual(TransactionTestData.Message, transaction.Message);
         }
 
-        [Test]
+        [TestMethod]
         public async Task Update_Transaction_Works()
         {
             await _storage.CreatePaymentAsync(PaymentTestData);
@@ -179,7 +180,7 @@ namespace Parbad.Storage.Cache.Tests
             Assert.AreEqual(transaction.Message, newTransaction.Message);
         }
 
-        [Test]
+        [TestMethod]
         public async Task Delete_Transaction_Works()
         {
             await _storage.CreatePaymentAsync(PaymentTestData);

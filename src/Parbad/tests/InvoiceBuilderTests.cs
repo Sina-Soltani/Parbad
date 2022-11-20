@@ -1,18 +1,19 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using NUnit.Framework;
 using Parbad.Internal;
 using Parbad.InvoiceBuilder;
 using System;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Parbad.Tests
 {
+    [TestClass]
     public class InvoiceBuilderTests
     {
         private ServiceProvider _services;
         private IInvoiceBuilder _builder;
 
-        [SetUp]
+        [TestInitialize]
         public void Setup()
         {
             _services = new ServiceCollection()
@@ -21,13 +22,13 @@ namespace Parbad.Tests
             _builder = new DefaultInvoiceBuilder(_services);
         }
 
-        [TearDown]
+        [TestCleanup]
         public ValueTask Cleanup()
         {
             return _services.DisposeAsync();
         }
 
-        [Test]
+        [TestMethod]
         public async Task Build_Must_Return_An_Invoice()
         {
             var invoice = await _builder.BuildAsync();
@@ -35,7 +36,7 @@ namespace Parbad.Tests
             Assert.IsNotNull(invoice);
         }
 
-        [Test]
+        [TestMethod]
         public async Task Invoice_Must_Have_The_Expected_TrackingNumber()
         {
             const long expectedValue = 1000;
@@ -47,7 +48,7 @@ namespace Parbad.Tests
             Assert.AreEqual(expectedValue, invoice.TrackingNumber);
         }
 
-        [Test]
+        [TestMethod]
         public async Task Invoice_Must_Have_The_Expected_Amount()
         {
             const decimal expectedValue = 1000;
@@ -59,7 +60,7 @@ namespace Parbad.Tests
             Assert.AreEqual(expectedValue, (decimal)invoice.Amount);
         }
 
-        [Test]
+        [TestMethod]
         public async Task Invoice_Must_Have_The_Expected_CallbackUrl()
         {
             const string expectedValue = "http://test.com";
@@ -71,7 +72,7 @@ namespace Parbad.Tests
             Assert.AreEqual(expectedValue, (string)invoice.CallbackUrl);
         }
 
-        [Test]
+        [TestMethod]
         public async Task Invoice_Must_Have_The_Expected_GatewayName()
         {
             const string expectedValue = "Gateway";
@@ -83,7 +84,7 @@ namespace Parbad.Tests
             Assert.AreEqual(expectedValue, invoice.GatewayName);
         }
 
-        [Test]
+        [TestMethod]
         public async Task Invoice_Must_Have_The_Expected_AdditionalData()
         {
             const string expectedKey = "key";
@@ -98,7 +99,7 @@ namespace Parbad.Tests
             Assert.AreEqual(expectedValue, invoice.Properties[expectedKey]);
         }
 
-        [Test]
+        [TestMethod]
         public void Invoice_Must_Throw_Exception_When_Duplicate_AdditionalKey_Is_Added()
         {
             const string key = "key";
@@ -106,10 +107,10 @@ namespace Parbad.Tests
             _builder.AddProperty(key, "");
             _builder.AddProperty(key, "");
 
-            Assert.ThrowsAsync<ArgumentException>(() => _builder.BuildAsync());
+            Assert.ThrowsExceptionAsync<ArgumentException>(() => _builder.BuildAsync());
         }
 
-        [Test]
+        [TestMethod]
         public async Task Invoice_Must_Have_The_Updated_AdditionalData_Value()
         {
             const string expectedKey = "key";
@@ -125,7 +126,7 @@ namespace Parbad.Tests
             Assert.AreEqual(expectedValue, invoice.Properties[expectedKey]);
         }
 
-        [Test]
+        [TestMethod]
         public async Task Invoice_Formatter_Must_Apply_Value_Correctly()
         {
             const long expectedTrackingNumber = 1000;

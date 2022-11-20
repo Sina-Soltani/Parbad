@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
-using NUnit.Framework;
 using Parbad.Builder;
 using Parbad.Gateway.Melli;
 using Parbad.Tests.Helpers;
@@ -10,12 +9,14 @@ using RichardSzalay.MockHttp;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Parbad.Tests.Gateway.Melli
 {
+    [TestClass]
     public class MelliGatewayTests
     {
-        [Test]
+        [TestMethod]
         public async Task Requesting_And_Verifying_Work()
         {
             const long expectedTrackingNumber = 1;

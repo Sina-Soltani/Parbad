@@ -1,19 +1,19 @@
 ﻿using Moq;
-using NUnit.Framework;
 using Parbad.Internal;
 using Parbad.InvoiceBuilder;
 using System;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Parbad.Gateway.AsanPardakht;
-using Parbad.Utilities;
 
 namespace Parbad.Tests.Gateway.AsanPardakht
 {
+    [TestClass]
     public class AsanPardakhtCommonTests
     {
         private IInvoiceBuilder _invoiceBuilder;
 
-        [SetUp]
+        [TestInitialize]
         public void Initialize()
         {
             var mockServiceProvider = new Mock<IServiceProvider>();
@@ -21,7 +21,7 @@ namespace Parbad.Tests.Gateway.AsanPardakht
             _invoiceBuilder = new DefaultInvoiceBuilder(mockServiceProvider.Object);
         }
 
-        [Test]
+        [TestMethod]
         public async Task Invoice_Must_Have_Correct_GatewayName()
         {
             _invoiceBuilder.UseAsanPardakht();

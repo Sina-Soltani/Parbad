@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
-using NUnit.Framework;
 using Parbad.Builder;
 using Parbad.Gateway.Saman;
 using Parbad.Gateway.Saman.Internal.Models;
@@ -10,9 +9,11 @@ using RichardSzalay.MockHttp;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Parbad.Tests.Gateway.Saman
 {
+    [TestClass]
     public class SamanGatewayTests
     {
         private const string ExpectedMerchantId = "test";
@@ -24,7 +25,7 @@ namespace Parbad.Tests.Gateway.Saman
         private const string ApiUrl = "http://localhost/";
         private const string PaymentPageUrl = "http://localhost/";
 
-        [Test]
+        [TestMethod]
         public async Task WebGateway_Requesting_And_Verifying_Work()
         {
             await GatewayTestHelpers.TestGatewayAsync(
@@ -94,7 +95,7 @@ namespace Parbad.Tests.Gateway.Saman
                 result => GatewayOnResultHelper.OnVerifyResult(result, ExpectedTrackingNumber, ExpectedAmount, SamanGateway.Name, ExpectedTransactionCode));
         }
 
-        [Test]
+        [TestMethod]
         public async Task MobileGateway_Requesting_And_Verifying_Work()
         {
             await GatewayTestHelpers.TestGatewayAsync(

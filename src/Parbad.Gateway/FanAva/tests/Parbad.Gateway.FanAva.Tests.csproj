@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.3" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\..\..\tests\Parbad.Tests.Helpers\Parbad.Tests.Helpers.csproj" />
     <ProjectReference Include="..\src\Parbad.Gateway.FanAva.csproj" />
   </ItemGroup>

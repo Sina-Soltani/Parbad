@@ -549,11 +549,6 @@
             </summary>
             <param name="builder"></param>
         </member>
-        <member name="M:Parbad.Gateway.Mellat.MellatGatewayInvoiceBuilderExtensions.SetMellatMobileNumber(Parbad.InvoiceBuilder.IInvoiceBuilder,System.String)">
-            <summary>
-            Sets the Mobile Number for the current invoice to sent to Mellat Gateway.
-            </summary>
-        </member>
         <member name="M:Parbad.Gateway.Mellat.MellatGatewayInvoiceBuilderExtensions.SetMellatAdditionalData(Parbad.InvoiceBuilder.IInvoiceBuilder,Parbad.Gateway.Mellat.MellatGatewayAdditionalDataRequest)">
             <summary>
             Sets additional data for <see cref="T:Parbad.Gateway.Mellat.MellatGateway"/>.

@@ -1,19 +1,20 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
-using NUnit.Framework;
 using Parbad.Internal;
 using Parbad.Tests.Helpers;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Parbad.Tests
 {
+    [TestClass]
     public class GatewayTransporterTests
     {
         private HttpContext _httpContext;
 
-        [SetUp]
+        [TestInitialize]
         public void Setup()
         {
             var httpContextAccessor = MockHelpers.MockHttpContextAccessor();
@@ -21,7 +22,7 @@ namespace Parbad.Tests
             _httpContext = httpContextAccessor.HttpContext;
         }
 
-        [Test]
+        [TestMethod]
         public async Task Transporter_Redirects_Correctly()
         {
             const string expectedUrl = "http://test.com";
@@ -37,7 +38,7 @@ namespace Parbad.Tests
             Assert.AreEqual(expectedUrl, _httpContext.Response.Headers[HeaderNames.Location]);
         }
 
-        [Test]
+        [TestMethod]
         public async Task Transporter_Posts_Correctly()
         {
             const string expectedUrl = "http://test.com";

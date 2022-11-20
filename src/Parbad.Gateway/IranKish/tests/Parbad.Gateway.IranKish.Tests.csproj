@@ -9,10 +9,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\..\..\..\tests\Parbad.Tests.Helpers\Parbad.Tests.Helpers.csproj" />
       <ProjectReference Include="..\..\..\Parbad\src\Parbad.csproj" />
       <ProjectReference Include="..\src\Parbad.Gateway.IranKish.csproj" />

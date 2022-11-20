@@ -1,19 +1,20 @@
 ﻿using Moq;
-using NUnit.Framework;
 using Parbad.Gateway.Melli;
 using Parbad.Gateway.Melli.Internal;
 using Parbad.Internal;
 using Parbad.InvoiceBuilder;
 using System;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Parbad.Tests.Gateway.Melli
 {
+    [TestClass]
     public class MelliCommonTests
     {
         private IInvoiceBuilder _invoiceBuilder;
 
-        [SetUp]
+        [TestInitialize]
         public void Initialize()
         {
             var mockServiceProvider = new Mock<IServiceProvider>();
@@ -21,7 +22,7 @@ namespace Parbad.Tests.Gateway.Melli
             _invoiceBuilder = new DefaultInvoiceBuilder(mockServiceProvider.Object);
         }
 
-        [Test]
+        [TestMethod]
         public async Task Invoice_Must_Have_Correct_GatewayName()
         {
             _invoiceBuilder.UseMelli();
@@ -33,14 +34,14 @@ namespace Parbad.Tests.Gateway.Melli
             Assert.IsTrue(invoice.GatewayName.Equals("melli", StringComparison.OrdinalIgnoreCase));
         }
 
-        [Test]
+        [TestMethod]
         public void Signing_Invalid_RequestData_Must_Throw_Exception()
         {
             var crypto = new MelliGatewayCrypto();
 
             const string data = "test";
 
-            Assert.Throws<MelliGatewayDataSigningException>(() =>
+            Assert.ThrowsException<MelliGatewayDataSigningException>(() =>
             {
                 crypto.Encrypt("test", data);
             });
