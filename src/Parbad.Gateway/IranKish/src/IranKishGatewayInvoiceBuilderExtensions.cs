@@ -27,7 +27,9 @@ namespace Parbad.Gateway.IranKish
             if (data == null) throw new ArgumentNullException(nameof(data));
 
             if (!string.IsNullOrWhiteSpace(data.MobileNumberOrEmail))
+            {
                 builder.AddOrUpdateProperty(IranKishHelper.CmsPreservationIdKey, data.MobileNumberOrEmail);
+            }
 
             return builder;
         }

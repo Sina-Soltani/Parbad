@@ -53,19 +53,19 @@ namespace Parbad.Gateway.ZarinPal.Internal
                                                                ZarinPalGatewayOptions gatewayOptions,
                                                                MessagesOptions messagesOptions)
         {
-            if (!IsSucceedCode(resultModel.Code))
+            if (!IsSucceedCode(resultModel.Data.Code))
             {
-                var message = ZarinPalCodeTranslator.Translate(resultModel.Code, messagesOptions);
+                var message = ZarinPalCodeTranslator.Translate(resultModel.Data.Code, messagesOptions);
 
                 return PaymentRequestResult.Failed(message, account.Name);
             }
 
-            var paymentPageUrl = GetPaymentPageUrl(account.IsSandbox, gatewayOptions) + resultModel.Authority;
+            var paymentPageUrl = GetPaymentPageUrl(account.IsSandbox, gatewayOptions) + resultModel.Data.Authority;
 
             var result = PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, paymentPageUrl);
 
-            result.GatewayResponseCode = resultModel.Code.ToString();
-            result.DatabaseAdditionalData.Add(AuthorityDatabaseKey, resultModel.Authority);
+            result.GatewayResponseCode = resultModel.Data.Code.ToString();
+            result.DatabaseAdditionalData.Add(AuthorityDatabaseKey, resultModel.Data.Authority);
 
             return result;
         }
@@ -150,11 +150,11 @@ namespace Parbad.Gateway.ZarinPal.Internal
         {
             var result = new PaymentRefundResult
                          {
-                             GatewayResponseCode = resultModel.Code.ToString(),
+                             GatewayResponseCode = resultModel.Data.Code.ToString(),
                              GatewayAccountName = account.Name
                          };
 
-            if (IsSucceedCode(resultModel.Code))
+            if (IsSucceedCode(resultModel.Data.Code))
             {
                 result.Status = PaymentRefundResultStatus.Succeed;
 
@@ -162,9 +162,9 @@ namespace Parbad.Gateway.ZarinPal.Internal
             }
             else
             {
-                result.Status = resultModel.Code == NumericAlreadyOkResult ? PaymentRefundResultStatus.AlreadyRefunded : PaymentRefundResultStatus.Failed;
+                result.Status = resultModel.Data.Code == NumericAlreadyOkResult ? PaymentRefundResultStatus.AlreadyRefunded : PaymentRefundResultStatus.Failed;
 
-                result.Message = ZarinPalCodeTranslator.Translate(resultModel.Code, messagesOptions);
+                result.Message = ZarinPalCodeTranslator.Translate(resultModel.Data.Code, messagesOptions);
             }
 
             return result;
@@ -229,17 +229,20 @@ namespace Parbad.Gateway.ZarinPal.Internal
             var failedResult = JsonConvert.DeserializeObject<ZarinPalFailedResult>(json);
 
             string message;
+            int? errorCode = null;
 
-            if (failedResult?.Errors != null)
+            if (failedResult?.Errors != null && failedResult.Errors.Any())
             {
-                message = ZarinPalCodeTranslator.Translate(failedResult.Errors.Code, messagesOptions);
+                errorCode = failedResult.Errors.First().Code;
+                
+                message = ZarinPalCodeTranslator.Translate(errorCode.Value, messagesOptions);
             }
             else
             {
                 message = $"ZarinPal HTTP request failed. Status code {httpResponseMessage.StatusCode}";
             }
 
-            return (failedResult?.Errors?.Code, message);
+            return (errorCode, message);
         }
 
         private static bool IsSucceedCode(int status) => status == NumericOkResult;

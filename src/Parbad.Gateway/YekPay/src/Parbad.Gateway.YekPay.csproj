@@ -4,8 +4,8 @@
     <PackageId>Parbad.Gateway.YekPay</PackageId>
     <Product>Parbad.Gateway.YekPay</Product>
     <VersionPrefix>1.2.0</VersionPrefix>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.0;net5.0</TargetFrameworks>
-    <LangVersion>9</LangVersion>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.0;net5.0;net6.0;net7.0</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
     <Authors>Sina Soltani</Authors>
     <Copyright>Copyright © Sina Soltani 2016</Copyright>
     <PackageProjectUrl>https://github.com/Sina-Soltani/Parbad</PackageProjectUrl>
@@ -16,6 +16,7 @@
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageTags>parbad Payment gateway bank Iran shetab yekpay  پرداخت درگاه بانک ایران شتاب یک پی</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageReleaseNotes>https://github.com/Sina-Soltani/Parbad/releases/tag/v3.9.0</PackageReleaseNotes>
     <Description>YekPay Gateway for Parbad project.
 
 For more information see: https://www.nuget.org/packages/Parbad/</Description>

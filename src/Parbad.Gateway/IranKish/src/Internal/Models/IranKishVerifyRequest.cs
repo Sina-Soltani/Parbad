@@ -12,7 +12,5 @@ namespace Parbad.Gateway.IranKish.Internal.Models
         public string SystemTraceAuditNumber { get; set; }
 
         public string TokenIdentity { get; set; }
-
     }
-
 }

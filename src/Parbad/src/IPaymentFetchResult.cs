@@ -30,6 +30,11 @@ namespace Parbad
     public interface IPaymentFetchResult : IPaymentResult
     {
         /// <summary>
+        /// Gets the transaction code from the gateway.
+        /// </summary>
+        string TransactionCode { get; set; }
+        
+        /// <summary>
         /// Gets the status of the fetched invoice.
         /// </summary>
         PaymentFetchResultStatus Status { get; }

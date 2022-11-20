@@ -2,11 +2,8 @@
 using NUnit.Framework;
 using Parbad.Internal;
 using Parbad.InvoiceBuilder;
-using System;
-using System.Threading.Tasks;
-using Parbad.Gateway.IranKish;
 
-namespace Parbad.Tests.Gateway.IranKish
+namespace Parbad.Gateway.IranKish.Tests
 {
     public class IranKishCommonTests
     {

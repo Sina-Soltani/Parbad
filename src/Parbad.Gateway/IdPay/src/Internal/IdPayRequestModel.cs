@@ -12,6 +12,14 @@ namespace Parbad.Gateway.IdPay.Internal
 
         public long Amount { get; set; }
 
+        public string Name { get; set; }
+
+        public string Phone { get; set; }
+
+        public string Email { get; set; }
+
+        public string Desc { get; set; }
+
         public string Callback { get; set; }
     }
 }
