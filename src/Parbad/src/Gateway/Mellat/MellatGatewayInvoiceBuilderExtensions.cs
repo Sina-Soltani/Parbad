@@ -63,18 +63,6 @@ namespace Parbad.Gateway.Mellat
         }
 
         /// <summary>
-        /// Sets the Mobile Number for the current invoice to sent to Mellat Gateway.
-        /// </summary>
-        [Obsolete("Please use the SetMellatAdditionalData method instead.")]
-        public static IInvoiceBuilder SetMellatMobileNumber(this IInvoiceBuilder builder, string mobileNumber)
-        {
-            return SetMellatAdditionalData(builder, new MellatGatewayAdditionalDataRequest
-            {
-                MobileNumber = mobileNumber
-            });
-        }
-
-        /// <summary>
         /// Sets additional data for <see cref="MellatGateway"/>.
         /// </summary>
         public static IInvoiceBuilder SetMellatAdditionalData(this IInvoiceBuilder builder, MellatGatewayAdditionalDataRequest request)

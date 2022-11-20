@@ -16,34 +16,34 @@ namespace Parbad.Storage.EntityFrameworkCore.Tests
         private ParbadDataContext _context;
         private EntityFrameworkCoreStorage _storage;
 
-        private static readonly Payment PaymentTestData = new Payment
-        {
-            TrackingNumber = 1,
-            Amount = 1000,
-            Token = "token",
-            TransactionCode = "test",
-            GatewayName = "gateway",
-            GatewayAccountName = "test",
-            IsPaid = false,
-            IsCompleted = false
-        };
+        private static readonly Payment PaymentTestData = new()
+                                                          {
+                                                              TrackingNumber = 1,
+                                                              Amount = 1000,
+                                                              Token = "token",
+                                                              TransactionCode = "test",
+                                                              GatewayName = "gateway",
+                                                              GatewayAccountName = "test",
+                                                              IsPaid = false,
+                                                              IsCompleted = false
+                                                          };
 
-        private static readonly Transaction TransactionTestData = new Transaction
-        {
-            PaymentId = 1,
-            Amount = 1000,
-            IsSucceed = false,
-            Message = "test",
-            Type = TransactionType.Request,
-            AdditionalData = "test"
-        };
+        private static readonly Transaction TransactionTestData = new()
+                                                                  {
+                                                                      PaymentId = 1,
+                                                                      Amount = 1000,
+                                                                      IsSucceed = false,
+                                                                      Message = "test",
+                                                                      Type = TransactionType.Request,
+                                                                      AdditionalData = "test"
+                                                                  };
 
         [SetUp]
         public void Setup()
         {
             var contextOptions = new DbContextOptionsBuilder<ParbadDataContext>()
-                .UseInMemoryDatabase(Guid.NewGuid().ToString())
-                .Options;
+                                 .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                                 .Options;
 
             var efCoreOptions = new OptionsWrapper<EntityFrameworkCoreOptions>(new EntityFrameworkCoreOptions());
 

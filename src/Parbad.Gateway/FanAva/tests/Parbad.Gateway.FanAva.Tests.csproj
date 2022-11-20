@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\tests\Parbad.Tests.Helpers\Parbad.Tests.Helpers.csproj" />
-    <ProjectReference Include="..\..\..\Parbad\src\Parbad.csproj" />
     <ProjectReference Include="..\src\Parbad.Gateway.FanAva.csproj" />
   </ItemGroup>
 
