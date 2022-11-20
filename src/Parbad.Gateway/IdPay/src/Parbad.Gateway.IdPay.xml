@@ -36,6 +36,11 @@
             <param name="builder"></param>
             <param name="configureOptions">Configuration</param>
         </member>
+        <member name="M:Parbad.Gateway.IdPay.IdPayGatewayInvoiceBuilderExtensions.SetIdPayData(Parbad.InvoiceBuilder.IInvoiceBuilder,Parbad.Gateway.IdPay.IdPayRequestAdditionalData)">
+            <summary>
+            Sets some additional data that can be sent to the ID Pay gateway by requesting a payment.
+            </summary>
+        </member>
         <member name="M:Parbad.Gateway.IdPay.IdPayGatewayInvoiceBuilderExtensions.UseIdPay(Parbad.InvoiceBuilder.IInvoiceBuilder)">
             <summary>
             The invoice will be sent to IDPay.ir gateway.

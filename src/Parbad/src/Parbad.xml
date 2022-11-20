@@ -1331,6 +1331,11 @@
             Describes the result of the Fetch operation.
             </summary>
         </member>
+        <member name="P:Parbad.IPaymentFetchResult.TransactionCode">
+            <summary>
+            Gets the transaction code from the gateway.
+            </summary>
+        </member>
         <member name="P:Parbad.IPaymentFetchResult.Status">
             <summary>
             Gets the status of the fetched invoice.
