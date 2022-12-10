@@ -107,19 +107,21 @@ namespace Parbad.Gateway.ZarinPal.Internal
                    };
         }
 
-        public static PaymentVerifyResult CreateVerifyResult(ZarinPalOriginalVerificationResult verificationResult, ZarinPalGatewayAccount account, MessagesOptions messagesOptions)
+        public static PaymentVerifyResult CreateVerifyResult(ZarinPalResultModel<ZarinPalOriginalVerificationResult> verificationResult,
+                                                             ZarinPalGatewayAccount account,
+                                                             MessagesOptions messagesOptions)
         {
             PaymentVerifyResult result;
 
-            if (IsSucceedCode(verificationResult.Code))
+            if (IsSucceedCode(verificationResult.Data.Code))
             {
-                result = PaymentVerifyResult.Succeed(verificationResult.RefId, messagesOptions.PaymentSucceed);
+                result = PaymentVerifyResult.Succeed(verificationResult.Data.RefId, messagesOptions.PaymentSucceed);
             }
             else
             {
-                var message = ZarinPalCodeTranslator.Translate(verificationResult.Code, messagesOptions);
+                var message = ZarinPalCodeTranslator.Translate(verificationResult.Data.Code, messagesOptions);
 
-                var verifyResultStatus = verificationResult.Code == NumericAlreadyOkResult
+                var verifyResultStatus = verificationResult.Data.Code == NumericAlreadyOkResult
                     ? PaymentVerifyResultStatus.AlreadyVerified
                     : PaymentVerifyResultStatus.Failed;
 
@@ -131,8 +133,8 @@ namespace Parbad.Gateway.ZarinPal.Internal
             }
 
             result.GatewayAccountName = account.Name;
-            result.GatewayResponseCode = verificationResult.Code.ToString();
-            result.SetZarinPalOriginalVerificationResult(verificationResult);
+            result.GatewayResponseCode = verificationResult.Data.Code.ToString();
+            result.SetZarinPalOriginalVerificationResult(verificationResult.Data);
 
             return result;
         }
@@ -234,7 +236,7 @@ namespace Parbad.Gateway.ZarinPal.Internal
             if (failedResult?.Errors != null && failedResult.Errors.Any())
             {
                 errorCode = failedResult.Errors.First().Code;
-                
+
                 message = ZarinPalCodeTranslator.Translate(errorCode.Value, messagesOptions);
             }
             else

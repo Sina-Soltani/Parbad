@@ -5,12 +5,11 @@ using Newtonsoft.Json;
 
 namespace Parbad.Gateway.ZarinPal.Internal
 {
-    public class ZarinPalRefundResultModel
+    internal class ZarinPalRefundResultModel : ZarinPalResultModel<ZarinPalRefundResultModelData>
     {
-        public ZarinPalRefundResultModelData Data { get; set; }
     }
 
-    public class ZarinPalRefundResultModelData
+    internal class ZarinPalRefundResultModelData
     {
         public int Code { get; set; }
 

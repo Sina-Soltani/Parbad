@@ -3,9 +3,8 @@
 
 namespace Parbad.Gateway.ZarinPal.Internal
 {
-    internal class ZarinPalRequestResultModel
+    internal class ZarinPalRequestResultModel : ZarinPalResultModel<ZarinPalRequestResultModelData>
     {
-        public ZarinPalRequestResultModelData Data { get; set; }
     }
     
     internal class ZarinPalRequestResultModelData
