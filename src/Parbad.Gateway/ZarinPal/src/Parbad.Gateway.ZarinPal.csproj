@@ -3,7 +3,7 @@
   <PropertyGroup>
     <PackageId>Parbad.Gateway.ZarinPal</PackageId>
     <Product>Parbad.Gateway.ZarinPal</Product>
-    <VersionPrefix>1.4.0</VersionPrefix>
+    <VersionPrefix>1.4.1-beta1</VersionPrefix>
     <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.0;net5.0;net6.0;net6.0;net7.0</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <Authors>Sina Soltani</Authors>
@@ -19,7 +19,7 @@
     <Description>ZarinPal Gateway for Parbad project.
 
 For more information see: https://github.com/Sina-Soltani/Parbad</Description>
-    <PackageReleaseNotes>https://github.com/Sina-Soltani/Parbad/releases/tag/v3.9.0</PackageReleaseNotes>
+    <PackageReleaseNotes>Bugs fixed.</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup>

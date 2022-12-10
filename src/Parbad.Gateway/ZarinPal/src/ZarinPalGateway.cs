@@ -71,7 +71,7 @@ namespace Parbad.Gateway.ZarinPal
 
             var resultModel = await ReadFromJsonAsync<ZarinPalRequestResultModel>(responseMessage);
 
-            var result = ZarinPalHelper.CreateRequestResult(resultModel.Data, _httpContextAccessor.HttpContext, account, _gatewayOptions, _messagesOptions);
+            var result = ZarinPalHelper.CreateRequestResult(resultModel, _httpContextAccessor.HttpContext, account, _gatewayOptions, _messagesOptions);
 
             return result;
         }
@@ -137,9 +137,9 @@ namespace Parbad.Gateway.ZarinPal
                        };
             }
 
-            var resultModel = await ReadFromJsonAsync<ZarinPalOriginalVerificationResult>(responseMessage);
+            var resultModel = await ReadFromJsonAsync<ZarinPalResultModel<ZarinPalOriginalVerificationResult>>(responseMessage);
 
-            var result = ZarinPalHelper.CreateVerifyResult(resultModel.Data, account, _messagesOptions);
+            var result = ZarinPalHelper.CreateVerifyResult(resultModel, account, _messagesOptions);
 
             return result;
         }
@@ -176,7 +176,7 @@ namespace Parbad.Gateway.ZarinPal
 
             var resultModel = await ReadFromJsonAsync<ZarinPalRefundResultModel>(responseMessage);
 
-            var result = ZarinPalHelper.CreateRefundResult(resultModel.Data, account, _messagesOptions);
+            var result = ZarinPalHelper.CreateRefundResult(resultModel, account, _messagesOptions);
 
             return result;
         }
@@ -192,11 +192,11 @@ namespace Parbad.Gateway.ZarinPal
             return httpClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"));
         }
 
-        private static async Task<ZarinPalResultModel<T>> ReadFromJsonAsync<T>(HttpResponseMessage httpResponseMessage) where T : class
+        private static async Task<T> ReadFromJsonAsync<T>(HttpResponseMessage httpResponseMessage) where T : class
         {
             var json = await httpResponseMessage.Content.ReadAsStringAsync();
 
-            return JsonConvert.DeserializeObject<ZarinPalResultModel<T>>(json);
+            return JsonConvert.DeserializeObject<T>(json);
         }
 
         private async Task Log(HttpResponseMessage responseMessage)
