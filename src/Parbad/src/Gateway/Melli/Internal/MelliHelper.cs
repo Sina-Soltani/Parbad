@@ -66,7 +66,7 @@ namespace Parbad.Gateway.Melli.Internal
                 return PaymentRequestResult.Failed(message, account.Name);
             }
 
-            var paymentPageUrl = $"{gatewayOptions.PaymentPageUrl}/Index?token={result.Token}";
+            var paymentPageUrl = $"{gatewayOptions.PaymentPageUrl}?token={result.Token}";
 
             return PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, paymentPageUrl);
         }
