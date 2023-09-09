@@ -37,7 +37,7 @@ namespace Parbad.Tests.Gateway.Saman
                         {
                             accounts.AddInMemory(account =>
                             {
-                                account.MerchantId = ExpectedMerchantId;
+                                account.TerminalId = ExpectedMerchantId;
                                 account.Password = "test";
                             });
                         })
@@ -107,7 +107,7 @@ namespace Parbad.Tests.Gateway.Saman
                         {
                             accounts.AddInMemory(account =>
                             {
-                                account.MerchantId = ExpectedMerchantId;
+                                account.TerminalId = ExpectedMerchantId;
                                 account.Password = "test";
                             });
                         })

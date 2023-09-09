@@ -102,7 +102,7 @@ namespace Parbad.Gateway.Saman.Internal
                 "<soapenv:Body>" +
                 "<urn:verifyTransaction soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">" +
                 $"<String_1 xsi:type=\"xsd:string\">{callbackResult.TransactionId}</String_1>" +
-                $"<String_2 xsi:type=\"xsd:string\">{account.MerchantId}</String_2>" +
+                $"<String_2 xsi:type=\"xsd:string\">{account.TerminalId}</String_2>" +
                 "</urn:verifyTransaction>" +
                 "</soapenv:Body>" +
                 "</soapenv:Envelope>";
@@ -149,7 +149,7 @@ namespace Parbad.Gateway.Saman.Internal
                 "<urn:reverseTransaction soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">" +
                 $"<String_1 xsi:type=\"xsd:string\">{context.Payment.TransactionCode}</String_1>" +
                 $"<String_2 xsi:type=\"xsd:string\">{(long)amount}</String_2>" +
-                $"<Username xsi:type=\"xsd:string\">{account.MerchantId}</Username>" +
+                $"<Username xsi:type=\"xsd:string\">{account.TerminalId}</Username>" +
                 $"<Password xsi:type=\"xsd:string\">{account.Password}</Password>" +
                 "</urn:reverseTransaction>" +
                 "</soapenv:Body>" +
@@ -184,7 +184,7 @@ namespace Parbad.Gateway.Saman.Internal
         {
             var data = CreateTokenRequest(invoice, account);
 
-            var responseMessage = await httpClient.PostXmlAsync(gatewayOptions.WebApiTokenUrl, data, cancellationToken);
+            var responseMessage = await httpClient.PostJsonAsync<SamanTokenResponse>(gatewayOptions.WebApiTokenUrl, data, cancellationToken);
 
             var response = await responseMessage.Content.ReadAsStringAsync();
 
@@ -231,7 +231,7 @@ namespace Parbad.Gateway.Saman.Internal
         {
             var data = new SamanMobilePaymentTokenRequest
             {
-                TerminalId = account.MerchantId,
+                TerminalId = account.TerminalId,
                 ResNum = invoice.TrackingNumber.ToString(),
                 Amount = invoice.Amount,
                 RedirectUrl = invoice.CallbackUrl,
@@ -269,19 +269,17 @@ namespace Parbad.Gateway.Saman.Internal
             return result;
         }
 
-        private static string CreateTokenRequest(Invoice invoice, SamanGatewayAccount account)
+        private static object CreateTokenRequest(Invoice invoice, SamanGatewayAccount account)
         {
-            return
-                "<soapenv:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:urn=\"urn:Foo\">" +
-                "<soapenv:Header/>" +
-                "<soapenv:Body>" +
-                "<urn:RequestToken soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">" +
-                $"<TermID xsi:type=\"xsd:string\">{account.MerchantId}</TermID>" +
-                $"<ResNum xsi:type=\"xsd:string\">{invoice.TrackingNumber}</ResNum>" +
-                $"<TotalAmount xsi:type=\"xsd:long\">{(long)invoice.Amount}</TotalAmount>" +
-                "</urn:RequestToken>" +
-                "</soapenv:Body>" +
-                "</soapenv:Envelope>";
+            return new
+                   {
+                       Action = "token",
+                       TerminalId = account.TerminalId,
+                       Amount = 12000,
+                       ResNum = "1qaz@WSX",
+                       RedirectUrl = "http://mysite.com/receipt",
+                       CellNumber = "9120000000"
+                   };
         }
 
         public static string GetVerificationUrl(InvoiceContext invoiceContext, SamanGatewayOptions gatewayOptions)
