@@ -7,28 +7,27 @@ using Parbad.Storage.Abstractions;
 using Parbad.Storage.Cache.DistributedCache;
 using System;
 
-namespace Parbad.Builder
+namespace Parbad.Builder;
+
+public static class DistributedCacheStorageBuilderExtensions
 {
-    public static class DistributedCacheStorageBuilderExtensions
+    /// <summary>
+    /// Uses <see cref="IDistributedCache"/> for saving and loading data.
+    /// </summary>
+    /// <param name="builder"></param>
+    public static IStorageBuilder UseDistributedCache(this IStorageBuilder builder)
+        => UseDistributedCache(builder, options => { });
+
+    /// <summary>
+    /// Uses <see cref="IDistributedCache"/> for saving and loading data.
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <param name="configureOptions"></param>
+    public static IStorageBuilder UseDistributedCache(this IStorageBuilder builder, Action<DistributedCacheStorageOptions> configureOptions)
     {
-        /// <summary>
-        /// Uses <see cref="IDistributedCache"/> for saving and loading data.
-        /// </summary>
-        /// <param name="builder"></param>
-        public static IStorageBuilder UseDistributedCache(this IStorageBuilder builder)
-            => UseDistributedCache(builder, options => { });
+        builder.Services.Configure(configureOptions);
+        builder.AddStorage<DistributedCacheStorage>(ServiceLifetime.Transient);
 
-        /// <summary>
-        /// Uses <see cref="IDistributedCache"/> for saving and loading data.
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="configureOptions"></param>
-        public static IStorageBuilder UseDistributedCache(this IStorageBuilder builder, Action<DistributedCacheStorageOptions> configureOptions)
-        {
-            builder.Services.Configure(configureOptions);
-            builder.AddStorage<DistributedCacheStorage>(ServiceLifetime.Transient);
-
-            return builder;
-        }
+        return builder;
     }
 }

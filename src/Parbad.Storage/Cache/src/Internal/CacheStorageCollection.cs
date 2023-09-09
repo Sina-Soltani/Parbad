@@ -6,25 +6,24 @@ using Parbad.Storage.Cache.Abstractions;
 using System;
 using System.Collections.Generic;
 
-namespace Parbad.Storage.Cache.Internal
+namespace Parbad.Storage.Cache.Internal;
+
+/// <inheritdoc />
+[Serializable]
+public class CacheStorageCollection : ICacheStorageCollection
 {
-    /// <inheritdoc />
-    [Serializable]
-    public class CacheStorageCollection : ICacheStorageCollection
+    /// <summary>
+    /// Initializes an instance of <see cref="CacheStorageCollection"/>.
+    /// </summary>
+    public CacheStorageCollection()
     {
-        /// <summary>
-        /// Initializes an instance of <see cref="CacheStorageCollection"/>.
-        /// </summary>
-        public CacheStorageCollection()
-        {
-            Payments = new List<Payment>();
-            Transactions = new List<Transaction>();
-        }
-
-        /// <inheritdoc />
-        public List<Payment> Payments { get; set; }
-
-        /// <inheritdoc />
-        public List<Transaction> Transactions { get; set; }
+        Payments = new List<Payment>();
+        Transactions = new List<Transaction>();
     }
+
+    /// <inheritdoc />
+    public List<Payment> Payments { get; set; }
+
+    /// <inheritdoc />
+    public List<Transaction> Transactions { get; set; }
 }
