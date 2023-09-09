@@ -3,25 +3,24 @@
 
 using Microsoft.Extensions.Caching.Memory;
 
-namespace Parbad.Storage.Cache.MemoryCache
+namespace Parbad.Storage.Cache.MemoryCache;
+
+/// <summary>
+/// Memory cache storage options.
+/// </summary>
+public class MemoryCacheStorageOptions
 {
     /// <summary>
-    /// Memory cache storage options.
+    /// Gets or sets the key name which will be used by <see cref="IMemoryCache"/>.
+    /// The default value is "parbad.storage.cache"
     /// </summary>
-    public class MemoryCacheStorageOptions
-    {
-        /// <summary>
-        /// Gets or sets the key name which will be used by <see cref="IMemoryCache"/>.
-        /// The default value is "parbad.storage.cache"
-        /// </summary>
-        public string CacheKey { get; set; } = "parbad.storage.cache";
+    public string CacheKey { get; set; } = "parbad.storage.cache";
 
-        /// <summary>
-        /// Represents the cache options applied to an entry of the <see cref="IMemoryCache"/> instance.
-        /// </summary>
-        public MemoryCacheEntryOptions CacheEntryOptions { get; set; } = new MemoryCacheEntryOptions
-        {
-            Priority = CacheItemPriority.NeverRemove
-        };
-    }
+    /// <summary>
+    /// Represents the cache options applied to an entry of the <see cref="IMemoryCache"/> instance.
+    /// </summary>
+    public MemoryCacheEntryOptions CacheEntryOptions { get; set; } = new MemoryCacheEntryOptions
+                                                                     {
+                                                                         Priority = CacheItemPriority.NeverRemove
+                                                                     };
 }

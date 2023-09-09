@@ -4,22 +4,21 @@
 using System.Text;
 using Newtonsoft.Json;
 
-namespace Parbad.Storage.Cache.Internal
+namespace Parbad.Storage.Cache.Internal;
+
+internal static class ObjectSerializer
 {
-    internal static class ObjectSerializer
+    public static byte[] SerializeObject(object obj)
     {
-        public static byte[] SerializeObject(object obj)
-        {
-            var json = JsonConvert.SerializeObject(obj);
+        var json = JsonConvert.SerializeObject(obj);
 
-            return Encoding.UTF8.GetBytes(json);
-        }
+        return Encoding.UTF8.GetBytes(json);
+    }
 
-        public static T DeserializeObject<T>(byte[] buffer)
-        {
-            var json = Encoding.UTF8.GetString(buffer);
+    public static T DeserializeObject<T>(byte[] buffer)
+    {
+        var json = Encoding.UTF8.GetString(buffer);
 
-            return JsonConvert.DeserializeObject<T>(json);
-        }
+        return JsonConvert.DeserializeObject<T>(json);
     }
 }
