@@ -2,302 +2,321 @@
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Primitives;
-using Newtonsoft.Json;
 using Parbad.Abstraction;
 using Parbad.Gateway.Saman.Internal.Models;
 using Parbad.Gateway.Saman.Internal.ResultTranslators;
 using Parbad.Http;
 using Parbad.Internal;
-using Parbad.Net;
 using Parbad.Options;
-using Parbad.Storage.Abstractions.Models;
-using Parbad.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Parbad.Storage.Abstractions.Models;
 
-namespace Parbad.Gateway.Saman.Internal
+namespace Parbad.Gateway.Saman.Internal;
+
+internal static class SamanHelper
 {
-    internal static class SamanHelper
+    private const string RefNumKey = nameof(RefNumKey);
+    public const string AdditionalVerificationDataKey = "SamanAdditionalVerificationData";
+    public const string CellNumberPropertyKey = "SamanCellNumber";
+
+    public static SamanTokenRequest CreateTokenRequestModel(Invoice invoice, SamanGatewayAccount account)
     {
-        public const string MobileGatewayKey = "UseMobileGateway";
-        public const string AdditionalVerificationDataKey = "SamanAdditionalVerificationData";
+        var model = new SamanTokenRequest
+                    {
+                        Action = "token",
+                        TerminalId = account.TerminalId,
+                        Amount = invoice.Amount,
+                        ResNum = invoice.TrackingNumber.ToString(),
+                        RedirectUrl = invoice.CallbackUrl,
+                        CellNumber = invoice.GetSamanCellNumber()
+                    };
 
-        public static Task<PaymentRequestResult> CreateRequest(
-            Invoice invoice,
-            HttpContext httpContext,
-            SamanGatewayAccount account,
-            HttpClient httpClient,
-            SamanGatewayOptions gatewayOptions,
-            MessagesOptions messagesOptions,
-            CancellationToken cancellationToken)
+        if (!string.IsNullOrWhiteSpace(invoice.GetSamanCellNumber()))
         {
-            if (invoice.IsSamanMobileGatewayEnabled())
-            {
-                return CreateMobilePaymentRequest(invoice, httpContext, account, httpClient, gatewayOptions, messagesOptions, cancellationToken);
-            }
-
-            return CreateWebPaymentRequest(invoice, httpContext, account, httpClient, gatewayOptions, messagesOptions, cancellationToken);
+            model.CellNumber = invoice.GetSamanCellNumber();
         }
 
-        public static async Task<SamanCallbackResult> CreateCallbackResultAsync(
-            HttpRequest httpRequest,
-            MessagesOptions messagesOptions,
-            CancellationToken cancellationToken)
+        return model;
+    }
+
+    public static IPaymentRequestResult CreatePaymentRequestResult(SamanTokenResponse tokenResponse,
+                                                                   SamanGatewayAccount account,
+                                                                   HttpContext httpContext,
+                                                                   SamanGatewayOptions gatewayOptions,
+                                                                   MessagesOptions messagesOptions)
+    {
+        if (tokenResponse.Status == 1)
         {
-            var isSuccess = false;
-            string message = null;
-            StringValues referenceId = "";
-            StringValues transactionId = "";
+            var form = new Dictionary<string, string>
+                       {
+                           { "Token", tokenResponse.Token },
+                           { "GetMethod", "false" }
+                       };
 
-            var securePan = await httpRequest.TryGetParamAsync("SecurePan", cancellationToken).ConfigureAwaitFalse();
-            var cid = await httpRequest.TryGetParamAsync("CID", cancellationToken).ConfigureAwaitFalse();
-            var traceNo = await httpRequest.TryGetParamAsync("TraceNo", cancellationToken).ConfigureAwaitFalse();
-            var rrn = await httpRequest.TryGetParamAsync("RRN", cancellationToken).ConfigureAwaitFalse();
-
-            var state = await httpRequest.TryGetParamAsync("state", cancellationToken).ConfigureAwaitFalse();
-
-            if (!state.Exists || state.Value.IsNullOrEmpty())
-            {
-                message = messagesOptions.InvalidDataReceivedFromGateway;
-            }
-            else
-            {
-                var referenceIdResult = await httpRequest.TryGetParamAsync("ResNum", cancellationToken).ConfigureAwaitFalse();
-                if (referenceIdResult.Exists) referenceId = referenceIdResult.Value;
-
-                var transactionIdResult = await httpRequest.TryGetParamAsync("RefNum", cancellationToken).ConfigureAwaitFalse();
-                if (transactionIdResult.Exists) transactionId = transactionIdResult.Value;
-
-                isSuccess = state.Value.Equals("OK", StringComparison.OrdinalIgnoreCase);
-
-                if (!isSuccess)
-                {
-                    message = SamanStateTranslator.Translate(state.Value, messagesOptions);
-                }
-            }
-
-            return new SamanCallbackResult
-            {
-                IsSucceed = isSuccess,
-                ReferenceId = referenceId,
-                TransactionId = transactionId,
-                SecurePan = securePan.Value,
-                Cid = cid.Value,
-                TraceNo = traceNo.Value,
-                Rrn = rrn.Value,
-                Message = message
-            };
+            return PaymentRequestResult.SucceedWithPost(account.Name, httpContext, gatewayOptions.PaymentPageUrl, form);
         }
 
-        public static string CreateVerifyData(SamanCallbackResult callbackResult, SamanGatewayAccount account)
+        var message = string.IsNullOrWhiteSpace(tokenResponse.ErrorDesc)
+            ? SamanResultTranslator.Translate(tokenResponse.ErrorCode, messagesOptions)
+            : tokenResponse.ErrorDesc;
+
+        return PaymentRequestResult.Failed(message, account.Name, tokenResponse.ErrorCode);
+    }
+
+    public static async Task<SamanCallbackResponse> BindCallbackResponse(HttpRequest httpRequest, CancellationToken cancellationToken)
+    {
+        var mid = await httpRequest.TryGetParamAsync("MID", cancellationToken).ConfigureAwaitFalse();
+        var terminalId = await httpRequest.TryGetParamAsync("TerminalId", cancellationToken).ConfigureAwaitFalse();
+        var state = await httpRequest.TryGetParamAsync("State", cancellationToken).ConfigureAwaitFalse();
+        var status = await httpRequest.TryGetParamAsync("Status", cancellationToken).ConfigureAwaitFalse();
+        var refNum = await httpRequest.TryGetParamAsync("RefNum", cancellationToken).ConfigureAwaitFalse();
+        var resNum = await httpRequest.TryGetParamAsync("ResNum", cancellationToken).ConfigureAwaitFalse();
+        var securePan = await httpRequest.TryGetParamAsync("SecurePan", cancellationToken).ConfigureAwaitFalse();
+        var hashedCardNumber = await httpRequest.TryGetParamAsync("HashedCardNumber", cancellationToken).ConfigureAwaitFalse();
+        var traceNo = await httpRequest.TryGetParamAsync("TraceNo", cancellationToken).ConfigureAwaitFalse();
+        var rrn = await httpRequest.TryGetParamAsync("RRN", cancellationToken).ConfigureAwaitFalse();
+        var amount = await httpRequest.TryGetParamAsync("Amount", cancellationToken).ConfigureAwaitFalse();
+        var wage = await httpRequest.TryGetParamAsync("Wage", cancellationToken).ConfigureAwaitFalse();
+
+        return new SamanCallbackResponse
+               {
+                   MID = mid.Value,
+                   State = state.Value,
+                   Status = status.Value,
+                   Rrn = rrn.Value,
+                   RefNum = refNum.Value,
+                   ResNum = resNum.Value,
+                   TerminalId = terminalId.Value,
+                   TraceNo = traceNo.Value,
+                   Amount = amount.Value,
+                   Wage = wage.Value,
+                   SecurePan = securePan.Value,
+                   HashedCardNumber = hashedCardNumber.Value,
+               };
+
+        // var status = await httpRequest.TryGetParamAsync("status", cancellationToken).ConfigureAwaitFalse();
+        //
+        // if (!status.Exists || status.Value.IsNullOrEmpty())
+        // {
+        //     message = messagesOptions.InvalidDataReceivedFromGateway;
+        // }
+        // else
+        // {
+        //     var referenceIdResult = await httpRequest.TryGetParamAsync("ResNum", cancellationToken).ConfigureAwaitFalse();
+        //     if (referenceIdResult.Exists) referenceId = referenceIdResult.Value;
+        //
+        //     var transactionIdResult = await httpRequest.TryGetParamAsync("RefNum", cancellationToken).ConfigureAwaitFalse();
+        //     if (transactionIdResult.Exists) transactionId = transactionIdResult.Value;
+        //
+        //     isSuccess = status.Value.Equals("OK", StringComparison.OrdinalIgnoreCase);
+        //
+        //     if (!isSuccess)
+        //     {
+        //         message = SamanStateTranslator.Translate(status.Value, messagesOptions);
+        //     }
+        // }
+        //
+        // return new SamanCallbackResult
+        //        {
+        //            IsSucceed = isSuccess,
+        //            ReferenceId = referenceId,
+        //            TransactionId = transactionId,
+        //            SecurePan = securePan.Value,
+        //            Cid = cid.Value,
+        //            TraceNo = traceNo.Value,
+        //            Rrn = rrn.Value,
+        //            Message = message
+        //        };
+    }
+
+    public static IPaymentFetchResult CreateFetchResult(SamanCallbackResponse callbackResponse,
+                                                        InvoiceContext invoiceContext,
+                                                        SamanGatewayAccount gatewayAccount,
+                                                        MessagesOptions messagesOptions)
+    {
+        var isCallbackResponseValid = ValidateCallbackResponse(callbackResponse, invoiceContext, gatewayAccount, out var message);
+
+        var isReceivedSuccessFromGateway = callbackResponse.Status == "2";
+
+        var isSucceed = isCallbackResponseValid && isReceivedSuccessFromGateway;
+
+        if (!isReceivedSuccessFromGateway)
         {
-            return
-                "<soapenv:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:urn=\"urn:Foo\">" +
-                "<soapenv:Header/>" +
-                "<soapenv:Body>" +
-                "<urn:verifyTransaction soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">" +
-                $"<String_1 xsi:type=\"xsd:string\">{callbackResult.TransactionId}</String_1>" +
-                $"<String_2 xsi:type=\"xsd:string\">{account.MerchantId}</String_2>" +
-                "</urn:verifyTransaction>" +
-                "</soapenv:Body>" +
-                "</soapenv:Envelope>";
+            message = SamanResultTranslator.Translate(callbackResponse.Status, messagesOptions);
+        }
+        else if (isSucceed)
+        {
+            message = messagesOptions.PaymentSucceed;
         }
 
-        public static PaymentVerifyResult CreateVerifyResult(string webServiceResponse, InvoiceContext context, SamanCallbackResult callbackResult, MessagesOptions messagesOptions)
+        var result = new PaymentFetchResult
+                     {
+                         Status = isSucceed ? PaymentFetchResultStatus.ReadyForVerifying : PaymentFetchResultStatus.Failed,
+                         GatewayResponseCode = callbackResponse.Status,
+                         Message = message
+                     };
+
+        result.AddSamanAdditionalData(MapToAdditionalData(callbackResponse));
+
+        return result;
+    }
+
+    public static SamanVerificationRequest CreateVerificationRequest(SamanCallbackResponse callbackResponse,
+                                                                     SamanGatewayAccount gatewayAccount)
+    {
+        return new()
+               {
+                   RefNum = callbackResponse.RefNum!,
+                   TerminalNumber = gatewayAccount.TerminalId
+               };
+    }
+
+    public static PaymentVerifyResult CreateVerifyResult(SamanGatewayAccount gatewayAccount,
+                                                         SamanCallbackResponse callbackResponse,
+                                                         SamanVerificationAndRefundResponse verificationResponse,
+                                                         InvoiceContext invoiceContext,
+                                                         MessagesOptions messagesOptions)
+    {
+        var isSuccess = verificationResponse.TransactionDetail.TerminalNumber.ToString() == gatewayAccount.TerminalId &&
+                        verificationResponse.TransactionDetail.AffectiveAmount == (long)invoiceContext.Payment.Amount &&
+                        verificationResponse.TransactionDetail.RefNum == callbackResponse.RefNum;
+
+
+        var message = isSuccess
+            ? messagesOptions.PaymentSucceed
+            : SamanResultTranslator.Translate(verificationResponse.ResultCode.ToString(), messagesOptions);
+
+        var result = new PaymentVerifyResult
+                     {
+                         Status = isSuccess ? PaymentVerifyResultStatus.Succeed : PaymentVerifyResultStatus.Failed,
+                         TransactionCode = verificationResponse.TransactionDetail.Rrn,
+                         GatewayResponseCode = verificationResponse.ResultCode.ToString(),
+                         Message = message
+                     };
+
+        result.DatabaseAdditionalData.Add(RefNumKey, callbackResponse.RefNum);
+
+        result.AddSamanAdditionalData(MapToAdditionalData(callbackResponse));
+
+        return result;
+    }
+
+    public static SamanReverseRequest CreateReverseRequest(InvoiceContext context, SamanGatewayAccount account)
+    {
+        var verificationTransaction = context.Transactions.SingleOrDefault(transaction => transaction.Type == TransactionType.Verify);
+
+        if (string.IsNullOrEmpty(verificationTransaction?.AdditionalData) ||
+            !verificationTransaction.ToDictionary().ContainsKey(RefNumKey))
         {
-            var stringResult = XmlHelper.GetNodeValueFromXml(webServiceResponse, "result");
-
-            //  This result is actually: TotalAmount
-            //  it must be equals to TotalAmount in database.
-            var numericResult = Convert.ToInt64(stringResult);
-
-            var isSuccess = numericResult > 0 && numericResult == (long)context.Payment.Amount;
-
-            var message = isSuccess
-                ? messagesOptions.PaymentSucceed
-                : SamanResultTranslator.Translate(numericResult, messagesOptions);
-
-            var result = new PaymentVerifyResult
-            {
-                Status = isSuccess ? PaymentVerifyResultStatus.Succeed : PaymentVerifyResultStatus.Failed,
-                TransactionCode = callbackResult.TransactionId,
-                Message = message
-            };
-
-            result.AdditionalData.Add(AdditionalVerificationDataKey, new SamanAdditionalVerificationData
-            {
-                Cid = callbackResult.Cid,
-                TraceNo = callbackResult.TraceNo,
-                SecurePan = callbackResult.SecurePan,
-                Rrn = callbackResult.Rrn
-            });
-
-            return result;
+            throw new InvalidOperationException($"No Transaction of type Verification or additional data found for reversing the invoice {context.Payment.TrackingNumber}.");
         }
 
-        public static string CreateRefundData(InvoiceContext context, Money amount, SamanGatewayAccount account)
+        return new()
+               {
+                   TerminalNumber = account.TerminalId,
+                   RefNum = verificationTransaction.ToDictionary()[RefNumKey]
+               };
+    }
+
+    public static PaymentRefundResult CreateRefundResult(SamanVerificationAndRefundResponse response)
+    {
+        return new PaymentRefundResult
+               {
+                   Status = response.Success ? PaymentRefundResultStatus.Succeed : PaymentRefundResultStatus.Failed,
+                   GatewayResponseCode = response.ResultCode.ToString()
+               };
+    }
+
+    private static bool ValidateCallbackResponse(SamanCallbackResponse callbackResponse,
+                                                 InvoiceContext invoiceContext,
+                                                 SamanGatewayAccount gatewayAccount,
+                                                 out string failures)
+    {
+        const string nullOrEmptyString = "IsReceivedFromTheGatewayAsNullOrEmpty";
+
+        var validationFailures = new StringBuilder();
+        var isValid = true;
+
+        if (string.IsNullOrWhiteSpace(callbackResponse.Status))
         {
-            return
-                "<soapenv:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:urn=\"urn:Foo\">" +
-                "<soapenv:Header/>" +
-                "<soapenv:Body>" +
-                "<urn:reverseTransaction soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">" +
-                $"<String_1 xsi:type=\"xsd:string\">{context.Payment.TransactionCode}</String_1>" +
-                $"<String_2 xsi:type=\"xsd:string\">{(long)amount}</String_2>" +
-                $"<Username xsi:type=\"xsd:string\">{account.MerchantId}</Username>" +
-                $"<Password xsi:type=\"xsd:string\">{account.Password}</Password>" +
-                "</urn:reverseTransaction>" +
-                "</soapenv:Body>" +
-                "</soapenv:Envelope>";
+            isValid = false;
+
+            validationFailures.AppendLine($"{nameof(SamanCallbackResponse.Status)}{nullOrEmptyString}");
         }
 
-        public static PaymentRefundResult CreateRefundResult(string webServiceResponse, MessagesOptions messagesOptions)
+        if (string.IsNullOrWhiteSpace(callbackResponse.TerminalId))
         {
-            var result = XmlHelper.GetNodeValueFromXml(webServiceResponse, "result");
+            isValid = false;
 
-            var integerResult = Convert.ToInt32(result);
+            validationFailures.AppendLine($"{nameof(SamanCallbackResponse.TerminalId)}{nullOrEmptyString}");
+        }
+        else if (callbackResponse.TerminalId != gatewayAccount.TerminalId)
+        {
+            isValid = false;
 
-            var isSucceed = integerResult > 0;
-
-            var message = SamanResultTranslator.Translate(integerResult, messagesOptions);
-
-            return new PaymentRefundResult
-            {
-                Status = isSucceed ? PaymentRefundResultStatus.Succeed : PaymentRefundResultStatus.Failed,
-                Message = message
-            };
+            validationFailures.AppendLine($"ReceivedInvalidTerminalId: {callbackResponse.TerminalId}");
         }
 
-        private static async Task<PaymentRequestResult> CreateWebPaymentRequest(
-            Invoice invoice,
-            HttpContext httpContext,
-            SamanGatewayAccount account,
-            HttpClient httpClient,
-            SamanGatewayOptions gatewayOptions,
-            MessagesOptions messagesOptions,
-            CancellationToken cancellationToken)
+        if (string.IsNullOrWhiteSpace(callbackResponse.RefNum))
         {
-            var data = CreateTokenRequest(invoice, account);
+            isValid = false;
 
-            var responseMessage = await httpClient.PostXmlAsync(gatewayOptions.WebApiTokenUrl, data, cancellationToken);
+            validationFailures.AppendLine($"{nameof(SamanCallbackResponse.RefNum)}{nullOrEmptyString}");
+        }
+        else if (callbackResponse.RefNum != invoiceContext.Payment.TrackingNumber.ToString())
+        {
+            isValid = false;
 
-            var response = await responseMessage.Content.ReadAsStringAsync();
-
-            var token = XmlHelper.GetNodeValueFromXml(response, "result");
-
-            string message = null;
-            var isSucceed = true;
-
-            if (token.IsNullOrEmpty())
-            {
-                message = $"{messagesOptions.InvalidDataReceivedFromGateway} Token is null or empty.";
-                isSucceed = false;
-            }
-            else if (long.TryParse(token, out var longToken) && longToken < 0)
-            {
-                message = SamanResultTranslator.Translate(longToken, messagesOptions);
-                isSucceed = false;
-            }
-
-            if (!isSucceed)
-            {
-                return PaymentRequestResult.Failed(message, account.Name);
-            }
-
-            return PaymentRequestResult.SucceedWithPost(
-                account.Name,
-                httpContext,
-                gatewayOptions.WebPaymentPageUrl,
-                new Dictionary<string, string>
-                {
-                    {"Token", token},
-                    {"RedirectURL", invoice.CallbackUrl}
-                });
+            validationFailures.AppendLine($"ReceivedInvalidTrackingNumber: {callbackResponse.RefNum}");
         }
 
-        private static async Task<PaymentRequestResult> CreateMobilePaymentRequest(
-            Invoice invoice,
-            HttpContext httpContext,
-            SamanGatewayAccount account,
-            HttpClient httpClient,
-            SamanGatewayOptions gatewayOptions,
-            MessagesOptions messagesOptions,
-            CancellationToken cancellationToken)
+        if (string.IsNullOrWhiteSpace(callbackResponse.ResNum))
         {
-            var data = new SamanMobilePaymentTokenRequest
-            {
-                TerminalId = account.MerchantId,
-                ResNum = invoice.TrackingNumber.ToString(),
-                Amount = invoice.Amount,
-                RedirectUrl = invoice.CallbackUrl,
-                Action = "Token"
-            };
+            isValid = false;
 
-            var responseMessage = await httpClient.PostJsonAsync(gatewayOptions.MobileApiTokenUrl, data, cancellationToken);
-
-            var response = await responseMessage.Content.ReadAsStringAsync();
-
-            var tokenResponse = JsonConvert.DeserializeObject<SamanMobilePaymentTokenResponse>(response);
-
-            if (tokenResponse == null)
-            {
-                var message = $"{messagesOptions.InvalidDataReceivedFromGateway} Serialized token response is null.";
-                return PaymentRequestResult.Failed(message, account.Name);
-            }
-
-            if (tokenResponse.Status == -1)
-            {
-                return PaymentRequestResult.Failed(tokenResponse.GetError(), account.Name);
-            }
-
-            var result = PaymentRequestResult.SucceedWithPost(
-                account.Name,
-                httpContext,
-                gatewayOptions.MobilePaymentPageUrl,
-                new Dictionary<string, string>
-                {
-                    {"Token", tokenResponse.Token}
-                });
-
-            result.DatabaseAdditionalData.Add(MobileGatewayKey, true.ToString());
-
-            return result;
+            validationFailures.AppendLine($"{nameof(SamanCallbackResponse.ResNum)}{nullOrEmptyString}");
         }
 
-        private static string CreateTokenRequest(Invoice invoice, SamanGatewayAccount account)
+        if (string.IsNullOrWhiteSpace(callbackResponse.Amount))
         {
-            return
-                "<soapenv:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:urn=\"urn:Foo\">" +
-                "<soapenv:Header/>" +
-                "<soapenv:Body>" +
-                "<urn:RequestToken soapenv:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">" +
-                $"<TermID xsi:type=\"xsd:string\">{account.MerchantId}</TermID>" +
-                $"<ResNum xsi:type=\"xsd:string\">{invoice.TrackingNumber}</ResNum>" +
-                $"<TotalAmount xsi:type=\"xsd:long\">{(long)invoice.Amount}</TotalAmount>" +
-                "</urn:RequestToken>" +
-                "</soapenv:Body>" +
-                "</soapenv:Envelope>";
+            isValid = false;
+
+            validationFailures.AppendLine($"{nameof(SamanCallbackResponse.Amount)}{nullOrEmptyString}");
+        }
+        else if (callbackResponse.Amount != ((long)invoiceContext.Payment.Amount).ToString())
+        {
+            isValid = false;
+
+            validationFailures.AppendLine($"ReceivedInvalidAmount: {callbackResponse.Amount}");
         }
 
-        public static string GetVerificationUrl(InvoiceContext invoiceContext, SamanGatewayOptions gatewayOptions)
+        if (string.IsNullOrWhiteSpace(callbackResponse.Rrn))
         {
-            var record = invoiceContext
-                .Transactions
-                .SingleOrDefault(transaction => transaction.Type == TransactionType.Request);
+            isValid = false;
 
-            if (record == null || record.AdditionalData.IsNullOrEmpty()) return gatewayOptions.WebApiUrl;
-
-            if (AdditionalDataConverter.ToDictionary(record).TryGetValue(MobileGatewayKey, out var isMobileGatewayEnabled) && bool.Parse(isMobileGatewayEnabled))
-            {
-                return gatewayOptions.MobileApiVerificationUrl;
-            }
-
-            return gatewayOptions.WebApiUrl;
+            validationFailures.AppendLine($"{nameof(SamanCallbackResponse.Rrn)}{nullOrEmptyString}");
         }
+
+        failures = validationFailures.ToString();
+
+        return isValid;
+    }
+
+    private static SamanVerificationAdditionalData MapToAdditionalData(SamanCallbackResponse callbackResponse)
+    {
+        return new SamanVerificationAdditionalData
+               {
+                   Rrn = callbackResponse.Rrn,
+                   TraceNo = callbackResponse.TraceNo,
+                   RefNum = callbackResponse.RefNum,
+                   ResNum = callbackResponse.ResNum,
+                   SecurePan = callbackResponse.SecurePan,
+                   HashedCardNumber = callbackResponse.HashedCardNumber
+               };
     }
 }

@@ -50,7 +50,7 @@ namespace Parbad.Gateway.IranKish
             var data = IranKishHelper.CreateRequestData(invoice, account);
 
             var result = await _httpClient
-                               .PostJsonAsync<IranKishTokenResult>(_gatewayOptions.ApiTokenUrl, data, cancellationToken)
+                               .PostJsonAsync<IranKishTokenResult>(_gatewayOptions.ApiTokenUrl, data, cancellationToken: cancellationToken)
                                .ConfigureAwaitFalse();
 
             return IranKishHelper.CreateRequestResult(result, _httpContextAccessor.HttpContext, account, _gatewayOptions, _messageOptions.Value);
@@ -106,7 +106,7 @@ namespace Parbad.Gateway.IranKish
                        };
 
             var result = await _httpClient
-                               .PostJsonAsync<IranKishVerifyResult>(_gatewayOptions.ApiVerificationUrl, data, cancellationToken)
+                               .PostJsonAsync<IranKishVerifyResult>(_gatewayOptions.ApiVerificationUrl, data, cancellationToken: cancellationToken)
                                .ConfigureAwaitFalse();
 
             return IranKishHelper.CreateVerifyResult(result, _messageOptions.Value);

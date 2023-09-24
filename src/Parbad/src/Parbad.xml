@@ -798,12 +798,20 @@
             </summary>
             <param name="builder"></param>
         </member>
-        <member name="M:Parbad.Gateway.Saman.SamanGatewayInvoiceBuilderExtensions.EnableSamanMobileGateway(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Boolean)">
+        <member name="M:Parbad.Gateway.Saman.SamanGatewayInvoiceBuilderExtensions.SetSamanData(Parbad.InvoiceBuilder.IInvoiceBuilder,System.String)">
             <summary>
-            Enables or disables Saman Mobile gateway.
+            Sets additional data which will be sent to Saman Gateway.
             </summary>
-            <param name="builder"></param>
-            <param name="enable">If true, the invoice will be sent to Saman Mobile gateway. Otherwise it will be sent to Saman Web gateway.</param>
+        </member>
+        <member name="M:Parbad.Gateway.Saman.SamanPaymentResultExtensions.GetSamanAdditionalData(Parbad.IPaymentFetchResult)">
+            <summary>
+            Gets the additional data which is received from Saman Gateway. 
+            </summary>
+        </member>
+        <member name="M:Parbad.Gateway.Saman.SamanPaymentResultExtensions.GetSamanAdditionalData(Parbad.IPaymentVerifyResult)">
+            <summary>
+            Gets the additional data which is received from Saman Gateway. 
+            </summary>
         </member>
         <member name="T:Parbad.IGatewayTransporter">
             <summary>

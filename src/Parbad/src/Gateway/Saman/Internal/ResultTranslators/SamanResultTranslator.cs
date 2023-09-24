@@ -3,39 +3,22 @@
 
 using Parbad.Options;
 
-namespace Parbad.Gateway.Saman.Internal.ResultTranslators
-{
-    internal static class SamanResultTranslator
-    {
-        public static string Translate(long result, MessagesOptions options)
-        {
-            if (result >= 0)
-            {
-                return "تراکنش با موفقیت انجام گردید";
-            }
+namespace Parbad.Gateway.Saman.Internal.ResultTranslators;
 
-            return result switch
-            {
-                -1 => "خطای داخلی شبکه مالی",
-                -2 => "سپرده ها برابر نیستند",
-                -3 => "ورودی ها حاوی کاراکترهای غیرمجاز هستند",
-                -4 => "کد پذیرنده و یا کلمه عبور آن اشتباه است",
-                -5 => "Database Exception",
-                -6 => "سند قبلا برگشت کامل یافته است",
-                -7 => "رسید دیجیتالی تهی است",
-                -8 => "طول ورودی ها بیشتر از حد مجاز است",
-                -9 => "وجود کاراکترهای غیرمجاز در مبلغ برگشتی",
-                -10 => "رسید دیجیتالی حاوی کاراکترهای غیرمجاز است",
-                -11 => "طول ورودی ها کمتر از حد مجاز است",
-                -12 => "مبلغ برگشتی منفی است",
-                -13 => "مبلغ برگشتی برای برگشت جزئی بیش از مبلغ برگشت نخورده رسیده دیجیتالی است",
-                -14 => "چنین تراکنشی تعریف نشده است",
-                -15 => "مبلغ برگشتی بصورت اعشاری داده شده است",
-                -16 => "خطای داخلی سیستم",
-                -17 => "برگشت زدن جزئی تراکنشی که با کارتی غیر از بانک سامان انجام شده است",
-                -18 => "IP Address پذیرنده نامعتبر است",
-                _ => $"{options.UnexpectedErrorText} Response: {result}"
-            };
-        }
+internal static class SamanResultTranslator
+{
+    public static string Translate(string result, MessagesOptions options)
+    {
+        return result switch
+        {
+            "0" => options.PaymentSucceed,
+            "2" => "درخواست تکراری می باشد",
+            "-2" => "تراکنش یافته نشد",
+            "-6" => "بیش از نیم ساعت از زمان اجرای تراکنش گذشته است.",
+            "-104" => "ترمینال ارسال ی غیرفعا ل م ی باشد",
+            "-105" => "کد پذیرنده و یا کلمه عبور آن اشتباه است",
+            "-106" => "آدرس آی پ ی درخواست ی غی ر مجاز می باشد",
+            _ => $"{options.UnexpectedErrorText} Response: {result}"
+        };
     }
 }
