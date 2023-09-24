@@ -3,22 +3,21 @@
 
 using Microsoft.Extensions.Caching.Distributed;
 
-namespace Parbad.Storage.Cache.DistributedCache
+namespace Parbad.Storage.Cache.DistributedCache;
+
+/// <summary>
+/// Distributed cache storage options.
+/// </summary>
+public class DistributedCacheStorageOptions
 {
     /// <summary>
-    /// Distributed cache storage options.
+    /// Gets or sets the key name which will be used by <see cref="IDistributedCache"/>.
+    /// The default value is "parbad.storage.cache"
     /// </summary>
-    public class DistributedCacheStorageOptions
-    {
-        /// <summary>
-        /// Gets or sets the key name which will be used by <see cref="IDistributedCache"/>.
-        /// The default value is "parbad.storage.cache"
-        /// </summary>
-        public string CacheKey { get; set; } = "parbad.storage.cache";
+    public string CacheKey { get; set; } = "parbad.storage.cache";
 
-        /// <summary>
-        /// Provides the cache options for an entry in <see cref="IDistributedCache"/>.
-        /// </summary>
-        public DistributedCacheEntryOptions CacheEntryOptions { get; set; } = new DistributedCacheEntryOptions();
-    }
+    /// <summary>
+    /// Provides the cache options for an entry in <see cref="IDistributedCache"/>.
+    /// </summary>
+    public DistributedCacheEntryOptions CacheEntryOptions { get; set; } = new DistributedCacheEntryOptions();
 }

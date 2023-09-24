@@ -4,21 +4,20 @@
 using Parbad.Storage.Abstractions.Models;
 using System.Collections.Generic;
 
-namespace Parbad.Storage.Cache.Abstractions
+namespace Parbad.Storage.Cache.Abstractions;
+
+/// <summary>
+/// A collection for holding the data.
+/// </summary>
+public interface ICacheStorageCollection
 {
     /// <summary>
-    /// A collection for holding the data.
+    /// Gets or sets a list of current payment records.
     /// </summary>
-    public interface ICacheStorageCollection
-    {
-        /// <summary>
-        /// Gets or sets a list of current payment records.
-        /// </summary>
-        List<Payment> Payments { get; set; }
+    List<Payment> Payments { get; set; }
 
-        /// <summary>
-        /// Gets or sets a list of current transaction records.
-        /// </summary>
-        List<Transaction> Transactions { get; set; }
-    }
+    /// <summary>
+    /// Gets or sets a list of current transaction records.
+    /// </summary>
+    List<Transaction> Transactions { get; set; }
 }

@@ -7,35 +7,34 @@ using Parbad.Storage.Abstractions;
 using Parbad.Storage.Cache.MemoryCache;
 using System;
 
-namespace Parbad.Builder
+namespace Parbad.Builder;
+
+public static class MemoryCacheStorageBuilderExtensions
 {
-    public static class MemoryCacheStorageBuilderExtensions
+    /// <summary>
+    /// Uses <see cref="IMemoryCache"/> for saving and loading data.
+    /// <para>Note: The information inside the memory will be removed
+    /// if the website or server goes down for any reasons. Use MemoryCache only for development.</para>
+    /// </summary>
+    /// <param name="builder"></param>
+    public static IStorageBuilder UseMemoryCache(this IStorageBuilder builder)
+        => UseMemoryCache(builder, options => { });
+
+    /// <summary>
+    /// Uses <see cref="IMemoryCache"/> for saving and loading data.
+    /// <para>Note: The information inside the memory will be removed
+    /// if the website or server goes down for any reasons. Use MemoryCache only for development.</para>
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <param name="configureOptions"></param>
+    public static IStorageBuilder UseMemoryCache(this IStorageBuilder builder, Action<MemoryCacheStorageOptions> configureOptions)
     {
-        /// <summary>
-        /// Uses <see cref="IMemoryCache"/> for saving and loading data.
-        /// <para>Note: The information inside the memory will be removed
-        /// if the website or server goes down for any reasons. Use MemoryCache only for development.</para>
-        /// </summary>
-        /// <param name="builder"></param>
-        public static IStorageBuilder UseMemoryCache(this IStorageBuilder builder)
-            => UseMemoryCache(builder, options => { });
+        builder.Services.AddMemoryCache();
 
-        /// <summary>
-        /// Uses <see cref="IMemoryCache"/> for saving and loading data.
-        /// <para>Note: The information inside the memory will be removed
-        /// if the website or server goes down for any reasons. Use MemoryCache only for development.</para>
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="configureOptions"></param>
-        public static IStorageBuilder UseMemoryCache(this IStorageBuilder builder, Action<MemoryCacheStorageOptions> configureOptions)
-        {
-            builder.Services.AddMemoryCache();
+        builder.Services.Configure(configureOptions);
 
-            builder.Services.Configure(configureOptions);
+        builder.AddStorage<MemoryCacheStorage>(ServiceLifetime.Transient);
 
-            builder.AddStorage<MemoryCacheStorage>(ServiceLifetime.Transient);
-
-            return builder;
-        }
+        return builder;
     }
 }
