@@ -30,22 +30,28 @@ namespace Parbad.Net
             return httpClient.PostAsync(requestUri, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken);
         }
 
-        public static Task<HttpResponseMessage> PostJsonAsync(this HttpClient httpClient, string requestUri, object data, JsonSerializerSettings serializerSettings, CancellationToken cancellationToken = default)
+        public static Task<HttpResponseMessage> PostJsonAsync(this HttpClient httpClient,
+                                                              string requestUri,
+                                                              object data,
+                                                              JsonSerializerSettings serializerSettings = null,
+                                                              CancellationToken cancellationToken = default)
         {
             if (httpClient == null) throw new ArgumentNullException(nameof(httpClient));
+
+            serializerSettings ??= new JsonSerializerSettings();
 
             var json = JsonConvert.SerializeObject(data, serializerSettings);
 
             return httpClient.PostAsync(requestUri, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken);
         }
 
-        public static async Task<TResult> PostJsonAsync<TResult>(this HttpClient httpClient, string requestUri, object data, CancellationToken cancellationToken = default)
+        public static async Task<TResult> PostJsonAsync<TResult>(this HttpClient httpClient,
+                                                                 string requestUri,
+                                                                 object data,
+                                                                 JsonSerializerSettings serializerSettings = null,
+                                                                 CancellationToken cancellationToken = default)
         {
-            if (httpClient == null) throw new ArgumentNullException(nameof(httpClient));
-
-            var json = JsonConvert.SerializeObject(data, Formatting.None);
-
-            var responseMessage = await httpClient.PostAsync(requestUri, new StringContent(json, Encoding.UTF8, "application/json"), cancellationToken);
+            var responseMessage = await httpClient.PostJsonAsync(requestUri, data, serializerSettings, cancellationToken);
 
             var response = await responseMessage.Content.ReadAsStringAsync();
 
@@ -61,13 +67,16 @@ namespace Parbad.Net
             return JsonConvert.DeserializeObject<TResult>(response);
         }
 
-        public static Task<HttpResponseMessage> PostFormAsync(this HttpClient httpClient, string requestUri, IEnumerable<KeyValuePair<string, string>> data, CancellationToken cancellationToken = default)
+        public static Task<HttpResponseMessage> PostFormAsync(this HttpClient httpClient,
+                                                              string requestUri,
+                                                              IEnumerable<KeyValuePair<string, string>> data,
+                                                              CancellationToken cancellationToken = default)
         {
             if (httpClient == null) throw new ArgumentNullException(nameof(httpClient));
 
             return httpClient.PostAsync(requestUri, new FormUrlEncodedContent(data), cancellationToken);
         }
-        
+
         public static void AddOrUpdate(this HttpRequestHeaders headers, string name, string value)
         {
             if (headers == null) throw new ArgumentNullException(nameof(headers));

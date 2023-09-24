@@ -488,6 +488,8 @@ namespace Parbad.Internal
             }
             fetchResult.Message = message;
 
+            fetchResult.GatewayResponseCode = gatewayFetchResult.GatewayResponseCode;
+
             return fetchResult;
         }
     }
