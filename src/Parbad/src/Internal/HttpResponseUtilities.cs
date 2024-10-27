@@ -14,6 +14,9 @@ namespace Parbad.Internal
             response.Headers["Cache-Control"] = "no-store, no-cache";
             response.Headers["Pragma"] = "no-cache";
             response.Headers["Expires"] = "Thu, 01 Jan 1970 00:00:00 GMT";
+            response.Headers["Access-Control-Allow-Origin"] = "*";
+            response.Headers["Access-Control-Allow-Methods"] = "*";
+            response.Headers["Access-Control-Allow-Headers"] = "*";
 
             if (!contentType.IsNullOrEmpty())
             {
