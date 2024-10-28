@@ -4,36 +4,35 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
-namespace Parbad.Storage.Abstractions
+namespace Parbad.Storage.Abstractions;
+
+/// <summary>
+/// A builder for building the Parbad storage.
+/// </summary>
+public interface IStorageBuilder
 {
     /// <summary>
-    /// A builder for building the Parbad storage.
+    /// Specifies the contract for a collection of service descriptors.
     /// </summary>
-    public interface IStorageBuilder
-    {
-        /// <summary>
-        /// Specifies the contract for a collection of service descriptors.
-        /// </summary>
-        IServiceCollection Services { get; }
+    IServiceCollection Services { get; }
 
-        /// <summary>
-        /// Adds the given storage to Parbad services.
-        /// </summary>
-        /// <typeparam name="TStorage"></typeparam>
-        /// <param name="lifetime">Lifetime of the given storage.</param>
-        IStorageBuilder AddStorage<TStorage>(ServiceLifetime lifetime) where TStorage : class, IStorage;
+    /// <summary>
+    /// Adds the given storage to Parbad services.
+    /// </summary>
+    /// <typeparam name="TStorage"></typeparam>
+    /// <param name="lifetime">Lifetime of the given storage.</param>
+    IStorageBuilder AddStorage<TStorage>(ServiceLifetime lifetime) where TStorage : class, IStorage;
 
-        /// <summary>
-        /// Adds the given storage to Parbad services as singleton.
-        /// </summary>
-        /// <param name="storage"></param>
-        IStorageBuilder AddStorage(IStorage storage);
+    /// <summary>
+    /// Adds the given storage to Parbad services as singleton.
+    /// </summary>
+    /// <param name="storage"></param>
+    IStorageBuilder AddStorage(IStorage storage);
 
-        /// <summary>
-        /// Adds the given storage to Parbad services.
-        /// </summary>
-        /// <param name="factory"></param>
-        /// <param name="lifetime">Lifetime of the given storage.</param>
-        IStorageBuilder AddStorage(Func<IServiceProvider, IStorage> factory, ServiceLifetime lifetime);
-    }
+    /// <summary>
+    /// Adds the given storage to Parbad services.
+    /// </summary>
+    /// <param name="factory"></param>
+    /// <param name="lifetime">Lifetime of the given storage.</param>
+    IStorageBuilder AddStorage(Func<IServiceProvider, IStorage> factory, ServiceLifetime lifetime);
 }

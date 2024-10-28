@@ -14,86 +14,124 @@ namespace Parbad.Gateway.ParbadVirtual.MiddlewareInvoker
 {
     internal class ParbadVirtualGatewayMiddlewareInvoker : IParbadVirtualGatewayMiddlewareInvoker
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly HttpContext _httpContext;
         private readonly IOptions<ParbadVirtualGatewayOptions> _options;
 
-        public ParbadVirtualGatewayMiddlewareInvoker(IOptions<ParbadVirtualGatewayOptions> options, IHttpContextAccessor httpContextAccessor)
+        public ParbadVirtualGatewayMiddlewareInvoker(IOptions<ParbadVirtualGatewayOptions> options,
+                                                     IHttpContextAccessor httpContextAccessor)
         {
             _options = options;
-            _httpContextAccessor = httpContextAccessor;
+            _httpContext = httpContextAccessor.HttpContext;
         }
 
         public async Task InvokeAsync()
         {
-            var httpContext = _httpContextAccessor.HttpContext;
+            if (_httpContext == null)
+            {
+                throw new InvalidOperationException("HttpContext is null");
+            }
 
-            HttpResponseUtilities.AddNecessaryContents(httpContext, "text/html");
+            if (_httpContext.Request.Query.ContainsKey("css"))
+            {
+                await HandleCss(_httpContext);
 
-            var commandDetails = await GetCommandDetails(httpContext);
+                return;
+            }
+
+            HttpResponseUtilities.AddNecessaryContents(_httpContext, "text/html");
+
+            var commandDetails = await GetCommandDetails(_httpContext);
 
             if (commandDetails == null)
             {
-                await httpContext.Response.WriteAsync("Command details are not valid.");
+                await _httpContext.Response.WriteAsync("Parbad Virtual Gateway message: Invalid data is received.");
+
                 return;
             }
+
+            var cssUrl =
+                $"{_httpContext.Request.Scheme}://{_httpContext.Request.Host}{_httpContext.Request.PathBase}?css=true";
 
             switch (commandDetails.CommandType)
             {
                 case VirtualGatewayCommandType.Request:
-                    await HandleRequestPage(httpContext, commandDetails);
+                    await HandleRequestPage(_httpContext, commandDetails, cssUrl);
+
                     break;
 
                 case VirtualGatewayCommandType.Pay:
-                    await HandleResultPage(httpContext, commandDetails);
+                    await HandleResultPage(_httpContext, commandDetails, cssUrl);
+
                     break;
 
                 default:
-                    await httpContext.Response.WriteAsync("CommandType is not valid.");
+                    await _httpContext.Response.WriteAsync("CommandType is not valid.");
+
                     break;
             }
         }
 
-        private async Task HandleRequestPage(HttpContext httpContext, VirtualGatewayCommandDetails commandDetails)
+        private async Task HandleCss(HttpContext httpContext)
+        {
+            HttpResponseUtilities.AddNecessaryContents(_httpContext, "text/css");
+
+            var cssContent = await GetTemplate("ParbadVirtualGatewayStyles.css");
+
+            await httpContext.Response.WriteAsync(cssContent);
+        }
+
+        private async Task HandleRequestPage(HttpContext httpContext,
+                                             VirtualGatewayCommandDetails commandDetails,
+                                             string cssUrl)
         {
             var template = await GetTemplate("VirtualGatewayRequestTemplate.html");
 
             var html = template
-                .Replace("#VirtualGatewayPath#", _options.Value.GatewayPath)
-                .Replace("#TrackingNumber#", commandDetails.TrackingNumber.ToString())
-                .Replace("#Amount#", commandDetails.Amount.ToString())
-                .Replace("#DisplayAmount#", ((long)commandDetails.Amount).ToString("N0"))
-                .Replace("#RedirectUrl#", commandDetails.RedirectUrl)
-                .Replace("#YearNow#", DateTime.Now.Year.ToString());
+                      .Replace("#CssUrl#", cssUrl)
+                      .Replace("#VirtualGatewayPath#", _options.Value.GatewayPath)
+                      .Replace("#TrackingNumber#", commandDetails.TrackingNumber.ToString())
+                      .Replace("#Amount#", commandDetails.Amount.ToString())
+                      .Replace("#DisplayAmount#", ((long)commandDetails.Amount).ToString("N0"))
+                      .Replace("#RedirectUrl#", commandDetails.RedirectUrl)
+                      .Replace("#YearNow#", DateTime.Now.Year.ToString());
 
             await httpContext.Response.WriteAsync(html);
         }
 
-        private static async Task HandleResultPage(HttpContext httpContext, VirtualGatewayCommandDetails commandDetails)
+        private static async Task HandleResultPage(HttpContext httpContext,
+                                                   VirtualGatewayCommandDetails commandDetails,
+                                                   string cssUrl)
         {
             if (!httpContext.Request.Form.TryGetValue("isPaid", out var isPaid) ||
                 !bool.TryParse(isPaid, out var boolIsPaid))
             {
                 await httpContext.Response.WriteAsync($"{nameof(isPaid)} field is not valid.");
+
                 return;
             }
 
             var template = await GetTemplate("VirtualGatewayResultTemplate.html");
 
             var html = template
-                .Replace("#TrackingNumber#", commandDetails.TrackingNumber.ToString())
-                .Replace("#DisplayAmount#", ((long)commandDetails.Amount).ToString("N0"))
-                .Replace("#TransactionCode#", boolIsPaid ? Guid.NewGuid().ToString("N") : string.Empty)
-                .Replace("#RedirectUrl#", commandDetails.RedirectUrl)
-                .Replace("#IsPaid#", isPaid.ToString().ToLower())
-                .Replace("#YearNow#", DateTime.Now.Year.ToString())
-                .Replace("#CssStatusName#", boolIsPaid ? "success" : "danger")
-                .Replace("#StatusText#", boolIsPaid ? "Succeed" : "Failed");
+                      .Replace("#CssUrl#", cssUrl)
+                      .Replace("#TrackingNumber#", commandDetails.TrackingNumber.ToString())
+                      .Replace("#DisplayAmount#", ((long)commandDetails.Amount).ToString("N0"))
+                      .Replace("#TransactionCode#", boolIsPaid ? Guid.NewGuid().ToString("N") : string.Empty)
+                      .Replace("#RedirectUrl#", commandDetails.RedirectUrl)
+                      .Replace("#IsPaid#", isPaid.ToString().ToLower())
+                      .Replace("#YearNow#", DateTime.Now.Year.ToString())
+                      .Replace("#StatusText#", boolIsPaid ? "Paid" : "Cancelled");
 
             await httpContext.Response.WriteAsync(html);
         }
 
         private static async Task<VirtualGatewayCommandDetails> GetCommandDetails(HttpContext httpContext)
         {
+            if (!httpContext.Request.HasFormContentType)
+            {
+                return null;
+            }
+
             var form = await httpContext.Request.ReadFormAsync();
 
             if (!Enum.TryParse(form["commandType"], out VirtualGatewayCommandType commandType))
@@ -114,9 +152,9 @@ namespace Parbad.Gateway.ParbadVirtual.MiddlewareInvoker
         private static Task<string> GetTemplate(string templateName)
         {
             using var stream = typeof(ParbadVirtualGatewayOptions)
-                .GetTypeInfo()
-                .Assembly
-                .GetManifestResourceStream($"Parbad.Gateway.ParbadVirtual.{templateName}");
+                              .GetTypeInfo()
+                              .Assembly
+                              .GetManifestResourceStream($"Parbad.Gateway.ParbadVirtual.{templateName}");
 
             var streamReader = new StreamReader(stream, Encoding.UTF8);
 

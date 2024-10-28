@@ -3,21 +3,18 @@
 
 using Newtonsoft.Json;
 
-namespace Parbad.Gateway.ZarinPal.Internal
+namespace Parbad.Gateway.ZarinPal.Internal;
+
+internal class ZarinPalRefundResultModel : ZarinPalResultModel<ZarinPalRefundResultModelData>;
+
+internal class ZarinPalRefundResultModelData
 {
-    internal class ZarinPalRefundResultModel : ZarinPalResultModel<ZarinPalRefundResultModelData>
-    {
-    }
+    public int Code { get; set; }
 
-    internal class ZarinPalRefundResultModelData
-    {
-        public int Code { get; set; }
+    public string Iban { get; set; }
 
-        public string Iban { get; set; }
+    [JsonProperty("ref_id")]
+    public string RefId { get; set; }
 
-        [JsonProperty("ref_id")]
-        public string RefId { get; set; }
-
-        public string Message { get; set; }
-    }
+    public string Message { get; set; }
 }

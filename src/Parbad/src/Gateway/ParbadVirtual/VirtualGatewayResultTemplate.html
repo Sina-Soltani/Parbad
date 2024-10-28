@@ -1,87 +1,71 @@
-﻿<!DOCTYPE html>
-<html>
+﻿<!doctype html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Parbad Virtual Gateway</title>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <style type="text/css">
-        body {
-            margin-top: 40px;
-        }
-    </style>
+    <link rel="stylesheet" href="#CssUrl#" />
 </head>
 <body>
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-2"></div>
-            <div class="col-md-8">
-                <div class="card border-#CssStatusName#">
-                    <div class="card-header">
-                        Parbad Virtual Gateway
-                    </div>
-                    <div class="card-body">
-                        <form id="paymentForm" action="#RedirectUrl#" method="post">
-                            <input name="transactionCode" value="#TransactionCode#" type="hidden" />
-                            <input name="result" id="result" value="#IsPaid#" type="hidden" />
-                            <div class="form-group">
-                                <label>Tracking Number</label>
-                                <input type="text" value="#TrackingNumber#" class="form-control-plaintext" readonly />
-                            </div>
-                            <div class="form-group">
-                                <label>Amount</label>
-                                <input type="text" value="#DisplayAmount#" class="form-control-plaintext" readonly />
-                            </div>
-                            <div class="form-group">
-                                <label>Transaction Code</label>
-                                <input type="text" value="#TransactionCode#" class="form-control-plaintext" readonly />
-                            </div>
-                            <div class="form-group">
-                                <label>Status</label>
-                                <input type="text" value="#StatusText#" class="form-control-plaintext" readonly />
-                            </div>
-                        </form>
-                        <br />
-                        <div class="alert alert-primary">
-                            <i class="glyphicon glyphicon-info-sign"></i>
-                            Page will redirect automatically in <strong id="counter">5</strong> second(s)...
-                        </div>
-                    </div>
-                    <div class="card-footer text-center">
-                        <small>
-                            Copyright © Parbad 2016-#YearNow# <a href="https://github.com/Sina-Soltani/Parbad/blob/master/LICENSE.txt" target="_blank">GNU license</a>
-                        </small>
-                    </div>
+<div class="container">
+    <h1 class="heading">Parbad Virtual Gateway</h1>
+    <div class="panel">
+        <form id="paymentForm" action="#RedirectUrl#" method="post" class="form">
+            <input name="transactionCode" value="#TransactionCode#" type="hidden"/>
+            <input name="result" id="result" value="#IsPaid#" type="hidden"/>
+
+            <div class="panel-content">
+                <div>
+                    <span>Tracking Number</span>
+                    <span>#TrackingNumber#</span>
+                </div>
+                <div>
+                    <span>Amount</span>
+                    <span>#DisplayAmount#</span>
+                </div>
+                <div>
+                    <span>Transaction Code</span>
+                    <span>#TransactionCode#</span>
+                </div>
+                <div>
+                    <span>Status</span>
+                    <span>#StatusText#</span>
                 </div>
             </div>
-            <div class="col-sm-2"></div>
+        </form>
+        <div class="counter-bg">
+            <span>Page will redirect automatically in</span>
+            <span id="counter">5</span>
+            <span>seconds...</span>
         </div>
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-    <script type="text/javascript">
-        var timer;
-        var seconds = 5;
+    <div class="copyright">
+        Copyright © Parbad 2016-#YearNow# <a href="https://github.com/Sina-Soltani/Parbad/blob/master/LICENSE.txt" target="_blank">GNU license</a>
+    </div>
+</div>
+<script type="text/javascript">
+    let timer;
+    let seconds = 5;
 
-        function submitForm() {
-            document.getElementById('paymentForm').submit();
+    function submitForm() {
+        document.getElementById("paymentForm").submit();
+    }
+
+    function countDown() {
+        seconds--;
+
+        document.getElementById("counter").innerHTML = seconds.toString();
+
+        if (seconds > 0) {
+            return;
         }
 
-        function countDown() {
-            seconds--;
+        clearInterval(timer);
 
-            document.getElementById('counter').innerHTML = seconds;
+        submitForm();
+    }
 
-            if (seconds <= 0) {
-                clearInterval(timer);
-                submitForm();
-                return;
-            }
-
-        }
-
-        timer = setInterval(countDown, 1000);
-    </script>
+    timer = setInterval(countDown, 1000);
+</script>
 </body>
 </html>

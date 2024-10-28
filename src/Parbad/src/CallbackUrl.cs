@@ -13,7 +13,7 @@ namespace Parbad
     /// <para>Note: A complete URL would be like: "http://www.mywebsite.com/foo/bar/"</para>
     /// </summary>
     /// <exception cref="CallbackUrlFormatException"></exception>
-    public readonly struct CallbackUrl : IComparable<CallbackUrl>
+    public readonly struct CallbackUrl : IComparable<CallbackUrl>, IEquatable<CallbackUrl>
     {
         /// <summary>
         /// Initializes an instance of <see cref="CallbackUrl"/> class.
@@ -67,6 +67,7 @@ namespace Parbad
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
+
             return obj is CallbackUrl other && Equals(other);
         }
 
@@ -87,11 +88,13 @@ namespace Parbad
             try
             {
                 callbackUrl = new CallbackUrl(url);
+
                 return true;
             }
             catch
             {
                 callbackUrl = default;
+
                 return false;
             }
         }
@@ -99,6 +102,16 @@ namespace Parbad
         public static implicit operator string(CallbackUrl callbackUrl)
         {
             return callbackUrl.ToString();
+        }
+
+        public static bool operator ==(CallbackUrl left, CallbackUrl right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(CallbackUrl left, CallbackUrl right)
+        {
+            return !(left == right);
         }
     }
 }

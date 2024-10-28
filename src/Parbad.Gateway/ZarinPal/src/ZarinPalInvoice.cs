@@ -4,44 +4,43 @@
 using System;
 using Parbad.Internal;
 
-namespace Parbad.Gateway.ZarinPal
+namespace Parbad.Gateway.ZarinPal;
+
+/// <summary>
+/// Describes an invoice for ZarinPal gateway.
+/// </summary>
+public class ZarinPalInvoice
 {
     /// <summary>
-    /// Describes an invoice for ZarinPal gateway.
+    /// Initializes an instance of <see cref="ZarinPalInvoice"/>.
     /// </summary>
-    public class ZarinPalInvoice
+    /// <param name="description">A short description about this invoice which is required by ZarinPal gateway.</param>
+    /// <param name="email">Buyer's email.</param>
+    /// <param name="mobile">Buyer's mobile.</param>
+    public ZarinPalInvoice(string description, string email = null, string mobile = null)
     {
-        /// <summary>
-        /// Initializes an instance of <see cref="ZarinPalInvoice"/>.
-        /// </summary>
-        /// <param name="description">A short description about this invoice which is required by ZarinPal gateway.</param>
-        /// <param name="email">Buyer's email.</param>
-        /// <param name="mobile">Buyer's mobile.</param>
-        public ZarinPalInvoice(string description, string email = null, string mobile = null)
+        if (description.IsNullOrEmpty())
         {
-            if (description.IsNullOrEmpty())
-            {
-                throw new ArgumentNullException(nameof(description));
-            }
-
-            Description = description;
-            Email = email;
-            Mobile = mobile;
+            throw new ArgumentNullException(nameof(description));
         }
 
-        /// <summary>
-        /// A short description about this invoice which is required by ZarinPal gateway.
-        /// </summary>
-        public string Description { get; }
-
-        /// <summary>
-        /// Buyer's email.
-        /// </summary>
-        public string Email { get; }
-
-        /// <summary>
-        /// Buyer's mobile.
-        /// </summary>
-        public string Mobile { get; }
+        Description = description;
+        Email = email;
+        Mobile = mobile;
     }
+
+    /// <summary>
+    /// A short description about this invoice which is required by ZarinPal gateway.
+    /// </summary>
+    public string Description { get; }
+
+    /// <summary>
+    /// Buyer's email.
+    /// </summary>
+    public string Email { get; }
+
+    /// <summary>
+    /// Buyer's mobile.
+    /// </summary>
+    public string Mobile { get; }
 }

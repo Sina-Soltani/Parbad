@@ -14,9 +14,9 @@ public static class ZarinPalPaymentResultExtensions
     /// </summary>
     public static ZarinPalOriginalVerificationResult GetZarinPalOriginalVerificationResult(this IPaymentVerifyResult result)
     {
-        if (result.AdditionalData.ContainsKey(ZarinPalOriginalVerificationResultKey))
+        if (result.AdditionalData.TryGetValue(ZarinPalOriginalVerificationResultKey, out var value))
         {
-            return (ZarinPalOriginalVerificationResult)result.AdditionalData[ZarinPalOriginalVerificationResultKey];
+            return (ZarinPalOriginalVerificationResult)value;
         }
 
         return null;

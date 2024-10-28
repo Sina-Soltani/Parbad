@@ -4,16 +4,15 @@
 using Microsoft.AspNetCore.Mvc;
 using Parbad.AspNetCore.ActionResults;
 
-namespace Parbad.AspNetCore
+namespace Parbad.AspNetCore;
+
+public static class GatewayTransporterExtensions
 {
-    public static class GatewayTransporterExtensions
+    /// <summary>
+    /// Transports the client to the specified gateway.
+    /// </summary>
+    public static IActionResult TransportToGateway(this IGatewayTransporter transporter)
     {
-        /// <summary>
-        /// Transports the client to the specified gateway.
-        /// </summary>
-        public static IActionResult TransportToGateway(this IGatewayTransporter transporter)
-        {
-            return new TransportToGatewayActionResult(transporter);
-        }
+        return new TransportToGatewayActionResult(transporter);
     }
 }

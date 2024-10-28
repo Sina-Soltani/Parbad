@@ -3,12 +3,11 @@
 
 using System.Collections.Generic;
 
-namespace Parbad.Gateway.ZarinPal.Internal
-{
-    internal class ZarinPalResultModel<TData> where TData : class
-    {
-        public TData Data { get; set; }
+namespace Parbad.Gateway.ZarinPal.Internal;
 
-        public List<ZarinPalErrorModel> Errors { get; set; }
-    }
+internal class ZarinPalResultModel<TData> where TData : class
+{
+    public TData Data { get; set; }
+
+    public List<ZarinPalErrorModel> Errors { get; set; }
 }
