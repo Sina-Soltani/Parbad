@@ -3,23 +3,22 @@
 
 using System;
 
-namespace Parbad.Storage.Abstractions.Models
+namespace Parbad.Storage.Abstractions.Models;
+
+[Serializable]
+public class Transaction
 {
-    [Serializable]
-    public class Transaction
-    {
-        public long Id { get; set; }
+    public long Id { get; set; }
 
-        public decimal Amount { get; set; }
+    public decimal Amount { get; set; }
 
-        public TransactionType Type { get; set; }
+    public TransactionType Type { get; set; }
 
-        public bool IsSucceed { get; set; }
+    public bool IsSucceed { get; set; }
 
-        public string Message { get; set; }
+    public string Message { get; set; }
 
-        public string AdditionalData { get; set; }
+    public string AdditionalData { get; set; }
 
-        public long PaymentId { get; set; }
-    }
+    public long PaymentId { get; set; }
 }
