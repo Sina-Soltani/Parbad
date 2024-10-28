@@ -4,6 +4,10 @@
     font-family: arial, sans-serif;
 }
 
+html {
+    font-size: 16px;
+}
+
 body {
     background-color: #b1278d;
     background-image: linear-gradient(0deg, #b1278d 0%, #770b4b 50%, #8414b1 100%);
@@ -34,7 +38,7 @@ body {
 }
 
 .heading {
-    font-size: 26px;
+    font-size: 1.9rem;
     color: white;
     text-shadow: 0 2px 5px #000000;
 }
@@ -43,7 +47,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 30PX;
-    min-height: 326px;
+    min-height: 200px;
 }
 
 .panel-content > div {
@@ -71,11 +75,48 @@ body {
 .copyright {
     margin-top: 20px;
     color: white;
-    font-size: 15px;
+    font-size: .9rem;
 }
 
 .copyright a:link, .copyright a:visited {
     color: white;
+}
+
+.counter-bg {
+    height: 40px;
+    width: 100%;
+    padding: 5px;
+    text-align: center;
+    align-content: center;
+    justify-content: center;
+    background: linear-gradient(90deg, #b1278d 0%, #770b4b 50%, #8414b1 100%) no-repeat;
+    color: white;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+    font-size: .9rem;
+    box-shadow: 0 2px 5px #0000007d;
+}
+
+@keyframes counter-anim {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+#counter {
+    display: inline-block;
+    font-weight: bold;
+    font-size: 2rem;
+    animation: 1s cubic-bezier(.19, 1, .22, 1) 0s 6 counter-anim;
 }
 
 .btn {
@@ -109,47 +150,12 @@ body {
     border-color: #b02a37;
 }
 
-.counter-bg {
-    height: 40px;
-    width: 100%;
-    padding: 5px;
-    text-align: center;
-    align-content: center;
-    justify-content: center;
-    background: linear-gradient(90deg, #b1278d 0%, #770b4b 50%, #8414b1 100%) no-repeat;
-    color: white;
-    border-radius: 8px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 5px;
-}
-
-@keyframes counter-anim {
-    0% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.2);
-    }
-    100% {
-        transform: scale(1);
-    }
-}
-
-#counter {
-    display: inline-block;
-    font-weight: bold;
-    font-size: 30px;
-    animation: 1s cubic-bezier(.19, 1, .22, 1) 0s 6 counter-anim;
-}
-
 @media only screen and (min-width: 768px) {
     .panel {
         min-width: 500px;
     }
 
-    .heading {
-        font-size: 30px;
+    .counter-bg {
+        font-size: 1rem;
     }
 }

@@ -44,12 +44,13 @@ namespace Parbad.Gateway.ParbadVirtual.MiddlewareInvoker
 
             if (commandDetails == null)
             {
-                await _httpContext.Response.WriteAsync("Command details are not valid.");
+                await _httpContext.Response.WriteAsync("Parbad Virtual Gateway message: Invalid data is received.");
 
                 return;
             }
 
-            var cssUrl = $"{_httpContext.Request.Scheme}://{_httpContext.Request.Host}{_httpContext.Request.PathBase}?css=true";
+            var cssUrl =
+                $"{_httpContext.Request.Scheme}://{_httpContext.Request.Host}{_httpContext.Request.PathBase}?css=true";
 
             switch (commandDetails.CommandType)
             {
@@ -126,6 +127,11 @@ namespace Parbad.Gateway.ParbadVirtual.MiddlewareInvoker
 
         private static async Task<VirtualGatewayCommandDetails> GetCommandDetails(HttpContext httpContext)
         {
+            if (!httpContext.Request.HasFormContentType)
+            {
+                return null;
+            }
+
             var form = await httpContext.Request.ReadFormAsync();
 
             if (!Enum.TryParse(form["commandType"], out VirtualGatewayCommandType commandType))
