@@ -3,13 +3,12 @@
 
 using Newtonsoft.Json;
 
-namespace Parbad.Gateway.ZarinPal.Internal
-{
-    public class ZarinPalRefundModel
-    {
-        [JsonProperty("merchant_id")]
-        public string MerchantId { get; set; }
+namespace Parbad.Gateway.ZarinPal.Internal;
 
-        public string Authority { set; get; }
-    }
+public class ZarinPalRefundModel
+{
+    [JsonProperty("merchant_id")]
+    public string MerchantId { get; set; }
+
+    public string Authority { set; get; }
 }

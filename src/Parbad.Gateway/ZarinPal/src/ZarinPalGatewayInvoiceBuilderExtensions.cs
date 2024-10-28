@@ -5,46 +5,45 @@ using Parbad.Gateway.ZarinPal.Internal;
 using Parbad.InvoiceBuilder;
 using System;
 
-namespace Parbad.Gateway.ZarinPal
+namespace Parbad.Gateway.ZarinPal;
+
+public static class ZarinPalGatewayInvoiceBuilderExtensions
 {
-    public static class ZarinPalGatewayInvoiceBuilderExtensions
+    /// <summary>
+    /// The invoice will be sent to ZarinPal Gateway.
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <exception cref="ArgumentNullException"></exception>
+    public static IInvoiceBuilder UseZarinPal(this IInvoiceBuilder builder)
     {
-        /// <summary>
-        /// The invoice will be sent to ZarinPal Gateway.
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <exception cref="ArgumentNullException"></exception>
-        public static IInvoiceBuilder UseZarinPal(this IInvoiceBuilder builder)
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            return builder.SetGateway(ZarinPalGateway.Name);
-        }
-
-        /// <summary>
-        /// Sets ZarinPal Gateway data.
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="zarinPalInvoice">Describes an invoice for ZarinPal gateway.</param>
-        /// <exception cref="ArgumentNullException"></exception>
-        public static IInvoiceBuilder SetZarinPalData(this IInvoiceBuilder builder, ZarinPalInvoice zarinPalInvoice)
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-
-            builder.AddOrUpdateProperty(ZarinPalHelper.ZarinPalRequestAdditionalKeyName, zarinPalInvoice);
-
-            return builder;
-        }
-
-        /// <summary>
-        /// Sets ZarinPal Gateway data.
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="description">A short description about this invoice which is required by ZarinPal gateway.</param>
-        /// <param name="email">Buyer's email.</param>
-        /// <param name="mobile">Buyer's mobile.</param>
-        /// <exception cref="ArgumentNullException"></exception>
-        public static IInvoiceBuilder SetZarinPalData(this IInvoiceBuilder builder, string description, string email = null, string mobile = null)
-            => SetZarinPalData(builder, new ZarinPalInvoice(description, email, mobile));
+        return builder.SetGateway(ZarinPalGateway.Name);
     }
+
+    /// <summary>
+    /// Sets ZarinPal Gateway data.
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <param name="zarinPalInvoice">Describes an invoice for ZarinPal gateway.</param>
+    /// <exception cref="ArgumentNullException"></exception>
+    public static IInvoiceBuilder SetZarinPalData(this IInvoiceBuilder builder, ZarinPalInvoice zarinPalInvoice)
+    {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+        builder.AddOrUpdateProperty(ZarinPalHelper.ZarinPalRequestAdditionalKeyName, zarinPalInvoice);
+
+        return builder;
+    }
+
+    /// <summary>
+    /// Sets ZarinPal Gateway data.
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <param name="description">A short description about this invoice which is required by ZarinPal gateway.</param>
+    /// <param name="email">Buyer's email.</param>
+    /// <param name="mobile">Buyer's mobile.</param>
+    /// <exception cref="ArgumentNullException"></exception>
+    public static IInvoiceBuilder SetZarinPalData(this IInvoiceBuilder builder, string description, string email = null, string mobile = null)
+        => SetZarinPalData(builder, new ZarinPalInvoice(description, email, mobile));
 }

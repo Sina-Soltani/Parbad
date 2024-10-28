@@ -5,17 +5,16 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Parbad.Gateway.ParbadVirtual.MiddlewareInvoker;
 
-namespace Parbad.AspNetCore.VirtualGateway
-{
-    public class ParbadVirtualGatewayMiddleware
-    {
-        public ParbadVirtualGatewayMiddleware(RequestDelegate next)
-        {
-        }
+namespace Parbad.AspNetCore.VirtualGateway;
 
-        public Task Invoke(HttpContext httpContext, IParbadVirtualGatewayMiddlewareInvoker invoker)
-        {
-            return invoker.InvokeAsync();
-        }
+public class ParbadVirtualGatewayMiddleware
+{
+    public ParbadVirtualGatewayMiddleware(RequestDelegate next)
+    {
+    }
+
+    public Task Invoke(HttpContext httpContext, IParbadVirtualGatewayMiddlewareInvoker invoker)
+    {
+        return invoker.InvokeAsync();
     }
 }

@@ -3,20 +3,19 @@
 
 using Parbad.Abstraction;
 
-namespace Parbad.Gateway.ZarinPal
+namespace Parbad.Gateway.ZarinPal;
+
+/// <summary>
+/// Describes an account for ZarinPal Gateway.
+/// </summary>
+public class ZarinPalGatewayAccount : GatewayAccount
 {
+    public string MerchantId { get; set; }
+
     /// <summary>
-    /// Describes an account for ZarinPal Gateway.
+    /// It's needed for refunding a payment.
     /// </summary>
-    public class ZarinPalGatewayAccount : GatewayAccount
-    {
-        public string MerchantId { get; set; }
+    public string AuthorizationToken { get; set; }
 
-        /// <summary>
-        /// It's needed for refunding a payment.
-        /// </summary>
-        public string AuthorizationToken { get; set; }
-
-        public bool IsSandbox { get; set; }
-    }
+    public bool IsSandbox { get; set; }
 }

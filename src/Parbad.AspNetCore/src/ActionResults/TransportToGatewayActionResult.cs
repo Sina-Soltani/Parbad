@@ -4,27 +4,26 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Parbad.AspNetCore.ActionResults
+namespace Parbad.AspNetCore.ActionResults;
+
+/// <summary>
+/// An <see cref="IActionResult"/> for transporting the client to the specified gateway.
+/// </summary>
+public class TransportToGatewayActionResult : IActionResult
 {
+    private readonly IGatewayTransporter _transporter;
+
     /// <summary>
-    /// An <see cref="IActionResult"/> for transporting the client to the specified gateway.
+    /// Initializes an instance of <see cref="TransportToGatewayActionResult"/> for redirecting the client to the gateway.
     /// </summary>
-    public class TransportToGatewayActionResult : IActionResult
+    public TransportToGatewayActionResult(IGatewayTransporter transporter)
     {
-        private readonly IGatewayTransporter _transporter;
+        _transporter = transporter;
+    }
 
-        /// <summary>
-        /// Initializes an instance of <see cref="TransportToGatewayActionResult"/> for redirecting the client to the gateway.
-        /// </summary>
-        public TransportToGatewayActionResult(IGatewayTransporter transporter)
-        {
-            _transporter = transporter;
-        }
-
-        /// <inheritdoc />
-        public Task ExecuteResultAsync(ActionContext context)
-        {
-            return _transporter.TransportAsync();
-        }
+    /// <inheritdoc />
+    public Task ExecuteResultAsync(ActionContext context)
+    {
+        return _transporter.TransportAsync();
     }
 }
