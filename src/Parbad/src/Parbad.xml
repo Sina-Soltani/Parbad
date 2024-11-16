@@ -1907,6 +1907,12 @@
             Gets an instance of <see cref="T:Parbad.Storage.Abstractions.IStorage"/>.
             </summary>
         </member>
+        <member name="P:Parbad.Storage.StorageManager.Payments">
+            <inheritdoc />
+        </member>
+        <member name="P:Parbad.Storage.StorageManager.Transactions">
+            <inheritdoc />
+        </member>
         <member name="M:Parbad.Storage.StorageManager.CreatePaymentAsync(Parbad.Storage.Abstractions.Models.Payment,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>

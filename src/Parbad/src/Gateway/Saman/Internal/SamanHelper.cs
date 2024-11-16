@@ -21,6 +21,8 @@ namespace Parbad.Gateway.Saman.Internal;
 internal static class SamanHelper
 {
     private const string RefNumKey = nameof(RefNumKey);
+    private const string CallbackSuccessCode = "2";
+    private const int VerificationSuccessCode = 0;
     public const string AdditionalVerificationDataKey = "SamanAdditionalVerificationData";
     public const string CellNumberPropertyKey = "SamanCellNumber";
 
@@ -98,40 +100,6 @@ internal static class SamanHelper
                    SecurePan = securePan.Value,
                    HashedCardNumber = hashedCardNumber.Value,
                };
-
-        // var status = await httpRequest.TryGetParamAsync("status", cancellationToken).ConfigureAwaitFalse();
-        //
-        // if (!status.Exists || status.Value.IsNullOrEmpty())
-        // {
-        //     message = messagesOptions.InvalidDataReceivedFromGateway;
-        // }
-        // else
-        // {
-        //     var referenceIdResult = await httpRequest.TryGetParamAsync("ResNum", cancellationToken).ConfigureAwaitFalse();
-        //     if (referenceIdResult.Exists) referenceId = referenceIdResult.Value;
-        //
-        //     var transactionIdResult = await httpRequest.TryGetParamAsync("RefNum", cancellationToken).ConfigureAwaitFalse();
-        //     if (transactionIdResult.Exists) transactionId = transactionIdResult.Value;
-        //
-        //     isSuccess = status.Value.Equals("OK", StringComparison.OrdinalIgnoreCase);
-        //
-        //     if (!isSuccess)
-        //     {
-        //         message = SamanStateTranslator.Translate(status.Value, messagesOptions);
-        //     }
-        // }
-        //
-        // return new SamanCallbackResult
-        //        {
-        //            IsSucceed = isSuccess,
-        //            ReferenceId = referenceId,
-        //            TransactionId = transactionId,
-        //            SecurePan = securePan.Value,
-        //            Cid = cid.Value,
-        //            TraceNo = traceNo.Value,
-        //            Rrn = rrn.Value,
-        //            Message = message
-        //        };
     }
 
     public static IPaymentFetchResult CreateFetchResult(SamanCallbackResponse callbackResponse,
@@ -141,7 +109,7 @@ internal static class SamanHelper
     {
         var isCallbackResponseValid = ValidateCallbackResponse(callbackResponse, invoiceContext, gatewayAccount, out var message);
 
-        var isReceivedSuccessFromGateway = callbackResponse.Status == "2";
+        var isReceivedSuccessFromGateway = callbackResponse.Status == CallbackSuccessCode;
 
         var isSucceed = isCallbackResponseValid && isReceivedSuccessFromGateway;
 
@@ -184,9 +152,9 @@ internal static class SamanHelper
     {
         var isSuccess = verificationResponse.TransactionDetail.TerminalNumber.ToString() == gatewayAccount.TerminalId &&
                         verificationResponse.TransactionDetail.AffectiveAmount == (long)invoiceContext.Payment.Amount &&
-                        verificationResponse.TransactionDetail.RefNum == callbackResponse.RefNum;
-
-
+                        verificationResponse.TransactionDetail.RefNum == callbackResponse.RefNum &&
+                        verificationResponse.ResultCode == VerificationSuccessCode;
+        
         var message = isSuccess
             ? messagesOptions.PaymentSucceed
             : SamanResultTranslator.Translate(verificationResponse.ResultCode.ToString(), messagesOptions);
@@ -213,7 +181,8 @@ internal static class SamanHelper
         if (string.IsNullOrEmpty(verificationTransaction?.AdditionalData) ||
             !verificationTransaction.ToDictionary().ContainsKey(RefNumKey))
         {
-            throw new InvalidOperationException($"No Transaction of type Verification or additional data found for reversing the invoice {context.Payment.TrackingNumber}.");
+            throw new
+                InvalidOperationException($"No Transaction of type Verification or additional data found for reversing the invoice {context.Payment.TrackingNumber}.");
         }
 
         return new()

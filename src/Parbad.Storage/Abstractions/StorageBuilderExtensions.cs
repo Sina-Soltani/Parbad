@@ -12,6 +12,7 @@ public static class StorageBuilderExtensions
     /// <typeparam name="TManager"></typeparam>
     /// <param name="builder"></param>
     /// <param name="lifetime">The lifetime of given StorageManager.</param>
+    [Obsolete("StorageManager will be removed in a future release. The implementations are moved to the IStorage interface.")]
     public static IStorageBuilder AddStorageManager<TManager>(this IStorageBuilder builder, ServiceLifetime lifetime) where TManager : class, IStorageManager
     {
         builder.Services.AddOrUpdate<IStorageManager, TManager>(lifetime);
@@ -24,6 +25,7 @@ public static class StorageBuilderExtensions
     /// </summary>
     /// <param name="builder"></param>
     /// <param name="storageManager"></param>
+    [Obsolete("StorageManager will be removed in a future release. The implementations are moved to the IStorage interface.")]
     public static IStorageBuilder AddStorageManager(this IStorageBuilder builder, IStorageManager storageManager)
     {
         if (builder == null) throw new ArgumentNullException(nameof(builder));
@@ -42,6 +44,7 @@ public static class StorageBuilderExtensions
     /// <param name="builder"></param>
     /// <param name="factory"></param>
     /// <param name="lifetime">The lifetime of given StorageManager.</param>
+    [Obsolete("StorageManager will be removed in a future release. The implementations are moved to the IStorage interface.")]
     public static IStorageBuilder AddStorageManager(this IStorageBuilder builder, Func<IServiceProvider, IStorageManager> factory, ServiceLifetime lifetime)
     {
         if (builder == null) throw new ArgumentNullException(nameof(builder));

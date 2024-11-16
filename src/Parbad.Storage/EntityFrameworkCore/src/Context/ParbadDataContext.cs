@@ -7,26 +7,25 @@ using Parbad.Storage.EntityFrameworkCore.Configuration;
 using Parbad.Storage.EntityFrameworkCore.Domain;
 using Parbad.Storage.EntityFrameworkCore.Options;
 
-namespace Parbad.Storage.EntityFrameworkCore.Context
+namespace Parbad.Storage.EntityFrameworkCore.Context;
+
+public class ParbadDataContext : DbContext
 {
-    public class ParbadDataContext : DbContext
+    public ParbadDataContext(DbContextOptions<ParbadDataContext> options, IOptions<EntityFrameworkCoreOptions> efCoreOptions)
+        : base(options)
     {
-        public ParbadDataContext(DbContextOptions<ParbadDataContext> options, IOptions<EntityFrameworkCoreOptions> efCoreOptions) : base(options)
-        {
-            EntityFrameworkCoreOptions = efCoreOptions.Value;
-        }
+        EntityFrameworkCoreOptions = efCoreOptions.Value;
+    }
 
-        public EntityFrameworkCoreOptions EntityFrameworkCoreOptions { get; }
+    public EntityFrameworkCoreOptions EntityFrameworkCoreOptions { get; }
 
-        public DbSet<PaymentEntity> Payments { get; set; }
+    public DbSet<PaymentEntity> Payments { get; set; }
 
-        public DbSet<TransactionEntity> Transactions { get; set; }
+    public DbSet<TransactionEntity> Transactions { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder
-                .ApplyConfiguration(new PaymentConfiguration(EntityFrameworkCoreOptions))
-                .ApplyConfiguration(new TransactionConfiguration(EntityFrameworkCoreOptions));
-        }
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.ApplyConfiguration(new PaymentConfiguration(EntityFrameworkCoreOptions))
+                    .ApplyConfiguration(new TransactionConfiguration(EntityFrameworkCoreOptions));
     }
 }

@@ -16,7 +16,7 @@ internal class SamanTokenRequest
         
     public string ResNum { get; set; }
         
-    public CallbackUrl RedirectUrl { get; set; }
+    public string RedirectUrl { get; set; }
         
     public string CellNumber { get; set; }
 }

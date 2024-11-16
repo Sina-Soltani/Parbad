@@ -4,28 +4,27 @@
 using Parbad.Storage.Abstractions.Models;
 using System;
 
-namespace Parbad.Storage.EntityFrameworkCore.Domain
+namespace Parbad.Storage.EntityFrameworkCore.Domain;
+
+public class TransactionEntity
 {
-    public class TransactionEntity
-    {
-        public long Id { get; set; }
+    public long Id { get; set; }
 
-        public decimal Amount { get; set; }
+    public decimal Amount { get; set; }
 
-        public TransactionType Type { get; set; }
+    public TransactionType Type { get; set; }
 
-        public bool IsSucceed { get; set; }
+    public bool IsSucceed { get; set; }
 
-        public string Message { get; set; }
+    public string Message { get; set; }
 
-        public string AdditionalData { get; set; }
+    public string AdditionalData { get; set; }
 
-        public long PaymentId { get; set; }
+    public long PaymentId { get; set; }
 
-        public DateTime CreatedOn { get; set; }
+    public DateTime CreatedOn { get; set; }
 
-        public DateTime? UpdatedOn { get; set; }
+    public DateTime? UpdatedOn { get; set; }
 
-        public PaymentEntity Payment { get; set; }
-    }
+    public PaymentEntity Payment { get; set; }
 }
