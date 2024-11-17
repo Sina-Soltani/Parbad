@@ -38,6 +38,21 @@
         <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.DeleteTransactionAsync(Parbad.Storage.Abstractions.Models.Transaction,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
+        <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.GetPaymentByTrackingNumberAsync(System.Int64,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.GetPaymentByTokenAsync(System.String,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.DoesPaymentExistAsync(System.Int64,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.DoesPaymentExistAsync(System.String,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.GetTransactionsAsync(Parbad.Storage.Abstractions.Models.Payment,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
         <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.FindPayment(Parbad.Storage.Abstractions.Models.Payment)">
             <summary>
             Finds a payment in storage.

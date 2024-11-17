@@ -717,9 +717,34 @@
             <param name="builder"></param>
             <param name="additionalData"></param>
         </member>
-        <member name="P:Parbad.Gateway.Pasargad.Internal.Models.PasargadCallbackResult.InvoiceNumber">
+        <member name="T:Parbad.Gateway.Pasargad.Api.IPasargadApi">
             <summary>
-            Equals to ReferenceID in Parbad system.
+            API provided by Pasargad Bank.
+            </summary>
+        </member>
+        <member name="M:Parbad.Gateway.Pasargad.Api.IPasargadApi.GetToken(Parbad.Gateway.Pasargad.Api.Models.PasargadGetTokenRequestModel,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Gets a token to start a payment request.
+            </summary>
+        </member>
+        <member name="M:Parbad.Gateway.Pasargad.Api.IPasargadApi.VerifyPayment(Parbad.Gateway.Pasargad.Api.Models.PasargadVerifyPaymentRequestModel,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Verifies a payment.
+            </summary>
+        </member>
+        <member name="M:Parbad.Gateway.Pasargad.Api.IPasargadApi.RefundPayment(Parbad.Gateway.Pasargad.Api.Models.PasargadRefundPaymentRequestModel,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Refunds an already paid invoice.
+            </summary>
+        </member>
+        <member name="T:Parbad.Gateway.Pasargad.IPasargadCrypto">
+            <summary>
+            An Encryptor to sign data which will be sent by each request to Pasargad gateway.
+            </summary>
+        </member>
+        <member name="M:Parbad.Gateway.Pasargad.IPasargadCrypto.Encrypt(System.String,System.String)">
+            <summary>
+            Encrypts the given data using the provided Private Key.
             </summary>
         </member>
         <member name="M:Parbad.Gateway.Pasargad.PasargadGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
@@ -740,6 +765,13 @@
             </summary>
             <param name="builder"></param>
         </member>
+        <member name="M:Parbad.Gateway.Pasargad.PasargadGatewayBuilderExtensions.WithHttpClient``1(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Pasargad.PasargadGateway},System.Action{System.IServiceProvider,System.Net.Http.HttpClient},System.Action{Microsoft.Extensions.DependencyInjection.IHttpClientBuilder})">
+            <summary>
+            Configures the HttpClient for <see cref="T:Parbad.Gateway.Pasargad.Api.IPasargadApi"/>.
+            </summary>
+            <typeparam name="TGatewayApi">Implementation type of <see cref="T:Parbad.Gateway.Pasargad.Api.IPasargadApi"/>.</typeparam>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
         <member name="M:Parbad.Gateway.Pasargad.PasargadGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Pasargad.PasargadGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.Gateway.Pasargad.PasargadGatewayAccount}})">
             <summary>
             Configures the accounts for <see cref="T:Parbad.Gateway.Pasargad.PasargadGateway"/>.
@@ -754,11 +786,37 @@
             <param name="builder"></param>
             <param name="configureOptions">Configuration</param>
         </member>
+        <member name="M:Parbad.Gateway.Pasargad.PasargadGatewayBuilderExtensions.WithEncryptor(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Pasargad.PasargadGateway},Parbad.Gateway.Pasargad.IPasargadCrypto)">
+            <summary>
+            Registers an Encryptor for <see cref="T:Parbad.Gateway.Pasargad.IPasargadCrypto"/>.
+            </summary>
+        </member>
+        <member name="M:Parbad.Gateway.Pasargad.PasargadGatewayBuilderExtensions.WithEncryptor``1(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Pasargad.PasargadGateway},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Registers an Encryptor for <see cref="T:Parbad.Gateway.Pasargad.IPasargadCrypto"/>.
+            </summary>
+        </member>
+        <member name="M:Parbad.Gateway.Pasargad.PasargadGatewayBuilderExtensions.WithEncryptor(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Pasargad.PasargadGateway},System.Func{System.IServiceProvider,Parbad.Gateway.Pasargad.IPasargadCrypto})">
+            <summary>
+            Registers an Encryptor for <see cref="T:Parbad.Gateway.Pasargad.IPasargadCrypto"/>.
+            </summary>
+        </member>
         <member name="M:Parbad.Gateway.Pasargad.PasargadGatewayInvoiceBuilderExtensions.UsePasargad(Parbad.InvoiceBuilder.IInvoiceBuilder)">
             <summary>
             The invoice will be sent to Pasargad gateway.
             </summary>
             <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.Gateway.Pasargad.PasargadGatewayInvoiceBuilderExtensions.SetPasargadData(Parbad.InvoiceBuilder.IInvoiceBuilder,Parbad.Gateway.Pasargad.PasargadRequestAdditionalData)">
+            <summary>
+            Sets additional data that will be sent to Pasargad gateway when requesting a token.
+            </summary>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
+        <member name="T:Parbad.Gateway.Pasargad.PasargadRequestAdditionalData">
+            <summary>
+            Additional Data that can be sent to Pasargad gateway when requesting a token.
+            </summary>
         </member>
         <member name="M:Parbad.Gateway.Saman.SamanGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
@@ -916,6 +974,21 @@
             <inheritdoc />
         </member>
         <member name="M:Parbad.Internal.GatewayBuilder.AddGateway``1(Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <inheritdoc />
+        </member>
+        <member name="T:Parbad.Internal.GatewayConfigurationBuilder`1">
+            <inheritdoc />
+        </member>
+        <member name="P:Parbad.Internal.GatewayConfigurationBuilder`1.Services">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Internal.GatewayConfigurationBuilder`1.WithAccounts``1(System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{``0}})">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Internal.GatewayConfigurationBuilder`1.WithHttpClient(System.Action{Microsoft.Extensions.DependencyInjection.IHttpClientBuilder})">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Internal.GatewayConfigurationBuilder`1.WithHttpClient``2(System.Action{System.IServiceProvider,System.Net.Http.HttpClient},System.Action{Microsoft.Extensions.DependencyInjection.IHttpClientBuilder})">
             <inheritdoc />
         </member>
         <member name="M:Parbad.Internal.GatewayHelper.IsGateway(System.Type,System.Boolean)">
@@ -1906,6 +1979,12 @@
             <summary>
             Gets an instance of <see cref="T:Parbad.Storage.Abstractions.IStorage"/>.
             </summary>
+        </member>
+        <member name="P:Parbad.Storage.StorageManager.Payments">
+            <inheritdoc />
+        </member>
+        <member name="P:Parbad.Storage.StorageManager.Transactions">
+            <inheritdoc />
         </member>
         <member name="M:Parbad.Storage.StorageManager.CreatePaymentAsync(Parbad.Storage.Abstractions.Models.Payment,System.Threading.CancellationToken)">
             <inheritdoc />

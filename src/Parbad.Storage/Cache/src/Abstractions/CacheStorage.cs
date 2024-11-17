@@ -4,6 +4,7 @@
 using Parbad.Storage.Abstractions;
 using Parbad.Storage.Abstractions.Models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,6 +36,7 @@ public abstract class CacheStorage : IStorage
         payment.Id = GenerateNewPaymentId();
 
         var record = FindPayment(payment);
+
         if (record != null) throw new InvalidOperationException($"There is already a payment record in database with id {payment.Id}");
 
         Collection.Payments.Add(payment);
@@ -85,6 +87,7 @@ public abstract class CacheStorage : IStorage
         transaction.Id = GenerateNewTransactionId();
 
         var record = FindTransaction(transaction);
+
         if (record != null) throw new InvalidOperationException($"There is already a transaction record in database with id {transaction.Id}");
 
         Collection.Transactions.Add(transaction);
@@ -122,11 +125,61 @@ public abstract class CacheStorage : IStorage
         return SaveChangesAsync(cancellationToken);
     }
 
+    /// <inheritdoc />
+    public virtual Task<Payment?> GetPaymentByTrackingNumberAsync(long trackingNumber, CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var record = Collection.Payments.SingleOrDefault(payment => payment.TrackingNumber == trackingNumber);
+
+        return Task.FromResult<Payment?>(record);
+    }
+
+    /// <inheritdoc />
+    public virtual Task<Payment?> GetPaymentByTokenAsync(string paymentToken, CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var record = Collection.Payments.SingleOrDefault(payment => payment.Token == paymentToken);
+
+        return Task.FromResult<Payment?>(record);
+    }
+
+    /// <inheritdoc />
+    public virtual Task<bool> DoesPaymentExistAsync(long trackingNumber, CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var exists = Collection.Payments.Any(payment => payment.TrackingNumber == trackingNumber);
+
+        return Task.FromResult(exists);
+    }
+
+    /// <inheritdoc />
+    public virtual Task<bool> DoesPaymentExistAsync(string paymentToken, CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var exists = Collection.Payments.Any(payment => payment.Token == paymentToken);
+
+        return Task.FromResult(exists);
+    }
+
+    /// <inheritdoc />
+    public virtual Task<List<Transaction>> GetTransactionsAsync(Payment payment, CancellationToken cancellationToken = default)
+    {
+        var transactions = Collection.Transactions
+                                     .Where(transaction => transaction.PaymentId == payment.Id)
+                                     .ToList();
+
+        return Task.FromResult(transactions);
+    }
+
     /// <summary>
     /// Finds a payment in storage.
     /// </summary>
     /// <param name="payment"></param>
-    protected virtual Payment FindPayment(Payment payment)
+    protected virtual Payment? FindPayment(Payment payment)
     {
         return Collection.Payments.Contains(payment)
             ? payment
@@ -137,7 +190,7 @@ public abstract class CacheStorage : IStorage
     /// Finds a transaction in storage.
     /// </summary>
     /// <param name="transaction"></param>
-    protected virtual Transaction FindTransaction(Transaction transaction)
+    protected virtual Transaction? FindTransaction(Transaction transaction)
     {
         return Collection.Transactions.Contains(transaction)
             ? transaction

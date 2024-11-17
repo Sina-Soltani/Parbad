@@ -61,6 +61,41 @@
             <param name="transaction"></param>
             <param name="cancellationToken"></param>
         </member>
+        <member name="M:Parbad.Storage.Abstractions.IStorage.GetPaymentByTrackingNumberAsync(System.Int64,System.Threading.CancellationToken)">
+            <summary>
+            Gets a payment by its tracking number.
+            </summary>
+            <param name="trackingNumber"></param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="M:Parbad.Storage.Abstractions.IStorage.GetPaymentByTokenAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Gets a payment by its token.
+            </summary>
+            <param name="paymentToken"></param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="M:Parbad.Storage.Abstractions.IStorage.DoesPaymentExistAsync(System.Int64,System.Threading.CancellationToken)">
+            <summary>
+            Checks whether a payment exists with the given <paramref name="trackingNumber"/>.
+            </summary>
+            <param name="trackingNumber"></param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="M:Parbad.Storage.Abstractions.IStorage.DoesPaymentExistAsync(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Checks whether a payment exists with the given <paramref name="paymentToken"/>.
+            </summary>
+            <param name="paymentToken"></param>
+            <param name="cancellationToken"></param>
+        </member>
+        <member name="M:Parbad.Storage.Abstractions.IStorage.GetTransactionsAsync(Parbad.Storage.Abstractions.Models.Payment,System.Threading.CancellationToken)">
+            <summary>
+            Gets a list of transactions of the given <paramref name="payment"/>.
+            </summary>
+            <param name="payment"></param>
+            <param name="cancellationToken"></param>
+        </member>
         <member name="T:Parbad.Storage.Abstractions.IStorageBuilder">
             <summary>
             A builder for building the Parbad storage.
@@ -93,64 +128,8 @@
         </member>
         <member name="T:Parbad.Storage.Abstractions.IStorageManager">
             <summary>
-            Provides the APIs for managing payment and transaction in a persistence store.
+            Provides the APIs for managing payments and transactions in a persistence store.
             </summary>
-        </member>
-        <member name="M:Parbad.Storage.Abstractions.IStorageManager.CreatePaymentAsync(Parbad.Storage.Abstractions.Models.Payment,System.Threading.CancellationToken)">
-            <summary>
-            Creates a new payment.
-            </summary>
-            <param name="payment"></param>
-            <param name="cancellationToken"></param>
-        </member>
-        <member name="M:Parbad.Storage.Abstractions.IStorageManager.UpdatePaymentAsync(Parbad.Storage.Abstractions.Models.Payment,System.Threading.CancellationToken)">
-            <summary>
-            Updates the given <paramref name="payment"/>.
-            </summary>
-            <param name="payment"></param>
-            <param name="cancellationToken"></param>
-        </member>
-        <member name="M:Parbad.Storage.Abstractions.IStorageManager.CreateTransactionAsync(Parbad.Storage.Abstractions.Models.Transaction,System.Threading.CancellationToken)">
-            <summary>
-            Creates a new transaction.
-            </summary>
-            <param name="transaction"></param>
-            <param name="cancellationToken"></param>
-        </member>
-        <member name="M:Parbad.Storage.Abstractions.IStorageManager.GetPaymentByTrackingNumberAsync(System.Int64,System.Threading.CancellationToken)">
-            <summary>
-            Gets a payment by its tracking number.
-            </summary>
-            <param name="trackingNumber"></param>
-            <param name="cancellationToken"></param>
-        </member>
-        <member name="M:Parbad.Storage.Abstractions.IStorageManager.GetPaymentByTokenAsync(System.String,System.Threading.CancellationToken)">
-            <summary>
-            Gets a payment by its token.
-            </summary>
-            <param name="paymentToken"></param>
-            <param name="cancellationToken"></param>
-        </member>
-        <member name="M:Parbad.Storage.Abstractions.IStorageManager.DoesPaymentExistAsync(System.Int64,System.Threading.CancellationToken)">
-            <summary>
-            Checks whether a payment exists with the given <paramref name="trackingNumber"/>.
-            </summary>
-            <param name="trackingNumber"></param>
-            <param name="cancellationToken"></param>
-        </member>
-        <member name="M:Parbad.Storage.Abstractions.IStorageManager.DoesPaymentExistAsync(System.String,System.Threading.CancellationToken)">
-            <summary>
-            Checks whether a payment exists with the given <paramref name="paymentToken"/>.
-            </summary>
-            <param name="paymentToken"></param>
-            <param name="cancellationToken"></param>
-        </member>
-        <member name="M:Parbad.Storage.Abstractions.IStorageManager.GetTransactionsAsync(Parbad.Storage.Abstractions.Models.Payment,System.Threading.CancellationToken)">
-            <summary>
-            Gets a list of transactions of the given <paramref name="payment"/>.
-            </summary>
-            <param name="payment"></param>
-            <param name="cancellationToken"></param>
         </member>
         <member name="P:Parbad.Storage.Abstractions.Models.Payment.IsCompleted">
             <summary>
@@ -189,6 +168,21 @@
             <param name="builder"></param>
             <param name="factory"></param>
             <param name="lifetime">The lifetime of given StorageManager.</param>
+        </member>
+        <member name="M:Parbad.Storage.Abstractions.StorageExtensions.GetPaymentByTrackingNumberAsync(Parbad.Storage.Abstractions.IStorage,System.Int64,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.Abstractions.StorageExtensions.GetPaymentByTokenAsync(Parbad.Storage.Abstractions.IStorage,System.String,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.Abstractions.StorageExtensions.DoesPaymentExistAsync(Parbad.Storage.Abstractions.IStorage,System.Int64,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.Abstractions.StorageExtensions.DoesPaymentExistAsync(Parbad.Storage.Abstractions.IStorage,System.String,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.Abstractions.StorageExtensions.GetTransactionsAsync(Parbad.Storage.Abstractions.IStorage,Parbad.Storage.Abstractions.Models.Payment,System.Threading.CancellationToken)">
+            <inheritdoc />
         </member>
     </members>
 </doc>

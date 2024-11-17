@@ -3,14 +3,13 @@
 
 using Parbad.Abstraction;
 
-namespace Parbad.Gateway.Pasargad
+namespace Parbad.Gateway.Pasargad;
+
+public class PasargadGatewayAccount : GatewayAccount
 {
-    public class PasargadGatewayAccount : GatewayAccount
-    {
-        public string MerchantCode { get; set; }
+    public string MerchantCode { get; set; }
 
-        public string TerminalCode { get; set; }
+    public string TerminalCode { get; set; }
 
-        public string PrivateKey { get; set; }
-    }
+    public string PrivateKey { get; set; }
 }

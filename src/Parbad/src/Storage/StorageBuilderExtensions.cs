@@ -7,37 +7,37 @@ using Parbad.Storage;
 using Parbad.Storage.Abstractions;
 using System;
 
-namespace Parbad.Builder
+namespace Parbad.Builder;
+
+public static class StorageBuilderExtensions
 {
-    public static class StorageBuilderExtensions
+    /// <summary>
+    /// Configures the storage which required by Parbad for saving and loading data.
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <param name="configureStorage"></param>
+    public static IParbadBuilder ConfigureStorage(this IParbadBuilder builder, Action<IStorageBuilder> configureStorage)
     {
-        /// <summary>
-        /// Configures the storage which required by Parbad for saving and loading data.
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="configureStorage"></param>
-        public static IParbadBuilder ConfigureStorage(this IParbadBuilder builder, Action<IStorageBuilder> configureStorage)
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-            if (configureStorage == null) throw new ArgumentNullException(nameof(configureStorage));
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
+        if (configureStorage == null) throw new ArgumentNullException(nameof(configureStorage));
 
-            var storageBuilder = new StorageBuilder(builder.Services);
-            storageBuilder.UseDefaultStorageManager();
+        var storageBuilder = new StorageBuilder(builder.Services);
+        storageBuilder.UseDefaultStorageManager();
 
-            configureStorage(storageBuilder);
+        configureStorage(storageBuilder);
 
-            return builder;
-        }
+        return builder;
+    }
 
-        /// <summary>
-        /// Uses the default implementation of <see cref="IStorageManager"/>.
-        /// </summary>
-        /// <param name="builder"></param>
-        public static IStorageBuilder UseDefaultStorageManager(this IStorageBuilder builder)
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
+    /// <summary>
+    /// Uses the default implementation of <see cref="IStorageManager"/>.
+    /// </summary>
+    /// <param name="builder"></param>
+    [Obsolete("StorageManager will be removed in a future release. The implementations are moved to the IStorage interface.")]
+    public static IStorageBuilder UseDefaultStorageManager(this IStorageBuilder builder)
+    {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            return builder.AddStorageManager<StorageManager>(ServiceLifetime.Transient);
-        }
+        return builder.AddStorageManager<StorageManager>(ServiceLifetime.Transient);
     }
 }

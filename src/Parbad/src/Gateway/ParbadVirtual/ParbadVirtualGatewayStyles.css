@@ -73,7 +73,7 @@ body {
 }
 
 .copyright {
-    margin-top: 20px;
+    margin: 20px 0 20px 0;
     color: white;
     font-size: .9rem;
 }
