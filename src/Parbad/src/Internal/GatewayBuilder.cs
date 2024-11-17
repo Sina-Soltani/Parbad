@@ -5,33 +5,32 @@ using Microsoft.Extensions.DependencyInjection;
 using Parbad.Abstraction;
 using Parbad.GatewayBuilders;
 
-namespace Parbad.Internal
+namespace Parbad.Internal;
+
+/// <inheritdoc />
+internal class GatewayBuilder : IGatewayBuilder
 {
-    /// <inheritdoc />
-    internal class GatewayBuilder : IGatewayBuilder
+    /// <summary>
+    /// Initializes an instance of <see cref="GatewayBuilder"/>.
+    /// </summary>
+    /// <param name="services"></param>
+    public GatewayBuilder(IServiceCollection services)
     {
-        /// <summary>
-        /// Initializes an instance of <see cref="GatewayBuilder"/>.
-        /// </summary>
-        /// <param name="services"></param>
-        public GatewayBuilder(IServiceCollection services)
-        {
-            Services = services;
-        }
+        Services = services;
+    }
 
-        /// <inheritdoc />
-        public IServiceCollection Services { get; }
+    /// <inheritdoc />
+    public IServiceCollection Services { get; }
 
-        /// <inheritdoc />
-        public IGatewayConfigurationBuilder<TGateway> AddGateway<TGateway>(
-            ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
-            where TGateway : class, IGateway
-        {
-            Services.AddSingleton(new GatewayDescriptor(typeof(TGateway)));
+    /// <inheritdoc />
+    public IGatewayConfigurationBuilder<TGateway> AddGateway<TGateway>(
+        ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
+        where TGateway : class, IGateway
+    {
+        Services.AddSingleton(new GatewayDescriptor(typeof(TGateway)));
 
-            Services.TryAdd<TGateway>(serviceLifetime);
+        Services.TryAdd<TGateway>(serviceLifetime);
 
-            return new GatewayConfigurationBuilder<TGateway>(Services);
-        }
+        return new GatewayConfigurationBuilder<TGateway>(Services);
     }
 }

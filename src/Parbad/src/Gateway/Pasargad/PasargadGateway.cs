@@ -7,138 +7,188 @@ using Parbad.Abstraction;
 using Parbad.Gateway.Pasargad.Internal;
 using Parbad.GatewayBuilders;
 using Parbad.Internal;
-using Parbad.Net;
 using Parbad.Options;
 using System;
-using System.Net.Http;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Parbad.Gateway.Pasargad.Api;
+using Parbad.Gateway.Pasargad.Api.Models;
+using Parbad.Storage.Abstractions.Models;
 
-namespace Parbad.Gateway.Pasargad
+namespace Parbad.Gateway.Pasargad;
+
+[Gateway(Name)]
+public class PasargadGateway : GatewayBase<PasargadGatewayAccount>
 {
-    [Gateway(Name)]
-    public class PasargadGateway : GatewayBase<PasargadGatewayAccount>
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IPasargadApi _pasargadApi;
+    private readonly PasargadGatewayOptions _gatewayOptions;
+    private readonly MessagesOptions _messageOptions;
+
+    private const string InvoiceDateKey = "invoiceDate";
+    public const string Name = "Pasargad";
+
+    public PasargadGateway(IHttpContextAccessor httpContextAccessor,
+                           IPasargadApi pasargadApi,
+                           IGatewayAccountProvider<PasargadGatewayAccount> accountProvider,
+                           IOptions<PasargadGatewayOptions> gatewayOptions,
+                           IOptions<MessagesOptions> messageOptions)
+        : base(accountProvider)
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly HttpClient _httpClient;
-        private readonly IPasargadCrypto _crypto;
-        private readonly PasargadGatewayOptions _gatewayOptions;
-        private readonly IOptions<MessagesOptions> _messageOptions;
+        _httpContextAccessor = httpContextAccessor;
+        _pasargadApi = pasargadApi;
+        _gatewayOptions = gatewayOptions.Value;
+        _messageOptions = messageOptions.Value;
+    }
 
-        public const string Name = "Pasargad";
+    /// <inheritdoc />
+    public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
+    {
+        if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-        public PasargadGateway(
-            IHttpContextAccessor httpContextAccessor,
-            IHttpClientFactory httpClientFactory,
-            IGatewayAccountProvider<PasargadGatewayAccount> accountProvider,
-            IPasargadCrypto crypto,
-            IOptions<PasargadGatewayOptions> gatewayOptions,
-            IOptions<MessagesOptions> messageOptions) : base(accountProvider)
+        var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
+
+        var invoiceDate = PasargadHelper.GetTimeStamp();
+        var timeStamp = invoiceDate;
+
+        var additionalData = invoice.GetPasargadRequestAdditionalData();
+
+        var response = await _pasargadApi.GetToken(new PasargadGetTokenRequestModel
+                                                   {
+                                                       MerchantCode = account.MerchantCode,
+                                                       TerminalCode = account.TerminalCode,
+                                                       InvoiceNumber = invoice.TrackingNumber.ToString(),
+                                                       InvoiceDate = invoiceDate,
+                                                       Amount = invoice.Amount,
+                                                       RedirectAddress = invoice.CallbackUrl,
+                                                       Timestamp = timeStamp,
+                                                       Email = additionalData?.Email,
+                                                       Mobile = additionalData?.Mobile,
+                                                       Pidn = additionalData?.Pidn,
+                                                       MerchantName = additionalData?.MerchantName
+                                                   },
+                                                   account.PrivateKey,
+                                                   cancellationToken)
+                                         .ConfigureAwaitFalse();
+
+        if (!response.IsSuccess)
         {
-            _httpContextAccessor = httpContextAccessor;
-            _httpClient = httpClientFactory.CreateClient(this);
-            _crypto = crypto;
-            _gatewayOptions = gatewayOptions.Value;
-            _messageOptions = messageOptions;
+            return PaymentRequestResult.Failed(response.Message, account.Name);
         }
 
-        /// <inheritdoc />
-        public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
+        var form = new Dictionary<string, string>
+                   {
+                       { "Token", response.Token }
+                   };
+
+        var result = PaymentRequestResult.SucceedWithPost(account.Name,
+                                                          _httpContextAccessor.HttpContext,
+                                                          _gatewayOptions.PaymentPageUrl,
+                                                          form);
+
+        result.DatabaseAdditionalData.Add(InvoiceDateKey, invoiceDate);
+
+        return result;
+    }
+
+    /// <inheritdoc />
+    public override async Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default)
+    {
+        if (context == null) throw new ArgumentNullException(nameof(context));
+
+        var callbackResult = await PasargadHelper.BindCallbackResultModel(_httpContextAccessor.HttpContext.Request,
+                                                                          cancellationToken)
+                                                 .ConfigureAwaitFalse();
+
+        if (!callbackResult.IsSucceed)
         {
-            if (invoice == null) throw new ArgumentNullException(nameof(invoice));
-
-            var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
-
-            return PasargadHelper.CreateRequestResult(invoice, _httpContextAccessor.HttpContext, account, _crypto, _gatewayOptions);
+            return PaymentFetchResult.Failed(_messageOptions.PaymentFailed);
         }
 
-        /// <inheritdoc />
-        public override async Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default)
+        var result = PaymentFetchResult.ReadyForVerifying();
+        result.TransactionCode = callbackResult.TransactionReferenceId;
+
+        return result;
+    }
+
+    /// <inheritdoc />
+    public override async Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default)
+    {
+        if (context == null) throw new ArgumentNullException(nameof(context));
+
+        var callbackResult = await PasargadHelper.BindCallbackResultModel(_httpContextAccessor.HttpContext.Request,
+                                                                          cancellationToken)
+                                                 .ConfigureAwaitFalse();
+
+        if (!callbackResult.IsSucceed)
         {
-            if (context == null) throw new ArgumentNullException(nameof(context));
-
-            var callbackResult = await PasargadHelper.CreateCallbackResult(
-                    _httpContextAccessor.HttpContext.Request,
-                    _messageOptions.Value,
-                    cancellationToken)
-                .ConfigureAwaitFalse();
-
-            if (callbackResult.IsSucceed)
-            {
-                return PaymentFetchResult.ReadyForVerifying();
-            }
-
-            return PaymentFetchResult.Failed(callbackResult.Message);
+            return PaymentVerifyResult.Failed(_messageOptions.PaymentFailed);
         }
 
-        /// <inheritdoc />
-        public override async Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default)
+        var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
+
+        var response = await _pasargadApi.VerifyPayment(new PasargadVerifyPaymentRequestModel
+                                                        {
+                                                            MerchantCode = account.MerchantCode,
+                                                            TerminalCode = account.TerminalCode,
+                                                            InvoiceNumber = context.Payment.TrackingNumber.ToString(),
+                                                            InvoiceDate = callbackResult.InvoiceDate,
+                                                            Amount = context.Payment.Amount,
+                                                            Timestamp = PasargadHelper.GetTimeStamp()
+                                                        },
+                                                        account.PrivateKey,
+                                                        cancellationToken)
+                                         .ConfigureAwaitFalse();
+
+        if (!response.IsSuccess)
         {
-            if (context == null) throw new ArgumentNullException(nameof(context));
-
-            var callbackResult = await PasargadHelper.CreateCallbackResult(
-                _httpContextAccessor.HttpContext.Request,
-                _messageOptions.Value,
-                cancellationToken)
-                .ConfigureAwaitFalse();
-
-            if (!callbackResult.IsSucceed)
-            {
-                return PaymentVerifyResult.Failed(callbackResult.Message);
-            }
-
-            var responseMessage = await _httpClient.PostFormAsync(
-                    _gatewayOptions.ApiCheckPaymentUrl,
-                    callbackResult.CallbackCheckData,
-                    cancellationToken)
-                .ConfigureAwaitFalse();
-
-            var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
-
-            var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
-
-            var checkCallbackResult = PasargadHelper.CreateCheckCallbackResult(
-                response,
-                account,
-                callbackResult,
-                _messageOptions.Value);
-
-            if (!checkCallbackResult.IsSucceed)
-            {
-                return checkCallbackResult.Result;
-            }
-
-            var data = PasargadHelper.CreateVerifyData(context, account, _crypto, callbackResult);
-
-            responseMessage = await _httpClient.PostFormAsync(
-                    _gatewayOptions.ApiVerificationUrl,
-                    data,
-                    cancellationToken)
-                .ConfigureAwaitFalse();
-
-            response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
-
-            return PasargadHelper.CreateVerifyResult(response, callbackResult, _messageOptions.Value);
+            return PaymentVerifyResult.Failed(response.Message ?? _messageOptions.PaymentFailed);
         }
 
-        /// <inheritdoc />
-        public override async Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default)
+        return PaymentVerifyResult.Succeed(callbackResult.TransactionReferenceId,
+                                           _messageOptions.PaymentSucceed);
+    }
+
+    /// <inheritdoc />
+    public override async Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default)
+    {
+        if (context == null) throw new ArgumentNullException(nameof(context));
+
+        var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
+
+        var requestTransaction = context.Transactions.SingleOrDefault(transaction => transaction.Type == TransactionType.Request);
+
+        if (requestTransaction == null)
         {
-            if (context == null) throw new ArgumentNullException(nameof(context));
-
-            var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
-
-            var data = PasargadHelper.CreateRefundData(context, amount, _crypto, account);
-
-            var responseMessage = await _httpClient.PostFormAsync(
-                    _gatewayOptions.ApiRefundUrl,
-                    data,
-                    cancellationToken)
-                .ConfigureAwaitFalse();
-
-            var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
-
-            return PasargadHelper.CreateRefundResult(response, _messageOptions.Value);
+            return PaymentRefundResult.Failed($"Transaction for Invoice {context.Payment.TrackingNumber} not found");
         }
+
+        var requestTransactionAdditionalData = requestTransaction.ToDictionary();
+
+        if (!requestTransactionAdditionalData.TryGetValue(InvoiceDateKey, out var invoiceDate))
+        {
+            return PaymentRefundResult.Failed($"InvoiceDate for Invoice {context.Payment.TrackingNumber} not found");
+        }
+
+        var response = await _pasargadApi.RefundPayment(new PasargadRefundPaymentRequestModel
+                                                        {
+                                                            MerchantCode = account.MerchantCode,
+                                                            TerminalCode = account.TerminalCode,
+                                                            InvoiceNumber = context.Payment.TrackingNumber.ToString(),
+                                                            InvoiceDate = invoiceDate,
+                                                            Timestamp = PasargadHelper.GetTimeStamp()
+                                                        },
+                                                        account.PrivateKey,
+                                                        cancellationToken)
+                                         .ConfigureAwaitFalse();
+
+        if (!response.IsSuccess)
+        {
+            return PaymentRefundResult.Failed(response.Message ?? "Refund failed.");
+        }
+
+        return PaymentRefundResult.Succeed();
     }
 }

@@ -1,13 +1,17 @@
-﻿namespace Parbad.Gateway.Pasargad
+﻿// Copyright (c) Parbad. All rights reserved.
+// Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
+
+namespace Parbad.Gateway.Pasargad;
+
+public class PasargadGatewayOptions
 {
-    public class PasargadGatewayOptions
-    {
-        public string PaymentPageUrl { get; set; } = "https://pep.shaparak.ir/gateway.aspx";
+    public string PaymentPageUrl { get; set; } = "https://pep.shaparak.ir/payment.aspx";
 
-        public string ApiCheckPaymentUrl { get; set; } = "https://pep.shaparak.ir/CheckTransactionResult.aspx";
+    public string ApiBaseUrl { get; set; } = "https://pep.shaparak.ir/Api/v1/";
 
-        public string ApiVerificationUrl { get; set; } = "https://pep.shaparak.ir/VerifyPayment.aspx";
+    public string ApiGetTokenUrl { get; set; } = "Payment/GetToken";
 
-        public string ApiRefundUrl { get; set; } = "https://pep.shaparak.ir/DoRefund.aspx";
-    }
+    public string ApiVerificationUrl { get; set; } = "Payment/VerifyPayment";
+
+    public string ApiRefundUrl { get; set; } = "Payment/RefundPayment";
 }

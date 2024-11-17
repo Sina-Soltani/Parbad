@@ -4,25 +4,24 @@
 using Microsoft.Extensions.DependencyInjection;
 using Parbad.Abstraction;
 
-namespace Parbad.GatewayBuilders
+namespace Parbad.GatewayBuilders;
+
+/// <summary>
+/// A builder for building a gateway.
+/// </summary>
+public interface IGatewayBuilder
 {
     /// <summary>
-    /// A builder for building a gateway.
+    /// Specifies the contract for a collection of service descriptors.
     /// </summary>
-    public interface IGatewayBuilder
-    {
-        /// <summary>
-        /// Specifies the contract for a collection of service descriptors.
-        /// </summary>
-        IServiceCollection Services { get; }
+    IServiceCollection Services { get; }
 
-        /// <summary>
-        /// Adds the specified gateway to Parbad services.
-        /// </summary>
-        /// <typeparam name="TGateway">Type of gateway.</typeparam>
-        /// <param name="serviceLifetime">Lifetime of <typeparamref name="TGateway"/>.</param>
-        IGatewayConfigurationBuilder<TGateway> AddGateway<TGateway>(
-            ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
-            where TGateway : class, IGateway;
-    }
+    /// <summary>
+    /// Adds the specified gateway to Parbad services.
+    /// </summary>
+    /// <typeparam name="TGateway">Type of gateway.</typeparam>
+    /// <param name="serviceLifetime">Lifetime of <typeparamref name="TGateway"/>.</param>
+    IGatewayConfigurationBuilder<TGateway> AddGateway<TGateway>(
+        ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
+        where TGateway : class, IGateway;
 }
