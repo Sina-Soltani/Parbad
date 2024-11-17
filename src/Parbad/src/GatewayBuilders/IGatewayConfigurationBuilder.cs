@@ -35,7 +35,9 @@ public interface IGatewayConfigurationBuilder<TGateway> where TGateway : class, 
     /// <param name="configureHttpClient">HttpClient configuration.</param>
     IGatewayConfigurationBuilder<TGateway> WithHttpClient(Action<IHttpClientBuilder> configureHttpClient);
 
-    //TODO:
+    /// <summary>
+    /// Configures the HttpClient for TGateway and its implementation.
+    /// </summary>
     IGatewayConfigurationBuilder<TGateway> WithHttpClient<TGatewayApi, TGatewayApiImplementation>(Action<IServiceProvider, HttpClient> configureHttpClient,
                                                                                                   Action<IHttpClientBuilder> configureHttpClientBuilder = null)
         where TGatewayApi : class
