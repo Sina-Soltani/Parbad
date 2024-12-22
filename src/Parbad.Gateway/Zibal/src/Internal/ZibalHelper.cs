@@ -20,6 +20,7 @@ namespace Parbad.Gateway.Zibal.Internal
     internal static class ZibalHelper
     {
         private const int SuccessCode = 100;
+        private const int FetchSuccessCode = 2;
         private const int PaymentAlreadyVerifiedCode = 201;
 
         public static string ZibalRequestAdditionalKeyName => "ZibalRequest";
@@ -85,7 +86,7 @@ namespace Parbad.Gateway.Zibal.Internal
 
             var trackIdInDatabase = GetTrackId(invoiceContext.Transactions);
 
-            var isSucceed = status.Exists && status.Value == SuccessCode &&
+            var isSucceed = status.Exists && status.Value == FetchSuccessCode &&
                             trackId.Exists && trackId.Value == trackIdInDatabase;
 
             string? message;
