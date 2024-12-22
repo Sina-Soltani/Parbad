@@ -18,7 +18,6 @@ namespace Parbad.Gateway.PayPing.Internal
             CancellationToken cancellationToken)
         {
             var refId = await request.TryGetParamAsync("refid", cancellationToken);
-            var amount = await request.TryGetParamAsAsync<long>("amount", cancellationToken);
             var clientRefId = await request.TryGetParamAsync("clientrefid", cancellationToken);
             var isValid = true;
             var message = "";
@@ -27,12 +26,6 @@ namespace Parbad.Gateway.PayPing.Internal
             {
                 isValid = false;
                 message += "RefId isn't received.";
-            }
-
-            if (!amount.Exists)
-            {
-                isValid = false;
-                message += "Amount isn't received.";
             }
 
             if (!clientRefId.Exists)
