@@ -81,7 +81,7 @@ internal static class SamanHelper
         var securePan = await httpRequest.TryGetParamAsync("SecurePan", cancellationToken).ConfigureAwaitFalse();
         var hashedCardNumber = await httpRequest.TryGetParamAsync("HashedCardNumber", cancellationToken).ConfigureAwaitFalse();
         var traceNo = await httpRequest.TryGetParamAsync("TraceNo", cancellationToken).ConfigureAwaitFalse();
-        var rrn = await httpRequest.TryGetParamAsync("RRN", cancellationToken).ConfigureAwaitFalse();
+        var rrn = await httpRequest.TryGetParamAsync("Rrn", cancellationToken).ConfigureAwaitFalse();
         var amount = await httpRequest.TryGetParamAsync("Amount", cancellationToken).ConfigureAwaitFalse();
         var wage = await httpRequest.TryGetParamAsync("Wage", cancellationToken).ConfigureAwaitFalse();
 
