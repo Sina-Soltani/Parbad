@@ -237,7 +237,7 @@ internal static class SamanHelper
 
             validationFailures.AppendLine($"{nameof(SamanCallbackResponse.RefNum)}{nullOrEmptyString}");
         }
-        else if (callbackResponse.RefNum != invoiceContext.Payment.TrackingNumber.ToString())
+        else if (callbackResponse.ResNum != invoiceContext.Payment.TrackingNumber.ToString())
         {
             isValid = false;
 
