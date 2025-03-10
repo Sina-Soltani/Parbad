@@ -55,11 +55,19 @@ public class PasargadGateway : GatewayBase<PasargadGatewayAccount>
 
         var additionalData = invoice.GetPasargadRequestAdditionalData();
 
-        var response = await _pasargadApi.GetToken(new PasargadGetTokenRequestModel
+        var tokenResponse = await _pasargadApi.GetToken(new PasargadGetTokenRequestModel
+                {
+                    Username = account.Username,
+                    Password = account.Password
+                },
+                cancellationToken)
+            .ConfigureAwaitFalse();
+
+        var response = await _pasargadApi.PurchasePayment(new PasargadPurchaseRequestModel
                                                    {
                                                        MerchantCode = account.MerchantCode,
                                                        TerminalCode = account.TerminalCode,
-                                                       InvoiceNumber = invoice.TrackingNumber.ToString(),
+                                                       Invoice = invoice.TrackingNumber.ToString(),
                                                        InvoiceDate = invoiceDate,
                                                        Amount = invoice.Amount,
                                                        RedirectAddress = invoice.CallbackUrl,
@@ -67,21 +75,22 @@ public class PasargadGateway : GatewayBase<PasargadGatewayAccount>
                                                        Email = additionalData?.Email,
                                                        Mobile = additionalData?.Mobile,
                                                        Pidn = additionalData?.Pidn,
-                                                       MerchantName = additionalData?.MerchantName
+                                                       MerchantName = additionalData?.MerchantName,
+                                                       
                                                    },
-                                                   account.PrivateKey,
+                                                   tokenResponse.Token,
                                                    cancellationToken)
                                          .ConfigureAwaitFalse();
 
-        if (!response.IsSuccess)
+        if (response.ResultCode == 0)
         {
-            return PaymentRequestResult.Failed(response.Message, account.Name);
+            return PaymentRequestResult.Failed(response.ResultMsg, account.Name);
         }
 
         var form = new Dictionary<string, string>
-                   {
-                       { "Token", response.Token }
-                   };
+        {
+            { "Token", response.Data.UrlId }
+        };
 
         var result = PaymentRequestResult.SucceedWithPost(account.Name,
                                                           _httpContextAccessor.HttpContext,
