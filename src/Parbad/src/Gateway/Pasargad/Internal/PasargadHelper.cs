@@ -16,18 +16,18 @@ internal static class PasargadHelper
     public static async Task<PasargadCallbackResultModel> BindCallbackResultModel(HttpRequest httpRequest,
                                                                                   CancellationToken cancellationToken)
     {
-        var invoiceNumber = await httpRequest.TryGetParamAsync("iN", cancellationToken).ConfigureAwaitFalse();
-
-        var invoiceDate = await httpRequest.TryGetParamAsync("iD", cancellationToken).ConfigureAwaitFalse();
-
-        var transactionReferenceId = await httpRequest.TryGetParamAsync("tref", cancellationToken).ConfigureAwaitFalse();
+        var invoiceId = await httpRequest.TryGetParamAsync("invoiceId", cancellationToken).ConfigureAwaitFalse();
+        var status = await httpRequest.TryGetParamAsync("status", cancellationToken).ConfigureAwaitFalse();
+        var referenceNumber = await httpRequest.TryGetParamAsync("referenceNumber", cancellationToken).ConfigureAwaitFalse();
+        var trackId = await httpRequest.TryGetParamAsync("trackId", cancellationToken).ConfigureAwaitFalse();
 
         return new PasargadCallbackResultModel
-               {
-                   InvoiceNumber = invoiceNumber.Value,
-                   InvoiceDate = invoiceDate.Value,
-                   TransactionReferenceId = transactionReferenceId.Value
-               };
+        {
+            InvoiceId = invoiceId.Value,
+            Status = (PasargadCallbackStatusResult)Enum.Parse(typeof(PasargadCallbackStatusResult), status.Value),
+            ReferenceNumber = referenceNumber.Value,
+            TrackId = trackId.Value,
+        };
     }
 
     public static string GetTimeStamp()

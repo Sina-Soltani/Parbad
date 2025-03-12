@@ -455,6 +455,11 @@
             </summary>
             <param name="configureHttpClient">HttpClient configuration.</param>
         </member>
+        <member name="M:Parbad.GatewayBuilders.IGatewayConfigurationBuilder`1.WithHttpClient``2(System.Action{System.IServiceProvider,System.Net.Http.HttpClient},System.Action{Microsoft.Extensions.DependencyInjection.IHttpClientBuilder})">
+            <summary>
+            Configures the HttpClient for TGateway and its implementation.
+            </summary>
+        </member>
         <member name="T:Parbad.GatewayTransporterDescriptor">
             <summary>
             Describes a gateway transporter.
@@ -722,9 +727,14 @@
             API provided by Pasargad Bank.
             </summary>
         </member>
-        <member name="M:Parbad.Gateway.Pasargad.Api.IPasargadApi.GetToken(Parbad.Gateway.Pasargad.Api.Models.PasargadGetTokenRequestModel,System.String,System.Threading.CancellationToken)">
+        <member name="M:Parbad.Gateway.Pasargad.Api.IPasargadApi.GetToken(Parbad.Gateway.Pasargad.Api.Models.PasargadGetTokenRequestModel,System.Threading.CancellationToken)">
             <summary>
             Gets a token to start a payment request.
+            </summary>
+        </member>
+        <member name="M:Parbad.Gateway.Pasargad.Api.IPasargadApi.PurchasePayment(Parbad.Gateway.Pasargad.Api.Models.PasargadPurchaseRequestModel,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Send payment request to Pasargad Bank.
             </summary>
         </member>
         <member name="M:Parbad.Gateway.Pasargad.Api.IPasargadApi.VerifyPayment(Parbad.Gateway.Pasargad.Api.Models.PasargadVerifyPaymentRequestModel,System.String,System.Threading.CancellationToken)">
@@ -737,14 +747,125 @@
             Refunds an already paid invoice.
             </summary>
         </member>
-        <member name="T:Parbad.Gateway.Pasargad.IPasargadCrypto">
+        <member name="P:Parbad.Gateway.Pasargad.Api.Models.PasargadPurchaseRequestModel.TerminalNumber">
             <summary>
-            An Encryptor to sign data which will be sent by each request to Pasargad gateway.
+            شماره ترمینال پرداختی
             </summary>
         </member>
-        <member name="M:Parbad.Gateway.Pasargad.IPasargadCrypto.Encrypt(System.String,System.String)">
+        <member name="P:Parbad.Gateway.Pasargad.Api.Models.PasargadPurchaseRequestModel.Invoice">
             <summary>
-            Encrypts the given data using the provided Private Key.
+            شماره فاکتور یکتا
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Pasargad.Api.Models.PasargadPurchaseRequestModel.CallbackApi">
+            <summary>
+            آدرسی که پس از عملیات پرداخت، کاربر به آن صفحه منتقل می شود
+            باید دامنه کالبک هنگام ثبت نام در دیتابیس تعریف شده باشد.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Pasargad.Api.Models.PasargadPurchaseRequestModel.InvoiceDate">
+            <summary>
+            تاریخ فاکتور به فرمت دلخواه
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Pasargad.Api.Models.PasargadPurchaseRequestModel.Amount">
+            <summary>
+            مبلغ به ریال
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Pasargad.Api.Models.PasargadPurchaseRequestModel.ServiceCode">
+            <summary>
+            کد سرویس که برای خرید باید مقدار ثابت 8 ارسال شود
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Pasargad.Api.Models.PasargadPurchaseRequestModel.ServiceType">
+            <summary>
+            کد سرویس که برای خرید باید مقدار ثابت PURCHASE ارسال شود
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Pasargad.Api.Models.PasargadPurchaseRequestModel.MobileNumber">
+            <summary>
+            تلفن همراه پرداخت کننده
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Pasargad.Api.Models.PasargadPurchaseRequestModel.Description">
+            <summary>
+            توضیحات
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Pasargad.Api.Models.PasargadPurchaseRequestModel.PayerMail">
+            <summary>
+            ایمیل پرداخت کننده
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Pasargad.Api.Models.PasargadPurchaseRequestModel.PayerName">
+            <summary>
+            نام پرداخت کننده
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Pasargad.Api.Models.PasargadPurchaseRequestModel.NationalCode">
+            <summary>
+            کدملی
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Pasargad.Api.Models.PasargadPurchaseRequestModel.Pans">
+            <summary>
+            شماره کارت ها
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Pasargad.Api.Models.PasargadRefundPaymentRequestModel.Invoice">
+            <summary>
+            شماره فاکتور که توسط پذیرنده هنگام ثبت درخواست خرید فرستاده شده
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Pasargad.Api.Models.PasargadRefundPaymentRequestModel.UrlId">
+            <summary>
+            توکن خرید که در جواب ثبت درخواست خرید دریافت شده است
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Pasargad.Api.Models.PasargadVerifyPaymentRequestModel.Invoice">
+            <summary>
+            شماره فاکتور که توسط پذیرنده هنگام ثبت درخواست خرید فرستاده شده
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Pasargad.Api.Models.PasargadVerifyPaymentRequestModel.UrlId">
+            <summary>
+            توکن خرید که در جواب ثبت درخواست خرید دریافت شده است
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Pasargad.Internal.Models.PasargadCallbackResultModel.InvoiceId">
+            <summary>
+            شماره فاکتوری که در مرحله ثبت خرید، شارژ یا پرداخت قبض توسط پذیرنده ارسال شده است
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Pasargad.Internal.Models.PasargadCallbackResultModel.Status">
+            <summary>
+            وضعیت پرداخت
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Pasargad.Internal.Models.PasargadCallbackResultModel.ReferenceNumber">
+            <summary>
+            شماره ارجاع شاپرکی
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Pasargad.Internal.Models.PasargadCallbackResultModel.TrackId">
+            <summary>
+            کد پیگیری
+            </summary>
+        </member>
+        <member name="F:Parbad.Gateway.Pasargad.Internal.Models.PasargadCallbackStatusResult.Success">
+            <summary>
+            پرداخت موفق
+            </summary>
+        </member>
+        <member name="F:Parbad.Gateway.Pasargad.Internal.Models.PasargadCallbackStatusResult.Failed">
+            <summary>
+            پرداخت ناموفق
+            </summary>
+        </member>
+        <member name="F:Parbad.Gateway.Pasargad.Internal.Models.PasargadCallbackStatusResult.Unknown">
+            <summary>
+            نامشخص
             </summary>
         </member>
         <member name="M:Parbad.Gateway.Pasargad.PasargadGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
@@ -785,21 +906,6 @@
             </summary>
             <param name="builder"></param>
             <param name="configureOptions">Configuration</param>
-        </member>
-        <member name="M:Parbad.Gateway.Pasargad.PasargadGatewayBuilderExtensions.WithEncryptor(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Pasargad.PasargadGateway},Parbad.Gateway.Pasargad.IPasargadCrypto)">
-            <summary>
-            Registers an Encryptor for <see cref="T:Parbad.Gateway.Pasargad.IPasargadCrypto"/>.
-            </summary>
-        </member>
-        <member name="M:Parbad.Gateway.Pasargad.PasargadGatewayBuilderExtensions.WithEncryptor``1(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Pasargad.PasargadGateway},Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
-            <summary>
-            Registers an Encryptor for <see cref="T:Parbad.Gateway.Pasargad.IPasargadCrypto"/>.
-            </summary>
-        </member>
-        <member name="M:Parbad.Gateway.Pasargad.PasargadGatewayBuilderExtensions.WithEncryptor(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Pasargad.PasargadGateway},System.Func{System.IServiceProvider,Parbad.Gateway.Pasargad.IPasargadCrypto})">
-            <summary>
-            Registers an Encryptor for <see cref="T:Parbad.Gateway.Pasargad.IPasargadCrypto"/>.
-            </summary>
         </member>
         <member name="M:Parbad.Gateway.Pasargad.PasargadGatewayInvoiceBuilderExtensions.UsePasargad(Parbad.InvoiceBuilder.IInvoiceBuilder)">
             <summary>

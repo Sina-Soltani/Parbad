@@ -8,11 +8,15 @@ namespace Parbad.Gateway.Pasargad;
 /// </summary>
 public class PasargadRequestAdditionalData
 {
-    public string Mobile { get; set; }
+    public string Description { get; set; }
 
     public string Email { get; set; }
 
-    public string MerchantName { get; set; }
+    public string NationalCode { get; set; }
 
-    public string Pidn { get; set; }
+    public string MobileNumber { get; set; }
+
+    public string PayerName { get; set; }
+
+    public string Pans { get; set; }
 }
