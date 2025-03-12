@@ -18,6 +18,7 @@ namespace Parbad.Gateway.Melli.Internal
     {
         private const int SuccessCode = 0;
         private const int DuplicateTrackingNumberCode = 1011;
+        public const string CumulativeAccountsKey="MultiplexingData";
 
         public static object CreateRequestData(Invoice invoice, MelliGatewayAccount account, IMelliGatewayCrypto crypto)
         {
@@ -25,15 +26,42 @@ namespace Parbad.Gateway.Melli.Internal
 
             var signedData = crypto.Encrypt(account.TerminalKey, data);
 
-            return CreateRequestObject(
+            if (invoice.Properties == null || !invoice.Properties.ContainsKey(CumulativeAccountsKey))
+            {
+                return CreateRequestObject(
+                    account.TerminalId,
+                    account.MerchantId,
+                    invoice.Amount,
+                    signedData,
+                    invoice.CallbackUrl,
+                    invoice.TrackingNumber);
+                
+            }
+
+            var melliCumulativeAccount = (MelliCumulativeAccount)invoice.Properties[CumulativeAccountsKey];
+            return CreateRequestMultiplexingDataObject(
                 account.TerminalId,
                 account.MerchantId,
                 invoice.Amount,
                 signedData,
                 invoice.CallbackUrl,
-                invoice.TrackingNumber);
+                invoice.TrackingNumber,
+                melliCumulativeAccount);
         }
-
+        private static object CreateRequestMultiplexingDataObject(string terminalId, string merchantId, long amount, string signedData, string callbackUrl, long orderId, MelliCumulativeAccount melliCumulativeAccount)
+        {
+            return new
+            {
+                TerminalId = terminalId,
+                MerchantId = merchantId,
+                Amount = amount,
+                SignData = signedData,
+                ReturnUrl = callbackUrl,
+                LocalDateTime = DateTime.Now,
+                OrderId = orderId.ToString(),
+                MultiplexingData=melliCumulativeAccount
+            };
+        }
         public static PaymentRequestResult CreateRequestResult(
             MelliApiRequestResult result,
             HttpContext httpContext,
