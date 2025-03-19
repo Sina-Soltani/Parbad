@@ -919,6 +919,11 @@
             </summary>
             <exception cref="T:System.ArgumentNullException"></exception>
         </member>
+        <member name="P:Parbad.Gateway.Pasargad.PasargadGatewayOptions.ApiBaseUrl">
+            <summary>
+            like https://pep.shaparak.ir/dorsa2 OR https://pep.shaparak.ir/dorsa1
+            </summary>
+        </member>
         <member name="T:Parbad.Gateway.Pasargad.PasargadRequestAdditionalData">
             <summary>
             Additional Data that can be sent to Pasargad gateway when requesting a token.

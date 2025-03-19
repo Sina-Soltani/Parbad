@@ -1,15 +1,14 @@
 ﻿// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
+using Microsoft.Extensions.Options;
+using Parbad.Gateway.Pasargad.Api;
+using Parbad.Gateway.Pasargad.Api.Models;
+using Parbad.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using Parbad.Gateway.Pasargad.Api;
-using Parbad.Gateway.Pasargad.Api.Models;
-using Parbad.Net;
 
 namespace Parbad.Gateway.Pasargad.Internal;
 
@@ -34,7 +33,7 @@ internal class PasargadApi : IPasargadApi
     public Task<PasargadPurchaseResponseModel> PurchasePayment(PasargadPurchaseRequestModel model, string token,
         CancellationToken cancellationToken)
     {
-        return PostJsonAsync<PasargadPurchaseResponseModel>(_options.ApiGetTokenUrl, model, token, cancellationToken);
+        return PostJsonAsync<PasargadPurchaseResponseModel>(_options.ApiPurchaseUrl, model, token, cancellationToken);
     }
 
     public Task<PasargadVerifyPaymentResponseModel> VerifyPayment(PasargadVerifyPaymentRequestModel model, string token,

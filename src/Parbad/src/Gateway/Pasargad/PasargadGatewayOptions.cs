@@ -5,9 +5,10 @@ namespace Parbad.Gateway.Pasargad;
 
 public class PasargadGatewayOptions
 {
-    public string PaymentPageUrl { get; set; } = "https://pep.shaparak.ir/dorsa2";
-
-    public string ApiBaseUrl { get; set; } = "https://pep.shaparak.ir/dorsa2";
+    /// <summary>
+    /// like https://pep.shaparak.ir/dorsa2 OR https://pep.shaparak.ir/dorsa1
+    /// </summary>
+    public string ApiBaseUrl { get; set; }
 
     public string ApiGetTokenUrl { get; set; } = "Token/GetToken";
 

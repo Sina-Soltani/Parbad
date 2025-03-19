@@ -96,7 +96,7 @@ public class PasargadGateway : GatewayBase<PasargadGatewayAccount>
 
         var result = PaymentRequestResult.SucceedWithPost(account.Name,
                                                           _httpContextAccessor.HttpContext,
-                                                          _gatewayOptions.PaymentPageUrl,
+                                                          _gatewayOptions.ApiBaseUrl,
                                                           form);
 
         //result.DatabaseAdditionalData.Add(InvoiceDateKey, invoiceDate);
