@@ -5,15 +5,13 @@ namespace Parbad.Gateway.Pasargad.Api.Models;
 
 public class PasargadVerifyPaymentRequestModel
 {
-    public string InvoiceNumber { get; set; }
+    /// <summary>
+    /// شماره فاکتور که توسط پذیرنده هنگام ثبت درخواست خرید فرستاده شده
+    /// </summary>
+    public string Invoice { get; set; }
 
-    public string InvoiceDate { get; set; }
-
-    public string TerminalCode { get; set; }
-
-    public string MerchantCode { get; set; }
-
-    public decimal Amount { get; set; }
-
-    public string Timestamp { get; set; }
+    /// <summary>
+    /// توکن خرید که در جواب ثبت درخواست خرید دریافت شده است
+    /// </summary>
+    public string UrlId { get; set; }
 }

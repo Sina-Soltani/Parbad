@@ -5,13 +5,16 @@ namespace Parbad.Gateway.Pasargad;
 
 public class PasargadGatewayOptions
 {
-    public string PaymentPageUrl { get; set; } = "https://pep.shaparak.ir/payment.aspx";
+    /// <summary>
+    /// like https://pep.shaparak.ir/dorsa2 OR https://pep.shaparak.ir/dorsa1
+    /// </summary>
+    public string ApiBaseUrl { get; set; }
 
-    public string ApiBaseUrl { get; set; } = "https://pep.shaparak.ir/Api/v1/";
+    public string ApiGetTokenUrl { get; set; } = "Token/GetToken";
 
-    public string ApiGetTokenUrl { get; set; } = "Payment/GetToken";
+    public string ApiPurchaseUrl { get; set; } = "Api/Payment/purchase";
 
-    public string ApiVerificationUrl { get; set; } = "Payment/VerifyPayment";
+    public string ApiVerificationUrl { get; set; } = "Api/Payment/Verify-Payment";
 
-    public string ApiRefundUrl { get; set; } = "Payment/RefundPayment";
+    public string ApiRefundUrl { get; set; } = "Api/Payment/Reverse-Transactions";
 }

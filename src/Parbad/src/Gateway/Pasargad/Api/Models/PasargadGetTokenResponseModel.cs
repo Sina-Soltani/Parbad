@@ -5,9 +5,17 @@ namespace Parbad.Gateway.Pasargad.Api.Models;
 
 public class PasargadGetTokenResponseModel
 {
-    public bool IsSuccess { get; set; }
+    public int ResultCode { get; set; }
 
-    public string Message { get; set; }
+    public string ResultMsg { get; set; }
 
     public string Token { get; set; }
+
+    public string Username { get; set; }
+
+    public string FirstName { get; set; }
+
+    public string LastName { get; set; }
+
+    public string BusinessName { get; set; }
 }

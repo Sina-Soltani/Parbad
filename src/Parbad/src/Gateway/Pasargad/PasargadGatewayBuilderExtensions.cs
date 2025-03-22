@@ -29,7 +29,6 @@ public static class PasargadGatewayBuilderExtensions
 
                                                httpClient.BaseAddress = new Uri(gatewayOptions.Value.ApiBaseUrl);
                                            })
-              .WithEncryptor<PasargadCrypto>(ServiceLifetime.Transient)
               .WithOptions(options => { });
     }
 
@@ -75,43 +74,6 @@ public static class PasargadGatewayBuilderExtensions
         Action<PasargadGatewayOptions> configureOptions)
     {
         builder.Services.Configure(configureOptions);
-
-        return builder;
-    }
-
-    /// <summary>
-    /// Registers an Encryptor for <see cref="IPasargadCrypto"/>.
-    /// </summary>
-    public static IGatewayConfigurationBuilder<PasargadGateway> WithEncryptor(
-        this IGatewayConfigurationBuilder<PasargadGateway> builder,
-        IPasargadCrypto crypto)
-    {
-        builder.Services.AddOrUpdate(crypto);
-
-        return builder;
-    }
-
-    /// <summary>
-    /// Registers an Encryptor for <see cref="IPasargadCrypto"/>.
-    /// </summary>
-    public static IGatewayConfigurationBuilder<PasargadGateway> WithEncryptor<TEncryptor>(
-        this IGatewayConfigurationBuilder<PasargadGateway> builder,
-        ServiceLifetime lifetime)
-        where TEncryptor : class, IPasargadCrypto
-    {
-        builder.Services.AddOrUpdate<IPasargadCrypto, TEncryptor>(lifetime);
-
-        return builder;
-    }
-
-    /// <summary>
-    /// Registers an Encryptor for <see cref="IPasargadCrypto"/>.
-    /// </summary>
-    public static IGatewayConfigurationBuilder<PasargadGateway> WithEncryptor(
-        this IGatewayConfigurationBuilder<PasargadGateway> builder,
-        Func<IServiceProvider, IPasargadCrypto> setup)
-    {
-        builder.Services.AddOrUpdate(setup);
 
         return builder;
     }
