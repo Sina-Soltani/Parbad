@@ -8,7 +8,7 @@ namespace Parbad.Internal
 {
     internal static class HtmlFormBuilder
     {
-        public static string CreateForm(string url, IEnumerable<KeyValuePair<string, string>> data)
+        public static string CreateForm(string url, IEnumerable<KeyValuePair<string, string>> data, string nonce = null)
         {
             var fields = string.Join("", data.Select(CreateHiddenInput));
 
@@ -18,7 +18,7 @@ namespace Parbad.Internal
                 $"<form id=\"paymentForm\" action=\"{url}\" method=\"post\" />" +
                 fields +
                 "</form>" +
-                "<script type=\"text/javascript\">" +
+                $"<script type=\"text/javascript\" {(string.IsNullOrWhiteSpace(nonce) ? null : $"nonce=\"{nonce}\"")}>" +
                 "document.getElementById('paymentForm').submit();" +
                 "</script>" +
                 "</body>" +

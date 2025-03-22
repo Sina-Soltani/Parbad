@@ -35,7 +35,9 @@ namespace Parbad.Internal
             {
                 HttpResponseUtilities.AddNecessaryContents(_httpContext, "text/html");
 
-                var form = HtmlFormBuilder.CreateForm(Descriptor.Url, Descriptor.Form);
+                var nonce = (_httpContext.Items["nonce"] ?? "").ToString();
+
+                var form = HtmlFormBuilder.CreateForm(Descriptor.Url, Descriptor.Form, nonce);
 
                 var buffer = Encoding.UTF8.GetBytes(form);
 
