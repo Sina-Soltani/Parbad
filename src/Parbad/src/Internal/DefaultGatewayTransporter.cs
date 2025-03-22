@@ -2,10 +2,13 @@
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using System;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Parbad.Options;
 
 namespace Parbad.Internal
 {
@@ -33,9 +36,17 @@ namespace Parbad.Internal
         {
             if (Descriptor.Type == GatewayTransporterDescriptor.TransportType.Post)
             {
+                string nonce = null;
+                var parbadOptions = _httpContext.RequestServices.GetRequiredService<IOptions<ParbadOptions>>();
+
                 HttpResponseUtilities.AddNecessaryContents(_httpContext, "text/html");
 
-                var form = HtmlFormBuilder.CreateForm(Descriptor.Url, Descriptor.Form);
+                if (parbadOptions.Value.NonceFactory != null)
+                {
+                    nonce = parbadOptions.Value.NonceFactory(_httpContext);
+                }
+
+                var form = HtmlFormBuilder.CreateForm(Descriptor.Url, Descriptor.Form, nonce);
 
                 var buffer = Encoding.UTF8.GetBytes(form);
 
