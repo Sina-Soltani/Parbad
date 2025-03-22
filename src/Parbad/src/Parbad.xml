@@ -921,7 +921,8 @@
         </member>
         <member name="P:Parbad.Gateway.Pasargad.PasargadGatewayOptions.ApiBaseUrl">
             <summary>
-            like https://pep.shaparak.ir/dorsa2 OR https://pep.shaparak.ir/dorsa1
+            According to Pasargad gateway, the BaseUrl is different for each merchant.
+            Get the BaseUrl from Pasargad gateway and set the value here.
             </summary>
         </member>
         <member name="T:Parbad.Gateway.Pasargad.PasargadRequestAdditionalData">
