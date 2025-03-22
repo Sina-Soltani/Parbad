@@ -19,20 +19,23 @@ public interface IPasargadApi
                                                  CancellationToken cancellationToken);
 
     /// <summary>
-    /// Send payment request to Pasargad Bank.
+    /// Sends a payment request to Pasargad Gateway.
     /// </summary>
-    Task<PasargadPurchaseResponseModel> PurchasePayment(PasargadPurchaseRequestModel model, string token,
-        CancellationToken cancellationToken);
+    Task<PasargadPurchaseResponseModel> PurchasePayment(PasargadPurchaseRequestModel model,
+                                                        string token,
+                                                        CancellationToken cancellationToken);
 
     /// <summary>
     /// Verifies a payment.
     /// </summary>
-    Task<PasargadVerifyPaymentResponseModel> VerifyPayment(PasargadVerifyPaymentRequestModel model, string token,
+    Task<PasargadVerifyPaymentResponseModel> VerifyPayment(PasargadVerifyPaymentRequestModel model,
+                                                           string token,
                                                            CancellationToken cancellationToken);
 
     /// <summary>
     /// Refunds an already paid invoice.
     /// </summary>
-    Task<PasargadRefundPaymentResponseModel> RefundPayment(PasargadRefundPaymentRequestModel model, string token,
+    Task<PasargadRefundPaymentResponseModel> RefundPayment(PasargadRefundPaymentRequestModel model,
+                                                           string token,
                                                            CancellationToken cancellationToken);
 }

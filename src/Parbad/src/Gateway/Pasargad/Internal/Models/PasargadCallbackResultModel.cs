@@ -13,7 +13,7 @@ internal class PasargadCallbackResultModel
     /// <summary>
     /// وضعیت پرداخت
     /// </summary>
-    public PasargadCallbackStatusResult Status { get; set; }
+    public PasargadCallbackResultStatus Status { get; set; }
 
     /// <summary>
     /// شماره ارجاع شاپرکی
@@ -26,7 +26,7 @@ internal class PasargadCallbackResultModel
     public string TrackId { get; set; }
 }
 
-public enum PasargadCallbackStatusResult
+internal enum PasargadCallbackResultStatus
 {
     /// <summary>
     /// پرداخت موفق

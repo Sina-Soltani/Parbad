@@ -6,7 +6,8 @@ namespace Parbad.Gateway.Pasargad;
 public class PasargadGatewayOptions
 {
     /// <summary>
-    /// like https://pep.shaparak.ir/dorsa2 OR https://pep.shaparak.ir/dorsa1
+    /// According to Pasargad gateway, the BaseUrl is different for each merchant.
+    /// Get the BaseUrl from Pasargad gateway and set the value here.
     /// </summary>
     public string ApiBaseUrl { get; set; }
 
@@ -16,5 +17,5 @@ public class PasargadGatewayOptions
 
     public string ApiVerificationUrl { get; set; } = "Api/Payment/Verify-Payment";
 
-    public string ApiRefundUrl { get; set; } = "Api/Payment/Reverse-Transactions";
+    public string ApiReverseUrl { get; set; } = "Api/Payment/Reverse-Transactions";
 }

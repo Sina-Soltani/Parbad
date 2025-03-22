@@ -71,4 +71,3 @@ public class PasargadPurchaseRequestModel
     /// </summary>
     public string Pans { get; set; }
 }
-
