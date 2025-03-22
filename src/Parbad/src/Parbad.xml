@@ -734,7 +734,7 @@
         </member>
         <member name="M:Parbad.Gateway.Pasargad.Api.IPasargadApi.PurchasePayment(Parbad.Gateway.Pasargad.Api.Models.PasargadPurchaseRequestModel,System.String,System.Threading.CancellationToken)">
             <summary>
-            Send payment request to Pasargad Bank.
+            Sends a payment request to Pasargad Gateway.
             </summary>
         </member>
         <member name="M:Parbad.Gateway.Pasargad.Api.IPasargadApi.VerifyPayment(Parbad.Gateway.Pasargad.Api.Models.PasargadVerifyPaymentRequestModel,System.String,System.Threading.CancellationToken)">
@@ -853,17 +853,17 @@
             کد پیگیری
             </summary>
         </member>
-        <member name="F:Parbad.Gateway.Pasargad.Internal.Models.PasargadCallbackStatusResult.Success">
+        <member name="F:Parbad.Gateway.Pasargad.Internal.Models.PasargadCallbackResultStatus.Success">
             <summary>
             پرداخت موفق
             </summary>
         </member>
-        <member name="F:Parbad.Gateway.Pasargad.Internal.Models.PasargadCallbackStatusResult.Failed">
+        <member name="F:Parbad.Gateway.Pasargad.Internal.Models.PasargadCallbackResultStatus.Failed">
             <summary>
             پرداخت ناموفق
             </summary>
         </member>
-        <member name="F:Parbad.Gateway.Pasargad.Internal.Models.PasargadCallbackStatusResult.Unknown">
+        <member name="F:Parbad.Gateway.Pasargad.Internal.Models.PasargadCallbackResultStatus.Unknown">
             <summary>
             نامشخص
             </summary>
@@ -921,7 +921,8 @@
         </member>
         <member name="P:Parbad.Gateway.Pasargad.PasargadGatewayOptions.ApiBaseUrl">
             <summary>
-            like https://pep.shaparak.ir/dorsa2 OR https://pep.shaparak.ir/dorsa1
+            According to Pasargad gateway, the BaseUrl is different for each merchant.
+            Get the BaseUrl from Pasargad gateway and set the value here.
             </summary>
         </member>
         <member name="T:Parbad.Gateway.Pasargad.PasargadRequestAdditionalData">

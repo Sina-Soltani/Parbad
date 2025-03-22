@@ -10,7 +10,7 @@ public class PasargadRequestAdditionalData
 {
     public string Description { get; set; }
 
-    public string Email { get; set; }
+    public string PayerMail { get; set; }
 
     public string NationalCode { get; set; }
 

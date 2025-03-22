@@ -1,21 +1,20 @@
 // Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
-using Parbad.Abstraction;
-using Parbad.Gateway.Pasargad.Internal;
-using Parbad.GatewayBuilders;
-using Parbad.Internal;
-using Parbad.Options;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
+using Parbad.Abstraction;
 using Parbad.Gateway.Pasargad.Api;
 using Parbad.Gateway.Pasargad.Api.Models;
+using Parbad.Gateway.Pasargad.Internal;
 using Parbad.Gateway.Pasargad.Internal.Models;
+using Parbad.GatewayBuilders;
+using Parbad.Internal;
+using Parbad.Options;
 using Parbad.Storage.Abstractions.Models;
 
 namespace Parbad.Gateway.Pasargad;
@@ -25,22 +24,20 @@ public class PasargadGateway : GatewayBase<PasargadGatewayAccount>
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IPasargadApi _pasargadApi;
-    private readonly PasargadGatewayOptions _gatewayOptions;
     private readonly MessagesOptions _messageOptions;
 
-    private const string InvoiceDateKey = "invoiceDate";
     public const string Name = "Pasargad";
+    private const int SuccessCode = 0;
+    private const string UrlIdName = "UrlId";
 
     public PasargadGateway(IHttpContextAccessor httpContextAccessor,
                            IPasargadApi pasargadApi,
                            IGatewayAccountProvider<PasargadGatewayAccount> accountProvider,
-                           IOptions<PasargadGatewayOptions> gatewayOptions,
                            IOptions<MessagesOptions> messageOptions)
         : base(accountProvider)
     {
         _httpContextAccessor = httpContextAccessor;
         _pasargadApi = pasargadApi;
-        _gatewayOptions = gatewayOptions.Value;
         _messageOptions = messageOptions.Value;
     }
 
@@ -51,55 +48,45 @@ public class PasargadGateway : GatewayBase<PasargadGatewayAccount>
 
         var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
 
-        var invoiceDate = PasargadHelper.GetTimeStamp();
-        var timeStamp = invoiceDate;
-
         var additionalData = invoice.GetPasargadRequestAdditionalData();
 
-        var tokenResponse = await _pasargadApi.GetToken(new PasargadGetTokenRequestModel
-                {
-                    Username = account.Username,
-                    Password = account.Password
-                },
-                cancellationToken)
-            .ConfigureAwaitFalse();
+        var tokenResponse = await GetToken(account, cancellationToken);
 
-        var response = await _pasargadApi.PurchasePayment(new PasargadPurchaseRequestModel
-                       {
-                           ServiceCode = 8,
-                           ServiceType = "PURCHASE",
-                           TerminalNumber = account.TerminalCode,
-                           Invoice = invoice.TrackingNumber.ToString(),
-                           InvoiceDate = invoiceDate,
-                           Amount = invoice.Amount,
-                           CallbackApi = invoice.CallbackUrl,
-                           
-                           PayerMail = additionalData?.Email,
-                           Description = additionalData?.Description,
-                           NationalCode = additionalData?.NationalCode,
-                           Pans = additionalData?.Pans,
-                           PayerName = additionalData?.PayerName,
-                        },
-                       tokenResponse.Token,
-                       cancellationToken)
-                    .ConfigureAwaitFalse();
-
-        if (response.ResultCode == 0)
+        if (tokenResponse.ResultCode != SuccessCode)
         {
-            return PaymentRequestResult.Failed(response.ResultMsg, account.Name);
+            return PaymentRequestResult.Failed(tokenResponse.ResultMsg, account.Name, tokenResponse.ResultCode.ToString());
         }
 
-        var form = new Dictionary<string, string>
+        var response = await _pasargadApi.PurchasePayment(new PasargadPurchaseRequestModel
+                                                          {
+                                                              ServiceCode = 8,
+                                                              ServiceType = "PURCHASE",
+                                                              TerminalNumber = account.TerminalNumber,
+                                                              Invoice = invoice.TrackingNumber.ToString(),
+                                                              InvoiceDate = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss"),
+                                                              Amount = invoice.Amount,
+                                                              CallbackApi = invoice.CallbackUrl,
+                                                              Description = additionalData?.Description,
+                                                              NationalCode = additionalData?.NationalCode,
+                                                              Pans = additionalData?.Pans,
+                                                              PayerName = additionalData?.PayerName,
+                                                              PayerMail = additionalData?.PayerMail,
+                                                              MobileNumber = additionalData?.MobileNumber
+                                                          },
+                                                          tokenResponse.Token,
+                                                          cancellationToken)
+                                         .ConfigureAwaitFalse();
+
+        if (response.ResultCode != SuccessCode)
         {
-            { "Token", response.Data.UrlId }
-        };
+            return PaymentRequestResult.Failed(response.ResultMsg, account.Name, response.ResultCode.ToString());
+        }
 
-        var result = PaymentRequestResult.SucceedWithPost(account.Name,
-                                                          _httpContextAccessor.HttpContext,
-                                                          _gatewayOptions.ApiBaseUrl,
-                                                          form);
+        var result = PaymentRequestResult.SucceedWithRedirect(account.Name,
+                                                              _httpContextAccessor.HttpContext,
+                                                              response.Data.Url);
 
-        //result.DatabaseAdditionalData.Add(InvoiceDateKey, invoiceDate);
+        result.DatabaseAdditionalData.Add(UrlIdName, response.Data.UrlId);
 
         return result;
     }
@@ -113,7 +100,7 @@ public class PasargadGateway : GatewayBase<PasargadGatewayAccount>
                                                                           cancellationToken)
                                                  .ConfigureAwaitFalse();
 
-        if (callbackResult.Status != PasargadCallbackStatusResult.Success)
+        if (callbackResult.Status != PasargadCallbackResultStatus.Success)
         {
             return PaymentFetchResult.Failed(_messageOptions.PaymentFailed);
         }
@@ -133,33 +120,43 @@ public class PasargadGateway : GatewayBase<PasargadGatewayAccount>
                                                                           cancellationToken)
                                                  .ConfigureAwaitFalse();
 
-        if (callbackResult.Status != PasargadCallbackStatusResult.Success)
+        if (callbackResult.Status != PasargadCallbackResultStatus.Success)
         {
             return PaymentVerifyResult.Failed(_messageOptions.PaymentFailed);
         }
 
+        if (callbackResult.InvoiceId != context.Payment.TrackingNumber.ToString())
+        {
+            return PaymentVerifyResult.Failed(_messageOptions.InvalidDataReceivedFromGateway);
+        }
+
         var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 
-        var tokenResponse = await _pasargadApi.GetToken(new PasargadGetTokenRequestModel
-                {
-                    Username = account.Username,
-                    Password = account.Password
-                },
-                cancellationToken)
-            .ConfigureAwaitFalse();
+        var tokenResponse = await GetToken(account, cancellationToken);
+
+        if (tokenResponse.ResultCode != SuccessCode)
+        {
+            var message = tokenResponse.ResultMsg ?? _messageOptions.PaymentFailed;
+
+            return PaymentVerifyResult.Failed(message, tokenResponse.ResultCode.ToString());
+        }
+
+        var urlId = GetUrlIdFromRequestTransaction(context);
 
         var response = await _pasargadApi.VerifyPayment(new PasargadVerifyPaymentRequestModel
                                                         {
-                                                            Invoice = callbackResult.InvoiceId,
-                                                            UrlId = context.Payment.Token,
+                                                            Invoice = context.Payment.TrackingNumber.ToString(),
+                                                            UrlId = urlId
                                                         },
                                                         tokenResponse.Token,
                                                         cancellationToken)
                                          .ConfigureAwaitFalse();
 
-        if (response.ResultCode != 0)
+        if (response.ResultCode != SuccessCode)
         {
-            return PaymentVerifyResult.Failed(response.Data ?? _messageOptions.PaymentFailed);
+            var message = response.ResultMsg ?? _messageOptions.PaymentFailed;
+
+            return PaymentVerifyResult.Failed(message, response.ResultCode.ToString());
         }
 
         return PaymentVerifyResult.Succeed(callbackResult.ReferenceNumber,
@@ -167,37 +164,29 @@ public class PasargadGateway : GatewayBase<PasargadGatewayAccount>
     }
 
     /// <inheritdoc />
-    public override async Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default)
+    public override async Task<IPaymentRefundResult> RefundAsync(InvoiceContext context,
+                                                                 Money amount,
+                                                                 CancellationToken cancellationToken = default)
     {
         if (context == null) throw new ArgumentNullException(nameof(context));
 
         var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 
-        var requestTransaction = context.Transactions.SingleOrDefault(transaction => transaction.Type == TransactionType.Request);
+        var tokenResponse = await GetToken(account, cancellationToken);
 
-        if (requestTransaction == null)
+        if (tokenResponse.ResultCode != SuccessCode)
         {
-            return PaymentRefundResult.Failed($"Transaction for Invoice {context.Payment.TrackingNumber} not found");
+            var message = tokenResponse.ResultMsg ?? _messageOptions.PaymentFailed;
+
+            return PaymentRefundResult.Failed(message, tokenResponse.ResultCode.ToString());
         }
 
-        //var requestTransactionAdditionalData = requestTransaction.ToDictionary();
-        //if (!requestTransactionAdditionalData.TryGetValue(InvoiceDateKey, out var invoiceDate))
-        //{
-        //    return PaymentRefundResult.Failed($"InvoiceDate for Invoice {context.Payment.TrackingNumber} not found");
-        //}
-
-        var tokenResponse = await _pasargadApi.GetToken(new PasargadGetTokenRequestModel
-                {
-                    Username = account.Username,
-                    Password = account.Password
-                },
-                cancellationToken)
-            .ConfigureAwaitFalse();
+        var urlId = GetUrlIdFromRequestTransaction(context);
 
         var response = await _pasargadApi.RefundPayment(new PasargadRefundPaymentRequestModel
                                                         {
                                                             Invoice = context.Payment.TrackingNumber.ToString(),
-                                                            UrlId = context.Payment.Token,
+                                                            UrlId = urlId
                                                         },
                                                         tokenResponse.Token,
                                                         cancellationToken)
@@ -209,5 +198,34 @@ public class PasargadGateway : GatewayBase<PasargadGatewayAccount>
         }
 
         return PaymentRefundResult.Succeed();
+    }
+
+    private Task<PasargadGetTokenResponseModel> GetToken(PasargadGatewayAccount account, CancellationToken cancellationToken)
+    {
+        return _pasargadApi.GetToken(new PasargadGetTokenRequestModel
+                                     {
+                                         Username = account.Username,
+                                         Password = account.Password
+                                     },
+                                     cancellationToken);
+    }
+
+    private static string GetUrlIdFromRequestTransaction(InvoiceContext context)
+    {
+        var transactionRecord = context.Transactions.SingleOrDefault(transaction => transaction.Type == TransactionType.Request);
+
+        if (transactionRecord == null)
+        {
+            return null;
+        }
+
+        var additionalData = transactionRecord.ToDictionary();
+
+        if (additionalData.TryGetValue(UrlIdName, out var urlId))
+        {
+            return urlId;
+        }
+
+        return null;
     }
 }
