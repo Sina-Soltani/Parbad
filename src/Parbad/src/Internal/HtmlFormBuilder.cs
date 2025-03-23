@@ -4,30 +4,31 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Parbad.Internal
+namespace Parbad.Internal;
+
+internal static class HtmlFormBuilder
 {
-    internal static class HtmlFormBuilder
+    public static string CreateForm(string url, IEnumerable<KeyValuePair<string, string>> data, string nonce = null)
     {
-        public static string CreateForm(string url, IEnumerable<KeyValuePair<string, string>> data, string nonce = null)
-        {
-            var fields = string.Join("", data.Select(CreateHiddenInput));
+        var fields = string.Join("", data.Select(CreateHiddenInput));
 
-            return
-                "<html>" +
-                "<body>" +
-                $"<form id=\"paymentForm\" action=\"{url}\" method=\"post\" />" +
-                fields +
-                "</form>" +
-                $"<script type=\"text/javascript\" {(string.IsNullOrWhiteSpace(nonce) ? null : $"nonce=\"{nonce}\"")}>" +
-                "document.getElementById('paymentForm').submit();" +
-                "</script>" +
-                "</body>" +
-                "</html>";
-        }
+        var nonceProp = string.IsNullOrWhiteSpace(nonce) ? null : $" nonce=\"{nonce}\"";
 
-        public static string CreateHiddenInput(KeyValuePair<string, string> data)
-        {
-            return $"<input type=\"hidden\" name=\"{data.Key}\" value=\"{data.Value}\" />";
-        }
+        return
+            "<html>" +
+            "<body>" +
+            $"<form id=\"paymentForm\" action=\"{url}\" method=\"post\" />" +
+            fields +
+            "</form>" +
+            $"<script type=\"text/javascript\"{nonceProp}>" +
+            "document.getElementById('paymentForm').submit();" +
+            "</script>" +
+            "</body>" +
+            "</html>";
+    }
+
+    private static string CreateHiddenInput(KeyValuePair<string, string> data)
+    {
+        return $"<input type=\"hidden\" name=\"{data.Key}\" value=\"{data.Value}\" />";
     }
 }

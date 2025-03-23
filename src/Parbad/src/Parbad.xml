@@ -1934,6 +1934,12 @@
             Contains all messages that Parbad uses in results.
             </summary>
         </member>
+        <member name="P:Parbad.Options.ParbadOptions.NonceFactory">
+            <summary>
+            A factory to represent Nonce. The value will be used in inline-scripts and CSS links
+            to support CSP (Content-Security-Policy). If your application doesn't include any CSP, you can leave this property null. 
+            </summary>
+        </member>
         <member name="T:Parbad.ParbadBuilder">
             <inheritdoc />
         </member>
