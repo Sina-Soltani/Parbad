@@ -2,136 +2,188 @@
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
 using System;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Parbad.Abstraction;
+using Parbad.Gateway.Melli.Api;
+using Parbad.Gateway.Melli.Api.Models;
 using Parbad.Gateway.Melli.Internal;
-using Parbad.Gateway.Melli.Internal.Models;
+using Parbad.Gateway.Melli.Internal.ResultTranslator;
 using Parbad.GatewayBuilders;
 using Parbad.Internal;
-using Parbad.Net;
 using Parbad.Options;
 using Parbad.Properties;
 
-namespace Parbad.Gateway.Melli
+namespace Parbad.Gateway.Melli;
+
+/// <summary>
+/// Melli Gateway.
+/// </summary>
+[Gateway(Name)]
+public class MelliGateway : GatewayBase<MelliGatewayAccount>
 {
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IMelliApi _api;
+    private readonly IMelliGatewayCrypto _crypto;
+    private readonly MelliGatewayOptions _gatewayOptions;
+    private readonly MessagesOptions _messageOptions;
+
+    public const string Name = "Melli";
+
     /// <summary>
-    /// Melli Gateway.
+    /// Initializes an instance of <see cref="MelliGateway"/>.
     /// </summary>
-    [Gateway(Name)]
-    public class MelliGateway : GatewayBase<MelliGatewayAccount>
+    public MelliGateway(IGatewayAccountProvider<MelliGatewayAccount> accountProvider,
+                        IHttpContextAccessor httpContextAccessor,
+                        IMelliApi api,
+                        IMelliGatewayCrypto crypto,
+                        IOptions<MelliGatewayOptions> gatewayOptions,
+                        IOptions<MessagesOptions> messageOptions)
+        : base(accountProvider)
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly HttpClient _httpClient;
-        private readonly IMelliGatewayCrypto _crypto;
-        private readonly MelliGatewayOptions _gatewayOptions;
-        private readonly IOptions<MessagesOptions> _messageOptions;
+        _httpContextAccessor = httpContextAccessor;
+        _api = api;
+        _crypto = crypto;
+        _messageOptions = messageOptions.Value;
+        _gatewayOptions = gatewayOptions.Value;
+    }
 
-        public const string Name = "Melli";
+    /// <inheritdoc />
+    public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
+    {
+        if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-        /// <summary>
-        /// Initializes an instance of <see cref="MelliGateway"/>.
-        /// </summary>
-        /// <param name="httpContextAccessor"></param>
-        /// <param name="httpClientFactory"></param>
-        /// <param name="accountProvider"></param>
-        /// <param name="crypto"></param>
-        /// <param name="gatewayOptions"></param>
-        /// <param name="messageOptions"></param>
-        public MelliGateway(
-            IHttpContextAccessor httpContextAccessor,
-            IHttpClientFactory httpClientFactory,
-            IGatewayAccountProvider<MelliGatewayAccount> accountProvider,
-            IMelliGatewayCrypto crypto,
-            IOptions<MelliGatewayOptions> gatewayOptions,
-            IOptions<MessagesOptions> messageOptions) : base(accountProvider)
+        var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
+
+        var signedData = CreateRequestSignData(account, invoice);
+
+        var requestResult = await _api.Request(new MelliApiRequestModel
+                                               {
+                                                   TerminalId = account.TerminalId,
+                                                   MerchantId = account.MerchantId,
+                                                   SignData = signedData,
+                                                   ReturnUrl = invoice.CallbackUrl,
+                                                   LocalDateTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                                                   OrderId = invoice.TrackingNumber,
+                                                   Amount = invoice.Amount
+                                               },
+                                               cancellationToken);
+
+        if (requestResult == null)
         {
-            _httpContextAccessor = httpContextAccessor;
-            _httpClient = httpClientFactory.CreateClient(this);
-            _crypto = crypto;
-            _messageOptions = messageOptions;
-            _gatewayOptions = gatewayOptions.Value;
+            return PaymentRequestResult.Failed(_messageOptions.UnexpectedErrorText);
         }
 
-        /// <inheritdoc />
-        public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
+        var isSucceed = requestResult.ResCode == Constants.SuccessCode;
+
+        if (!isSucceed)
         {
-            if (invoice == null) throw new ArgumentNullException(nameof(invoice));
+            string message;
 
-            var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
-
-            var data = MelliHelper.CreateRequestData(invoice, account, _crypto);
-
-            var result = await PostJsonAsync<MelliApiRequestResult>(_gatewayOptions.ApiRequestUrl, data, cancellationToken).ConfigureAwaitFalse();
-
-            return MelliHelper.CreateRequestResult(result, _httpContextAccessor.HttpContext, account, _gatewayOptions, _messageOptions.Value);
-        }
-
-        /// <inheritdoc />
-        public override async Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default)
-        {
-            if (context == null) throw new ArgumentNullException(nameof(context));
-
-            var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
-
-            var callbackResult = await MelliHelper.CreateCallbackResultAsync(
-                context,
-                _httpContextAccessor.HttpContext.Request,
-                account,
-                _crypto,
-                _messageOptions.Value,
-                cancellationToken);
-
-            if (callbackResult.IsSucceed)
+            if (requestResult.ResCode == Constants.DuplicateTrackingNumberCode)
             {
-                return PaymentFetchResult.ReadyForVerifying();
+                message = _messageOptions.DuplicateTrackingNumber;
+            }
+            else
+            {
+                message = !requestResult.Description.IsNullOrEmpty()
+                    ? requestResult.Description
+                    : MelliRequestResultTranslator.Translate(requestResult.ResCode, _messageOptions);
             }
 
-            return PaymentFetchResult.Failed(callbackResult.Message);
+            return PaymentRequestResult.Failed(message, account.Name, requestResult.ResCode?.ToString());
         }
 
-        /// <inheritdoc />
-        public override async Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default)
+        var paymentPageUrl = $"{_gatewayOptions.PaymentPageUrl}?token={requestResult.Token}";
+
+        return PaymentRequestResult.SucceedWithRedirect(account.Name, _httpContextAccessor.HttpContext, paymentPageUrl);
+    }
+
+    /// <inheritdoc />
+    public override async Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default)
+    {
+        if (context == null) throw new ArgumentNullException(nameof(context));
+
+        var callbackResult = await MelliHelper.BindCallbackResult(_httpContextAccessor.HttpContext.Request,
+                                                                  context,
+                                                                  _messageOptions,
+                                                                  cancellationToken);
+
+        if (!callbackResult.IsSucceeded)
         {
-            if (context == null) throw new ArgumentNullException(nameof(context));
-
-            var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
-
-            var callbackResult = await MelliHelper.CreateCallbackResultAsync(
-                context,
-                _httpContextAccessor.HttpContext.Request,
-                account,
-                _crypto,
-                _messageOptions.Value,
-                cancellationToken);
-
-            if (!callbackResult.IsSucceed)
-            {
-                return PaymentVerifyResult.Failed(callbackResult.Message);
-            }
-
-            var result = await PostJsonAsync<MelliApiVerifyResult>(_gatewayOptions.ApiVerificationUrl, callbackResult.JsonDataToVerify, cancellationToken).ConfigureAwaitFalse();
-
-            return MelliHelper.CreateVerifyResult(result, _messageOptions.Value);
+            return PaymentFetchResult.Failed(callbackResult.Message, callbackResult.ResCode.ToString());
         }
 
-        /// <inheritdoc />
-        public override Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default)
+        return PaymentFetchResult.ReadyForVerifying();
+    }
+
+    /// <inheritdoc />
+    public override async Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default)
+    {
+        if (context == null) throw new ArgumentNullException(nameof(context));
+
+        var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
+
+        var callbackResult = await MelliHelper.BindCallbackResult(_httpContextAccessor.HttpContext.Request,
+                                                                  context,
+                                                                  _messageOptions,
+                                                                  cancellationToken);
+
+        if (!callbackResult.IsSucceeded)
         {
-            return PaymentRefundResult.Failed(Resources.RefundNotSupports).ToInterfaceAsync();
+            return PaymentVerifyResult.Failed(callbackResult.Message, callbackResult.ResCode.ToString());
         }
 
-        private async Task<T> PostJsonAsync<T>(string url, object data, CancellationToken cancellationToken = default)
+        var signedData = _crypto.Encrypt(account.TerminalKey, callbackResult.Token);
+
+        var verifyResult = await _api.Verify(new MelliApiVerifyModel
+                                             {
+                                                 Token = callbackResult.Token,
+                                                 SignData = signedData
+                                             },
+                                             cancellationToken);
+
+        if (verifyResult == null)
         {
-            var responseMessage = await _httpClient.PostJsonAsync(url, data, cancellationToken).ConfigureAwaitFalse();
-
-            var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
-
-            return JsonConvert.DeserializeObject<T>(response);
+            return PaymentVerifyResult.Failed(_messageOptions.UnexpectedErrorText);
         }
+
+        string message;
+
+        if (!verifyResult.Description.IsNullOrEmpty())
+        {
+            message = verifyResult.Description;
+        }
+        else
+        {
+            message = MelliVerifyResultTranslator.Translate(verifyResult.ResCode, _messageOptions);
+        }
+
+        var status = verifyResult.ResCode == Constants.SuccessCode
+            ? PaymentVerifyResultStatus.Succeed
+            : PaymentVerifyResultStatus.Failed;
+
+        return new PaymentVerifyResult
+               {
+                   Status = status,
+                   TransactionCode = verifyResult.RetrivalRefNo,
+                   Message = message,
+                   GatewayResponseCode = verifyResult.ResCode.ToString()
+               };
+    }
+
+    /// <inheritdoc />
+    public override Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default)
+    {
+        return PaymentRefundResult.Failed(Resources.RefundNotSupports).ToInterfaceAsync();
+    }
+
+    private string CreateRequestSignData(MelliGatewayAccount account, Invoice invoice)
+    {
+        var data = $"{account.TerminalId};{invoice.TrackingNumber};{(long)invoice.Amount}";
+
+        return _crypto.Encrypt(account.TerminalKey, data);
     }
 }

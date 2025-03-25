@@ -564,16 +564,10 @@
             Melli Gateway.
             </summary>
         </member>
-        <member name="M:Parbad.Gateway.Melli.MelliGateway.#ctor(Microsoft.AspNetCore.Http.IHttpContextAccessor,System.Net.Http.IHttpClientFactory,Parbad.GatewayBuilders.IGatewayAccountProvider{Parbad.Gateway.Melli.MelliGatewayAccount},Parbad.Gateway.Melli.IMelliGatewayCrypto,Microsoft.Extensions.Options.IOptions{Parbad.Gateway.Melli.MelliGatewayOptions},Microsoft.Extensions.Options.IOptions{Parbad.Options.MessagesOptions})">
+        <member name="M:Parbad.Gateway.Melli.MelliGateway.#ctor(Parbad.GatewayBuilders.IGatewayAccountProvider{Parbad.Gateway.Melli.MelliGatewayAccount},Microsoft.AspNetCore.Http.IHttpContextAccessor,Parbad.Gateway.Melli.Api.IMelliApi,Parbad.Gateway.Melli.IMelliGatewayCrypto,Microsoft.Extensions.Options.IOptions{Parbad.Gateway.Melli.MelliGatewayOptions},Microsoft.Extensions.Options.IOptions{Parbad.Options.MessagesOptions})">
             <summary>
             Initializes an instance of <see cref="T:Parbad.Gateway.Melli.MelliGateway"/>.
             </summary>
-            <param name="httpContextAccessor"></param>
-            <param name="httpClientFactory"></param>
-            <param name="accountProvider"></param>
-            <param name="crypto"></param>
-            <param name="gatewayOptions"></param>
-            <param name="messageOptions"></param>
         </member>
         <member name="M:Parbad.Gateway.Melli.MelliGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
@@ -597,6 +591,13 @@
             Adds Melli gateway to Parbad services.
             </summary>
             <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.Gateway.Melli.MelliGatewayBuilderExtensions.WithHttpClient``1(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Melli.MelliGateway},System.Action{System.IServiceProvider,System.Net.Http.HttpClient},System.Action{Microsoft.Extensions.DependencyInjection.IHttpClientBuilder})">
+            <summary>
+            Configures the HttpClient for <see cref="T:Parbad.Gateway.Melli.Api.IMelliApi"/>.
+            </summary>
+            <typeparam name="TGatewayApi">Implementation type of <see cref="T:Parbad.Gateway.Melli.Api.IMelliApi"/>.</typeparam>
+            <exception cref="T:System.ArgumentNullException"></exception>
         </member>
         <member name="M:Parbad.Gateway.Melli.MelliGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Melli.MelliGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.Gateway.Melli.MelliGatewayAccount}})">
             <summary>
