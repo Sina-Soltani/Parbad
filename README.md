@@ -6,6 +6,7 @@ Parbad is a free and open-source integrated online payment library which helps d
 
 [![NuGet version](https://img.shields.io/nuget/v/parbad.svg?style=flat&label=nuget)](https://www.nuget.org/packages/Parbad/)
 [![Nuget Downloads](https://img.shields.io/nuget/dt/parbad.svg?color=blue&label=Downloads)](https://www.nuget.org/packages/Parbad/)
+[![libs.tech recommends](https://libs.tech/project/140307106/badge.svg)](https://libs.tech/project/140307106/parbad)
 [![Build Status](https://dev.azure.com/ssoltani/Parbad/_apis/build/status/Sina-Soltani.Parbad?branchName=master)](https://dev.azure.com/ssoltani/Parbad/_build/latest?definitionId=5&branchName=master)
 
 # Benefits and features
