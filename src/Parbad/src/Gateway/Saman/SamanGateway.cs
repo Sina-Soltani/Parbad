@@ -1,19 +1,22 @@
 // Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Parbad.Abstraction;
+using Parbad.Gateway.Saman.Api;
+using Parbad.Gateway.Saman.Api.Models;
 using Parbad.Gateway.Saman.Internal;
+using Parbad.Gateway.Saman.Internal.ResultTranslators;
 using Parbad.GatewayBuilders;
 using Parbad.Internal;
-using Parbad.Net;
 using Parbad.Options;
-using System;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using Parbad.Gateway.Saman.Internal.Models;
+using Parbad.Storage.Abstractions.Models;
 
 namespace Parbad.Gateway.Saman;
 
@@ -21,20 +24,20 @@ namespace Parbad.Gateway.Saman;
 public class SamanGateway : GatewayBase<SamanGatewayAccount>
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly HttpClient _httpClient;
+    private readonly ISamanApi _api;
     private readonly SamanGatewayOptions _gatewayOptions;
     private readonly MessagesOptions _messageOptions;
 
     public const string Name = "Saman";
 
-    public SamanGateway(IHttpContextAccessor httpContextAccessor,
-                        IHttpClientFactory httpClientFactory,
-                        IGatewayAccountProvider<SamanGatewayAccount> accountProvider,
+    public SamanGateway(IGatewayAccountProvider<SamanGatewayAccount> accountProvider,
+                        IHttpContextAccessor httpContextAccessor,
+                        ISamanApi api,
                         IOptions<SamanGatewayOptions> gatewayOptions,
                         IOptions<MessagesOptions> messageOptions) : base(accountProvider)
     {
         _httpContextAccessor = httpContextAccessor;
-        _httpClient = httpClientFactory.CreateClient(this);
+        _api = api;
         _gatewayOptions = gatewayOptions.Value;
         _messageOptions = messageOptions.Value;
     }
@@ -46,17 +49,34 @@ public class SamanGateway : GatewayBase<SamanGatewayAccount>
 
         var account = await GetAccountAsync(invoice);
 
-        var tokenRequestModel = SamanHelper.CreateTokenRequestModel(invoice, account);
+        var tokenResponse = await _api.RequestToken(new SamanTokenRequest
+                                                    {
+                                                        Action = "token",
+                                                        TerminalId = account.TerminalId,
+                                                        Amount = invoice.Amount,
+                                                        ResNum = invoice.TrackingNumber.ToString(),
+                                                        RedirectUrl = invoice.CallbackUrl,
+                                                        CellNumber = invoice.GetSamanCellNumber()
+                                                    },
+                                                    cancellationToken);
 
-        var responseModel = await _httpClient.PostJsonAsync<SamanTokenResponse>(_gatewayOptions.ApiTokenUrl,
-                                                                                tokenRequestModel,
-                                                                                cancellationToken: cancellationToken);
+        if (tokenResponse.Status != Constants.TokenSuccessCode)
+        {
+            var resultMessage = GetResultMessage(tokenResponse.ErrorCode, tokenResponse.ErrorDesc);
 
-        return SamanHelper.CreatePaymentRequestResult(responseModel,
-                                                      account,
-                                                      _httpContextAccessor.HttpContext,
-                                                      _gatewayOptions,
-                                                      _messageOptions);
+            return PaymentRequestResult.Failed(resultMessage, account.Name, tokenResponse.ErrorCode);
+        }
+
+        var form = new Dictionary<string, string>
+                   {
+                       { "Token", tokenResponse.Token },
+                       { "GetMethod", "false" }
+                   };
+
+        return PaymentRequestResult.SucceedWithPost(account.Name,
+                                                    _httpContextAccessor.HttpContext,
+                                                    _gatewayOptions.PaymentPageUrl,
+                                                    form);
     }
 
     /// <inheritdoc />
@@ -64,11 +84,35 @@ public class SamanGateway : GatewayBase<SamanGatewayAccount>
     {
         if (context == null) throw new ArgumentNullException(nameof(context));
 
-        var callbackResultResponse = await SamanHelper.BindCallbackResponse(_httpContextAccessor.HttpContext.Request, cancellationToken);
+        var callbackResponse = await SamanHelper.BindCallbackResponse(_httpContextAccessor.HttpContext.Request, cancellationToken);
 
         var account = await GetAccountAsync(context.Payment);
 
-        return SamanHelper.CreateFetchResult(callbackResultResponse, context, account, _messageOptions);
+        var isCallbackResponseValid = SamanHelper.ValidateCallbackResponse(callbackResponse, context, account, out var failures);
+
+        if (!isCallbackResponseValid)
+        {
+            return PaymentFetchResult.Failed(failures, callbackResponse.Status);
+        }
+
+        var hasReceivedSuccessFromGateway = callbackResponse.Status == Constants.CallbackSuccessCode;
+
+        var resultStatus = hasReceivedSuccessFromGateway ? PaymentFetchResultStatus.ReadyForVerifying : PaymentFetchResultStatus.Failed;
+
+        var resultMessage = hasReceivedSuccessFromGateway ? null : GetResultMessage(callbackResponse.Status);
+
+        var result = new PaymentFetchResult
+                     {
+                         Status = resultStatus,
+                         GatewayResponseCode = callbackResponse.Status,
+                         Message = resultMessage
+                     };
+
+        var additionalData = SamanHelper.MapCallbackResponseToAdditionalData(callbackResponse);
+
+        result.AddSamanAdditionalData(additionalData);
+
+        return result;
     }
 
     /// <inheritdoc />
@@ -80,24 +124,57 @@ public class SamanGateway : GatewayBase<SamanGatewayAccount>
 
         var account = await GetAccountAsync(context.Payment);
 
-        var fetchResult = SamanHelper.CreateFetchResult(callbackResponse, context, account, _messageOptions);
+        var isCallbackResponseValid = SamanHelper.ValidateCallbackResponse(callbackResponse, context, account, out var failures);
 
-        if (!fetchResult.IsSucceed)
+        if (!isCallbackResponseValid)
         {
-            return PaymentVerifyResult.Failed(fetchResult.Message);
+            return PaymentVerifyResult.Failed(failures, callbackResponse.Status);
         }
 
-        var verificationRequest = SamanHelper.CreateVerificationRequest(callbackResponse, account);
+        var hasReceivedSuccessFromGateway = callbackResponse.Status == Constants.CallbackSuccessCode;
 
-        var verificationResponse = await _httpClient.PostJsonAsync<SamanVerificationAndRefundResponse>(_gatewayOptions.ApiVerificationUrl,
-                                                                                                       verificationRequest,
-                                                                                                       cancellationToken: cancellationToken);
+        string resultMessage;
 
-        return SamanHelper.CreateVerifyResult(account,
-                                              callbackResponse,
-                                              verificationResponse,
-                                              context,
-                                              _messageOptions);
+        if (!hasReceivedSuccessFromGateway)
+        {
+            resultMessage = GetResultMessage(callbackResponse.Status);
+
+            return PaymentVerifyResult.Failed(resultMessage, callbackResponse.Status);
+        }
+
+        var verificationResponse = await _api.Verify(new SamanVerificationRequest
+                                                     {
+                                                         RefNum = callbackResponse.RefNum,
+                                                         TerminalNumber = account.TerminalId
+                                                     },
+                                                     cancellationToken);
+
+        var isVerificationSucceeded = verificationResponse.TransactionDetail.TerminalNumber.ToString() == account.TerminalId &&
+                                      verificationResponse.TransactionDetail.AffectiveAmount == (long)context.Payment.Amount &&
+                                      verificationResponse.TransactionDetail.RefNum == callbackResponse.RefNum &&
+                                      verificationResponse.ResultCode == Constants.VerificationSuccessCode;
+
+        resultMessage = isVerificationSucceeded
+            ? _messageOptions.PaymentSucceed
+            : GetResultMessage(verificationResponse.ResultCode.ToString());
+
+        var verifyResultStatus = isVerificationSucceeded ? PaymentVerifyResultStatus.Succeed : PaymentVerifyResultStatus.Failed;
+
+        var result = new PaymentVerifyResult
+                     {
+                         Status = verifyResultStatus,
+                         TransactionCode = verificationResponse.TransactionDetail.Rrn,
+                         GatewayResponseCode = verificationResponse.ResultCode.ToString(),
+                         Message = resultMessage
+                     };
+
+        result.DatabaseAdditionalData.Add(Constants.RefNumKey, callbackResponse.RefNum);
+
+        var additionalData = SamanHelper.MapCallbackResponseToAdditionalData(callbackResponse);
+
+        result.AddSamanAdditionalData(additionalData);
+
+        return result;
     }
 
     /// <inheritdoc />
@@ -107,12 +184,49 @@ public class SamanGateway : GatewayBase<SamanGatewayAccount>
 
         var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 
-        var request = SamanHelper.CreateReverseRequest(context, account);
+        if (!TryGetRefNumFromTransaction(context, out var refNum))
+        {
+            throw new
+                InvalidOperationException($"No Transaction of type Verification or additional data found for reversing the invoice {context.Payment.TrackingNumber}.");
+        }
 
-        var response = await _httpClient.PostJsonAsync<SamanVerificationAndRefundResponse>(_gatewayOptions.ApiReverseUrl,
-                                                                                           request,
-                                                                                           cancellationToken: cancellationToken);
+        var reverseResponse = await _api.Reverse(new SamanReverseRequest
+                                                 {
+                                                     TerminalNumber = account.TerminalId,
+                                                     RefNum = refNum
+                                                 },
+                                                 cancellationToken);
 
-        return SamanHelper.CreateRefundResult(response);
+        var resultStatus = reverseResponse.Success ? PaymentRefundResultStatus.Succeed : PaymentRefundResultStatus.Failed;
+
+        return new PaymentRefundResult
+               {
+                   Status = resultStatus,
+                   GatewayResponseCode = reverseResponse.ResultCode.ToString()
+               };
+    }
+
+    private static bool TryGetRefNumFromTransaction(InvoiceContext context, out string refNum)
+    {
+        var verificationTransaction = context.Transactions.SingleOrDefault(transaction => transaction.Type == TransactionType.Verify);
+
+        if (string.IsNullOrEmpty(verificationTransaction?.AdditionalData))
+        {
+            refNum = null;
+
+            return false;
+        }
+
+        return verificationTransaction.ToDictionary().TryGetValue(Constants.RefNumKey, out refNum);
+    }
+
+    private string GetResultMessage(string errorCode, string message = null)
+    {
+        if (!string.IsNullOrWhiteSpace(message))
+        {
+            return message;
+        }
+
+        return SamanResultTranslator.Translate(errorCode, _messageOptions);
     }
 }

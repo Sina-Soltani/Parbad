@@ -1,3 +1,6 @@
+// Copyright (c) Parbad. All rights reserved.
+// Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
+
 using System;
 using Parbad.Gateway.Saman.Internal;
 
@@ -19,25 +22,25 @@ public static class SamanPaymentResultExtensions
     {
         if (paymentFetchResult == null) throw new ArgumentNullException(nameof(paymentFetchResult));
 
-        paymentFetchResult.AdditionalData.Add(SamanHelper.AdditionalVerificationDataKey, additionalData);
+        paymentFetchResult.AdditionalData.Add(Constants.AdditionalVerificationDataKey, additionalData);
     }
 
     internal static void AddSamanAdditionalData(this IPaymentVerifyResult paymentVerifyResult, SamanVerificationAdditionalData additionalData)
     {
         if (paymentVerifyResult == null) throw new ArgumentNullException(nameof(paymentVerifyResult));
 
-        paymentVerifyResult.AdditionalData.Add(SamanHelper.AdditionalVerificationDataKey, additionalData);
+        paymentVerifyResult.AdditionalData.Add(Constants.AdditionalVerificationDataKey, additionalData);
     }
 
     private static SamanVerificationAdditionalData GetAdditionalData(this IPaymentResult paymentResult)
     {
         if (paymentResult == null) throw new ArgumentNullException(nameof(paymentResult));
 
-        if (!paymentResult.AdditionalData.ContainsKey(SamanHelper.AdditionalVerificationDataKey))
+        if (!paymentResult.AdditionalData.TryGetValue(Constants.AdditionalVerificationDataKey, out var additionalData))
         {
             return null;
         }
 
-        return (SamanVerificationAdditionalData)paymentResult.AdditionalData[SamanHelper.AdditionalVerificationDataKey];
+        return (SamanVerificationAdditionalData)additionalData;
     }
 }

@@ -1,75 +1,18 @@
 // Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
-using Microsoft.AspNetCore.Http;
-using Parbad.Abstraction;
-using Parbad.Gateway.Saman.Internal.Models;
-using Parbad.Gateway.Saman.Internal.ResultTranslators;
-using Parbad.Http;
-using Parbad.Internal;
-using Parbad.Options;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Parbad.Storage.Abstractions.Models;
+using Microsoft.AspNetCore.Http;
+using Parbad.Gateway.Saman.Internal.Models;
+using Parbad.Http;
+using Parbad.Internal;
 
 namespace Parbad.Gateway.Saman.Internal;
 
 internal static class SamanHelper
 {
-    private const string RefNumKey = nameof(RefNumKey);
-    private const string CallbackSuccessCode = "2";
-    private const int VerificationSuccessCode = 0;
-    public const string AdditionalVerificationDataKey = "SamanAdditionalVerificationData";
-    public const string CellNumberPropertyKey = "SamanCellNumber";
-
-    public static SamanTokenRequest CreateTokenRequestModel(Invoice invoice, SamanGatewayAccount account)
-    {
-        var model = new SamanTokenRequest
-                    {
-                        Action = "token",
-                        TerminalId = account.TerminalId,
-                        Amount = invoice.Amount,
-                        ResNum = invoice.TrackingNumber.ToString(),
-                        RedirectUrl = invoice.CallbackUrl,
-                        CellNumber = invoice.GetSamanCellNumber()
-                    };
-
-        if (!string.IsNullOrWhiteSpace(invoice.GetSamanCellNumber()))
-        {
-            model.CellNumber = invoice.GetSamanCellNumber();
-        }
-
-        return model;
-    }
-
-    public static IPaymentRequestResult CreatePaymentRequestResult(SamanTokenResponse tokenResponse,
-                                                                   SamanGatewayAccount account,
-                                                                   HttpContext httpContext,
-                                                                   SamanGatewayOptions gatewayOptions,
-                                                                   MessagesOptions messagesOptions)
-    {
-        if (tokenResponse.Status == 1)
-        {
-            var form = new Dictionary<string, string>
-                       {
-                           { "Token", tokenResponse.Token },
-                           { "GetMethod", "false" }
-                       };
-
-            return PaymentRequestResult.SucceedWithPost(account.Name, httpContext, gatewayOptions.PaymentPageUrl, form);
-        }
-
-        var message = string.IsNullOrWhiteSpace(tokenResponse.ErrorDesc)
-            ? SamanResultTranslator.Translate(tokenResponse.ErrorCode, messagesOptions)
-            : tokenResponse.ErrorDesc;
-
-        return PaymentRequestResult.Failed(message, account.Name, tokenResponse.ErrorCode);
-    }
-
     public static async Task<SamanCallbackResponse> BindCallbackResponse(HttpRequest httpRequest, CancellationToken cancellationToken)
     {
         var mid = await httpRequest.TryGetParamAsync("MID", cancellationToken).ConfigureAwaitFalse();
@@ -102,109 +45,10 @@ internal static class SamanHelper
                };
     }
 
-    public static IPaymentFetchResult CreateFetchResult(SamanCallbackResponse callbackResponse,
-                                                        InvoiceContext invoiceContext,
-                                                        SamanGatewayAccount gatewayAccount,
-                                                        MessagesOptions messagesOptions)
-    {
-        var isCallbackResponseValid = ValidateCallbackResponse(callbackResponse, invoiceContext, gatewayAccount, out var message);
-
-        var isReceivedSuccessFromGateway = callbackResponse.Status == CallbackSuccessCode;
-
-        var isSucceed = isCallbackResponseValid && isReceivedSuccessFromGateway;
-
-        if (!isReceivedSuccessFromGateway)
-        {
-            message = SamanResultTranslator.Translate(callbackResponse.Status, messagesOptions);
-        }
-        else if (isSucceed)
-        {
-            message = messagesOptions.PaymentSucceed;
-        }
-
-        var result = new PaymentFetchResult
-                     {
-                         Status = isSucceed ? PaymentFetchResultStatus.ReadyForVerifying : PaymentFetchResultStatus.Failed,
-                         GatewayResponseCode = callbackResponse.Status,
-                         Message = message
-                     };
-
-        result.AddSamanAdditionalData(MapToAdditionalData(callbackResponse));
-
-        return result;
-    }
-
-    public static SamanVerificationRequest CreateVerificationRequest(SamanCallbackResponse callbackResponse,
-                                                                     SamanGatewayAccount gatewayAccount)
-    {
-        return new()
-               {
-                   RefNum = callbackResponse.RefNum!,
-                   TerminalNumber = gatewayAccount.TerminalId
-               };
-    }
-
-    public static PaymentVerifyResult CreateVerifyResult(SamanGatewayAccount gatewayAccount,
-                                                         SamanCallbackResponse callbackResponse,
-                                                         SamanVerificationAndRefundResponse verificationResponse,
-                                                         InvoiceContext invoiceContext,
-                                                         MessagesOptions messagesOptions)
-    {
-        var isSuccess = verificationResponse.TransactionDetail.TerminalNumber.ToString() == gatewayAccount.TerminalId &&
-                        verificationResponse.TransactionDetail.AffectiveAmount == (long)invoiceContext.Payment.Amount &&
-                        verificationResponse.TransactionDetail.RefNum == callbackResponse.RefNum &&
-                        verificationResponse.ResultCode == VerificationSuccessCode;
-        
-        var message = isSuccess
-            ? messagesOptions.PaymentSucceed
-            : SamanResultTranslator.Translate(verificationResponse.ResultCode.ToString(), messagesOptions);
-
-        var result = new PaymentVerifyResult
-                     {
-                         Status = isSuccess ? PaymentVerifyResultStatus.Succeed : PaymentVerifyResultStatus.Failed,
-                         TransactionCode = verificationResponse.TransactionDetail.Rrn,
-                         GatewayResponseCode = verificationResponse.ResultCode.ToString(),
-                         Message = message
-                     };
-
-        result.DatabaseAdditionalData.Add(RefNumKey, callbackResponse.RefNum);
-
-        result.AddSamanAdditionalData(MapToAdditionalData(callbackResponse));
-
-        return result;
-    }
-
-    public static SamanReverseRequest CreateReverseRequest(InvoiceContext context, SamanGatewayAccount account)
-    {
-        var verificationTransaction = context.Transactions.SingleOrDefault(transaction => transaction.Type == TransactionType.Verify);
-
-        if (string.IsNullOrEmpty(verificationTransaction?.AdditionalData) ||
-            !verificationTransaction.ToDictionary().ContainsKey(RefNumKey))
-        {
-            throw new
-                InvalidOperationException($"No Transaction of type Verification or additional data found for reversing the invoice {context.Payment.TrackingNumber}.");
-        }
-
-        return new()
-               {
-                   TerminalNumber = account.TerminalId,
-                   RefNum = verificationTransaction.ToDictionary()[RefNumKey]
-               };
-    }
-
-    public static PaymentRefundResult CreateRefundResult(SamanVerificationAndRefundResponse response)
-    {
-        return new PaymentRefundResult
-               {
-                   Status = response.Success ? PaymentRefundResultStatus.Succeed : PaymentRefundResultStatus.Failed,
-                   GatewayResponseCode = response.ResultCode.ToString()
-               };
-    }
-
-    private static bool ValidateCallbackResponse(SamanCallbackResponse callbackResponse,
-                                                 InvoiceContext invoiceContext,
-                                                 SamanGatewayAccount gatewayAccount,
-                                                 out string failures)
+    public static bool ValidateCallbackResponse(SamanCallbackResponse callbackResponse,
+                                                InvoiceContext invoiceContext,
+                                                SamanGatewayAccount gatewayAccount,
+                                                out string failures)
     {
         const string nullOrEmptyString = "IsReceivedFromTheGatewayAsNullOrEmpty";
 
@@ -276,7 +120,7 @@ internal static class SamanHelper
         return isValid;
     }
 
-    private static SamanVerificationAdditionalData MapToAdditionalData(SamanCallbackResponse callbackResponse)
+    public static SamanVerificationAdditionalData MapCallbackResponseToAdditionalData(SamanCallbackResponse callbackResponse)
     {
         return new SamanVerificationAdditionalData
                {

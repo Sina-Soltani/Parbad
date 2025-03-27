@@ -948,6 +948,13 @@
             </summary>
             <param name="builder"></param>
         </member>
+        <member name="M:Parbad.Gateway.Saman.SamanGatewayBuilderExtensions.WithHttpClient``1(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Saman.SamanGateway},System.Action{System.IServiceProvider,System.Net.Http.HttpClient},System.Action{Microsoft.Extensions.DependencyInjection.IHttpClientBuilder})">
+            <summary>
+            Configures the HttpClient for <see cref="T:Parbad.Gateway.Saman.Api.ISamanApi"/>.
+            </summary>
+            <typeparam name="TGatewayApi">Implementation type of <see cref="T:Parbad.Gateway.Saman.Api.ISamanApi"/>.</typeparam>
+            <exception cref="T:System.ArgumentNullException"></exception>
+        </member>
         <member name="M:Parbad.Gateway.Saman.SamanGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Saman.SamanGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.Gateway.Saman.SamanGatewayAccount}})">
             <summary>
             Configures the accounts for <see cref="T:Parbad.Gateway.Saman.SamanGateway"/>.

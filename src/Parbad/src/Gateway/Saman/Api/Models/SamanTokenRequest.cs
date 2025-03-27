@@ -3,9 +3,9 @@
 
 using Newtonsoft.Json;
 
-namespace Parbad.Gateway.Saman.Internal.Models;
+namespace Parbad.Gateway.Saman.Api.Models;
 
-internal class SamanTokenRequest
+public class SamanTokenRequest
 {
     [JsonProperty("action")]
     public string Action { get; set; }

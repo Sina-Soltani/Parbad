@@ -7,9 +7,11 @@ public class SamanGatewayOptions
 {
     public string PaymentPageUrl { get; set; } = "https://sep.shaparak.ir/OnlinePG/OnlinePG";
 
-    public string ApiTokenUrl { get; set; } = "https://sep.shaparak.ir/onlinepg/onlinepg";
+    public string ApiBaseUrl { get; set; } = "https://sep.shaparak.ir/";
 
-    public string ApiVerificationUrl { get; set; } = "https://sep.shaparak.ir/verifyTxnRandomSessionkey/ipg/VerifyTransaction";
+    public string ApiTokenUrl { get; set; } = "onlinepg/onlinepg";
 
-    public string ApiReverseUrl { get; set; } = "https://sep.shaparak.ir/verifyTxnRandomSessionkey/ipg/ReverseTransaction";
+    public string ApiVerificationUrl { get; set; } = "verifyTxnRandomSessionkey/ipg/VerifyTransaction";
+
+    public string ApiReverseUrl { get; set; } = "verifyTxnRandomSessionkey/ipg/ReverseTransaction";
 }

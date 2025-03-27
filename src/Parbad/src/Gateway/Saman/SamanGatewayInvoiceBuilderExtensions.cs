@@ -30,7 +30,7 @@ public static class SamanGatewayInvoiceBuilderExtensions
 
         if (!string.IsNullOrWhiteSpace(cellNumber))
         {
-            builder.AddOrUpdateProperty(SamanHelper.CellNumberPropertyKey, cellNumber);
+            builder.AddOrUpdateProperty(Constants.CellNumberPropertyKey, cellNumber);
         }
 
         return builder;
@@ -38,7 +38,7 @@ public static class SamanGatewayInvoiceBuilderExtensions
 
     internal static string GetSamanCellNumber(this Invoice invoice)
     {
-        if (invoice.Properties.TryGetValue(SamanHelper.CellNumberPropertyKey, out var cellNumber))
+        if (invoice.Properties.TryGetValue(Constants.CellNumberPropertyKey, out var cellNumber))
         {
             return cellNumber.ToString();
         }
