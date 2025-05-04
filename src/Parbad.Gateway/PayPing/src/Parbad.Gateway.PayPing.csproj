@@ -2,7 +2,7 @@
   <PropertyGroup>
     <PackageId>Parbad.Gateway.PayPing</PackageId>
     <Product>Parbad.Gateway.PayPing</Product>
-    <VersionPrefix>1.4.2</VersionPrefix>
+    <VersionPrefix>1.5.0</VersionPrefix>
     <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.0;net5.0;net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <Authors>Ali Zaferany</Authors>
