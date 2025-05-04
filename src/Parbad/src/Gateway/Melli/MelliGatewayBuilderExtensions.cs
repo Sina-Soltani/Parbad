@@ -5,6 +5,7 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 using Parbad.Gateway.Melli.Internal;
 using Parbad.GatewayBuilders;
+using Parbad.InvoiceBuilder;
 
 namespace Parbad.Gateway.Melli
 {
@@ -53,5 +54,23 @@ namespace Parbad.Gateway.Melli
 
             return builder;
         }
+        
+        /// <summary>
+        /// اضافه کردن اطلاعات تسهیم بانک سداد ملی به درخواست
+        /// </summary>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static IInvoiceBuilder AddMelliCumulativeAccounts(this IInvoiceBuilder builder, MelliCumulativeAccount data)
+        {
+            if (data == null) throw new ArgumentNullException(nameof(data));
+            if (data.MultiplexingRows==null || data.MultiplexingRows.Count==0)  throw new ArgumentNullException(nameof(data.MultiplexingRows));
+            
+            builder.ChangeProperties(properties =>
+            {
+                properties[MelliHelper.CumulativeAccountsKey] = data;
+            });
+
+            return builder;
+        }
+        
     }
 }
