@@ -3,7 +3,7 @@
   <PropertyGroup>
     <PackageId>Parbad</PackageId>
     <Product>Parbad</Product>
-    <VersionPrefix>3.11.0</VersionPrefix>
+    <VersionPrefix>3.11.1</VersionPrefix>
     <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.0;netcoreapp3.1;net5.0;net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <Authors>Parbad Sina Soltani</Authors>
@@ -23,7 +23,7 @@ More information: https://github.com/Sina-Soltani/Parbad
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageTags>parbad Payment Gateway virtual virtual-gateway Bank Iran Shetab IranKish Mellat Melli Sadad Parsian Pasargad Saman Asan-Pardakht پرداخت درگاه بانک ایران شتاب ایران-کیش ملت ملی سداد پارسیان پاسارگاد سامان آسان-پرداخت</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-	<PackageReleaseNotes>https://github.com/Sina-Soltani/Parbad/releases/tag/v3.11.0</PackageReleaseNotes>
+	<PackageReleaseNotes>https://github.com/Sina-Soltani/Parbad/releases/tag/v3.11.1</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup>
