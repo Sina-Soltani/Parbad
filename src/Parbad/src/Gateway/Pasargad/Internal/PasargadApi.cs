@@ -12,7 +12,7 @@ using Parbad.Net;
 
 namespace Parbad.Gateway.Pasargad.Internal;
 
-internal class PasargadApi : IPasargadApi
+public class PasargadApi : IPasargadApi
 {
     private readonly HttpClient _httpClient;
     private readonly PasargadGatewayOptions _options;
