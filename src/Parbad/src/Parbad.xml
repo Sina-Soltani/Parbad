@@ -1934,6 +1934,11 @@
             Contains all messages that Parbad uses in results.
             </summary>
         </member>
+        <member name="P:Parbad.Options.ParbadOptions.NonceFactory">
+            <summary>
+            A delegate that allows for the generation of a nonce (a unique token) based on the HttpContext.
+            </summary>
+        </member>
         <member name="T:Parbad.ParbadBuilder">
             <inheritdoc />
         </member>
