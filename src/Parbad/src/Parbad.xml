@@ -1936,7 +1936,8 @@
         </member>
         <member name="P:Parbad.Options.ParbadOptions.NonceFactory">
             <summary>
-            A delegate that allows for the generation of a nonce (a unique token) based on the HttpContext.
+            A factory to represent Nonce. The value will be used in inline-scripts and CSS links
+            to support CSP (Content-Security-Policy). If your application doesn't include any CSP, you can leave this property null. 
             </summary>
         </member>
         <member name="T:Parbad.ParbadBuilder">

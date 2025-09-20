@@ -12,7 +12,7 @@ using Parbad.Net;
 
 namespace Parbad.Gateway.Pasargad.Internal;
 
-internal class PasargadApi : IPasargadApi
+public class PasargadApi : IPasargadApi
 {
     private readonly HttpClient _httpClient;
     private readonly PasargadGatewayOptions _options;
@@ -24,29 +24,29 @@ internal class PasargadApi : IPasargadApi
         _options = options.Value;
     }
 
-    public Task<PasargadGetTokenResponseModel> GetToken(PasargadGetTokenRequestModel model,
+    public virtual Task<PasargadGetTokenResponseModel> GetToken(PasargadGetTokenRequestModel model,
                                                         CancellationToken cancellationToken)
     {
         return PostJsonAsync<PasargadGetTokenResponseModel>(_options.ApiGetTokenUrl, model, "", cancellationToken);
     }
 
-    public Task<PasargadPurchaseResponseModel> PurchasePayment(PasargadPurchaseRequestModel model,
+    public virtual Task<PasargadPurchaseResponseModel> PurchasePayment(PasargadPurchaseRequestModel model,
                                                                string token,
                                                                CancellationToken cancellationToken)
     {
         return PostJsonAsync<PasargadPurchaseResponseModel>(_options.ApiPurchaseUrl, model, token, cancellationToken);
     }
 
-    public Task<PasargadVerifyPaymentResponseModel> VerifyPayment(PasargadVerifyPaymentRequestModel model,
-                                                                  string token,
-                                                                  CancellationToken cancellationToken)
+    public virtual Task<PasargadVerifyPaymentResponseModel> VerifyPayment(PasargadVerifyPaymentRequestModel model,
+                                                                          string token,
+                                                                          CancellationToken cancellationToken)
     {
         return PostJsonAsync<PasargadVerifyPaymentResponseModel>(_options.ApiVerificationUrl, model, token, cancellationToken);
     }
 
-    public Task<PasargadRefundPaymentResponseModel> RefundPayment(PasargadRefundPaymentRequestModel model,
-                                                                  string token,
-                                                                  CancellationToken cancellationToken)
+    public virtual Task<PasargadRefundPaymentResponseModel> RefundPayment(PasargadRefundPaymentRequestModel model,
+                                                                          string token,
+                                                                          CancellationToken cancellationToken)
     {
         return PostJsonAsync<PasargadRefundPaymentResponseModel>(_options.ApiReverseUrl, model, token, cancellationToken);
     }
