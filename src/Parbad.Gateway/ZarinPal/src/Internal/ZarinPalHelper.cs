@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Parbad.Abstraction;
 using Parbad.Gateway.ZarinPal.Models;
 using Parbad.Http;
@@ -237,9 +238,16 @@ internal static class ZarinPalHelper
             return (null, messagesOptions.UnexpectedErrorText);
         }
 
-        var json = await httpResponseMessage.Content.ReadAsStringAsync();
+        var jsonResponse = await httpResponseMessage.Content.ReadAsStringAsync();
 
-        var failedResult = JsonConvert.DeserializeObject<ZarinPalFailedResult>(json);
+        JObject jsonObject = JObject.Parse(jsonResponse);
+        var errorsToken = jsonObject["errors"];
+        if (errorsToken != null && errorsToken.Type == JTokenType.Object)
+        {
+            jsonObject["errors"] = new JArray(errorsToken);
+        }
+
+        var failedResult = JsonConvert.DeserializeObject<ZarinPalFailedResult>(jsonObject.ToString());
 
         string message;
         int? errorCode = null;
