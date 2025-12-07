@@ -1,0 +1,315 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Parbad.Gateway.Tara</name>
+    </assembly>
+    <members>
+        <member name="T:Parbad.Gateway.Tara.Internal.Models.TaraInvoiceItem">
+            <summary>
+            Represents an invoice item in Tara gateway request.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Tara.Internal.Models.TaraInvoiceItem.name">
+            <summary>
+            Item name
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Tara.Internal.Models.TaraInvoiceItem.code">
+            <summary>
+            Item code
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Tara.Internal.Models.TaraInvoiceItem.count">
+            <summary>
+            Item count/quantity
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Tara.Internal.Models.TaraInvoiceItem.unit">
+            <summary>
+            Unit type
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Tara.Internal.Models.TaraInvoiceItem.fee">
+            <summary>
+            Item fee/price
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Tara.Internal.Models.TaraInvoiceItem.group">
+            <summary>
+            Item group
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Tara.Internal.Models.TaraInvoiceItem.groupTitle">
+            <summary>
+            Item group title
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Tara.Internal.Models.TaraInvoiceItem.data">
+            <summary>
+            Additional data for this item
+            </summary>
+        </member>
+        <member name="T:Parbad.Gateway.Tara.Internal.Models.TaraServiceAmount">
+            <summary>
+            Represents a service amount in Tara gateway request.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Tara.Internal.Models.TaraServiceAmount.serviceId">
+            <summary>
+            Service identifier
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Tara.Internal.Models.TaraServiceAmount.amount">
+            <summary>
+            Amount for this service
+            </summary>
+        </member>
+        <member name="M:Parbad.Gateway.Tara.TaraGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Gateway.Tara.TaraGateway.FetchAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Gateway.Tara.TaraGateway.VerifyAsync(Parbad.InvoiceContext,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Gateway.Tara.TaraGateway.RefundAsync(Parbad.InvoiceContext,Parbad.Money,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="P:Parbad.Gateway.Tara.TaraGatewayAccount.Username">
+            <summary>
+            Gets or sets the username for Tara gateway authentication.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Tara.TaraGatewayAccount.Password">
+            <summary>
+            Gets or sets the password for Tara gateway authentication.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Tara.TaraGatewayAccount.Ip">
+            <summary>
+            Gets or sets the IP address to use for API calls.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Tara.TaraGatewayAccount.IsTest">
+            <summary>
+            Gets or sets whether to use the staging/test environment.
+            When true, uses https://stage-pay.tara360.ir/pay instead of production.
+            </summary>
+        </member>
+        <member name="M:Parbad.Gateway.Tara.TaraGatewayAccountExtensions.SetUsername(Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.Gateway.Tara.TaraGatewayAccount},System.String)">
+            <summary>
+            Sets the username for Tara gateway authentication.
+            </summary>
+            <param name="builder"></param>
+            <param name="username">Username</param>
+        </member>
+        <member name="M:Parbad.Gateway.Tara.TaraGatewayAccountExtensions.SetPassword(Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.Gateway.Tara.TaraGatewayAccount},System.String)">
+            <summary>
+            Sets the password for Tara gateway authentication.
+            </summary>
+            <param name="builder"></param>
+            <param name="password">Password</param>
+        </member>
+        <member name="M:Parbad.Gateway.Tara.TaraGatewayAccountExtensions.SetIp(Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.Gateway.Tara.TaraGatewayAccount},System.String)">
+            <summary>
+            Sets the IP address for Tara gateway API calls.
+            </summary>
+            <param name="builder"></param>
+            <param name="ip">IP Address</param>
+        </member>
+        <member name="M:Parbad.Gateway.Tara.TaraGatewayAccountExtensions.UseTestMode(Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.Gateway.Tara.TaraGatewayAccount},System.Boolean)">
+            <summary>
+            Marks this account as a test account to use the staging environment.
+            This will automatically switch to https://stage-pay.tara360.ir/pay
+            </summary>
+            <param name="builder"></param>
+            <param name="isTest">Whether to use staging environment</param>
+        </member>
+        <member name="M:Parbad.Gateway.Tara.TaraGatewayBuilderExtensions.AddTara(Parbad.GatewayBuilders.IGatewayBuilder)">
+            <summary>
+            Adds Tara gateway to Parbad services.
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.Gateway.Tara.TaraGatewayBuilderExtensions.WithAccounts(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Tara.TaraGateway},System.Action{Parbad.GatewayBuilders.IGatewayAccountBuilder{Parbad.Gateway.Tara.TaraGatewayAccount}})">
+            <summary>
+            Configures the accounts for <see cref="T:Parbad.Gateway.Tara.TaraGateway"/>.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureAccounts">Configures the accounts.</param>
+        </member>
+        <member name="M:Parbad.Gateway.Tara.TaraGatewayBuilderExtensions.WithOptions(Parbad.GatewayBuilders.IGatewayConfigurationBuilder{Parbad.Gateway.Tara.TaraGateway},System.Action{Parbad.Gateway.Tara.TaraGatewayOptions})">
+            <summary>
+            Configures the options for Tara Gateway.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureOptions">Configuration</param>
+        </member>
+        <member name="T:Parbad.Gateway.Tara.TaraGatewayDiagnostics">
+            <summary>
+            Diagnostic helpers for troubleshooting Tara gateway integration.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Tara.TaraGatewayDiagnostics.EnableDetailedLogging">
+            <summary>
+            Enables detailed logging for Tara gateway requests.
+            Logs will be written to Debug output.
+            </summary>
+        </member>
+        <member name="M:Parbad.Gateway.Tara.TaraGatewayInvoiceBuilderExtensions.UseTara(Parbad.InvoiceBuilder.IInvoiceBuilder)">
+            <summary>
+            The invoice will be sent to Tara gateway.
+            </summary>
+            <param name="builder"></param>
+        </member>
+        <member name="M:Parbad.Gateway.Tara.TaraGatewayInvoiceBuilderExtensions.SetTaraData(Parbad.InvoiceBuilder.IInvoiceBuilder,Parbad.Gateway.Tara.TaraRequestAdditionalData)">
+            <summary>
+            Sets additional data for Tara gateway request.
+            </summary>
+            <param name="builder"></param>
+            <param name="additionalData"></param>
+        </member>
+        <member name="M:Parbad.Gateway.Tara.TaraGatewayInvoiceBuilderExtensions.SetTaraData(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Action{Parbad.Gateway.Tara.TaraRequestAdditionalData})">
+            <summary>
+            Sets additional data for Tara gateway request using a configuration action.
+            </summary>
+            <param name="builder"></param>
+            <param name="configureData">Action to configure the additional data</param>
+        </member>
+        <member name="M:Parbad.Gateway.Tara.TaraGatewayInvoiceBuilderExtensions.AddTaraServiceAmount(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Int64,System.Int64)">
+            <summary>
+            Adds a service amount to the Tara gateway request.
+            </summary>
+            <param name="builder"></param>
+            <param name="serviceId">Service identifier</param>
+            <param name="amount">Amount for this service</param>
+        </member>
+        <member name="M:Parbad.Gateway.Tara.TaraGatewayInvoiceBuilderExtensions.AddTaraServiceAmounts(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Collections.Generic.IEnumerable{Parbad.Gateway.Tara.Internal.Models.TaraServiceAmount})">
+            <summary>
+            Adds multiple service amounts to the Tara gateway request.
+            </summary>
+            <param name="builder"></param>
+            <param name="serviceAmounts">List of service amounts</param>
+        </member>
+        <member name="M:Parbad.Gateway.Tara.TaraGatewayInvoiceBuilderExtensions.AddTaraInvoiceItem(Parbad.InvoiceBuilder.IInvoiceBuilder,Parbad.Gateway.Tara.Internal.Models.TaraInvoiceItem)">
+            <summary>
+            Adds an invoice item to the Tara gateway request.
+            </summary>
+            <param name="builder"></param>
+            <param name="item">Invoice item to add</param>
+        </member>
+        <member name="M:Parbad.Gateway.Tara.TaraGatewayInvoiceBuilderExtensions.AddTaraInvoiceItems(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Collections.Generic.IEnumerable{Parbad.Gateway.Tara.Internal.Models.TaraInvoiceItem})">
+            <summary>
+            Adds multiple invoice items to the Tara gateway request.
+            </summary>
+            <param name="builder"></param>
+            <param name="items">List of invoice items</param>
+        </member>
+        <member name="M:Parbad.Gateway.Tara.TaraGatewayInvoiceBuilderExtensions.SetTaraMobile(Parbad.InvoiceBuilder.IInvoiceBuilder,System.String)">
+            <summary>
+            Sets the mobile number for the Tara gateway request.
+            </summary>
+            <param name="builder"></param>
+            <param name="mobile">Mobile number</param>
+        </member>
+        <member name="M:Parbad.Gateway.Tara.TaraGatewayInvoiceBuilderExtensions.SetTaraAdditionalData(Parbad.InvoiceBuilder.IInvoiceBuilder,System.String)">
+            <summary>
+            Sets the additional data string for the Tara gateway request.
+            </summary>
+            <param name="builder"></param>
+            <param name="additionalData">Additional data string</param>
+        </member>
+        <member name="M:Parbad.Gateway.Tara.TaraGatewayInvoiceBuilderExtensions.SetTaraVat(Parbad.InvoiceBuilder.IInvoiceBuilder,System.Int64)">
+            <summary>
+            Sets the VAT amount for the Tara gateway request.
+            </summary>
+            <param name="builder"></param>
+            <param name="vat">VAT amount</param>
+        </member>
+        <member name="F:Parbad.Gateway.Tara.TaraGatewayOptions.ProductionBaseUrl">
+            <summary>
+            Production base URL for Tara API.
+            </summary>
+        </member>
+        <member name="F:Parbad.Gateway.Tara.TaraGatewayOptions.StagingBaseUrl">
+            <summary>
+            Staging/Test base URL for Tara API.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Tara.TaraGatewayOptions.BaseUrl">
+            <summary>
+            Gets or sets the base URL for Tara API.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Tara.TaraGatewayOptions.AuthenticationUrl">
+            <summary>
+            Gets or sets the authentication URL.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Tara.TaraGatewayOptions.GetTokenUrl">
+            <summary>
+            Gets or sets the get token URL.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Tara.TaraGatewayOptions.PaymentUrl">
+            <summary>
+            Gets or sets the payment request URL.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Tara.TaraGatewayOptions.VerifyUrl">
+            <summary>
+            Gets or sets the payment verification URL.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Tara.TaraGatewayOptions.InquiryUrl">
+            <summary>
+            Gets or sets the payment inquiry URL.
+            </summary>
+        </member>
+        <member name="M:Parbad.Gateway.Tara.TaraGatewayOptions.GetEnvironmentUrl(System.String,System.Boolean)">
+            <summary>
+            Gets the appropriate URL based on test mode.
+            Replaces production URL with staging URL if isTest is true.
+            </summary>
+            <param name="url">The configured URL</param>
+            <param name="isTest">Whether to use staging environment</param>
+            <returns>Production or staging URL</returns>
+        </member>
+        <member name="T:Parbad.Gateway.Tara.TaraRequestAdditionalData">
+            <summary>
+            Additional data for Tara gateway payment request.
+            </summary>
+        </member>
+        <member name="M:Parbad.Gateway.Tara.TaraRequestAdditionalData.#ctor">
+            <summary>
+            Initializes a new instance of <see cref="T:Parbad.Gateway.Tara.TaraRequestAdditionalData"/>.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Tara.TaraRequestAdditionalData.ServiceAmountList">
+            <summary>
+            List of service amounts for the payment request.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Tara.TaraRequestAdditionalData.InvoiceItemList">
+            <summary>
+            List of invoice items for the payment request.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Tara.TaraRequestAdditionalData.AdditionalData">
+            <summary>
+            Additional data string.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Tara.TaraRequestAdditionalData.Mobile">
+            <summary>
+            Mobile number of the customer.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.Tara.TaraRequestAdditionalData.Vat">
+            <summary>
+            VAT (Value Added Tax) amount.
+            </summary>
+        </member>
+    </members>
+</doc>

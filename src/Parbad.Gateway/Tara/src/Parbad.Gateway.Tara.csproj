@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.0;net5.0;net6.0;net7.0;net8.0,net9.0</TargetFrameworks>
+    <VersionPrefix>1.0.0</VersionPrefix>
+    <LangVersion>latest</LangVersion>
+    <Authors>Pooria Shariatzadeh</Authors>
+    <Copyright>Copyright © Sina Soltani 2016</Copyright>
+    <PackageProjectUrl>https://github.com/Sina-Soltani/Parbad</PackageProjectUrl>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageIconUrl>https://raw.githubusercontent.com/Sina-Soltani/Parbad/master/images/Parbad-128x128.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/Sina-Soltani/Parbad</RepositoryUrl>
+    <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageTags>«تارا» اپلیکیشن خرید و پرداخت اعتباری است.با استفاده از تارا می‌توانید به صورت اعتباری، قسطی و نقدی -بدون پرداخت در لحظه- خرید حضوری یا آنلاین انجام دهید و هزینه را به صورت قسطی از ماه بعد پرداخت کنید.</PackageTags>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageReleaseNotes>https://github.com/Sina-Soltani/Parbad/releases/tag/v3.11.0</PackageReleaseNotes>
+    <Description>Tara Gateway for Parbad project.For more information see: https://www.nuget.org/packages/Parbad/</Description>
+  </PropertyGroup>
+  <PropertyGroup>
+    <NoWarn>1701;1702;1591</NoWarn>
+    <PackageId>Parbad.Gateway.Tara</PackageId>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>Parbad.Gateway.Tara.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>Parbad.Gateway.Tara.xml</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Parbad\src\Parbad.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="icon.png" pack="true" Visible="false" PackagePath="" />
+    <None Include="readme.txt" pack="true" PackagePath="." />
+    <None Include="Parbad.Gateway.Tara.xml" pack="true" Visible="false" PackagePath="" />
+  </ItemGroup>
+</Project>
