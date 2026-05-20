@@ -65,6 +65,7 @@ public class EntityFrameworkCoreStorage : IStorage
 
         var record = await Context
                           .Payments
+                          .AsQueryable()
                           .AsNoTracking()
                           .SingleOrDefaultAsync(model => model.Id == payment.Id, cancellationToken);
 
@@ -85,6 +86,7 @@ public class EntityFrameworkCoreStorage : IStorage
 
         var record = await Context
                           .Payments
+                          .AsQueryable()
                           .AsNoTracking()
                           .SingleOrDefaultAsync(model => model.Id == payment.Id, cancellationToken);
 
@@ -117,6 +119,7 @@ public class EntityFrameworkCoreStorage : IStorage
 
         var record = await Context
                           .Transactions
+                          .AsQueryable()
                           .SingleOrDefaultAsync(model => model.Id == transaction.Id, cancellationToken);
 
         if (record == null) throw new InvalidOperationException($"No transaction records found in database with id {transaction.Id}");
@@ -136,6 +139,7 @@ public class EntityFrameworkCoreStorage : IStorage
 
         var record = await Context
                           .Transactions
+                          .AsQueryable()
                           .SingleOrDefaultAsync(model => model.Id == transaction.Id, cancellationToken);
 
         if (record == null) throw new InvalidOperationException($"No transaction records found in database with id {transaction.Id}");
@@ -149,6 +153,7 @@ public class EntityFrameworkCoreStorage : IStorage
     public virtual async Task<Payment?> GetPaymentByTrackingNumberAsync(long trackingNumber, CancellationToken cancellationToken = default)
     {
         var paymentEntity = await Context.Payments
+                                         .AsQueryable()
                                          .AsNoTracking()
                                          .SingleOrDefaultAsync(payment => payment.TrackingNumber == trackingNumber, cancellationToken);
 
@@ -159,6 +164,7 @@ public class EntityFrameworkCoreStorage : IStorage
     public virtual async Task<Payment?> GetPaymentByTokenAsync(string paymentToken, CancellationToken cancellationToken = default)
     {
         var paymentEntity = await Context.Payments
+                                         .AsQueryable()
                                          .AsNoTracking()
                                          .SingleOrDefaultAsync(payment => payment.Token == paymentToken, cancellationToken);
 
@@ -168,19 +174,24 @@ public class EntityFrameworkCoreStorage : IStorage
     /// <inheritdoc />
     public virtual Task<bool> DoesPaymentExistAsync(long trackingNumber, CancellationToken cancellationToken = default)
     {
-        return Context.Payments.AnyAsync(payment => payment.TrackingNumber == trackingNumber, cancellationToken);
+        return Context.Payments
+                      .AsQueryable()
+                      .AnyAsync(payment => payment.TrackingNumber == trackingNumber, cancellationToken);
     }
 
     /// <inheritdoc />
     public virtual Task<bool> DoesPaymentExistAsync(string paymentToken, CancellationToken cancellationToken = default)
     {
-        return Context.Payments.AnyAsync(payment => payment.Token == paymentToken, cancellationToken);
+        return Context.Payments
+                      .AsQueryable()
+                      .AnyAsync(payment => payment.Token == paymentToken, cancellationToken);
     }
 
     /// <inheritdoc />
     public virtual Task<List<Transaction>> GetTransactionsAsync(Payment payment, CancellationToken cancellationToken = default)
     {
         return Context.Transactions
+                      .AsQueryable()
                       .Where(transaction => transaction.PaymentId == payment.Id)
                       .AsNoTracking()
                       .Select(Mapper.ToTransactionModel())

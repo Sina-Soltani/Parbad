@@ -1,0 +1,60 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp3.0;netcoreapp3.1;net5.0;net6.0;net7.0;net8.0;net9.0;net10.0</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.0' ">
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="3.1.1" />
+    <PackageReference Include="MSTest.TestFramework" Version="3.1.1" />
+    <PackageReference Include="coverlet.collector" Version="6.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' or '$(TargetFramework)' == 'net5.0' or '$(TargetFramework)' == 'net6.0' or '$(TargetFramework)' == 'net7.0' ">
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
+    <PackageReference Include="MSTest.TestAdapter" Version="3.1.1" />
+    <PackageReference Include="MSTest.TestFramework" Version="3.1.1" />
+    <PackageReference Include="coverlet.collector" Version="6.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net8.0' or '$(TargetFramework)' == 'net9.0' or '$(TargetFramework)' == 'net10.0' ">
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.5.1" />
+    <PackageReference Include="MSTest.TestAdapter" Version="4.2.3" />
+    <PackageReference Include="MSTest.TestFramework" Version="4.2.3" />
+    <PackageReference Include="coverlet.collector" Version="10.0.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Parbad\src\Parbad.csproj" />
+    <ProjectReference Include="..\..\src\Parbad.AspNetCore\src\Parbad.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\src\Parbad.Storage\Abstractions\Parbad.Storage.Abstractions.csproj" />
+    <ProjectReference Include="..\..\src\Parbad.Storage\Cache\src\Parbad.Storage.Cache.csproj" />
+    <ProjectReference Include="..\..\src\Parbad.Gateway\FanAva\src\Parbad.Gateway.FanAva.csproj" />
+    <ProjectReference Include="..\..\src\Parbad.Gateway\IdPay\src\Parbad.Gateway.IdPay.csproj" />
+    <ProjectReference Include="..\..\src\Parbad.Gateway\IranKish\src\Parbad.Gateway.IranKish.csproj" />
+    <ProjectReference Include="..\..\src\Parbad.Gateway\PayIr\src\Parbad.Gateway.PayIr.csproj" />
+    <ProjectReference Include="..\..\src\Parbad.Gateway\PayPing\src\Parbad.Gateway.PayPing.csproj" />
+    <ProjectReference Include="..\..\src\Parbad.Gateway\Sepehr\src\Parbad.Gateway.Sepehr.csproj" />
+    <ProjectReference Include="..\..\src\Parbad.Gateway\YekPay\src\Parbad.Gateway.YekPay.csproj" />
+    <ProjectReference Include="..\..\src\Parbad.Gateway\ZarinPal\src\Parbad.Gateway.ZarinPal.csproj" />
+    <ProjectReference Include="..\..\src\Parbad.Gateway\Zibal\src\Parbad.Gateway.Zibal.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net5.0' or '$(TargetFramework)' == 'net6.0' or '$(TargetFramework)' == 'net7.0' or '$(TargetFramework)' == 'net8.0' or '$(TargetFramework)' == 'net9.0' or '$(TargetFramework)' == 'net10.0' ">
+    <ProjectReference Include="..\..\src\Parbad.Storage\EntityFrameworkCore\src\Parbad.Storage.EntityFrameworkCore.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -11,51 +11,110 @@ pool:
 variables:
   buildConfiguration: 'release'
   projects: 'src/**/*.csproj'
+  dotnetRoot: '$(Agent.ToolsDirectory)/dotnet'
 
 steps:
-- task: NuGetToolInstaller@1
-  displayName: 'Use Nuget'
-  inputs:
-    versionSpec: 
-    checkLatest: true
 - task: UseDotNet@2
-  displayName: Use Dotnet
+  displayName: 'Use .NET Core 3.0 SDK'
   inputs:
-    packageType: sdk
-    version: 9.x
-- task: NuGetCommand@2
+    packageType: 'sdk'
+    version: '3.0.x'
+    installationPath: '$(dotnetRoot)'
+
+- task: UseDotNet@2
+  displayName: 'Use .NET Core 3.1 SDK'
+  inputs:
+    packageType: 'sdk'
+    version: '3.1.x'
+    installationPath: '$(dotnetRoot)'
+
+- task: UseDotNet@2
+  displayName: 'Use .NET 5 SDK'
+  inputs:
+    packageType: 'sdk'
+    version: '5.0.x'
+    installationPath: '$(dotnetRoot)'
+
+- task: UseDotNet@2
+  displayName: 'Use .NET 6 SDK'
+  inputs:
+    packageType: 'sdk'
+    version: '6.0.x'
+    installationPath: '$(dotnetRoot)'
+
+- task: UseDotNet@2
+  displayName: 'Use .NET 7 SDK'
+  inputs:
+    packageType: 'sdk'
+    version: '7.0.x'
+    installationPath: '$(dotnetRoot)'
+
+- task: UseDotNet@2
+  displayName: 'Use .NET 8 SDK'
+  inputs:
+    packageType: 'sdk'
+    version: '8.0.x'
+    installationPath: '$(dotnetRoot)'
+
+- task: UseDotNet@2
+  displayName: 'Use .NET 9 SDK'
+  inputs:
+    packageType: 'sdk'
+    version: '9.0.x'
+    installationPath: '$(dotnetRoot)'
+
+- task: UseDotNet@2
+  displayName: 'Use .NET 10 SDK'
+  inputs:
+    packageType: 'sdk'
+    version: '10.0.x'
+    installationPath: '$(dotnetRoot)'
+
+- script: |
+    dotnet --info
+    dotnet --list-sdks
+    dotnet --list-runtimes
+  displayName: 'Show .NET SDKs and runtimes'
+
+- task: DotNetCoreCLI@2
   displayName: 'restoring'
   inputs:
     command: 'restore'
-    restoreSolution: '**/*.sln'
+    projects: '**/*.sln'
     feedsToUse: 'select'
+
 - task: DotNetCoreCLI@2
   displayName: 'building'
   inputs:
     command: 'build'
-    projects: $(projects)
-    arguments: '-c $(buildConfiguration)'
+    projects: '$(projects)'
+    arguments: '-c $(buildConfiguration) --no-restore'
+
 - task: DotNetCoreCLI@2
   displayName: 'testing'
   inputs:
     command: 'test'
     projects: '**/*.Tests.csproj'
+    arguments: '-c $(buildConfiguration) --no-restore --verbosity normal'
+
 - task: DotNetCoreCLI@2
   displayName: 'packing'
   condition: eq(variables['build.sourceBranch'], 'refs/heads/dev')
   inputs:
     command: 'custom'
-    projects: $(projects)
+    projects: '$(projects)'
     custom: 'pack'
     arguments: '-c $(buildConfiguration) --no-build -o $(Build.ArtifactStagingDirectory) --version-suffix dev$(Build.BuildNumber)'
+
 - task: DotNetCoreCLI@2
   displayName: 'packing'
   condition: eq(variables['build.sourceBranch'], 'refs/heads/master')
   inputs:
     command: 'custom'
-    projects: $(projects)
+    projects: '$(projects)'
     custom: 'pack'
     arguments: '-c $(buildConfiguration) --no-build -o $(Build.ArtifactStagingDirectory)'
+
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'

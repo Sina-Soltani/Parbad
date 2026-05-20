@@ -23,9 +23,9 @@ namespace Parbad.Tests
         }
 
         [TestCleanup]
-        public ValueTask Cleanup()
+        public Task Cleanup()
         {
-            return _services.DisposeAsync();
+            return _services.DisposeAsync().AsTask();
         }
 
         [TestMethod]
@@ -100,14 +100,21 @@ namespace Parbad.Tests
         }
 
         [TestMethod]
-        public void Invoice_Must_Throw_Exception_When_Duplicate_AdditionalKey_Is_Added()
+        public async Task Invoice_Must_Throw_Exception_When_Duplicate_AdditionalKey_Is_Added()
         {
             const string key = "key";
 
             _builder.AddProperty(key, "");
             _builder.AddProperty(key, "");
 
-            Assert.ThrowsExceptionAsync<ArgumentException>(() => _builder.BuildAsync());
+            try
+            {
+                await _builder.BuildAsync();
+                Assert.Fail("Expected ArgumentException.");
+            }
+            catch (ArgumentException)
+            {
+            }
         }
 
         [TestMethod]

@@ -52,9 +52,9 @@ public class MemoryCacheTests
     }
 
     [TestCleanup]
-    public ValueTask Cleanup()
+    public Task Cleanup()
     {
-        return _services.DisposeAsync();
+        return _services.DisposeAsync().AsTask();
     }
 
     [TestMethod]

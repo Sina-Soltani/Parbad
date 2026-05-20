@@ -57,8 +57,8 @@ namespace Parbad.Tests
         {
             var money = new Money(10);
 
-            Assert.AreEqual(money, 10L);
-            Assert.AreEqual(money, 10M);
+            Assert.AreEqual(10L, (long)money);
+            Assert.AreEqual(10M, (decimal)money);
             Assert.AreEqual(money, new Money(10));
         }
     }

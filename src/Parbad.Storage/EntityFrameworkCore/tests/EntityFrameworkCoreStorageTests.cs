@@ -54,9 +54,9 @@ namespace Parbad.Storage.EntityFrameworkCore.Tests
         }
 
         [TestCleanup]
-        public ValueTask Cleanup()
+        public Task Cleanup()
         {
-            return _context.DisposeAsync();
+            return _context.DisposeAsync().AsTask();
         }
 
         [TestMethod]

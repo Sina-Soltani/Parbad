@@ -52,7 +52,7 @@ namespace Parbad.Tests.Helpers
 
             onRequestResult(requestResult);
 
-            var storageManager = serviceProvider.GetRequiredService<IStorageManager>();
+            var storageManager = serviceProvider.GetRequiredService<IStorage>();
 
             var payment = await storageManager.GetPaymentByTrackingNumberAsync(requestResult.TrackingNumber);
 

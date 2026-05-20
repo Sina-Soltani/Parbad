@@ -41,10 +41,14 @@ namespace Parbad.Tests.Gateway.Melli
 
             const string data = "test";
 
-            Assert.ThrowsException<MelliGatewayDataSigningException>(() =>
+            try
             {
                 crypto.Encrypt("test", data);
-            });
+                Assert.Fail("Expected MelliGatewayDataSigningException.");
+            }
+            catch (MelliGatewayDataSigningException)
+            {
+            }
         }
     }
 }

@@ -2,9 +2,9 @@
 
   <PropertyGroup>
     <PackageId>Parbad.Storage.Cache</PackageId>
-    <VersionPrefix>1.5.0</VersionPrefix>
+    <VersionPrefix>1.6.0</VersionPrefix>
     <LangVersion>latest</LangVersion>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.0;netcoreapp3.1;net5.0;net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.0;netcoreapp3.1;net5.0;net6.0;net7.0;net8.0;net9.0;net10.0</TargetFrameworks>
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
@@ -20,7 +20,7 @@ More information: https://github.com/Sina-Soltani/Parbad</Description>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Authors>Sina Soltani</Authors>
     <Product>Parbad.Storage.Cache</Product>
-    <PackageReleaseNotes>https://github.com/Sina-Soltani/Parbad/releases/tag/v3.10.0</PackageReleaseNotes>
+    <PackageReleaseNotes>https://github.com/Sina-Soltani/Parbad/releases/tag/v3.12.0</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -35,14 +35,14 @@ More information: https://github.com/Sina-Soltani/Parbad</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
     
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1' ">
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="2.2.0" />
   </ItemGroup>
     
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.0' or '$(TargetFramework)' == 'netcoreapp3.1' or '$(TargetFramework)' == 'net5.0' or '$(TargetFramework)' == 'net6.0' or '$(TargetFramework)' == 'net7.0' or '$(TargetFramework)' == 'net8.0' or '$(TargetFramework)' == 'net9.0' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.0' or '$(TargetFramework)' == 'netcoreapp3.1' or '$(TargetFramework)' == 'net5.0' or '$(TargetFramework)' == 'net6.0' or '$(TargetFramework)' == 'net7.0' or '$(TargetFramework)' == 'net8.0' or '$(TargetFramework)' == 'net9.0' or '$(TargetFramework)' == 'net10.0' ">
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 

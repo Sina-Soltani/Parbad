@@ -2,9 +2,9 @@
 
   <PropertyGroup>
     <PackageId>Parbad.Storage.EntityFrameworkCore</PackageId>
-    <VersionPrefix>1.6.0</VersionPrefix>
+    <VersionPrefix>1.7.0</VersionPrefix>
     <LangVersion>latest</LangVersion>
-    <TargetFrameworks>net5;net6;net7;net8.0;net9.0</TargetFrameworks>
+    <TargetFrameworks>net5;net6;net7;net8.0;net9.0;net10.0</TargetFrameworks>
     <Nullable>enable</Nullable>  
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
@@ -20,7 +20,7 @@ More information: https://github.com/Sina-Soltani/Parbad</Description>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Authors>Sina Soltani</Authors>
     <Product>Parbad.Storage.EntityframeworkCore</Product>
-    <PackageReleaseNotes>https://github.com/Sina-Soltani/Parbad/releases/tag/v3.10.0</PackageReleaseNotes>
+    <PackageReleaseNotes>https://github.com/Sina-Soltani/Parbad/releases/tag/v3.12.0</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -44,8 +44,12 @@ More information: https://github.com/Sina-Soltani/Parbad</Description>
     <None Include="Parbad.Storage.EntityFrameworkCore.xml" pack="true" Visible="false" PackagePath="" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.0" />
+  <ItemGroup Condition=" '$(TargetFramework)' != 'net10.0' ">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.17" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net10.0' ">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.8" />
   </ItemGroup>
 
 </Project>

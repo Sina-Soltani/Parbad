@@ -57,6 +57,13 @@ public class CallbackUrlTests
     [TestMethod]
     public void NonValidUrl_Must_Throw_Exception()
     {
-        Assert.ThrowsException<CallbackUrlFormatException>(() => new CallbackUrl("abcd"));
+        try
+        {
+            _ = new CallbackUrl("abcd");
+            Assert.Fail("Expected CallbackUrlFormatException.");
+        }
+        catch (CallbackUrlFormatException)
+        {
+        }
     }
 }

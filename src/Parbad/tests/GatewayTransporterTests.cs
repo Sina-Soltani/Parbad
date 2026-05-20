@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
 using Parbad.Internal;
+using Parbad.Options;
 using Parbad.Tests.Helpers;
 using System.Collections.Generic;
 using System.Net;
@@ -13,6 +15,7 @@ namespace Parbad.Tests
     public class GatewayTransporterTests
     {
         private HttpContext _httpContext;
+        private ServiceProvider _services;
 
         [TestInitialize]
         public void Setup()
@@ -20,6 +23,16 @@ namespace Parbad.Tests
             var httpContextAccessor = MockHelpers.MockHttpContextAccessor();
 
             _httpContext = httpContextAccessor.HttpContext;
+            _services = new ServiceCollection()
+                        .Configure<ParbadOptions>(_ => { })
+                        .BuildServiceProvider();
+            _httpContext.RequestServices = _services;
+        }
+
+        [TestCleanup]
+        public Task Cleanup()
+        {
+            return _services.DisposeAsync().AsTask();
         }
 
         [TestMethod]
@@ -34,8 +47,8 @@ namespace Parbad.Tests
             await transporter.TransportAsync();
 
             Assert.AreEqual((int)HttpStatusCode.Redirect, _httpContext.Response.StatusCode);
-            Assert.IsNotNull(_httpContext.Response.Headers[HeaderNames.Location]);
-            Assert.AreEqual(expectedUrl, _httpContext.Response.Headers[HeaderNames.Location]);
+            Assert.IsFalse(string.IsNullOrEmpty(_httpContext.Response.Headers[HeaderNames.Location].ToString()));
+            Assert.AreEqual(expectedUrl, _httpContext.Response.Headers[HeaderNames.Location].ToString());
         }
 
         [TestMethod]
