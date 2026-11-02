@@ -21,7 +21,11 @@ namespace Parbad.PaymentFlow.Tests.Gateways;
 /// <param name="Paid">Whether the callback reports a successful payment.</param>
 /// <param name="OrderId">The order id (tracking number) the callback claims.</param>
 /// <param name="Amount">The amount the callback claims, in the bank's unit.</param>
-public sealed record CallbackClaims(bool Paid, long OrderId, decimal Amount);
+/// <param name="Token">
+/// The request token the callback claims, when an attacker replaces it with the victim invoice's token (which
+/// they know, because it passed through their browser). Null means the transaction's own token.
+/// </param>
+public sealed record CallbackClaims(bool Paid, long OrderId, decimal Amount, string? Token = null);
 
 /// <summary>
 /// The same payment scenarios, run against every gateway through the real <see cref="IOnlinePayment"/>
@@ -263,6 +267,15 @@ public abstract class GatewayConformanceTests
         RunAsync(nameof(Payment_of_another_invoice_with_the_same_amount_cannot_settle_this_invoice),
                  () => PaymentOfAnotherInvoiceCannotSettleThisInvoiceAsync(InvoiceAmount));
 
+    /// <summary>
+    /// The attacker also replaces the request token in the callback with the victim invoice's token, so a check
+    /// that only compares the token with the one stored at request time is not enough.
+    /// </summary>
+    [TestMethod]
+    public Task Payment_of_another_invoice_cannot_settle_this_invoice_even_with_this_invoices_token() =>
+        RunAsync(nameof(Payment_of_another_invoice_cannot_settle_this_invoice_even_with_this_invoices_token),
+                 () => PaymentOfAnotherInvoiceCannotSettleThisInvoiceAsync(InvoiceAmount, forgeVictimToken: true));
+
     // ------------------------------------------------------------------ refund
 
     [TestMethod]
@@ -359,7 +372,7 @@ public abstract class GatewayConformanceTests
         if (HasBank) Assert.IsTrue(transaction.Verified, "The bank never received a successful verification.");
     }
 
-    private async Task PaymentOfAnotherInvoiceCannotSettleThisInvoiceAsync(decimal attackerAmount)
+    private async Task PaymentOfAnotherInvoiceCannotSettleThisInvoiceAsync(decimal attackerAmount, bool forgeVictimToken = false)
     {
         // The victim invoice: requested, but never paid at the bank.
         await RequestSucceededAsync(InvoiceTrackingNumber, InvoiceAmount);
@@ -370,7 +383,8 @@ public abstract class GatewayConformanceTests
 
         // The attacker sends the paid transaction's callback to the victim invoice's callback URL,
         // forging every browser-supplied field to match the victim invoice.
-        DeliverCallback(victim, attacker, Claims(InvoiceTrackingNumber, InvoiceAmount));
+        var claims = Claims(InvoiceTrackingNumber, InvoiceAmount) with { Token = forgeVictimToken ? victim.Token : null };
+        DeliverCallback(victim, attacker, claims);
         var outcome = await FetchAndVerifyAsync();
 
         outcome.AssertNoUnexpectedException();

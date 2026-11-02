@@ -69,7 +69,7 @@ namespace Parbad.Gateway.PayIr
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
-            var callbackResult = await PayIrHelper.CreateCallbackResultAsync(_httpContextAccessor.HttpContext.Request, cancellationToken).ConfigureAwaitFalse();
+            var callbackResult = await PayIrHelper.CreateCallbackResultAsync(_httpContextAccessor.HttpContext.Request, context, _messagesOptions, cancellationToken).ConfigureAwaitFalse();
 
             if (callbackResult.IsSucceed)
             {
@@ -84,7 +84,7 @@ namespace Parbad.Gateway.PayIr
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
-            var callbackResult = await PayIrHelper.CreateCallbackResultAsync(_httpContextAccessor.HttpContext.Request, cancellationToken).ConfigureAwaitFalse();
+            var callbackResult = await PayIrHelper.CreateCallbackResultAsync(_httpContextAccessor.HttpContext.Request, context, _messagesOptions, cancellationToken).ConfigureAwaitFalse();
 
             if (!callbackResult.IsSucceed)
             {
@@ -101,7 +101,7 @@ namespace Parbad.Gateway.PayIr
 
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
-            return PayIrHelper.CreateVerifyResult(response, _messagesOptions);
+            return PayIrHelper.CreateVerifyResult(response, context, _messagesOptions);
         }
 
         /// <inheritdoc />

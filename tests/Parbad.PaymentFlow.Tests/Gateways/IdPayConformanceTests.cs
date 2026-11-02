@@ -85,7 +85,7 @@ public class IdPayConformanceTests : GatewayConformanceTests
         TestCallback.Post(
             ("status", claims.Paid ? "10" : "7"), // 10 = ready for verification, 7 = cancelled by the user
             ("track_id", transaction.TraceNumber),
-            ("id", transaction.Token),
+            ("id", claims.Token ?? transaction.Token),
             ("order_id", claims.OrderId.ToString(CultureInfo.InvariantCulture)),
             ("amount", claims.Amount.ToString("0", CultureInfo.InvariantCulture)),
             ("card_no", transaction.MaskedCardNumber));

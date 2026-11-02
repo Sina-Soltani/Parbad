@@ -92,7 +92,7 @@ public class ZibalConformanceTests : GatewayConformanceTests
     protected override TestCallback CreateCallback(BankTransaction transaction, CallbackClaims claims) =>
         TestCallback.Get(
             ("success", claims.Paid ? "1" : "0"),
-            ("trackId", transaction.Token),
+            ("trackId", claims.Token ?? transaction.Token),
             ("orderId", claims.OrderId.ToString(CultureInfo.InvariantCulture)),
             ("status", claims.Paid ? "2" : "3")); // 3 = cancelled by the user
 

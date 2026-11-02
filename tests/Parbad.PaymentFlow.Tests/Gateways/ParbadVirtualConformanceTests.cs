@@ -36,6 +36,7 @@ public class ParbadVirtualConformanceTests : GatewayConformanceTests
         [nameof(Lost_verification_response_is_recovered_when_the_callback_is_retried)] = NoBank,
         [nameof(Payment_of_a_cheaper_invoice_cannot_settle_this_invoice)] = NoBank,
         [nameof(Payment_of_another_invoice_with_the_same_amount_cannot_settle_this_invoice)] = NoBank,
+        [nameof(Payment_of_another_invoice_cannot_settle_this_invoice_even_with_this_invoices_token)] = NoBank,
         [nameof(Full_refund_reaches_the_bank)] = NoBank,
         [nameof(Partial_refund_is_not_silently_turned_into_a_full_refund)] = NoBank
     };

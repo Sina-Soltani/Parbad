@@ -29,10 +29,6 @@ public class ParsianConformanceTests : GatewayConformanceTests
 
     protected override IReadOnlyDictionary<string, string> KnownIssues => new Dictionary<string, string>
     {
-        // Token, orderId and amount come from the browser; the token stored at request time is never compared,
-        // and the ConfirmPayment response is not checked against the invoice.
-        [nameof(Payment_of_a_cheaper_invoice_cannot_settle_this_invoice)] = "G-C1",
-        [nameof(Payment_of_another_invoice_with_the_same_amount_cannot_settle_this_invoice)] = "G-C1",
         // Any non-zero ConfirmPayment status is Failed, including "already confirmed".
         [nameof(Lost_verification_response_is_recovered_when_the_callback_is_retried)] = "G-H1 (assumes -1533 = already confirmed)",
         [nameof(Partial_refund_is_not_silently_turned_into_a_full_refund)] = "ANALYSIS-02 §5 (partial refunds)"
@@ -107,7 +103,7 @@ public class ParsianConformanceTests : GatewayConformanceTests
 
     protected override TestCallback CreateCallback(BankTransaction transaction, CallbackClaims claims) =>
         TestCallback.Post(
-            ("token", transaction.Token),
+            ("token", claims.Token ?? transaction.Token),
             ("status", claims.Paid ? "0" : "-138"), // -138 = cancelled by the user
             ("orderId", claims.OrderId.ToString(CultureInfo.InvariantCulture)),
             ("amount", claims.Amount.ToString("0", CultureInfo.InvariantCulture)),

@@ -31,7 +31,8 @@ public class PayPingConformanceTests : GatewayConformanceTests
     protected override IReadOnlyDictionary<string, string> KnownIssues => new Dictionary<string, string>
     {
         // refid comes from the browser and is not tied to this invoice; only the amount check protects it.
-        [nameof(Payment_of_another_invoice_with_the_same_amount_cannot_settle_this_invoice)] = "G-C1b"
+        [nameof(Payment_of_another_invoice_with_the_same_amount_cannot_settle_this_invoice)] = "G-C1b",
+        [nameof(Payment_of_another_invoice_cannot_settle_this_invoice_even_with_this_invoices_token)] = "G-C1b"
     };
 
     protected override void AddGateway(IGatewayBuilder gateways) =>

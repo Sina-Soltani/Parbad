@@ -105,6 +105,13 @@ namespace Parbad.Gateway.Parsian.Internal
                     isSucceed = false;
                     message = "Error in Callback section. Token is null or empty.";
                 }
+                else if (!IsTokenIssuedForThisInvoice(token, context))
+                {
+                    // ConfirmPayment confirms whatever token it receives, so a token of another (paid) invoice
+                    // would settle this one.
+                    isSucceed = false;
+                    message = "Error in Callback section. Token is not equal with the data in database.";
+                }
                 else if (orderId.IsNullOrEmpty())
                 {
                     isSucceed = false;
@@ -235,6 +242,23 @@ namespace Parbad.Gateway.Parsian.Internal
             result.DatabaseAdditionalData.Add("token", token);
 
             return result;
+        }
+
+        /// <summary>
+        /// Checks that the callback's token is the one stored when this invoice was requested. Invoices without
+        /// a stored token have nothing to compare with and are accepted as before.
+        /// </summary>
+        private static bool IsTokenIssuedForThisInvoice(string callbackToken, InvoiceContext context)
+        {
+            var requestTransaction = context.Transactions?.SingleOrDefault(transaction => transaction.Type == TransactionType.Request);
+
+            if (string.IsNullOrEmpty(requestTransaction?.AdditionalData) ||
+                !requestTransaction.ToDictionary().TryGetValue("token", out var issuedToken))
+            {
+                return true;
+            }
+
+            return string.Equals(issuedToken, callbackToken, StringComparison.Ordinal);
         }
     }
 }

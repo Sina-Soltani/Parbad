@@ -36,9 +36,9 @@ public class IranKishConformanceTests : GatewayConformanceTests
         // CreateVerifyResult reads result.Result.ResponseCode although Result is null on errors.
         [nameof(Bank_rejection_during_verification_is_recorded_as_failed)] = "G-H9",
         [nameof(Html_error_page_during_verification_does_not_crash_or_mark_the_payment_as_paid)] = "G-H9",
-        // Token, RRN and STAN come from the callback; the confirmation's Amount and PaymentId are not compared.
-        [nameof(Payment_of_a_cheaper_invoice_cannot_settle_this_invoice)] = "G-C1",
-        [nameof(Payment_of_another_invoice_with_the_same_amount_cannot_settle_this_invoice)] = "G-C1"
+        // The attack is blocked (the bank rejects the victim's token with the attacker's RRN/STAN), but the
+        // rejection crashes on the null Result.
+        [nameof(Payment_of_another_invoice_cannot_settle_this_invoice_even_with_this_invoices_token)] = "G-H9"
     };
 
     protected override void AddGateway(IGatewayBuilder gateways) =>
@@ -120,7 +120,7 @@ public class IranKishConformanceTests : GatewayConformanceTests
 
     protected override TestCallback CreateCallback(BankTransaction transaction, CallbackClaims claims) =>
         TestCallback.Post(
-            ("Token", transaction.Token),
+            ("Token", claims.Token ?? transaction.Token),
             ("AcceptorId", AcceptorId),
             ("ResponseCode", claims.Paid ? "00" : "17"), // 17 = cancelled by the user
             ("PaymentId", claims.OrderId.ToString(CultureInfo.InvariantCulture)),

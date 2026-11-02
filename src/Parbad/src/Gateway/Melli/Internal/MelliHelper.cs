@@ -8,7 +8,9 @@ using Parbad.Gateway.Melli.Internal.ResultTranslator;
 using Parbad.Http;
 using Parbad.Internal;
 using Parbad.Options;
+using Parbad.Storage.Abstractions.Models;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,6 +20,7 @@ namespace Parbad.Gateway.Melli.Internal
     {
         private const int SuccessCode = 0;
         private const int DuplicateTrackingNumberCode = 1011;
+        private const string TokenDatabaseKey = "MelliToken";
 
         public static object CreateRequestData(Invoice invoice, MelliGatewayAccount account, IMelliGatewayCrypto crypto)
         {
@@ -68,7 +71,12 @@ namespace Parbad.Gateway.Melli.Internal
 
             var paymentPageUrl = $"{gatewayOptions.PaymentPageUrl}?token={result.Token}";
 
-            return PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, paymentPageUrl);
+            var requestResult = PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, paymentPageUrl);
+
+            // Stored so that the callback can be bound to this invoice (see CreateCallbackResultAsync).
+            requestResult.DatabaseAdditionalData.Add(TokenDatabaseKey, result.Token);
+
+            return requestResult;
         }
 
         public static async Task<MelliCallbackResult> CreateCallbackResultAsync(
@@ -93,7 +101,10 @@ namespace Parbad.Gateway.Melli.Internal
             var apiToken = await httpRequest.TryGetParamAsync("Token", cancellationToken).ConfigureAwaitFalse();
             var apiOrderId = await httpRequest.TryGetParamAsAsync<long>("OrderId", cancellationToken).ConfigureAwaitFalse();
 
-            if (!apiOrderId.Exists || apiOrderId.Value != context.Payment.TrackingNumber)
+            // The order id comes from the browser, so it proves nothing on its own; the token is what the bank
+            // verifies, so it must be the one issued for this invoice.
+            if (!apiOrderId.Exists || apiOrderId.Value != context.Payment.TrackingNumber ||
+                !IsTokenIssuedForThisInvoice(apiToken.Value, context))
             {
                 return new MelliCallbackResult
                 {
@@ -115,11 +126,19 @@ namespace Parbad.Gateway.Melli.Internal
             };
         }
 
-        public static PaymentVerifyResult CreateVerifyResult(MelliApiVerifyResult result, MessagesOptions messagesOptions)
+        public static PaymentVerifyResult CreateVerifyResult(MelliApiVerifyResult result, InvoiceContext context, MessagesOptions messagesOptions)
         {
             if (result == null)
             {
                 return PaymentVerifyResult.Failed(messagesOptions.UnexpectedErrorText);
+            }
+
+            // Compare what the bank reports with the invoice. Values the bank does not send (0) are not compared.
+            if (result.ResCode == SuccessCode &&
+                ((result.Amount > 0 && result.Amount != (long)context.Payment.Amount) ||
+                 (result.OrderId > 0 && result.OrderId != context.Payment.TrackingNumber)))
+            {
+                return PaymentVerifyResult.Failed($"{messagesOptions.PaymentFailed} The amount or order id reported by the gateway does not match the invoice.");
             }
 
             string message;
@@ -166,6 +185,23 @@ namespace Parbad.Gateway.Melli.Internal
                 token = apiToken,
                 SignData = signedData
             };
+        }
+
+        /// <summary>
+        /// Checks that the callback's token is the one Sadad issued for this invoice. Invoices requested before
+        /// the token was stored have nothing to compare with and are accepted as before.
+        /// </summary>
+        private static bool IsTokenIssuedForThisInvoice(string callbackToken, InvoiceContext context)
+        {
+            var requestTransaction = context.Transactions?.SingleOrDefault(transaction => transaction.Type == TransactionType.Request);
+
+            if (string.IsNullOrEmpty(requestTransaction?.AdditionalData) ||
+                !requestTransaction.ToDictionary().TryGetValue(TokenDatabaseKey, out var issuedToken))
+            {
+                return true;
+            }
+
+            return string.Equals(issuedToken, callbackToken, StringComparison.Ordinal);
         }
     }
 }

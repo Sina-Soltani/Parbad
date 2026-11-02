@@ -4,6 +4,17 @@
         <name>Parbad.Gateway.IranKish</name>
     </assembly>
     <members>
+        <member name="M:Parbad.Gateway.IranKish.Internal.IranKishHelper.IsTokenIssuedForThisInvoice(System.String,Parbad.InvoiceContext)">
+            <summary>
+            Checks that the callback's token is the one Iran Kish issued for this invoice. Invoices requested before
+            the token was stored have nothing to compare with and are accepted as before.
+            </summary>
+        </member>
+        <member name="M:Parbad.Gateway.IranKish.Internal.IranKishHelper.MatchesInvoice(Parbad.Gateway.IranKish.Internal.Models.IranKishVerifyResultInfo,Parbad.InvoiceContext)">
+            <summary>
+            Compares what the bank reports with the invoice. Values the bank does not send are not compared.
+            </summary>
+        </member>
         <member name="M:Parbad.Gateway.IranKish.IranKishGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>

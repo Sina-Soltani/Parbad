@@ -125,7 +125,7 @@ public class FanAvaConformanceTests : GatewayConformanceTests
             ("State", claims.Paid ? "ok" : "CanceledByUser"),
             ("RefNum", claims.Paid ? transaction.Reference : ""),
             ("ResNum", claims.OrderId.ToString(CultureInfo.InvariantCulture)),
-            ("token", transaction.Token));
+            ("token", claims.Token ?? transaction.Token));
 
     private static bool IsMerchant(JObject json) =>
         (string?)json["WSContext"]?["UserId"] == UserId && (string?)json["WSContext"]?["Password"] == Password;

@@ -88,5 +88,5 @@ public class YekPayConformanceTests : GatewayConformanceTests
     }
 
     protected override TestCallback CreateCallback(BankTransaction transaction, CallbackClaims claims) =>
-        TestCallback.Post(("success", claims.Paid ? "1" : "0"), ("authority", transaction.Token));
+        TestCallback.Post(("success", claims.Paid ? "1" : "0"), ("authority", claims.Token ?? transaction.Token));
 }
