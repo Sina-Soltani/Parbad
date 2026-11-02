@@ -4,6 +4,12 @@
         <name>Parbad.Gateway.PayIr</name>
     </assembly>
     <members>
+        <member name="M:Parbad.Gateway.PayIr.Internal.PayIrHelper.IsTokenIssuedForThisInvoice(System.String,Parbad.InvoiceContext)">
+            <summary>
+            Checks that the callback's token is the one Pay.ir issued for this invoice. Invoices requested before
+            the token was stored have nothing to compare with and are accepted as before.
+            </summary>
+        </member>
         <member name="M:Parbad.Gateway.PayIr.PayIrGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>

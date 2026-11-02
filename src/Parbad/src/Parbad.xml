@@ -559,6 +559,12 @@
             Sets additional data for <see cref="T:Parbad.Gateway.Mellat.MellatGateway"/>.
             </summary>
         </member>
+        <member name="M:Parbad.Gateway.Melli.Internal.MelliHelper.IsTokenIssuedForThisInvoice(System.String,Parbad.InvoiceContext)">
+            <summary>
+            Checks that the callback's token is the one Sadad issued for this invoice. Invoices requested before
+            the token was stored have nothing to compare with and are accepted as before.
+            </summary>
+        </member>
         <member name="T:Parbad.Gateway.Melli.MelliGateway">
             <summary>
             Melli Gateway.
@@ -675,6 +681,12 @@
         <member name="P:Parbad.Gateway.Parsian.Internal.Models.ParsianCallbackResult.RRN">
             <summary>
             Equals to TransactionCode in Parbad system.
+            </summary>
+        </member>
+        <member name="M:Parbad.Gateway.Parsian.Internal.ParsianHelper.IsTokenIssuedForThisInvoice(System.String,Parbad.InvoiceContext)">
+            <summary>
+            Checks that the callback's token is the one stored when this invoice was requested. Invoices without
+            a stored token have nothing to compare with and are accepted as before.
             </summary>
         </member>
         <member name="M:Parbad.Gateway.Parsian.ParsianGateway.RequestAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">

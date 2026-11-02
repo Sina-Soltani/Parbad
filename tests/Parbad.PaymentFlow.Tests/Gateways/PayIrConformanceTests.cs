@@ -25,10 +25,7 @@ public class PayIrConformanceTests : GatewayConformanceTests
     protected override IReadOnlyDictionary<string, string> KnownIssues => new Dictionary<string, string>
     {
         // The response body is deserialised without checking the HTTP status.
-        [nameof(Html_error_page_during_verification_does_not_crash_or_mark_the_payment_as_paid)] = "G-H9",
-        // The token comes only from the browser, and the verify response's amount is never compared.
-        [nameof(Payment_of_a_cheaper_invoice_cannot_settle_this_invoice)] = "G-C1",
-        [nameof(Payment_of_another_invoice_with_the_same_amount_cannot_settle_this_invoice)] = "G-C1"
+        [nameof(Html_error_page_during_verification_does_not_crash_or_mark_the_payment_as_paid)] = "G-H9"
     };
 
     protected override void AddGateway(IGatewayBuilder gateways) =>
@@ -83,5 +80,5 @@ public class PayIrConformanceTests : GatewayConformanceTests
     }
 
     protected override TestCallback CreateCallback(BankTransaction transaction, CallbackClaims claims) =>
-        TestCallback.Get(("token", transaction.Token), ("status", claims.Paid ? "1" : "0"));
+        TestCallback.Get(("token", claims.Token ?? transaction.Token), ("status", claims.Paid ? "1" : "0"));
 }

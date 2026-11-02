@@ -32,10 +32,7 @@ public class MelliConformanceTests : GatewayConformanceTests
     protected override IReadOnlyDictionary<string, string> KnownIssues => new Dictionary<string, string>
     {
         // The private PostJsonAsync deserialises the body without checking the HTTP status.
-        [nameof(Html_error_page_during_verification_does_not_crash_or_mark_the_payment_as_paid)] = "G-H9",
-        // The bank's verify response contains Amount and OrderId, but neither is compared with the payment.
-        [nameof(Payment_of_a_cheaper_invoice_cannot_settle_this_invoice)] = "G-C1",
-        [nameof(Payment_of_another_invoice_with_the_same_amount_cannot_settle_this_invoice)] = "G-C1"
+        [nameof(Html_error_page_during_verification_does_not_crash_or_mark_the_payment_as_paid)] = "G-H9"
     };
 
     protected override void AddGateway(IGatewayBuilder gateways) =>
@@ -106,7 +103,7 @@ public class MelliConformanceTests : GatewayConformanceTests
 
     protected override TestCallback CreateCallback(BankTransaction transaction, CallbackClaims claims) =>
         TestCallback.Post(
-            ("Token", transaction.Token),
+            ("Token", claims.Token ?? transaction.Token),
             ("OrderId", claims.OrderId.ToString(CultureInfo.InvariantCulture)),
             ("ResCode", claims.Paid ? "0" : "-1"));
 

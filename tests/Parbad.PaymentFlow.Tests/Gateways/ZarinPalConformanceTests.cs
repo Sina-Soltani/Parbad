@@ -98,7 +98,7 @@ public class ZarinPalConformanceTests : GatewayConformanceTests
     }
 
     protected override TestCallback CreateCallback(BankTransaction transaction, CallbackClaims claims) =>
-        TestCallback.Get(("Authority", transaction.Token), ("Status", claims.Paid ? "OK" : "NOK"));
+        TestCallback.Get(("Authority", claims.Token ?? transaction.Token), ("Status", claims.Paid ? "OK" : "NOK"));
 
     /// <summary>The v4 error shape: HTTP 4xx, "data" as an empty array and "errors" as an object.</summary>
     private static HttpResponseMessage Error(int code, string message) =>

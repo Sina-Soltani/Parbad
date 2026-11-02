@@ -108,7 +108,7 @@ public class MellatConformanceTests : GatewayConformanceTests
 
     protected override TestCallback CreateCallback(BankTransaction transaction, CallbackClaims claims) =>
         TestCallback.Post(
-            ("RefId", transaction.Token),
+            ("RefId", claims.Token ?? transaction.Token),
             ("ResCode", claims.Paid ? "0" : "17"), // 17 = cancelled by the user
             ("SaleOrderId", claims.OrderId.ToString(CultureInfo.InvariantCulture)),
             ("SaleReferenceId", claims.Paid ? transaction.Reference : ""),

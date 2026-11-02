@@ -9,6 +9,7 @@ using Parbad.Options;
 using Parbad.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading.Tasks;
 
 namespace Parbad.Gateway.AsanPardakht.Internal
@@ -158,6 +159,14 @@ namespace Parbad.Gateway.AsanPardakht.Internal
                     {
                         isSucceed = false;
                         message = "مبلغ پرداخت شده نامشخص است.";
+                    }
+
+                    // ReturningParams is encrypted by the bank, so it cannot be forged, but it can be replayed:
+                    // the callback of another invoice with the same amount would otherwise settle this one.
+                    if (isSucceed && preInvoiceID != context.Payment.TrackingNumber.ToString(CultureInfo.InvariantCulture))
+                    {
+                        isSucceed = false;
+                        message = "شماره فاکتور پرداخت شده با فاکتور درخواست شده مطابقت ندارد.";
                     }
                 }
             }

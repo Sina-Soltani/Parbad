@@ -29,6 +29,7 @@ public class SamanConformanceTests : GatewayConformanceTests
         [nameof(Html_error_page_during_verification_does_not_crash_or_mark_the_payment_as_paid)] = "G-H9",
         // The callback RefNum is never compared with anything stored for this invoice; only the amount protects it.
         [nameof(Payment_of_another_invoice_with_the_same_amount_cannot_settle_this_invoice)] = "G-C1b",
+        [nameof(Payment_of_another_invoice_cannot_settle_this_invoice_even_with_this_invoices_token)] = "G-C1b",
         [nameof(Lost_verification_response_is_recovered_when_the_callback_is_retried)] = "G-H1",
         [nameof(Partial_refund_is_not_silently_turned_into_a_full_refund)] = "ANALYSIS-02 §5 (partial refunds)"
     };

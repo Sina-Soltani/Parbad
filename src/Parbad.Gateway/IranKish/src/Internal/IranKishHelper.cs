@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,12 +13,14 @@ using Parbad.Gateway.IranKish.Internal.Models;
 using Parbad.Http;
 using Parbad.Internal;
 using Parbad.Options;
+using Parbad.Storage.Abstractions.Models;
 
 namespace Parbad.Gateway.IranKish.Internal
 {
     internal static class IranKishHelper
     {
         private const string SuccessResponseCode = "00";
+        private const string TokenDatabaseKey = "IranKishToken";
 
         internal static string CmsPreservationIdKey => "IranKishCmsPreservationId";
 
@@ -93,11 +96,16 @@ namespace Parbad.Gateway.IranKish.Internal
                            { "tokenIdentity", result.Result.Token }
                        };
 
-            return PaymentRequestResult.SucceedWithPost(
-                                                        account.Name,
-                                                        httpContext,
-                                                        gatewayOptions.PaymentPageUrl,
-                                                        form);
+            var requestResult = PaymentRequestResult.SucceedWithPost(
+                                                                     account.Name,
+                                                                     httpContext,
+                                                                     gatewayOptions.PaymentPageUrl,
+                                                                     form);
+
+            // Stored so that the callback can be bound to this invoice (see CreateCallbackResultAsync).
+            requestResult.DatabaseAdditionalData.Add(TokenDatabaseKey, result.Result.Token);
+
+            return requestResult;
         }
 
         public static async Task<IranKishCallbackResult> CreateCallbackResultAsync(
@@ -123,6 +131,13 @@ namespace Parbad.Gateway.IranKish.Internal
                 ? null
                 : IranKishGatewayResultTranslator.Translate(responseCode.Value, messagesOptions);
 
+            if (isSucceed && !IsTokenIssuedForThisInvoice(token.Value, context))
+            {
+                // The callback carries the token of another invoice (e.g. a cheaper one that was paid).
+                isSucceed = false;
+                message = messagesOptions.InvalidDataReceivedFromGateway;
+            }
+
             return new IranKishCallbackResult
                    {
                        IsSucceed = isSucceed,
@@ -140,7 +155,7 @@ namespace Parbad.Gateway.IranKish.Internal
                    };
         }
 
-        public static PaymentVerifyResult CreateVerifyResult(IranKishVerifyResult result, MessagesOptions messagesOptions)
+        public static PaymentVerifyResult CreateVerifyResult(IranKishVerifyResult result, InvoiceContext context, MessagesOptions messagesOptions)
         {
             if (result == null)
             {
@@ -150,7 +165,12 @@ namespace Parbad.Gateway.IranKish.Internal
             var responseCode = result.Result.ResponseCode;
             PaymentVerifyResultStatus status;
             string message;
-            if (responseCode == SuccessResponseCode)
+            if (responseCode == SuccessResponseCode && !MatchesInvoice(result.Result, context))
+            {
+                status = PaymentVerifyResultStatus.Failed;
+                message = $"{messagesOptions.PaymentFailed} The amount or payment id reported by the gateway does not match the invoice.";
+            }
+            else if (responseCode == SuccessResponseCode)
             {
                 status = PaymentVerifyResultStatus.Succeed;
                 message = messagesOptions.PaymentSucceed;
@@ -167,6 +187,39 @@ namespace Parbad.Gateway.IranKish.Internal
                        TransactionCode = result.Result.RetrievalReferenceNumber,
                        Message = message
                    };
+        }
+
+        /// <summary>
+        /// Checks that the callback's token is the one Iran Kish issued for this invoice. Invoices requested before
+        /// the token was stored have nothing to compare with and are accepted as before.
+        /// </summary>
+        private static bool IsTokenIssuedForThisInvoice(string callbackToken, InvoiceContext context)
+        {
+            var requestTransaction = context.Transactions?.SingleOrDefault(transaction => transaction.Type == TransactionType.Request);
+
+            if (string.IsNullOrEmpty(requestTransaction?.AdditionalData) ||
+                !requestTransaction.ToDictionary().TryGetValue(TokenDatabaseKey, out var issuedToken))
+            {
+                return true;
+            }
+
+            return string.Equals(issuedToken, callbackToken, StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Compares what the bank reports with the invoice. Values the bank does not send are not compared.
+        /// </summary>
+        private static bool MatchesInvoice(IranKishVerifyResultInfo result, InvoiceContext context)
+        {
+            if (!string.IsNullOrEmpty(result.Amount) &&
+                (!long.TryParse(result.Amount, NumberStyles.None, CultureInfo.InvariantCulture, out var amount) ||
+                 amount != (long)context.Payment.Amount))
+            {
+                return false;
+            }
+
+            return string.IsNullOrEmpty(result.PaymentId) ||
+                   result.PaymentId == context.Payment.TrackingNumber.ToString(CultureInfo.InvariantCulture);
         }
     }
 }

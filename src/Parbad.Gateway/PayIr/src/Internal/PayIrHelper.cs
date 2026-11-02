@@ -7,7 +7,9 @@ using Parbad.Abstraction;
 using Parbad.Http;
 using Parbad.Internal;
 using Parbad.Options;
+using Parbad.Storage.Abstractions.Models;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,6 +18,7 @@ namespace Parbad.Gateway.PayIr.Internal
     internal static class PayIrHelper
     {
         public const string OkResult = "1";
+        private const string TokenDatabaseKey = "PayIrToken";
         public static string RequestAdditionalDataKey => nameof(RequestAdditionalDataKey);
 
         public static PayIrRequestModel CreateRequestData(PayIrGatewayAccount account, Invoice invoice)
@@ -48,10 +51,19 @@ namespace Parbad.Gateway.PayIr.Internal
 
             var paymentPageUrl = $"{gatewayOptions.PaymentPageUrl}{result.Token}";
 
-            return PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, paymentPageUrl);
+            var requestResult = PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, paymentPageUrl);
+
+            // Stored so that the callback can be bound to this invoice (see CreateCallbackResultAsync).
+            requestResult.DatabaseAdditionalData.Add(TokenDatabaseKey, result.Token);
+
+            return requestResult;
         }
 
-        public static async Task<PayIrCallbackResult> CreateCallbackResultAsync(HttpRequest httpRequest, CancellationToken cancellationToken)
+        public static async Task<PayIrCallbackResult> CreateCallbackResultAsync(
+            HttpRequest httpRequest,
+            InvoiceContext context,
+            MessagesOptions messagesOptions,
+            CancellationToken cancellationToken)
         {
             var token = await httpRequest.TryGetParamAsync("Token", cancellationToken).ConfigureAwaitFalse();
             var status = await httpRequest.TryGetParamAsync("Status", cancellationToken).ConfigureAwaitFalse();
@@ -62,6 +74,12 @@ namespace Parbad.Gateway.PayIr.Internal
             if (!isSucceed)
             {
                 message = $"Error {status}";
+            }
+            else if (!IsTokenIssuedForThisInvoice(token.Value, context))
+            {
+                // The callback carries the token of another invoice (e.g. a cheaper one that was paid).
+                isSucceed = false;
+                message = messagesOptions.InvalidDataReceivedFromGateway;
             }
 
             return new PayIrCallbackResult
@@ -83,13 +101,17 @@ namespace Parbad.Gateway.PayIr.Internal
             };
         }
 
-        public static PaymentVerifyResult CreateVerifyResult(string response, MessagesOptions messagesOptions)
+        public static PaymentVerifyResult CreateVerifyResult(string response, InvoiceContext context, MessagesOptions messagesOptions)
         {
             var result = JsonConvert.DeserializeObject<PayIrVerifyResponseModel>(response);
 
             PaymentVerifyResult verifyResult;
 
-            if (result.IsSucceed)
+            if (result.IsSucceed && result.Amount > 0 && result.Amount != (long)context.Payment.Amount)
+            {
+                verifyResult = PaymentVerifyResult.Failed($"{messagesOptions.PaymentFailed} The amount reported by the gateway ({result.Amount}) does not match the invoice amount ({(long)context.Payment.Amount}).");
+            }
+            else if (result.IsSucceed)
             {
                 verifyResult = PaymentVerifyResult.Succeed(result.TransId, messagesOptions.PaymentSucceed);
             }
@@ -111,6 +133,23 @@ namespace Parbad.Gateway.PayIr.Internal
             verifyResult.SetPayIrAdditionalData(additionalData);
 
             return verifyResult;
+        }
+
+        /// <summary>
+        /// Checks that the callback's token is the one Pay.ir issued for this invoice. Invoices requested before
+        /// the token was stored have nothing to compare with and are accepted as before.
+        /// </summary>
+        private static bool IsTokenIssuedForThisInvoice(string callbackToken, InvoiceContext context)
+        {
+            var requestTransaction = context.Transactions?.SingleOrDefault(transaction => transaction.Type == TransactionType.Request);
+
+            if (string.IsNullOrEmpty(requestTransaction?.AdditionalData) ||
+                !requestTransaction.ToDictionary().TryGetValue(TokenDatabaseKey, out var issuedToken))
+            {
+                return true;
+            }
+
+            return string.Equals(issuedToken, callbackToken, StringComparison.Ordinal);
         }
     }
 }

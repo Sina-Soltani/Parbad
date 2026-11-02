@@ -46,9 +46,7 @@ public class AsanPardakhtConformanceTests : GatewayConformanceTests
         // The retry after a lost response gets 504 (verification already requested), which is mapped to Failed.
         [nameof(Lost_verification_response_is_recovered_when_the_callback_is_retried)] = "G-H1",
         // The local date is formatted with the current culture: under fa-IR it is a Persian date.
-        [nameof(Payment_is_verified_on_a_server_with_persian_culture)] = "G-H6",
-        // The encrypted callback carries the other invoice's id (preInvoiceID), but it is never compared.
-        [nameof(Payment_of_another_invoice_with_the_same_amount_cannot_settle_this_invoice)] = "G-C1b"
+        [nameof(Payment_is_verified_on_a_server_with_persian_culture)] = "G-H6"
     };
 
     protected override void AddGateway(IGatewayBuilder gateways) =>

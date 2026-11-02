@@ -109,7 +109,7 @@ namespace Parbad.Gateway.IranKish
                                .PostJsonAsync<IranKishVerifyResult>(_gatewayOptions.ApiVerificationUrl, data, cancellationToken: cancellationToken)
                                .ConfigureAwaitFalse();
 
-            return IranKishHelper.CreateVerifyResult(result, _messageOptions.Value);
+            return IranKishHelper.CreateVerifyResult(result, context, _messageOptions.Value);
         }
 
         /// <inheritdoc />
