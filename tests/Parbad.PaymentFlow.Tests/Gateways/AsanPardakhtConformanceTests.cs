@@ -41,12 +41,8 @@ public class AsanPardakhtConformanceTests : GatewayConformanceTests
 
     protected override IReadOnlyDictionary<string, string> KnownIssues => new Dictionary<string, string>
     {
-        // The verification result is translated with int.Parse; an HTML page yields "" and a FormatException.
-        [nameof(Html_error_page_during_verification_does_not_crash_or_mark_the_payment_as_paid)] = "G-H9",
         // The retry after a lost response gets 504 (verification already requested), which is mapped to Failed.
-        [nameof(Lost_verification_response_is_recovered_when_the_callback_is_retried)] = "G-H1",
-        // The local date is formatted with the current culture: under fa-IR it is a Persian date.
-        [nameof(Payment_is_verified_on_a_server_with_persian_culture)] = "G-H6"
+        [nameof(Lost_verification_response_is_recovered_when_the_callback_is_retried)] = "G-H1"
     };
 
     protected override void AddGateway(IGatewayBuilder gateways) =>
@@ -97,7 +93,7 @@ public class AsanPardakhtConformanceTests : GatewayConformanceTests
                 return Soap("RequestOperationResponse", "RequestOperationResult", "305"); // invalid username or password
             }
 
-            if (!IsTodayInGregorianCalendar(fields[5]))
+            if (!IsNowInGregorianCalendar(fields[5]))
             {
                 return Soap("RequestOperationResponse", "RequestOperationResult", "-100"); // invalid local date
             }
@@ -174,14 +170,14 @@ public class AsanPardakhtConformanceTests : GatewayConformanceTests
         return transaction is { Paid: true } ? transaction : null;
     }
 
-    private static bool IsTodayInGregorianCalendar(string localDateTime)
-    {
-        var match = Regex.Match(localDateTime, @"^(\d{8}) \d{6}$");
-
-        return match.Success &&
-               DateTime.TryParseExact(match.Groups[1].Value, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var date) &&
-               Math.Abs((date - DateTime.Today).TotalDays) <= 1;
-    }
+    /// <summary>
+    /// A 12-hour clock (G-H5) is 12 hours off in the afternoon, and "12" instead of "00" after midnight, so it is
+    /// only caught at those times; a 24-hour clock passes at any time.
+    /// </summary>
+    private static bool IsNowInGregorianCalendar(string localDateTime) =>
+        Regex.IsMatch(localDateTime, @"^\d{8} \d{6}$") &&
+        DateTime.TryParseExact(localDateTime, "yyyyMMdd HHmmss", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateTime) &&
+        Math.Abs((dateTime - DateTime.Now).TotalMinutes) <= 10;
 
     private static string Encrypt(string plain) => "ENC:" + Convert.ToBase64String(Encoding.UTF8.GetBytes(plain));
 

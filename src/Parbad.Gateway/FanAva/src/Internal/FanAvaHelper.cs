@@ -11,6 +11,7 @@ using Parbad.Options;
 using Parbad.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -174,8 +175,8 @@ namespace Parbad.Gateway.FanAva.Internal
             return new PaymentVerifyResult
             {
                 IsSucceed = verifyResult.Result == "erSucceed",
-                Amount = Money.Parse(verifyResult.Amount),
-                TrackingNumber = long.Parse(verifyResult.InvoiceNumber),
+                Amount = decimal.Parse(verifyResult.Amount, NumberStyles.Number, CultureInfo.InvariantCulture),
+                TrackingNumber = long.Parse(verifyResult.InvoiceNumber, CultureInfo.InvariantCulture),
                 Status = PaymentVerifyResultStatus.Succeed
             };
         }
@@ -205,8 +206,8 @@ namespace Parbad.Gateway.FanAva.Internal
             return new PaymentRefundResult
             {
                 IsSucceed = refundResult.IsSucceed,
-                Amount = Money.Parse(refundResult.Amount),
-                TrackingNumber = long.Parse(refundResult.InvoiceNumber),
+                Amount = decimal.Parse(refundResult.Amount, NumberStyles.Number, CultureInfo.InvariantCulture),
+                TrackingNumber = long.Parse(refundResult.InvoiceNumber, CultureInfo.InvariantCulture),
                 Status = PaymentRefundResultStatus.Succeed
             };
         }

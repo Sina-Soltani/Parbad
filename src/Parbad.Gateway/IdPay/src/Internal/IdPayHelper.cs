@@ -8,6 +8,7 @@ using Parbad.Http;
 using Parbad.Internal;
 using Parbad.Net;
 using Parbad.Options;
+using System.Globalization;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
@@ -164,7 +165,7 @@ namespace Parbad.Gateway.IdPay.Internal
                 return (false, messagesOptions.InvalidDataReceivedFromGateway);
             }
 
-            if (!long.TryParse(orderId, out var integerOrderId))
+            if (!long.TryParse(orderId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var integerOrderId))
             {
                 return (false, messagesOptions.InvalidDataReceivedFromGateway);
             }
@@ -174,7 +175,7 @@ namespace Parbad.Gateway.IdPay.Internal
                 return (false, messagesOptions.InvalidDataReceivedFromGateway);
             }
 
-            if (!long.TryParse(amount, out var integerAmount))
+            if (!long.TryParse(amount, NumberStyles.Integer, CultureInfo.InvariantCulture, out var integerAmount))
             {
                 return (false, messagesOptions.InvalidDataReceivedFromGateway);
             }

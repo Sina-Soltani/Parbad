@@ -44,7 +44,8 @@ namespace Parbad.Gateway.AsanPardakht.Internal
 
         public static async Task<string> CreateRequestData(Invoice invoice, AsanPardakhtGatewayAccount account, IAsanPardakhtCrypto crypto)
         {
-            var requestToEncrypt = string.Format("{0},{1},{2},{3},{4},{5:yyyyMMdd hhmmss},{6},{7},{8}",
+            var requestToEncrypt = string.Format(CultureInfo.InvariantCulture,
+                "{0},{1},{2},{3},{4},{5:yyyyMMdd HHmmss},{6},{7},{8}",
                 1,
                 account.UserName,
                 account.Password,
@@ -147,7 +148,7 @@ namespace Parbad.Gateway.AsanPardakht.Internal
                 }
                 else
                 {
-                    if (long.TryParse(amount, out var longAmount))
+                    if (long.TryParse(amount, NumberStyles.Integer, CultureInfo.InvariantCulture, out var longAmount))
                     {
                         if (longAmount != (long)context.Payment.Amount)
                         {

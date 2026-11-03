@@ -2,6 +2,7 @@
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
 using System;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -43,7 +44,7 @@ namespace Parbad.Http
 
             if (result.Exists)
             {
-                value = (T)Convert.ChangeType((string)result.Value, typeof(T));
+                value = (T)Convert.ChangeType((string)result.Value, typeof(T), CultureInfo.InvariantCulture);
             }
 
             return (result.Exists, value);

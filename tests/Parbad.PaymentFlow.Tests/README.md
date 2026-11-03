@@ -59,7 +59,9 @@ List failing scenarios in `KnownIssues` with the id of a documented issue, never
   `Assumption (unverified)`, and assumes the answer most favourable to Parbad. Search for that text before
   relying on a passing result.
 - **Some problems cannot be tested here:**
-  - AsanPardakht's 12-hour timestamp (G-H5): the gateway reads `DateTime.Now` directly.
+  - AsanPardakht's 12-hour timestamp (G-H5) only partly: the gateway reads `DateTime.Now` directly, so the
+    simulator (which checks the timestamp against the clock) catches a 12-hour clock only between 12:00 and
+    00:59.
   - PayPing's amount unit (G-H8): this needs confirmation from PayPing.
 - **MockHttp 6 swallows exceptions from asynchronous response handlers,** so the request then hangs. Simulators
   must not throw: `FakeBank.Endpoint` records simulator errors instead, and a lost response is simulated by a
