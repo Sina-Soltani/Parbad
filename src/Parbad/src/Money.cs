@@ -138,7 +138,7 @@ namespace Parbad
 
         public static bool operator <(Money left, Money right)
         {
-            return !(left > right);
+            return left.Value < right.Value;
         }
 
         public static bool operator >=(Money left, Money right)
