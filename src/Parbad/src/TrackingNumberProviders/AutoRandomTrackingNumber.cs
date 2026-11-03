@@ -6,7 +6,7 @@ using Parbad.Abstraction;
 using Parbad.Internal;
 using Parbad.InvoiceBuilder;
 using Parbad.Storage.Abstractions;
-using System.Linq;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,6 +18,10 @@ namespace Parbad.TrackingNumberProviders
     /// </summary>
     public class AutoRandomTrackingNumber : IInvoiceFormatter
     {
+        // With 2^63 possible values a collision is already very unlikely; repeated collisions mean that
+        // the range above MinimumValue is (nearly) used up, so retrying for ever would never end.
+        private const int MaxAttempts = 10;
+
         private readonly IStorage _storage;
         private readonly AutoRandomTrackingNumberOptions _options;
 
@@ -27,29 +31,35 @@ namespace Parbad.TrackingNumberProviders
             _options = options.Value;
         }
 
-        public virtual Task FormatAsync(Invoice invoice, CancellationToken cancellationToken = default)
+        /// <summary>
+        /// Generates a random Tracking Number which is not used by any stored payment.
+        /// </summary>
+        /// <param name="invoice"></param>
+        /// <param name="cancellationToken"></param>
+        /// <exception cref="InvalidOperationException">No unused number was found.</exception>
+        public virtual async Task FormatAsync(Invoice invoice, CancellationToken cancellationToken = default)
         {
-            var trackingNumbers = _storage.Payments.Select(model => model.TrackingNumber).ToList();
+            // Random tracking numbers have always been non-negative, whatever the configured minimum.
+            var minimumValue = Math.Max(_options.MinimumValue, 0);
 
-            var minimumValue = _options.MinimumValue;
-
-            var trackingNumber = 0L;
-
-            while (true)
+            for (var attempt = 0; attempt < MaxAttempts; attempt++)
             {
-                if (cancellationToken.IsCancellationRequested) break;
+                cancellationToken.ThrowIfCancellationRequested();
 
-                trackingNumber = RandomNumberGenerator.Next();
+                var trackingNumber = RandomNumberGenerator.NextInt64(minimumValue);
 
-                if (trackingNumber >= minimumValue && !trackingNumbers.Contains(trackingNumber))
+                if (!await _storage.DoesPaymentExistAsync(trackingNumber, cancellationToken).ConfigureAwaitFalse())
                 {
-                    break;
+                    invoice.TrackingNumber = trackingNumber;
+
+                    return;
                 }
             }
 
-            invoice.TrackingNumber = trackingNumber;
-
-            return Task.CompletedTask;
+            throw new InvalidOperationException(
+                $"No unused tracking number was found after {MaxAttempts} random attempts in the range " +
+                $"[{minimumValue}, {long.MaxValue}]. The range is probably almost used up; " +
+                $"lower {nameof(AutoRandomTrackingNumberOptions)}.{nameof(AutoRandomTrackingNumberOptions.MinimumValue)}.");
         }
     }
 }

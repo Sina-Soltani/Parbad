@@ -1228,6 +1228,12 @@
         <member name="P:Parbad.Internal.PaymentResult.AdditionalData">
             <inheritdoc />
         </member>
+        <member name="M:Parbad.Internal.RandomNumberGenerator.NextInt64(System.Int64)">
+            <summary>
+            Returns a cryptographically random number in the range [<paramref name="minimum"/>, <see cref="F:System.Int64.MaxValue"/>].
+            </summary>
+            <param name="minimum">The inclusive lower bound. It must not be negative.</param>
+        </member>
         <member name="T:Parbad.InvoiceBuilder.DefaultInvoiceFormatter">
             <summary>
             Default implementation of <see cref="T:Parbad.InvoiceBuilder.IInvoiceFormatter"/>.
@@ -2168,6 +2174,14 @@
             An Invoice Formatter which generates automatically and randomly a Tracking Number
             depending on <see cref="T:Parbad.Storage.Abstractions.IStorage"/> and <see cref="T:Parbad.TrackingNumberProviders.AutoRandomTrackingNumberOptions"/>.
             </summary>
+        </member>
+        <member name="M:Parbad.TrackingNumberProviders.AutoRandomTrackingNumber.FormatAsync(Parbad.Abstraction.Invoice,System.Threading.CancellationToken)">
+            <summary>
+            Generates a random Tracking Number which is not used by any stored payment.
+            </summary>
+            <param name="invoice"></param>
+            <param name="cancellationToken"></param>
+            <exception cref="T:System.InvalidOperationException">No unused number was found.</exception>
         </member>
         <member name="P:Parbad.TrackingNumberProviders.AutoRandomTrackingNumberOptions.MinimumValue">
             <summary>
