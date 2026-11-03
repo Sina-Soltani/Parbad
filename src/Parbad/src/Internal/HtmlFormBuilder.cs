@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 
 namespace Parbad.Internal;
 
@@ -12,13 +13,19 @@ internal static class HtmlFormBuilder
     {
         var fields = string.Join("", data.Select(CreateHiddenInput));
 
-        var nonceProp = string.IsNullOrWhiteSpace(nonce) ? null : $" nonce=\"{nonce}\"";
+        var nonceProp = string.IsNullOrWhiteSpace(nonce) ? null : $" nonce=\"{WebUtility.HtmlEncode(nonce)}\"";
 
         return
+            "<!DOCTYPE html>" +
             "<html>" +
+            "<head>" +
+            "<meta charset=\"utf-8\">" +
+            "<title>Redirecting to the payment gateway</title>" +
+            "</head>" +
             "<body>" +
-            $"<form id=\"paymentForm\" action=\"{url}\" method=\"post\" />" +
+            $"<form id=\"paymentForm\" action=\"{WebUtility.HtmlEncode(url)}\" method=\"post\">" +
             fields +
+            "<noscript><button type=\"submit\">Continue to the payment gateway</button></noscript>" +
             "</form>" +
             $"<script type=\"text/javascript\"{nonceProp}>" +
             "document.getElementById('paymentForm').submit();" +
@@ -29,6 +36,6 @@ internal static class HtmlFormBuilder
 
     private static string CreateHiddenInput(KeyValuePair<string, string> data)
     {
-        return $"<input type=\"hidden\" name=\"{data.Key}\" value=\"{data.Value}\" />";
+        return $"<input type=\"hidden\" name=\"{WebUtility.HtmlEncode(data.Key)}\" value=\"{WebUtility.HtmlEncode(data.Value)}\">";
     }
 }
