@@ -2,6 +2,7 @@
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
 using Parbad.Options;
+using System.Globalization;
 
 namespace Parbad.Gateway.IdPay.Internal
 {
@@ -9,7 +10,7 @@ namespace Parbad.Gateway.IdPay.Internal
     {
         public static string TranslateStatus(string status, MessagesOptions options)
         {
-            if (!int.TryParse(status, out var integerStatus))
+            if (!int.TryParse(status, NumberStyles.Integer, CultureInfo.InvariantCulture, out var integerStatus))
             {
                 return $"Cannot parse the Status value to integer. Status: {status}";
             }

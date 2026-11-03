@@ -2,6 +2,7 @@
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -63,7 +64,7 @@ public class PasargadGateway : GatewayBase<PasargadGatewayAccount>
                                                               ServiceType = "PURCHASE",
                                                               TerminalNumber = account.TerminalNumber,
                                                               Invoice = invoice.TrackingNumber.ToString(),
-                                                              InvoiceDate = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss"),
+                                                              InvoiceDate = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss", CultureInfo.InvariantCulture),
                                                               Amount = invoice.Amount,
                                                               CallbackApi = invoice.CallbackUrl,
                                                               Description = additionalData?.Description,

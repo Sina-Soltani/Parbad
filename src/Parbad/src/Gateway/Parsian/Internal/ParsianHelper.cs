@@ -122,7 +122,7 @@ namespace Parbad.Gateway.Parsian.Internal
                     isSucceed = false;
                     message = "Error in Callback section. Amount is null or empty.";
                 }
-                else if (!long.TryParse(orderId, out var numberOrderNumber) ||
+                else if (!long.TryParse(orderId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var numberOrderNumber) ||
                          numberOrderNumber != context.Payment.TrackingNumber)
                 {
                     isSucceed = false;
@@ -130,7 +130,7 @@ namespace Parbad.Gateway.Parsian.Internal
                 }
                 else
                 {
-                    if (!long.TryParse(amount, NumberStyles.Any, CultureInfo.CurrentCulture, out var numberAmount))
+                    if (!long.TryParse(amount, NumberStyles.Integer | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out var numberAmount))
                     {
                         isSucceed = false;
                         message = $"Error in Callback section. Cannot parse the amount value {amount}";

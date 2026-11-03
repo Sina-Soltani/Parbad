@@ -10,6 +10,7 @@ using Parbad.Options;
 using Parbad.Storage.Abstractions.Models;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
@@ -105,7 +106,7 @@ namespace Parbad.Gateway.Sepehr.Internal
             }
             else
             {
-                if (!int.TryParse(respCodeParam.Value, out var responseCode))
+                if (!int.TryParse(respCodeParam.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var responseCode))
                 {
                     message = messages.InvalidDataReceivedFromGateway;
 
@@ -147,7 +148,7 @@ namespace Parbad.Gateway.Sepehr.Internal
                     }
                     else
                     {
-                        traceNumber = long.Parse(traceNumberParam.Value);
+                        traceNumber = long.Parse(traceNumberParam.Value, CultureInfo.InvariantCulture);
                     }
 
                     if (!rrnParam.Exists)
@@ -157,7 +158,7 @@ namespace Parbad.Gateway.Sepehr.Internal
                     }
                     else
                     {
-                        rrn = long.Parse(rrnParam.Value);
+                        rrn = long.Parse(rrnParam.Value, CultureInfo.InvariantCulture);
                     }
 
                     if (!digitalReceiptParam.Exists)
@@ -214,10 +215,10 @@ namespace Parbad.Gateway.Sepehr.Internal
             PaymentVerifyResultStatus status;
             string message;
 
-            switch (result.Status.ToLower())
+            switch (result.Status.ToLowerInvariant())
             {
                 case "ok":
-                    if (!long.TryParse(result.ReturnId, out var amount))
+                    if (!long.TryParse(result.ReturnId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var amount))
                     {
                         message = $"{messagesOptions.InvalidDataReceivedFromGateway} Cannot parse the amount. Amount: {result.ReturnId}";
                         status = PaymentVerifyResultStatus.Failed;
@@ -330,10 +331,10 @@ namespace Parbad.Gateway.Sepehr.Internal
             PaymentRefundResultStatus status;
             string message;
 
-            switch (result.Status.ToLower())
+            switch (result.Status.ToLowerInvariant())
             {
                 case "ok":
-                    if (!long.TryParse(result.ReturnId, out var amount))
+                    if (!long.TryParse(result.ReturnId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var amount))
                     {
                         message = $"{messagesOptions.InvalidDataReceivedFromGateway} Cannot parse the amount. Amount: {result.ReturnId}";
                         status = PaymentRefundResultStatus.Failed;

@@ -2,6 +2,7 @@
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
 using System;
+using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Reflection;
@@ -139,7 +140,7 @@ internal class ParbadVirtualGatewayMiddlewareInvoker : IParbadVirtualGatewayMidd
                   .Replace("#DisplayAmount#", Encode(((long)commandDetails.Amount).ToString("N0")))
                   .Replace("#TransactionCode#", boolIsPaid ? Guid.NewGuid().ToString("N") : string.Empty)
                   .Replace("#RedirectUrl#", Encode(commandDetails.RedirectUrl))
-                  .Replace("#IsPaid#", Encode(isPaid.ToString().ToLower()))
+                  .Replace("#IsPaid#", Encode(isPaid.ToString().ToLowerInvariant()))
                   .Replace("#YearNow#", DateTime.Now.Year.ToString())
                   .Replace("#StatusText#", boolIsPaid ? "Paid" : "Cancelled");
 
@@ -160,7 +161,7 @@ internal class ParbadVirtualGatewayMiddlewareInvoker : IParbadVirtualGatewayMidd
             commandType = VirtualGatewayCommandType.Request;
         }
 
-        if (!long.TryParse(form["trackingNumber"], out var trackingNumber) ||
+        if (!long.TryParse(form["trackingNumber"], NumberStyles.Integer, CultureInfo.InvariantCulture, out var trackingNumber) ||
             !form.TryGetValue("redirectUrl", out var redirectUrl) ||
             !Money.TryParse(form["amount"], out var amount))
         {

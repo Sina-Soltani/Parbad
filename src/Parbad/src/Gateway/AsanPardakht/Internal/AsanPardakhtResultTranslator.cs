@@ -3,6 +3,7 @@
 
 using Parbad.Options;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Parbad.Gateway.AsanPardakht.Internal
 {
@@ -22,11 +23,10 @@ namespace Parbad.Gateway.AsanPardakht.Internal
 
         private static string Translate(string result, IDictionary<int, string> dictionary, MessagesOptions options)
         {
-            var code = int.Parse(result);
-
-            if (dictionary.ContainsKey(code))
+            if (int.TryParse(result, NumberStyles.Integer, CultureInfo.InvariantCulture, out var code) &&
+                dictionary.TryGetValue(code, out var message))
             {
-                return dictionary[code];
+                return message;
             }
 
             return $"{options.UnexpectedErrorText} Response: {result}";

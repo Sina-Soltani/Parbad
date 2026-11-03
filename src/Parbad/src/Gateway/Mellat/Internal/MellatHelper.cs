@@ -10,6 +10,7 @@ using Parbad.Options;
 using Parbad.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -255,9 +256,9 @@ namespace Parbad.Gateway.Mellat.Internal
                 $"<orderId>{invoice.TrackingNumber}</orderId>" +
                 $"<amount>{(long)invoice.Amount}</amount>" +
                 "<!--Optional:-->" +
-                $"<localDate>{DateTime.Now:yyyyMMdd}</localDate>" +
+                $"<localDate>{DateTime.Now.ToString("yyyyMMdd", CultureInfo.InvariantCulture)}</localDate>" +
                 "<!--Optional:-->" +
-                $"<localTime>{DateTime.Now:HHmmss}</localTime>" +
+                $"<localTime>{DateTime.Now.ToString("HHmmss", CultureInfo.InvariantCulture)}</localTime>" +
                 "<!--Optional:-->" +
                 $"<additionalData>{additionalData?.AdditionalData}</additionalData>" +
                 "<!--Optional:-->" +
@@ -292,9 +293,9 @@ namespace Parbad.Gateway.Mellat.Internal
                 $"<orderId>{invoice.TrackingNumber}</orderId>" +
                 $"<amount>{(long)invoice.Amount}</amount>" +
                 "<!--Optional:-->" +
-                $"<localDate>{DateTime.Now:yyyyMMdd}</localDate>" +
+                $"<localDate>{DateTime.Now.ToString("yyyyMMdd", CultureInfo.InvariantCulture)}</localDate>" +
                 "<!--Optional:-->" +
-                $"<localTime>{DateTime.Now:HHmmss}</localTime>" +
+                $"<localTime>{DateTime.Now.ToString("HHmmss", CultureInfo.InvariantCulture)}</localTime>" +
                 "<!--Optional:-->" +
                 $"<additionalData>{additionalData}</additionalData>" +
                 "<!--Optional:-->" +

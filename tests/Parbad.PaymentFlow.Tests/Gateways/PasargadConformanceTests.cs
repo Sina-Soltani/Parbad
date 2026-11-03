@@ -39,10 +39,6 @@ public class PasargadConformanceTests : GatewayConformanceTests
     {
         // PostJsonAsync deserialises the body without checking the HTTP status.
         [nameof(Html_error_page_during_verification_does_not_crash_or_mark_the_payment_as_paid)] = "G-H9",
-        // InvoiceDate is formatted with the current culture: under fa-IR it is a Persian date (e.g. 1405/08/11),
-        // and "/" is the culture's date separator, so de-DE produces 2026.11.02.
-        [nameof(Payment_is_verified_on_a_server_with_persian_culture)] = "G-H6",
-        [nameof(Payment_is_verified_on_a_server_with_german_culture)] = "G-H6",
         [nameof(Partial_refund_is_not_silently_turned_into_a_full_refund)] = "ANALYSIS-02 §5 (partial refunds)"
     };
 
