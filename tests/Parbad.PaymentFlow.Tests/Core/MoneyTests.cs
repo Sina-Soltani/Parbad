@@ -26,11 +26,10 @@ public class MoneyTests
     }
 
     [TestMethod]
-    public Task Equal_amounts_are_not_less_than_each_other() =>
-        KnownIssue.ReproducesAsync("C-4", () =>
-        {
-            Assert.IsFalse(new Money(5) < new Money(5), "Money(5) < Money(5) returned true.");
-        });
+    public void Equal_amounts_are_not_less_than_each_other()
+    {
+        Assert.IsFalse(new Money(5) < new Money(5), "Money(5) < Money(5) returned true.");
+    }
 
     [TestMethod]
     public Task Amount_with_a_fraction_is_not_equal_to_its_truncated_value() =>
