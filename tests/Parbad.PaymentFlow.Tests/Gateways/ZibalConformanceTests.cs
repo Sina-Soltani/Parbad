@@ -98,16 +98,16 @@ public class ZibalConformanceTests : GatewayConformanceTests
 
     [TestMethod]
     public Task Sandbox_payment_can_be_verified() =>
-        KnownIssue.ReproducesAsync("G-H2", () => UnderCultureAsync(CultureInfo.InvariantCulture.Name, async () =>
+        UnderCultureAsync(CultureInfo.InvariantCulture.Name, async () =>
         {
             await UseHostAsync(gateways => AddZibal(gateways, isSandbox: true));
 
             await PaidInvoiceIsVerifiedAsync();
-        }));
+        });
 
     [TestMethod]
     public Task Http_client_configuration_is_applied_to_the_gateway() =>
-        KnownIssue.ReproducesAsync("G-H3", () => UnderCultureAsync(CultureInfo.InvariantCulture.Name, async () =>
+        UnderCultureAsync(CultureInfo.InvariantCulture.Name, async () =>
         {
             await UseHostAsync(gateways => AddZibal(gateways, isSandbox: false)
                                    .WithHttpClient(client => client.ConfigureHttpClient(http => http.DefaultRequestHeaders.Add(ConfiguredHeader, "yes"))));
@@ -116,13 +116,12 @@ public class ZibalConformanceTests : GatewayConformanceTests
 
             Assert.AreEqual("yes", _lastConfiguredHeader,
                             "The configuration passed to WithHttpClient (also used by WithProxy) did not reach Zibal's HttpClient.");
-        }));
+        });
 
-    /// <summary>3,000,000,000 Rial does not fit the Int32 amount of the verify response model.</summary>
+    /// <summary>3,000,000,000 Rial does not fit an Int32 amount in the verify response model.</summary>
     [TestMethod]
     public Task Large_amount_can_be_verified() =>
-        KnownIssue.ReproducesAsync("ANALYSIS-02 §5 (Zibal Int32 amount)", () =>
-            UnderCultureAsync(CultureInfo.InvariantCulture.Name, () => PaidInvoiceIsVerifiedAsync(3_000_000_000)));
+        UnderCultureAsync(CultureInfo.InvariantCulture.Name, () => PaidInvoiceIsVerifiedAsync(3_000_000_000));
 
     private static IGatewayConfigurationBuilder<ZibalGateway> AddZibal(IGatewayBuilder gateways, bool isSandbox) =>
         gateways.AddZibal()
