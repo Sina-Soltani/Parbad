@@ -41,7 +41,9 @@ namespace Parbad.Gateway.Zibal
             IOptions<ParbadOptions> options) : base(accountProvider)
         {
             _httpContextAccessor = httpContextAccessor;
-            _httpClient = httpClientFactory.CreateClient(Name);
+            // The client must be created by the gateway's type name: that is the name WithHttpClient and
+            // WithProxy configure.
+            _httpClient = httpClientFactory.CreateClient(this);
             _gatewayOptions = gatewayOptions.Value;
             _options = options.Value;
         }

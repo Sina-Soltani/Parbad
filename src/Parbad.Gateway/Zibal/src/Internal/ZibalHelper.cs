@@ -32,8 +32,7 @@ namespace Parbad.Gateway.Zibal.Internal
 
             return new ZibalPaymentRequestModel
             {
-                //if Merchant value is 'zibal' , Gateway mode is sandBox
-                Merchant = account.IsSandbox ? "zibal" : account.Merchant,
+                Merchant = GetMerchant(account),
                 Amount = invoice.Amount,
                 Mobile = requestAdditionalData?.MobileNumber,
                 OrderId = invoice.TrackingNumber.ToString(),
@@ -116,10 +115,14 @@ namespace Parbad.Gateway.Zibal.Internal
 
             return new ZibalPaymentVerifyModel
             {
-                Merchant = account.Merchant,
+                Merchant = GetMerchant(account),
                 TrackId = trackId
             };
         }
+
+        // In sandbox mode Zibal expects the merchant "zibal", for the request and for the verification.
+        private static string? GetMerchant(ZibalGatewayAccount account) =>
+            account.IsSandbox ? "zibal" : account.Merchant;
 
         public static async Task<PaymentVerifyResult> CreateVerifyResult(HttpResponseMessage responseMessage, MessagesOptions messagesOptions)
         {
@@ -165,12 +168,12 @@ namespace Parbad.Gateway.Zibal.Internal
 
             var additionalData = JsonConvert.DeserializeObject<IDictionary<string, string>>(transactionRecord.AdditionalData);
 
-            if (!additionalData.ContainsKey(TrackIdAdditionalDataKey))
+            if (!additionalData.TryGetValue(TrackIdAdditionalDataKey, out var id))
             {
                 throw new Exception("Cannot find the TrackId.");
             }
 
-            return additionalData[TrackIdAdditionalDataKey];
+            return id;
         }
     }
 }

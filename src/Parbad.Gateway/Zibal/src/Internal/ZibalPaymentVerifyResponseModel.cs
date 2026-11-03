@@ -11,7 +11,7 @@ namespace Parbad.Gateway.Zibal.Internal
 
         public string? CardNumber { get; set; }
 
-        public int Amount { get; set; }
+        public long Amount { get; set; }
 
         public long? RefNumber { get; set; }
 
