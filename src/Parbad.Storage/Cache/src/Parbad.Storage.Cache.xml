@@ -20,6 +20,11 @@
             A collection for holding the data.
             </summary>
         </member>
+        <member name="P:Parbad.Storage.Cache.Abstractions.CacheStorage.SyncRoot">
+            <summary>
+            The lock that guards every read and write of <see cref="P:Parbad.Storage.Cache.Abstractions.CacheStorage.Collection"/>.
+            </summary>
+        </member>
         <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.CreatePaymentAsync(Parbad.Storage.Abstractions.Models.Payment,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
@@ -98,7 +103,14 @@
         </member>
         <member name="T:Parbad.Storage.Cache.DistributedCache.DistributedCacheStorage">
             <summary>
-            Distributed cache implementation of Parbad storage.
+            Distributed cache implementation of Parbad storage, which lets several instances of an application share
+            the same payment records.
+            <para>
+            Note: all records are kept in a single cache entry, which an instance loads once and then rewrites
+            completely on every save. Writes of instances that work at the same time can therefore overwrite each
+            other's payments, and the data is lost when the cache entry is evicted. Consider the Entity Framework Core
+            storage (<c>Parbad.Storage.EntityFrameworkCore</c>) where payments must not be lost.
+            </para>
             </summary>
         </member>
         <member name="M:Parbad.Storage.Cache.DistributedCache.DistributedCacheStorage.#ctor(Microsoft.Extensions.Caching.Distributed.IDistributedCache,Microsoft.Extensions.Options.IOptions{Parbad.Storage.Cache.DistributedCache.DistributedCacheStorageOptions})">
@@ -181,12 +193,14 @@
         <member name="M:Parbad.Builder.DistributedCacheStorageBuilderExtensions.UseDistributedCache(Parbad.Storage.Abstractions.IStorageBuilder)">
             <summary>
             Uses <see cref="T:Microsoft.Extensions.Caching.Distributed.IDistributedCache"/> for saving and loading data.
+            <para>See <see cref="T:Parbad.Storage.Cache.DistributedCache.DistributedCacheStorage"/> for what this storage can and cannot guarantee.</para>
             </summary>
             <param name="builder"></param>
         </member>
         <member name="M:Parbad.Builder.DistributedCacheStorageBuilderExtensions.UseDistributedCache(Parbad.Storage.Abstractions.IStorageBuilder,System.Action{Parbad.Storage.Cache.DistributedCache.DistributedCacheStorageOptions})">
             <summary>
             Uses <see cref="T:Microsoft.Extensions.Caching.Distributed.IDistributedCache"/> for saving and loading data.
+            <para>See <see cref="T:Parbad.Storage.Cache.DistributedCache.DistributedCacheStorage"/> for what this storage can and cannot guarantee.</para>
             </summary>
             <param name="builder"></param>
             <param name="configureOptions"></param>

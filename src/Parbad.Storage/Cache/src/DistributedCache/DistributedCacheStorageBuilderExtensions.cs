@@ -13,6 +13,7 @@ public static class DistributedCacheStorageBuilderExtensions
 {
     /// <summary>
     /// Uses <see cref="IDistributedCache"/> for saving and loading data.
+    /// <para>See <see cref="DistributedCacheStorage"/> for what this storage can and cannot guarantee.</para>
     /// </summary>
     /// <param name="builder"></param>
     public static IStorageBuilder UseDistributedCache(this IStorageBuilder builder)
@@ -20,6 +21,7 @@ public static class DistributedCacheStorageBuilderExtensions
 
     /// <summary>
     /// Uses <see cref="IDistributedCache"/> for saving and loading data.
+    /// <para>See <see cref="DistributedCacheStorage"/> for what this storage can and cannot guarantee.</para>
     /// </summary>
     /// <param name="builder"></param>
     /// <param name="configureOptions"></param>

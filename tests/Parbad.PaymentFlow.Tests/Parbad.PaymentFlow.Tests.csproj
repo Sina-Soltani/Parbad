@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
-    <!-- Tests exercise obsolete members (IStorage.Payments) on purpose. -->
+    <!-- Tests exercise obsolete members (IStorage.Payments, DistributedCacheStorage) on purpose. -->
     <NoWarn>$(NoWarn);CS0618</NoWarn>
   </PropertyGroup>
 
@@ -28,6 +28,7 @@
     <ProjectReference Include="..\..\src\Parbad.Gateway\YekPay\src\Parbad.Gateway.YekPay.csproj" />
     <ProjectReference Include="..\..\src\Parbad.Gateway\ZarinPal\src\Parbad.Gateway.ZarinPal.csproj" />
     <ProjectReference Include="..\..\src\Parbad.Gateway\Zibal\src\Parbad.Gateway.Zibal.csproj" />
+    <ProjectReference Include="..\..\src\Parbad.Storage\Cache\src\Parbad.Storage.Cache.csproj" />
   </ItemGroup>
 
 </Project>
