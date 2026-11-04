@@ -17,7 +17,7 @@ namespace Parbad.Storage.EntityFrameworkCore;
 /// <summary>
 /// EntityFramework Core implementation of <see cref="IStorage"/>.
 /// </summary>
-public class EntityFrameworkCoreStorage : IStorage
+public class EntityFrameworkCoreStorage : IStorage, IPaidPaymentLookup
 {
     /// <summary>
     /// Initializes an instance of <see cref="EntityFrameworkCoreStorage"/>.
@@ -161,6 +161,23 @@ public class EntityFrameworkCoreStorage : IStorage
         var paymentEntity = await Context.Payments
                                          .AsNoTracking()
                                          .SingleOrDefaultAsync(payment => payment.Token == paymentToken, cancellationToken);
+
+        return paymentEntity?.ToPaymentModel();
+    }
+
+    /// <inheritdoc />
+    public virtual async Task<Payment?> FindPaidPaymentByTransactionCodeAsync(string gatewayName,
+                                                                              string transactionCode,
+                                                                              long exceptTrackingNumber,
+                                                                              CancellationToken cancellationToken = default)
+    {
+        var paymentEntity = await Context.Payments
+                                         .AsNoTracking()
+                                         .FirstOrDefaultAsync(payment => payment.IsPaid &&
+                                                                         payment.TrackingNumber != exceptTrackingNumber &&
+                                                                         payment.TransactionCode == transactionCode &&
+                                                                         payment.GatewayName == gatewayName,
+                                                              cancellationToken);
 
         return paymentEntity?.ToPaymentModel();
     }

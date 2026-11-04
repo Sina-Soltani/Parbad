@@ -15,7 +15,7 @@ namespace Parbad.Storage.Cache.Abstractions;
 /// <summary>
 /// Abstract cache implementation of Parbad storage.
 /// </summary>
-public abstract class CacheStorage : IStorage
+public abstract class CacheStorage : IStorage, IPaidPaymentLookup
 {
     // The storages are transient and all instances that use the same cache share one collection,
     // so the lock must belong to the collection, not to the storage instance.
@@ -194,6 +194,25 @@ public abstract class CacheStorage : IStorage
         lock (SyncRoot)
         {
             var record = Collection.Payments.SingleOrDefault(payment => payment.Token == paymentToken);
+
+            return Task.FromResult<Payment?>(record == null ? null : ClonePayment(record));
+        }
+    }
+
+    /// <inheritdoc />
+    public virtual Task<Payment?> FindPaidPaymentByTransactionCodeAsync(string gatewayName,
+                                                                        string transactionCode,
+                                                                        long exceptTrackingNumber,
+                                                                        CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        lock (SyncRoot)
+        {
+            var record = Collection.Payments.FirstOrDefault(payment => payment.IsPaid &&
+                                                                       payment.TrackingNumber != exceptTrackingNumber &&
+                                                                       payment.TransactionCode == transactionCode &&
+                                                                       string.Equals(payment.GatewayName, gatewayName, StringComparison.OrdinalIgnoreCase));
 
             return Task.FromResult<Payment?>(record == null ? null : ClonePayment(record));
         }

@@ -276,6 +276,28 @@ public abstract class GatewayConformanceTests
         RunAsync(nameof(Payment_of_another_invoice_cannot_settle_this_invoice_even_with_this_invoices_token),
                  () => PaymentOfAnotherInvoiceCannotSettleThisInvoiceAsync(InvoiceAmount, forgeVictimToken: true));
 
+    /// <summary>
+    /// The attacker pays and verifies their own invoice, then sends its callback again to this invoice's callback
+    /// URL. The bank answers "already verified", which must not settle this invoice too: one payment, two orders.
+    /// </summary>
+    [TestMethod]
+    public Task Payment_that_settled_another_invoice_cannot_settle_this_invoice() =>
+        RunAsync(nameof(Payment_that_settled_another_invoice_cannot_settle_this_invoice), async () =>
+        {
+            await RequestSucceededAsync(InvoiceTrackingNumber, InvoiceAmount);
+            var victim = BankTransactionOf(InvoiceTrackingNumber);
+
+            var attacker = await PayAndVerifyAsync(OtherTrackingNumber, InvoiceAmount);
+
+            DeliverCallback(victim, attacker, Claims(InvoiceTrackingNumber, InvoiceAmount) with { Token = victim.Token });
+            var outcome = await FetchAndVerifyAsync();
+
+            outcome.AssertNoUnexpectedException();
+            Assert.IsFalse((await Host.GetPaymentAsync(InvoiceTrackingNumber)).IsPaid,
+                           $"Invoice {InvoiceTrackingNumber} was recorded as paid with the bank transaction that already settled " +
+                           $"invoice {OtherTrackingNumber}. {outcome.Describe()}");
+        });
+
     // ------------------------------------------------------------------ refund
 
     [TestMethod]
@@ -564,7 +586,7 @@ public sealed class FlowOutcome
     {
         if (Exception != null && Exception is not HttpRequestException)
         {
-            Assert.Fail($"Parbad threw {Exception.GetType().Name} instead of returning a failed result: {Exception.Message}");
+            Assert.Fail($"Parbad threw {Exception.GetType().Name} instead of returning a failed result: {Exception.Message}{Environment.NewLine}{Exception.StackTrace}");
         }
     }
 

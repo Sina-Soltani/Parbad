@@ -29,8 +29,6 @@ public class ParsianConformanceTests : GatewayConformanceTests
 
     protected override IReadOnlyDictionary<string, string> KnownIssues => new Dictionary<string, string>
     {
-        // Any non-zero ConfirmPayment status is Failed, including "already confirmed".
-        [nameof(Lost_verification_response_is_recovered_when_the_callback_is_retried)] = "G-H1 (assumes -1533 = already confirmed)",
         [nameof(Partial_refund_is_not_silently_turned_into_a_full_refund)] = "ANALYSIS-02 §5 (partial refunds)"
     };
 
@@ -75,7 +73,8 @@ public class ParsianConformanceTests : GatewayConformanceTests
 
             if (transaction.Verified)
             {
-                // -1533: the transaction has already been confirmed.
+                // -1533 = "already confirmed" (several integrations; no official document found, ANALYSIS-02 §7.3).
+                // Assumption (unverified): the RRN is not returned again.
                 return Result(ConfirmNamespace, "ConfirmPaymentResult", ("Status", "-1533"), ("RRN", "0"), ("Token", transaction.Token));
             }
 

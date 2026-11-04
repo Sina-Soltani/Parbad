@@ -13,7 +13,7 @@ namespace Parbad.PaymentFlow.Tests.Infrastructure;
 /// It enforces unique tracking numbers and tokens, so the tests observe Parbad's own behaviour and are
 /// not affected by the known problems of the cache storages (ANALYSIS-03, S-3 to S-5).
 /// </summary>
-public sealed class InMemoryStorage : IStorage
+public sealed class InMemoryStorage : IStorage, IPaidPaymentLookup
 {
     private readonly object _sync = new();
     private readonly List<Payment> _payments = new();
@@ -126,6 +126,22 @@ public sealed class InMemoryStorage : IStorage
     public Task<Payment?> GetPaymentByTokenAsync(string paymentToken, CancellationToken cancellationToken = default)
     {
         lock (_sync) return Task.FromResult(_payments.Where(p => p.Token == paymentToken).Select(Copy).SingleOrDefault());
+    }
+
+    public Task<Payment?> FindPaidPaymentByTransactionCodeAsync(string gatewayName,
+                                                               string transactionCode,
+                                                               long exceptTrackingNumber,
+                                                               CancellationToken cancellationToken = default)
+    {
+        lock (_sync)
+        {
+            return Task.FromResult(_payments.Where(p => p.IsPaid &&
+                                                        p.TrackingNumber != exceptTrackingNumber &&
+                                                        p.TransactionCode == transactionCode &&
+                                                        string.Equals(p.GatewayName, gatewayName, StringComparison.OrdinalIgnoreCase))
+                                            .Select(Copy)
+                                            .FirstOrDefault());
+        }
     }
 
     public Task<bool> DoesPaymentExistAsync(long trackingNumber, CancellationToken cancellationToken = default)

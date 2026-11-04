@@ -11,5 +11,11 @@ namespace Parbad.Gateway.IdPay.Internal
 
         [JsonProperty("track_id")]
         public string TrackId { get; set; }
+
+        [JsonProperty("order_id")]
+        public string OrderId { get; set; }
+
+        [JsonProperty("amount")]
+        public long? Amount { get; set; }
     }
 }

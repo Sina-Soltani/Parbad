@@ -24,13 +24,11 @@ public class SamanConformanceTests : GatewayConformanceTests
 
     protected override IReadOnlyDictionary<string, string> KnownIssues => new Dictionary<string, string>
     {
-        // The verify response's TransactionDetail is dereferenced without a null check.
-        [nameof(Bank_rejection_during_verification_is_recorded_as_failed)] = "G-H9",
+        // An HTML error page is parsed as JSON.
         [nameof(Html_error_page_during_verification_does_not_crash_or_mark_the_payment_as_paid)] = "G-H9",
         // The callback RefNum is never compared with anything stored for this invoice; only the amount protects it.
         [nameof(Payment_of_another_invoice_with_the_same_amount_cannot_settle_this_invoice)] = "G-C1b",
         [nameof(Payment_of_another_invoice_cannot_settle_this_invoice_even_with_this_invoices_token)] = "G-C1b",
-        [nameof(Lost_verification_response_is_recovered_when_the_callback_is_retried)] = "G-H1",
         [nameof(Partial_refund_is_not_silently_turned_into_a_full_refund)] = "ANALYSIS-02 §5 (partial refunds)"
     };
 
@@ -73,7 +71,9 @@ public class SamanConformanceTests : GatewayConformanceTests
                 return FakeBank.Json(new { ResultCode = -2, ResultDescription = "Transaction not found.", Success = false });
             }
 
-            var resultCode = transaction.Verified ? 2 : 0; // 2 = the transaction was already verified
+            // 2 = "duplicate request" (official SEP guide v3.3, ANALYSIS-02 §7.3).
+            // Assumption (unverified): the answer still carries the TransactionDetail.
+            var resultCode = transaction.Verified ? 2 : 0;
             transaction.Verified = true;
 
             return FakeBank.Json(new

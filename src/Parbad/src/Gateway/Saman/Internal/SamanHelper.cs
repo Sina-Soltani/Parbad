@@ -10,6 +10,7 @@ using Parbad.Internal;
 using Parbad.Options;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -23,6 +24,8 @@ internal static class SamanHelper
     private const string RefNumKey = nameof(RefNumKey);
     private const string CallbackSuccessCode = "2";
     private const int VerificationSuccessCode = 0;
+    // "Duplicate request", i.e. the transaction was verified before (official SEP guide v3.3).
+    private const int VerificationAlreadyVerifiedCode = 2;
     public const string AdditionalVerificationDataKey = "SamanAdditionalVerificationData";
     public const string CellNumberPropertyKey = "SamanCellNumber";
 
@@ -150,21 +153,29 @@ internal static class SamanHelper
                                                          InvoiceContext invoiceContext,
                                                          MessagesOptions messagesOptions)
     {
-        var isSuccess = verificationResponse.TransactionDetail.TerminalNumber.ToString() == gatewayAccount.TerminalId &&
-                        verificationResponse.TransactionDetail.AffectiveAmount == (long)invoiceContext.Payment.Amount &&
-                        verificationResponse.TransactionDetail.RefNum == callbackResponse.RefNum &&
-                        verificationResponse.ResultCode == VerificationSuccessCode;
-        
+        var detail = verificationResponse.TransactionDetail;
+
+        var isThisTransaction = detail != null &&
+                                detail.TerminalNumber.ToString(CultureInfo.InvariantCulture) == gatewayAccount.TerminalId &&
+                                detail.AffectiveAmount == (long)invoiceContext.Payment.Amount &&
+                                detail.RefNum == callbackResponse.RefNum;
+
+        var isSuccess = isThisTransaction && verificationResponse.ResultCode == VerificationSuccessCode;
+
         var message = isSuccess
             ? messagesOptions.PaymentSucceed
-            : SamanResultTranslator.Translate(verificationResponse.ResultCode.ToString(), messagesOptions);
+            : SamanResultTranslator.Translate(verificationResponse.ResultCode.ToString(CultureInfo.InvariantCulture), messagesOptions);
 
         var result = new PaymentVerifyResult
                      {
                          Status = isSuccess ? PaymentVerifyResultStatus.Succeed : PaymentVerifyResultStatus.Failed,
-                         TransactionCode = verificationResponse.TransactionDetail.Rrn,
-                         GatewayResponseCode = verificationResponse.ResultCode.ToString(),
-                         Message = message
+                         TransactionCode = detail?.Rrn,
+                         GatewayResponseCode = verificationResponse.ResultCode.ToString(CultureInfo.InvariantCulture),
+                         Message = message,
+                         // The RefNum comes from the browser and the answer has no order id, so the gateway cannot tell
+                         // whether an "already verified" transaction is this invoice's. Parbad accepts it only when the
+                         // RRN has not settled another payment.
+                         IsAlreadyVerifiedAtBank = isThisTransaction && verificationResponse.ResultCode == VerificationAlreadyVerifiedCode
                      };
 
         result.DatabaseAdditionalData.Add(RefNumKey, callbackResponse.RefNum);

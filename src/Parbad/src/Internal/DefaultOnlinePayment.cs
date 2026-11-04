@@ -1,6 +1,7 @@
 // Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Parbad.Abstraction;
@@ -10,6 +11,7 @@ using Parbad.PaymentTokenProviders;
 using Parbad.Storage.Abstractions;
 using Parbad.Storage.Abstractions.Models;
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -260,6 +262,8 @@ namespace Parbad.Internal
             verifyResult.GatewayName = payment.GatewayName;
             verifyResult.GatewayAccountName = payment.GatewayAccountName;
 
+            await EnforceVerificationRulesAsync(payment, verifyResult, cancellationToken).ConfigureAwaitFalse();
+
             payment.IsCompleted = true;
             payment.IsPaid = verifyResult.IsSucceed;
             payment.TransactionCode = verifyResult.TransactionCode;
@@ -454,6 +458,86 @@ namespace Parbad.Internal
             _logger.LogInformation(LoggingEvents.RefundPayment, "Refunding the invoice {TrackingNumber} is finished", invoice.TrackingNumber);
 
             return refundResult;
+        }
+
+        /// <summary>
+        /// Checks that every gateway gets for free, so a gateway cannot forget them: the bank-reported amount and
+        /// order id must match the invoice, and one bank transaction can settle only one payment. An "already
+        /// verified" answer that the gateway could not tie to this invoice is accepted only after the last check.
+        /// </summary>
+        private async Task EnforceVerificationRulesAsync(Payment payment, PaymentVerifyResult verifyResult, CancellationToken cancellationToken)
+        {
+            if (!verifyResult.IsSucceed && !verifyResult.IsAlreadyVerifiedAtBank) return;
+
+            string failure = null;
+
+            if (verifyResult.BankReportedAmount.HasValue && verifyResult.BankReportedAmount.Value.Value != payment.Amount)
+            {
+                failure = _options.Messages.BankReportedDifferentAmount;
+            }
+            else if (verifyResult.BankReportedOrderId != null &&
+                     verifyResult.BankReportedOrderId != payment.TrackingNumber.ToString(CultureInfo.InvariantCulture))
+            {
+                failure = _options.Messages.BankReportedDifferentInvoice;
+            }
+            else if (!verifyResult.TransactionCode.IsNullOrEmpty())
+            {
+                var lookup = _storageManager as IPaidPaymentLookup ?? Services.GetService<IStorage>() as IPaidPaymentLookup;
+
+                if (lookup == null)
+                {
+                    _logger.LogWarning(LoggingEvents.VerifyPayment,
+                                       "Verifying the invoice {TrackingNumber}: the storage does not implement {Lookup}, so it is not checked whether the transaction code {TransactionCode} already settled another payment",
+                                       payment.TrackingNumber,
+                                       nameof(IPaidPaymentLookup),
+                                       verifyResult.TransactionCode);
+
+                    if (verifyResult.IsAlreadyVerifiedAtBank) failure = _options.Messages.AlreadyVerifiedPaymentCannotBeConfirmed;
+                }
+                else
+                {
+                    var otherPayment = await lookup
+                                             .FindPaidPaymentByTransactionCodeAsync(payment.GatewayName,
+                                                                                    verifyResult.TransactionCode,
+                                                                                    payment.TrackingNumber,
+                                                                                    cancellationToken)
+                                             .ConfigureAwaitFalse();
+
+                    if (otherPayment != null)
+                    {
+                        _logger.LogWarning(LoggingEvents.VerifyPayment,
+                                           "Verifying the invoice {TrackingNumber}: the transaction code {TransactionCode} already settled the invoice {OtherTrackingNumber}",
+                                           payment.TrackingNumber,
+                                           verifyResult.TransactionCode,
+                                           otherPayment.TrackingNumber);
+
+                        failure = _options.Messages.TransactionCodeAlreadyUsed;
+                    }
+                }
+            }
+            else if (verifyResult.IsAlreadyVerifiedAtBank)
+            {
+                failure = _options.Messages.AlreadyVerifiedPaymentCannotBeConfirmed;
+            }
+
+            if (failure != null)
+            {
+                _logger.LogWarning(LoggingEvents.VerifyPayment,
+                                   "Verifying the invoice {TrackingNumber} is rejected by Parbad: {Reason}",
+                                   payment.TrackingNumber,
+                                   failure);
+
+                verifyResult.Status = PaymentVerifyResultStatus.Failed;
+                verifyResult.Message = failure;
+
+                return;
+            }
+
+            if (verifyResult.IsAlreadyVerifiedAtBank)
+            {
+                verifyResult.Status = PaymentVerifyResultStatus.Succeed;
+                verifyResult.Message = _options.Messages.PaymentSucceed;
+            }
         }
 
         private async Task<IPaymentFetchResult> FetchAsync(Payment payment, CancellationToken cancellationToken)

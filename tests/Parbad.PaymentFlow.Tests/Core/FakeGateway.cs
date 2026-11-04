@@ -27,6 +27,10 @@ public sealed class FakeGatewayBehaviour
     /// <summary>Awaited inside every verify call; used to make concurrent verifications overlap.</summary>
     public Func<Task> BeforeVerify { get; set; } = () => Task.CompletedTask;
 
+    /// <summary>Builds the verify result from the invoice. By default the payment succeeds with <see cref="FakeGateway.TransactionCode"/>.</summary>
+    public Func<InvoiceContext, PaymentVerifyResult> VerifyResult { get; set; } =
+        _ => PaymentVerifyResult.Succeed(FakeGateway.TransactionCode, "Paid.");
+
     public int VerifyCalls => _verifyCalls;
 
     public ConcurrentQueue<decimal> RefundedAmounts { get; } = new();
@@ -77,7 +81,7 @@ public class FakeGateway : GatewayBase<FakeGatewayAccount>
 
         if (_behaviour.VerifyException != null) throw _behaviour.VerifyException;
 
-        return PaymentVerifyResult.Succeed(TransactionCode, "Paid.");
+        return _behaviour.VerifyResult(context);
     }
 
     public override Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default)

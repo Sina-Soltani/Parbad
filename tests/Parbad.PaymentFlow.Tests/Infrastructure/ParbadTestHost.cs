@@ -42,7 +42,8 @@ public sealed class ParbadTestHost : IAsyncDisposable
 
     public static ParbadTestHost Create(
         Action<IGatewayBuilder> configureGateways,
-        Action<IServiceCollection>? configureServices = null)
+        Action<IServiceCollection>? configureServices = null,
+        bool storageSupportsPaidPaymentLookup = true)
     {
         var unexpectedCalls = new List<string>();
         var http = new MockHttpMessageHandler();
@@ -64,7 +65,9 @@ public sealed class ParbadTestHost : IAsyncDisposable
         services.AddParbad()
                 .ConfigureGateways(configureGateways)
                 .ConfigureHttpContext(builder => builder.AddHttpContext(_ => httpContextAccessor, ServiceLifetime.Singleton))
-                .ConfigureStorage(builder => builder.AddStorage(storage));
+                .ConfigureStorage(builder => builder.AddStorage(storageSupportsPaidPaymentLookup
+                                                                    ? storage
+                                                                    : new StorageWithoutPaidPaymentLookup(storage)));
 
         // Registered last, so it wins over any primary handler a gateway or proxy setting configures.
         // The short timeout turns a hanging simulated call into a quick failure.
