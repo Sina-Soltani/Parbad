@@ -145,7 +145,10 @@ namespace Parbad.Gateway.Mellat.Internal
         {
             var serviceResult = XmlHelper.GetNodeValueFromXml(webServiceResponse, "return");
 
-            var isSucceed = serviceResult == OkResult;
+            // 43: this sale was verified before (e.g. the first response was lost). The bank identifies the
+            // sale by the stored order id together with the reference, so it is this invoice's own payment
+            // and the flow continues with settlement.
+            var isSucceed = serviceResult == OkResult || serviceResult == AlreadyVerifiedResult;
 
             PaymentVerifyResult verifyResult = null;
 

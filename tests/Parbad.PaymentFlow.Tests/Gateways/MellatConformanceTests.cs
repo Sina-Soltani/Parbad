@@ -29,8 +29,6 @@ public class MellatConformanceTests : GatewayConformanceTests
 
     protected override IReadOnlyDictionary<string, string> KnownIssues => new Dictionary<string, string>
     {
-        // The retry after a lost response gets code 43 (already verified), which is mapped to Failed.
-        [nameof(Lost_verification_response_is_recovered_when_the_callback_is_retried)] = "G-H1",
         // localDate is formatted with the current culture: under fa-IR it is a Persian date (e.g. 14050811).
         [nameof(Payment_is_verified_on_a_server_with_persian_culture)] = "G-H6",
         [nameof(Partial_refund_is_not_silently_turned_into_a_full_refund)] = "ANALYSIS-02 §5 (partial refunds)"

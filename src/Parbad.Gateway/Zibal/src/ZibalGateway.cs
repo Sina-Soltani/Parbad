@@ -83,7 +83,7 @@ namespace Parbad.Gateway.Zibal
                 .PostJsonAsync(_gatewayOptions.ApiVerificationUrl, data, DefaultSerializerSettings, cancellationToken)
                 .ConfigureAwaitFalse();
 
-            return await ZibalHelper.CreateVerifyResult(responseMessage, _options.Messages);
+            return await ZibalHelper.CreateVerifyResult(responseMessage, data.TrackId, _options.Messages);
         }
 
         public override Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default)

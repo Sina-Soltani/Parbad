@@ -43,8 +43,6 @@ public class AsanPardakhtConformanceTests : GatewayConformanceTests
     {
         // The verification result is translated with int.Parse; an HTML page yields "" and a FormatException.
         [nameof(Html_error_page_during_verification_does_not_crash_or_mark_the_payment_as_paid)] = "G-H9",
-        // The retry after a lost response gets 504 (verification already requested), which is mapped to Failed.
-        [nameof(Lost_verification_response_is_recovered_when_the_callback_is_retried)] = "G-H1",
         // The local date is formatted with the current culture: under fa-IR it is a Persian date.
         [nameof(Payment_is_verified_on_a_server_with_persian_culture)] = "G-H6"
     };
