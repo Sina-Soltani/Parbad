@@ -25,12 +25,6 @@ public class ZarinPalConformanceTests : GatewayConformanceTests
 
     protected override bool SupportsRefund => true;
 
-    protected override IReadOnlyDictionary<string, string> KnownIssues => new Dictionary<string, string>
-    {
-        // The refund request has no amount, so a partial refund refunds everything.
-        [nameof(Partial_refund_is_not_silently_turned_into_a_full_refund)] = "ANALYSIS-02 §5 (partial refunds)"
-    };
-
     protected override void AddGateway(IGatewayBuilder gateways) =>
         gateways.AddZarinPal()
                 .WithAccounts(accounts => accounts.AddInMemory(account => account.MerchantId = MerchantId))

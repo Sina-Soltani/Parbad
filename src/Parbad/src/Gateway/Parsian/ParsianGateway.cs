@@ -108,6 +108,12 @@ namespace Parbad.Gateway.Parsian
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
+            // Parsian's ReversalRequest has no amount: it always refunds the whole payment.
+            if (amount.Value != context.Payment.Amount)
+            {
+                return PaymentRefundResult.Failed(_messageOptions.PartialRefundNotSupported);
+            }
+
             var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 
             var data = ParsianHelper.CreateRefundData(account, context, amount);

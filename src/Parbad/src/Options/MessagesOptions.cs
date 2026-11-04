@@ -34,6 +34,8 @@ namespace Parbad.Options
 
         public string TransactionCodeAlreadyUsed { get; set; } = "The bank transaction has already settled another payment.";
 
+        public string PartialRefundNotSupported { get; set; } = "This gateway can only refund the whole payment. Partial refunds are not supported.";
+
         public string AlreadyVerifiedPaymentCannotBeConfirmed { get; set; } = "The bank reports that this payment was verified before, but it cannot be confirmed that it belongs to this invoice.";
     }
 }

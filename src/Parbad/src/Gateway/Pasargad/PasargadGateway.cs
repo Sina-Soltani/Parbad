@@ -171,6 +171,12 @@ public class PasargadGateway : GatewayBase<PasargadGatewayAccount>
     {
         if (context == null) throw new ArgumentNullException(nameof(context));
 
+        // Pasargad's reverse request has no amount: it always refunds the whole payment.
+        if (amount.Value != context.Payment.Amount)
+        {
+            return PaymentRefundResult.Failed(_messageOptions.PartialRefundNotSupported);
+        }
+
         var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 
         var tokenResponse = await GetToken(account, cancellationToken);

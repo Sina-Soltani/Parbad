@@ -149,6 +149,12 @@ public class ZarinPalGateway : GatewayBase<ZarinPalGatewayAccount>
     {
         if (context == null) throw new ArgumentNullException(nameof(context));
 
+        // The refund request Parbad sends to ZarinPal has no amount: it always refunds the whole payment.
+        if (amount.Value != context.Payment.Amount)
+        {
+            return PaymentRefundResult.Failed(_messagesOptions.PartialRefundNotSupported);
+        }
+
         var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 
         var authority = ZarinPalHelper.GetAuthorityFromAdditionalData(context);

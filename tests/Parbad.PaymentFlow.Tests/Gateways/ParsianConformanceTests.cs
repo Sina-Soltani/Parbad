@@ -27,11 +27,6 @@ public class ParsianConformanceTests : GatewayConformanceTests
 
     protected override bool SupportsRefund => true;
 
-    protected override IReadOnlyDictionary<string, string> KnownIssues => new Dictionary<string, string>
-    {
-        [nameof(Partial_refund_is_not_silently_turned_into_a_full_refund)] = "ANALYSIS-02 §5 (partial refunds)"
-    };
-
     protected override void AddGateway(IGatewayBuilder gateways) =>
         gateways.AddParsian()
                 .WithAccounts(accounts => accounts.AddInMemory(account => account.LoginAccount = LoginAccount))

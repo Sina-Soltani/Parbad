@@ -136,9 +136,14 @@ namespace Parbad.Gateway.FanAva
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
+            // FanAva's refund request, as Parbad sends it, has no amount: it always refunds the whole payment.
+            if (amount.Value != context.Payment.Amount)
+            {
+                return PaymentRefundResult.Failed(_messageOptions.PartialRefundNotSupported);
+            }
+
             var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 
-            // Sends the full payment amount: partial refunds are not supported yet (ANALYSIS-02 §5).
             var data = FanAvaHelper.CreateRefundRequest(context, account);
 
             if (data == null)
