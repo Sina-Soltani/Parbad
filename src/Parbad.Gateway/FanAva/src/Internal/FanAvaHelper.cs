@@ -7,6 +7,7 @@ using Parbad.Abstraction;
 using Parbad.Gateway.FanAva.Internal.Models;
 using Parbad.Http;
 using Parbad.Internal;
+using Parbad.Net;
 using Parbad.Options;
 using Parbad.Storage.Abstractions.Models;
 using Parbad.Utilities;
@@ -146,9 +147,7 @@ namespace Parbad.Gateway.FanAva.Internal
 
         internal static async Task<FanAvaCheckResultModel> CreateCheckResult(HttpResponseMessage responseMessage, InvoiceContext context, FanAvaCallbackResultModel callbackResult, MessagesOptions messagesOptions)
         {
-            var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
-
-            var result = JsonConvert.DeserializeObject<FanAvaCheckResultModel>(response) ?? new FanAvaCheckResultModel();
+            var result = await responseMessage.ReadJsonAsync<FanAvaCheckResultModel>().ConfigureAwaitFalse();
 
             var invoiceAmount = (long)context.Payment.Amount;
 
@@ -183,9 +182,7 @@ namespace Parbad.Gateway.FanAva.Internal
 
         internal static async Task<IPaymentVerifyResult> CreateVerifyResult(HttpResponseMessage responseMessage, FanAvaCallbackResultModel callbackResult, MessagesOptions messagesOptions)
         {
-            var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
-
-            var verifyResult = JsonConvert.DeserializeObject<FanAvaVerifyResultModel>(response);
+            var verifyResult = await responseMessage.ReadJsonAsync<FanAvaVerifyResultModel>().ConfigureAwaitFalse();
 
             if (verifyResult is not { IsSucceed: true })
             {
@@ -238,9 +235,7 @@ namespace Parbad.Gateway.FanAva.Internal
 
         internal static async Task<IPaymentRefundResult> CreateRefundResult(HttpResponseMessage responseMessage)
         {
-            var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
-
-            var refundResult = JsonConvert.DeserializeObject<FanAvaVerifyResultModel>(response);
+            var refundResult = await responseMessage.ReadJsonAsync<FanAvaVerifyResultModel>().ConfigureAwaitFalse();
 
             if (refundResult is not { IsSucceed: true })
             {

@@ -328,6 +328,32 @@
             <param name="name"></param>
             <param name="value"></param>
         </member>
+        <member name="T:Parbad.Exceptions.GatewayResponseException">
+            <summary>
+            The gateway returned a response that cannot be read, for example an HTML error page from a proxy, an empty
+            body or invalid JSON.
+            <para>
+            It is not known whether the bank processed the call, so the payment is not recorded as failed: it stays
+            open and the verification can be retried. It derives from <see cref="T:System.Net.Http.HttpRequestException"/>, so code that
+            already handles network errors handles it too.
+            </para>
+            </summary>
+        </member>
+        <member name="M:Parbad.Exceptions.GatewayResponseException.#ctor(System.Net.HttpStatusCode,System.String,System.String)">
+            <summary>
+            Initializes an instance of <see cref="T:Parbad.Exceptions.GatewayResponseException"/>.
+            </summary>
+        </member>
+        <member name="P:Parbad.Exceptions.GatewayResponseException.ResponseStatusCode">
+            <summary>
+            The HTTP status code of the response.
+            </summary>
+        </member>
+        <member name="P:Parbad.Exceptions.GatewayResponseException.ContentType">
+            <summary>
+            The content type of the response, if any.
+            </summary>
+        </member>
         <member name="F:Parbad.GatewayAccountInvoiceExtensions.GatewayAccountKeyName">
             <summary>
             Gateway Account key in <see cref="P:Parbad.Abstraction.Invoice.Properties"/> property.
@@ -1776,6 +1802,43 @@
             </summary>
             <param name="factory"></param>
             <param name="gateway"></param>
+        </member>
+        <member name="T:Parbad.Net.GatewayResponse">
+            <summary>
+            Reads the JSON responses of gateways.
+            <para>
+            A response the gateway can read, including a JSON error body with a non-success status code, is a definite
+            answer from the bank and is returned. A response that cannot be read throws
+            <see cref="T:Parbad.Exceptions.GatewayResponseException"/> instead of a <see cref="T:System.NullReferenceException"/> or a parsing
+            exception, so the payment stays open for a retry.
+            </para>
+            </summary>
+        </member>
+        <member name="M:Parbad.Net.GatewayResponse.ReadJsonAsync``1(System.Net.Http.HttpResponseMessage)">
+            <summary>
+            Reads the body of <paramref name="responseMessage"/> as JSON.
+            </summary>
+            <exception cref="T:Parbad.Exceptions.GatewayResponseException">The body is empty or not valid JSON.</exception>
+        </member>
+        <member name="M:Parbad.Net.GatewayResponse.DeserializeJson``1(System.Net.Http.HttpResponseMessage,System.String)">
+            <summary>
+            Deserializes <paramref name="body"/>, the already read body of <paramref name="responseMessage"/>.
+            </summary>
+            <exception cref="T:Parbad.Exceptions.GatewayResponseException">The body is empty or not valid JSON.</exception>
+        </member>
+        <member name="M:Parbad.Net.GatewayResponse.ReadJsonStringAsync(System.Net.Http.HttpResponseMessage)">
+            <summary>
+            Reads the body of <paramref name="responseMessage"/> and checks that it is JSON, for gateways that inspect
+            the JSON themselves (e.g. an error body with a non-success status code).
+            </summary>
+            <exception cref="T:Parbad.Exceptions.GatewayResponseException">The body is empty or not valid JSON.</exception>
+        </member>
+        <member name="M:Parbad.Net.GatewayResponse.ReadSoapAsync(System.Net.Http.HttpResponseMessage)">
+            <summary>
+            Reads the body of <paramref name="responseMessage"/> and checks that it is a SOAP envelope. A SOAP fault is
+            an envelope too, so it is returned and the gateway reports it as a failure.
+            </summary>
+            <exception cref="T:Parbad.Exceptions.GatewayResponseException">The body is not a SOAP envelope, e.g. an HTML error page.</exception>
         </member>
         <member name="M:Parbad.OnlinePaymentExtensions.Request(Parbad.IOnlinePayment,System.String,System.Int64,System.Decimal,System.String)">
             <summary>

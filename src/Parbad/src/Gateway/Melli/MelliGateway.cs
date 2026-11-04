@@ -129,9 +129,7 @@ namespace Parbad.Gateway.Melli
         {
             var responseMessage = await _httpClient.PostJsonAsync(url, data, cancellationToken).ConfigureAwaitFalse();
 
-            var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
-
-            return JsonConvert.DeserializeObject<T>(response);
+            return await responseMessage.ReadJsonAsync<T>().ConfigureAwaitFalse();
         }
     }
 }

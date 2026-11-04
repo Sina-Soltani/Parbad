@@ -52,7 +52,7 @@ namespace Parbad.Gateway.Mellat
                 .PostXmlAsync(_gatewayOptions.ApiUrl, data, cancellationToken)
                 .ConfigureAwaitFalse();
 
-            var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
+            var response = await responseMessage.ReadSoapAsync().ConfigureAwaitFalse();
 
             return MellatHelper.CreateRequestResult(
                 response,
@@ -102,7 +102,7 @@ namespace Parbad.Gateway.Mellat
                 .PostXmlAsync(_gatewayOptions.ApiUrl, data, cancellationToken)
                 .ConfigureAwaitFalse();
 
-            var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
+            var response = await responseMessage.ReadSoapAsync().ConfigureAwaitFalse();
 
             var verifyResult = MellatHelper.CheckVerifyResult(response, callbackResult, _messagesOptions.Value);
 
@@ -117,7 +117,7 @@ namespace Parbad.Gateway.Mellat
                 .PostXmlAsync(_gatewayOptions.ApiUrl, data, cancellationToken)
                 .ConfigureAwaitFalse();
 
-            response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
+            response = await responseMessage.ReadSoapAsync().ConfigureAwaitFalse();
 
             return MellatHelper.CreateSettleResult(response, callbackResult, _messagesOptions.Value);
         }
@@ -135,7 +135,7 @@ namespace Parbad.Gateway.Mellat
                 .PostXmlAsync(_gatewayOptions.ApiUrl, data, cancellationToken)
                 .ConfigureAwaitFalse();
 
-            var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
+            var response = await responseMessage.ReadSoapAsync().ConfigureAwaitFalse();
 
             return MellatHelper.CreateRefundResult(response, _messagesOptions.Value);
         }

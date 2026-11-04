@@ -28,12 +28,6 @@ public class ZibalConformanceTests : GatewayConformanceTests
 
     protected override bool SupportsRefund => false;
 
-    protected override IReadOnlyDictionary<string, string> KnownIssues => new Dictionary<string, string>
-    {
-        // The response is deserialised without checking the HTTP status.
-        [nameof(Html_error_page_during_verification_does_not_crash_or_mark_the_payment_as_paid)] = "G-H9"
-    };
-
     protected override void AddGateway(IGatewayBuilder gateways) => AddZibal(gateways, isSandbox: false);
 
     protected override void UseGateway(IInvoiceBuilder invoice) => invoice.UseZibal();

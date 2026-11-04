@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Parbad.Internal;
 
 namespace Parbad.Net
 {
@@ -51,20 +52,21 @@ namespace Parbad.Net
                                                                  JsonSerializerSettings serializerSettings = null,
                                                                  CancellationToken cancellationToken = default)
         {
-            var responseMessage = await httpClient.PostJsonAsync(requestUri, data, serializerSettings, cancellationToken);
+            var responseMessage = await httpClient.PostJsonAsync(requestUri, data, serializerSettings, cancellationToken).ConfigureAwaitFalse();
 
-            var response = await responseMessage.Content.ReadAsStringAsync();
-
-            return JsonConvert.DeserializeObject<TResult>(response);
+            return await responseMessage.ReadJsonAsync<TResult>().ConfigureAwaitFalse();
         }
 
         public static async Task<TResult> GetJsonAsync<TResult>(this HttpClient httpClient, string requestUri)
         {
             if (httpClient == null) throw new ArgumentNullException(nameof(httpClient));
 
-            var response = await httpClient.GetStringAsync(requestUri);
+            var responseMessage = await httpClient.GetAsync(requestUri).ConfigureAwaitFalse();
 
-            return JsonConvert.DeserializeObject<TResult>(response);
+            // GetStringAsync used to throw on a non-success status; keep that, so callers see the same exception type.
+            responseMessage.EnsureSuccessStatusCode();
+
+            return await responseMessage.ReadJsonAsync<TResult>().ConfigureAwaitFalse();
         }
 
         public static Task<HttpResponseMessage> PostFormAsync(this HttpClient httpClient,

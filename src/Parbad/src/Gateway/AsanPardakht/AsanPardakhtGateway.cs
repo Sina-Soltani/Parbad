@@ -56,7 +56,7 @@ namespace Parbad.Gateway.AsanPardakht
                 .PostXmlAsync(_gatewayOptions.ApiUrl, data, cancellationToken)
                 .ConfigureAwaitFalse();
 
-            var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
+            var response = await responseMessage.ReadSoapAsync().ConfigureAwaitFalse();
 
             return AsanPardakhtHelper.CreateRequestResult(
                 response,
@@ -114,7 +114,7 @@ namespace Parbad.Gateway.AsanPardakht
                 .PostXmlAsync(_gatewayOptions.ApiUrl, data, cancellationToken)
                 .ConfigureAwaitFalse();
 
-            var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
+            var response = await responseMessage.ReadSoapAsync().ConfigureAwaitFalse();
 
             var verifyResult = AsanPardakhtHelper.CheckVerifyResult(response, callbackResult, _messageOptions);
 
@@ -130,7 +130,7 @@ namespace Parbad.Gateway.AsanPardakht
                 .PostXmlAsync(_gatewayOptions.ApiUrl, data, cancellationToken)
                 .ConfigureAwaitFalse();
 
-            response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
+            response = await responseMessage.ReadSoapAsync().ConfigureAwaitFalse();
 
             return AsanPardakhtHelper.CreateSettleResult(response, callbackResult, _messageOptions);
         }

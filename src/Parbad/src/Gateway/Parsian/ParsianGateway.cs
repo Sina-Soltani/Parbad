@@ -52,7 +52,7 @@ namespace Parbad.Gateway.Parsian
                 .PostXmlAsync(_gatewayOptions.ApiRequestUrl, data, cancellationToken)
                 .ConfigureAwaitFalse();
 
-            var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
+            var response = await responseMessage.ReadSoapAsync().ConfigureAwaitFalse();
 
             return ParsianHelper.CreateRequestResult(response, _httpContextAccessor.HttpContext, account, _gatewayOptions, _messageOptions);
         }
@@ -98,7 +98,7 @@ namespace Parbad.Gateway.Parsian
                 .PostXmlAsync(_gatewayOptions.ApiVerificationUrl, data, cancellationToken)
                 .ConfigureAwaitFalse();
 
-            var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
+            var response = await responseMessage.ReadSoapAsync().ConfigureAwaitFalse();
 
             return ParsianHelper.CreateVerifyResult(response, callbackResult, context, _messageOptions);
         }
@@ -116,7 +116,7 @@ namespace Parbad.Gateway.Parsian
                 .PostXmlAsync(_gatewayOptions.ApiRefundUrl, data, cancellationToken)
                 .ConfigureAwaitFalse();
 
-            var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
+            var response = await responseMessage.ReadSoapAsync().ConfigureAwaitFalse();
 
             return ParsianHelper.CreateRefundResult(response, _messageOptions);
         }

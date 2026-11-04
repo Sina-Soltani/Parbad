@@ -24,8 +24,6 @@ public class SamanConformanceTests : GatewayConformanceTests
 
     protected override IReadOnlyDictionary<string, string> KnownIssues => new Dictionary<string, string>
     {
-        // An HTML error page is parsed as JSON.
-        [nameof(Html_error_page_during_verification_does_not_crash_or_mark_the_payment_as_paid)] = "G-H9",
         // The callback RefNum is never compared with anything stored for this invoice; only the amount protects it.
         [nameof(Payment_of_another_invoice_with_the_same_amount_cannot_settle_this_invoice)] = "G-C1b",
         [nameof(Payment_of_another_invoice_cannot_settle_this_invoice_even_with_this_invoices_token)] = "G-C1b",

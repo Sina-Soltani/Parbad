@@ -25,12 +25,6 @@ public class IdPayConformanceTests : GatewayConformanceTests
 
     protected override bool SupportsRefund => false;
 
-    protected override IReadOnlyDictionary<string, string> KnownIssues => new Dictionary<string, string>
-    {
-        // An error body is deserialised as JSON whatever its content type.
-        [nameof(Html_error_page_during_verification_does_not_crash_or_mark_the_payment_as_paid)] = "G-H9"
-    };
-
     protected override void AddGateway(IGatewayBuilder gateways) =>
         gateways.AddIdPay()
                 .WithAccounts(accounts => accounts.AddInMemory(account => account.Api = ApiKey))

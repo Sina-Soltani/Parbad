@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using Parbad.Abstraction;
 using Parbad.Http;
 using Parbad.Internal;
+using Parbad.Net;
 using Parbad.Options;
 using Parbad.Storage.Abstractions.Models;
 using System;
@@ -51,9 +52,7 @@ namespace Parbad.Gateway.Zibal.Internal
             ZibalGatewayOptions gatewayOptions,
             MessagesOptions messagesOptions)
         {
-            var message = await responseMessage.Content.ReadAsStringAsync();
-
-            var response = JsonConvert.DeserializeObject<ZibalResponseModel>(message);
+            var response = await responseMessage.ReadJsonAsync<ZibalResponseModel>().ConfigureAwaitFalse();
 
             if (response == null)
             {
@@ -126,9 +125,7 @@ namespace Parbad.Gateway.Zibal.Internal
 
         public static async Task<PaymentVerifyResult> CreateVerifyResult(HttpResponseMessage responseMessage, string? trackId, MessagesOptions messagesOptions)
         {
-            var message = await responseMessage.Content.ReadAsStringAsync();
-
-            var response = JsonConvert.DeserializeObject<ZibalPaymentVerifyResponseModel>(message);
+            var response = await responseMessage.ReadJsonAsync<ZibalPaymentVerifyResponseModel>().ConfigureAwaitFalse();
 
             if (response == null)
             {
