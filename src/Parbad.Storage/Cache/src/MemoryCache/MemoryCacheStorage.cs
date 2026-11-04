@@ -15,6 +15,8 @@ namespace Parbad.Storage.Cache.MemoryCache;
 /// </summary>
 public class MemoryCacheStorage : CacheStorage
 {
+    private static readonly object CollectionCreationLock = new();
+
     private readonly IMemoryCache _memoryCache;
     private readonly MemoryCacheStorageOptions _options;
 
@@ -27,7 +29,7 @@ public class MemoryCacheStorage : CacheStorage
     {
         _memoryCache = memoryCache;
         _options = options.Value;
-        Collection = memoryCache.Get<ICacheStorageCollection>(_options.CacheKey) ?? new CacheStorageCollection();
+        Collection = GetOrCreateCollection();
     }
 
     /// <inheritdoc />
@@ -39,5 +41,29 @@ public class MemoryCacheStorage : CacheStorage
         _memoryCache.Set(_options.CacheKey, Collection, _options.CacheEntryOptions);
 
         return Task.CompletedTask;
+    }
+
+    private ICacheStorageCollection GetOrCreateCollection()
+    {
+        if (_memoryCache.TryGetValue(_options.CacheKey, out ICacheStorageCollection? collection) && collection != null)
+        {
+            return collection;
+        }
+
+        // IMemoryCache.GetOrCreate is not atomic: concurrent requests could each create a collection,
+        // and the records saved into all but one of them would be lost.
+        lock (CollectionCreationLock)
+        {
+            if (_memoryCache.TryGetValue(_options.CacheKey, out collection) && collection != null)
+            {
+                return collection;
+            }
+
+            collection = new CacheStorageCollection();
+
+            _memoryCache.Set(_options.CacheKey, collection, _options.CacheEntryOptions);
+
+            return collection;
+        }
     }
 }

@@ -6,6 +6,7 @@ using Parbad.Storage.Abstractions.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,16 +17,43 @@ namespace Parbad.Storage.Cache.Abstractions;
 /// </summary>
 public abstract class CacheStorage : IStorage
 {
-    /// <inheritdoc />
-    public virtual IQueryable<Payment> Payments => Collection.Payments.AsQueryable();
+    // The storages are transient and all instances that use the same cache share one collection,
+    // so the lock must belong to the collection, not to the storage instance.
+    private static readonly ConditionalWeakTable<ICacheStorageCollection, object> CollectionLocks = new();
 
     /// <inheritdoc />
-    public virtual IQueryable<Transaction> Transactions => Collection.Transactions.AsQueryable();
+    public virtual IQueryable<Payment> Payments
+    {
+        get
+        {
+            lock (SyncRoot)
+            {
+                return Collection.Payments.Select(ClonePayment).ToList().AsQueryable();
+            }
+        }
+    }
+
+    /// <inheritdoc />
+    public virtual IQueryable<Transaction> Transactions
+    {
+        get
+        {
+            lock (SyncRoot)
+            {
+                return Collection.Transactions.Select(CloneTransaction).ToList().AsQueryable();
+            }
+        }
+    }
 
     /// <summary>
     /// A collection for holding the data.
     /// </summary>
     protected abstract ICacheStorageCollection Collection { get; }
+
+    /// <summary>
+    /// The lock that guards every read and write of <see cref="Collection"/>.
+    /// </summary>
+    private protected object SyncRoot => CollectionLocks.GetValue(Collection, _ => new object());
 
     /// <inheritdoc />
     public virtual Task CreatePaymentAsync(Payment payment, CancellationToken cancellationToken = default)
@@ -33,13 +61,18 @@ public abstract class CacheStorage : IStorage
         if (payment == null) throw new ArgumentNullException(nameof(payment));
         cancellationToken.ThrowIfCancellationRequested();
 
-        payment.Id = GenerateNewPaymentId();
+        lock (SyncRoot)
+        {
+            ThrowIfPaymentIsNotUnique(payment, existingRecord: null);
 
-        var record = FindPayment(payment);
+            payment.Id = GenerateNewPaymentId();
 
-        if (record != null) throw new InvalidOperationException($"There is already a payment record in database with id {payment.Id}");
+            var record = FindPayment(payment);
 
-        Collection.Payments.Add(payment);
+            if (record != null) throw new InvalidOperationException($"There is already a payment record in database with id {payment.Id}");
+
+            Collection.Payments.Add(ClonePayment(payment));
+        }
 
         return SaveChangesAsync(cancellationToken);
     }
@@ -50,13 +83,16 @@ public abstract class CacheStorage : IStorage
         if (payment == null) throw new ArgumentNullException(nameof(payment));
         cancellationToken.ThrowIfCancellationRequested();
 
-        var record = FindPayment(payment);
+        lock (SyncRoot)
+        {
+            var record = FindPayment(payment);
 
-        if (record == null) throw new InvalidOperationException($"No payment records found in database with id {payment.Id}");
+            if (record == null) throw new InvalidOperationException($"No payment records found in database with id {payment.Id}");
 
-        record.Token = payment.Token;
-        record.TrackingNumber = payment.TrackingNumber;
-        record.TransactionCode = payment.TransactionCode;
+            ThrowIfPaymentIsNotUnique(payment, record);
+
+            CopyPayment(payment, record);
+        }
 
         return SaveChangesAsync(cancellationToken);
     }
@@ -67,13 +103,16 @@ public abstract class CacheStorage : IStorage
         if (payment == null) throw new ArgumentNullException(nameof(payment));
         cancellationToken.ThrowIfCancellationRequested();
 
-        var record = FindPayment(payment);
+        lock (SyncRoot)
+        {
+            var record = FindPayment(payment);
 
-        if (record == null) throw new InvalidOperationException($"No payment records found in database with id {payment.Id}");
+            if (record == null) throw new InvalidOperationException($"No payment records found in database with id {payment.Id}");
 
-        Collection.Payments.Remove(record);
+            Collection.Payments.Remove(record);
 
-        Collection.Transactions.RemoveAll(model => model.PaymentId == record.Id);
+            Collection.Transactions.RemoveAll(model => model.PaymentId == record.Id);
+        }
 
         return SaveChangesAsync(cancellationToken);
     }
@@ -84,13 +123,16 @@ public abstract class CacheStorage : IStorage
         if (transaction == null) throw new ArgumentNullException(nameof(transaction));
         cancellationToken.ThrowIfCancellationRequested();
 
-        transaction.Id = GenerateNewTransactionId();
+        lock (SyncRoot)
+        {
+            transaction.Id = GenerateNewTransactionId();
 
-        var record = FindTransaction(transaction);
+            var record = FindTransaction(transaction);
 
-        if (record != null) throw new InvalidOperationException($"There is already a transaction record in database with id {transaction.Id}");
+            if (record != null) throw new InvalidOperationException($"There is already a transaction record in database with id {transaction.Id}");
 
-        Collection.Transactions.Add(transaction);
+            Collection.Transactions.Add(CloneTransaction(transaction));
+        }
 
         return SaveChangesAsync(cancellationToken);
     }
@@ -101,11 +143,14 @@ public abstract class CacheStorage : IStorage
         if (transaction == null) throw new ArgumentNullException(nameof(transaction));
         cancellationToken.ThrowIfCancellationRequested();
 
-        var record = FindTransaction(transaction);
+        lock (SyncRoot)
+        {
+            var record = FindTransaction(transaction);
 
-        if (record == null) throw new InvalidOperationException($"No payment records found in database with id {transaction.Id}");
+            if (record == null) throw new InvalidOperationException($"No payment records found in database with id {transaction.Id}");
 
-        record.IsSucceed = transaction.IsSucceed;
+            CopyTransaction(transaction, record);
+        }
 
         return SaveChangesAsync(cancellationToken);
     }
@@ -116,11 +161,14 @@ public abstract class CacheStorage : IStorage
         if (transaction == null) throw new ArgumentNullException(nameof(transaction));
         cancellationToken.ThrowIfCancellationRequested();
 
-        var record = FindTransaction(transaction);
+        lock (SyncRoot)
+        {
+            var record = FindTransaction(transaction);
 
-        if (record == null) throw new InvalidOperationException($"No payment records found in database with id {transaction.Id}");
+            if (record == null) throw new InvalidOperationException($"No payment records found in database with id {transaction.Id}");
 
-        Collection.Transactions.Remove(record);
+            Collection.Transactions.Remove(record);
+        }
 
         return SaveChangesAsync(cancellationToken);
     }
@@ -130,9 +178,12 @@ public abstract class CacheStorage : IStorage
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var record = Collection.Payments.SingleOrDefault(payment => payment.TrackingNumber == trackingNumber);
+        lock (SyncRoot)
+        {
+            var record = Collection.Payments.SingleOrDefault(payment => payment.TrackingNumber == trackingNumber);
 
-        return Task.FromResult<Payment?>(record);
+            return Task.FromResult<Payment?>(record == null ? null : ClonePayment(record));
+        }
     }
 
     /// <inheritdoc />
@@ -140,9 +191,12 @@ public abstract class CacheStorage : IStorage
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var record = Collection.Payments.SingleOrDefault(payment => payment.Token == paymentToken);
+        lock (SyncRoot)
+        {
+            var record = Collection.Payments.SingleOrDefault(payment => payment.Token == paymentToken);
 
-        return Task.FromResult<Payment?>(record);
+            return Task.FromResult<Payment?>(record == null ? null : ClonePayment(record));
+        }
     }
 
     /// <inheritdoc />
@@ -150,9 +204,12 @@ public abstract class CacheStorage : IStorage
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var exists = Collection.Payments.Any(payment => payment.TrackingNumber == trackingNumber);
+        lock (SyncRoot)
+        {
+            var exists = Collection.Payments.Any(payment => payment.TrackingNumber == trackingNumber);
 
-        return Task.FromResult(exists);
+            return Task.FromResult(exists);
+        }
     }
 
     /// <inheritdoc />
@@ -160,19 +217,26 @@ public abstract class CacheStorage : IStorage
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var exists = Collection.Payments.Any(payment => payment.Token == paymentToken);
+        lock (SyncRoot)
+        {
+            var exists = Collection.Payments.Any(payment => payment.Token == paymentToken);
 
-        return Task.FromResult(exists);
+            return Task.FromResult(exists);
+        }
     }
 
     /// <inheritdoc />
     public virtual Task<List<Transaction>> GetTransactionsAsync(Payment payment, CancellationToken cancellationToken = default)
     {
-        var transactions = Collection.Transactions
-                                     .Where(transaction => transaction.PaymentId == payment.Id)
-                                     .ToList();
+        lock (SyncRoot)
+        {
+            var transactions = Collection.Transactions
+                                         .Where(transaction => transaction.PaymentId == payment.Id)
+                                         .Select(CloneTransaction)
+                                         .ToList();
 
-        return Task.FromResult(transactions);
+            return Task.FromResult(transactions);
+        }
     }
 
     /// <summary>
@@ -181,9 +245,7 @@ public abstract class CacheStorage : IStorage
     /// <param name="payment"></param>
     protected virtual Payment? FindPayment(Payment payment)
     {
-        return Collection.Payments.Contains(payment)
-            ? payment
-            : Collection.Payments.SingleOrDefault(model => model.Id == payment.Id);
+        return Collection.Payments.SingleOrDefault(model => model.Id == payment.Id);
     }
 
     /// <summary>
@@ -192,9 +254,7 @@ public abstract class CacheStorage : IStorage
     /// <param name="transaction"></param>
     protected virtual Transaction? FindTransaction(Transaction transaction)
     {
-        return Collection.Transactions.Contains(transaction)
-            ? transaction
-            : Collection.Transactions.SingleOrDefault(model => model.Id == transaction.Id);
+        return Collection.Transactions.SingleOrDefault(model => model.Id == transaction.Id);
     }
 
     /// <summary>
@@ -222,4 +282,63 @@ public abstract class CacheStorage : IStorage
     /// </summary>
     /// <param name="cancellationToken"></param>
     protected abstract Task SaveChangesAsync(CancellationToken cancellationToken = default);
+
+    // Lookups by tracking number or token use SingleOrDefault, so a duplicate would make both payments unreachable.
+    private void ThrowIfPaymentIsNotUnique(Payment payment, Payment? existingRecord)
+    {
+        foreach (var record in Collection.Payments)
+        {
+            if (ReferenceEquals(record, existingRecord)) continue;
+
+            if (record.TrackingNumber == payment.TrackingNumber)
+            {
+                throw new InvalidOperationException($"There is already a payment record in database with tracking number {payment.TrackingNumber}");
+            }
+
+            if (payment.Token != null && record.Token == payment.Token)
+            {
+                throw new InvalidOperationException($"There is already a payment record in database with token {payment.Token}");
+            }
+        }
+    }
+
+    private static Payment ClonePayment(Payment payment)
+    {
+        var clone = new Payment { Id = payment.Id };
+
+        CopyPayment(payment, clone);
+
+        return clone;
+    }
+
+    private static void CopyPayment(Payment source, Payment target)
+    {
+        target.TrackingNumber = source.TrackingNumber;
+        target.Amount = source.Amount;
+        target.Token = source.Token;
+        target.TransactionCode = source.TransactionCode;
+        target.GatewayName = source.GatewayName;
+        target.GatewayAccountName = source.GatewayAccountName;
+        target.IsCompleted = source.IsCompleted;
+        target.IsPaid = source.IsPaid;
+    }
+
+    private static Transaction CloneTransaction(Transaction transaction)
+    {
+        var clone = new Transaction { Id = transaction.Id };
+
+        CopyTransaction(transaction, clone);
+
+        return clone;
+    }
+
+    private static void CopyTransaction(Transaction source, Transaction target)
+    {
+        target.Amount = source.Amount;
+        target.Type = source.Type;
+        target.IsSucceed = source.IsSucceed;
+        target.Message = source.Message;
+        target.AdditionalData = source.AdditionalData;
+        target.PaymentId = source.PaymentId;
+    }
 }

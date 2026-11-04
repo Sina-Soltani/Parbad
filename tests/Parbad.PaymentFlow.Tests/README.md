@@ -14,6 +14,7 @@ dotnet test tests/Parbad.PaymentFlow.Tests
 |---|---|
 | `Core/` | `DefaultOnlinePayment` (request, fetch, verify, cancel, refund, concurrent verification) against a fake gateway, and `Money` comparisons. |
 | `Gateways/` | The same 14 scenarios for each of the 16 gateways, plus a few gateway-specific tests. Each bank is simulated by `FakeBank` and the gateway's subclass. |
+| `Storage/` | `MemoryCacheStorage` and `DistributedCacheStorage`: updates from detached copies, no shared references, unique tracking numbers and tokens, parallel creates, instances sharing one `IMemoryCache`. |
 | `Infrastructure/` | The test host (DI container, thread-safe in-memory storage, replaceable HTTP context) and the `KnownIssue` helper. |
 
 The gateway scenarios cover:
