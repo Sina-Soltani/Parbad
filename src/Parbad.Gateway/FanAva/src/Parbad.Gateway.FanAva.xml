@@ -53,5 +53,22 @@
             <param name="builder"></param>
             <param name="additionalData"></param>
         </member>
+        <member name="M:Parbad.Gateway.FanAva.Internal.FanAvaHelper.CreateRefundRequest(Parbad.InvoiceContext,Parbad.Gateway.FanAva.FanAvaGatewayAccount)">
+            <summary>
+            Creates the refund request from the data stored by <see cref="M:Parbad.Gateway.FanAva.Internal.FanAvaHelper.CreateVerifyResult(System.Net.Http.HttpResponseMessage,Parbad.Gateway.FanAva.Internal.Models.FanAvaCallbackResultModel,Parbad.Options.MessagesOptions)"/>, or returns null if
+            the payment has no successful verification with that data.
+            </summary>
+        </member>
+        <member name="M:Parbad.Gateway.FanAva.Internal.FanAvaHelper.IsTokenIssuedForThisInvoice(System.String,Parbad.InvoiceContext)">
+            <summary>
+            Checks that the callback's token is the one FanAva issued for this invoice. Invoices requested before
+            the token was stored have nothing to compare with and are accepted as before.
+            </summary>
+        </member>
+        <member name="P:Parbad.Gateway.FanAva.Internal.Models.FanAvaCheckResultModel.IsSucceed">
+            <summary>
+            The outcome of <see cref="M:Parbad.Gateway.FanAva.Internal.FanAvaHelper.CreateCheckResult(System.Net.Http.HttpResponseMessage,Parbad.InvoiceContext,Parbad.Gateway.FanAva.Internal.Models.FanAvaCallbackResultModel,Parbad.Options.MessagesOptions)"/>, not a field of the bank's response.
+            </summary>
+        </member>
     </members>
 </doc>
