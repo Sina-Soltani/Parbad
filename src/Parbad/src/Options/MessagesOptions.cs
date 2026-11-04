@@ -23,5 +23,9 @@ namespace Parbad.Options
         public string PaymentCanceledProgrammatically { get; set; } = "Payment is canceled programmatically.";
 
         public string OnlyCompletedPaymentCanBeRefunded { get; set; } = "Only a completed payment can be refunded.";
+
+        public string OnlyPaidPaymentCanBeRefunded { get; set; } = "Only a paid payment can be refunded.";
+
+        public string RefundExceedsRemainingAmount { get; set; } = "The refund amount exceeds the amount that has not been refunded yet.";
     }
 }

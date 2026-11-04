@@ -10,6 +10,7 @@ using Parbad.PaymentTokenProviders;
 using Parbad.Storage.Abstractions;
 using Parbad.Storage.Abstractions.Models;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -375,24 +376,46 @@ namespace Parbad.Internal
                 return PaymentRefundResult.Failed(message);
             }
 
+            // A completed payment can also be a failed or cancelled one, which has nothing to refund.
+            if (!payment.IsPaid)
+            {
+                _logger.LogInformation(LoggingEvents.RefundPayment,
+                                       "Refunding the invoice {TrackingNumber} is finished. Only a paid payment can be refunded",
+                                       invoice.TrackingNumber);
+
+                return PaymentRefundResult.Failed($"{_options.Messages.OnlyPaidPaymentCanBeRefunded} Tracking number: {invoice.TrackingNumber}.");
+            }
+
+            var transactions = await _storageManager.GetTransactionsAsync(payment, cancellationToken).ConfigureAwaitFalse();
+
+            var alreadyRefunded = transactions
+                                  .Where(transaction => transaction.Type == TransactionType.Refund && transaction.IsSucceed)
+                                  .Sum(transaction => transaction.Amount);
+
+            var remainingAmount = payment.Amount - alreadyRefunded;
+
             Money amountToRefund;
 
-            if (invoice.Amount == 0)
-            {
-                amountToRefund = payment.Amount;
-            }
-            else if (invoice.Amount > payment.Amount)
+            if (invoice.Amount > payment.Amount)
             {
                 throw new Exception("Amount cannot be greater than the amount of the paid payment.");
             }
-            else
+
+            if (remainingAmount <= 0 || invoice.Amount > remainingAmount)
             {
-                amountToRefund = invoice.Amount;
+                _logger.LogInformation(LoggingEvents.RefundPayment,
+                                       "Refunding the invoice {TrackingNumber} is finished. The refund exceeds the remaining amount {RemainingAmount}",
+                                       invoice.TrackingNumber,
+                                       remainingAmount);
+
+                return PaymentRefundResult.Failed($"{_options.Messages.RefundExceedsRemainingAmount} Tracking number: {invoice.TrackingNumber}.");
             }
+
+            // Zero means "refund completely", i.e. everything that has not been refunded yet.
+            amountToRefund = invoice.Amount == 0 ? remainingAmount : invoice.Amount;
 
             var gateway = _gatewayProvider.Provide(payment.GatewayName);
 
-            var transactions = await _storageManager.GetTransactionsAsync(payment, cancellationToken).ConfigureAwaitFalse();
             var verifyContext = new InvoiceContext(payment, transactions);
 
             PaymentRefundResult refundResult;
