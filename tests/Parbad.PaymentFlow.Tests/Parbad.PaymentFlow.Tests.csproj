@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
-    <!-- Tests exercise obsolete members (IStorage.Payments, DistributedCacheStorage) on purpose. -->
+    <!-- Tests exercise obsolete members (IStorage.Payments, IStorageManager) on purpose. -->
     <NoWarn>$(NoWarn);CS0618</NoWarn>
   </PropertyGroup>
 
