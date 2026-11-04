@@ -14,6 +14,6 @@ namespace Parbad.Gateway.FanAva.Internal.Models
         [JsonProperty("RefNum")]
         public string InvoiceNumber { get; set; }
         
-        public Money Amount { get; set; }
+        public long Amount { get; set; }
     }
 }

@@ -69,6 +69,7 @@ namespace Parbad.Gateway.FanAva
 
             var callbackResult = await FanAvaHelper.CreateCallbackResult(
                     _httpContextAccessor.HttpContext.Request,
+                    context,
                     _messageOptions,
                     account,
                     cancellationToken)
@@ -91,6 +92,7 @@ namespace Parbad.Gateway.FanAva
 
             var callbackResult = await FanAvaHelper.CreateCallbackResult(
                     _httpContextAccessor.HttpContext.Request,
+                    context,
                     _messageOptions,
                     account,
                     cancellationToken)
@@ -109,7 +111,7 @@ namespace Parbad.Gateway.FanAva
 
             var checkResult = await FanAvaHelper.CreateCheckResult(
                 responseMessage,
-                account,
+                context,
                 callbackResult,
                 _messageOptions);
 
@@ -118,7 +120,7 @@ namespace Parbad.Gateway.FanAva
                 return checkResult.VerifyResult;
             }
 
-            var data = FanAvaHelper.CreateVerifyRequest(context, callbackResult, checkResult);
+            var data = FanAvaHelper.CreateVerifyRequest(context, callbackResult);
 
             responseMessage = await _httpClient.PostJsonAsync(
                     _gatewayOptions.ApiVerificationUrl,
@@ -136,44 +138,21 @@ namespace Parbad.Gateway.FanAva
 
             var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 
-            var callbackResult = await FanAvaHelper.CreateCallbackResult(
-                    _httpContextAccessor.HttpContext.Request,
-                    _messageOptions,
-                    account,
-                    cancellationToken)
-                .ConfigureAwaitFalse();
+            // Sends the full payment amount: partial refunds are not supported yet (ANALYSIS-02 §5).
+            var data = FanAvaHelper.CreateRefundRequest(context, account);
 
-            if (!callbackResult.IsSucceed)
+            if (data == null)
             {
-                return PaymentRefundResult.Failed(callbackResult.Message);
+                return PaymentRefundResult.Failed($"No successful verification with the FanAva token and reference number was found for the payment with tracking number {context.Payment.TrackingNumber}.");
             }
 
             var responseMessage = await _httpClient.PostJsonAsync(
-                    _gatewayOptions.ApiCheckPaymentUrl,
-                    callbackResult.CallbackCheckData,
-                    cancellationToken)
-                .ConfigureAwaitFalse();
-
-            var checkResult = await FanAvaHelper.CreateCheckResult(
-                responseMessage,
-                account,
-                callbackResult,
-                _messageOptions);
-
-            if (!checkResult.IsSucceed)
-            {
-                return PaymentRefundResult.Failed(checkResult.VerifyResult.Message);
-            }
-
-            var data = FanAvaHelper.CreateVerifyRequest(context, callbackResult, checkResult);
-
-            responseMessage = await _httpClient.PostJsonAsync(
                     _gatewayOptions.ApiRefundUrl,
                     data,
                     cancellationToken)
                 .ConfigureAwaitFalse();
 
-            return await FanAvaHelper.CreateRefundResult(responseMessage, callbackResult, _messageOptions);
+            return await FanAvaHelper.CreateRefundResult(responseMessage).ConfigureAwaitFalse();
         }
     }
 }

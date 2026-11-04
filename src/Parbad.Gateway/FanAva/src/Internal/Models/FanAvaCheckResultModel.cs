@@ -7,6 +7,9 @@ namespace Parbad.Gateway.FanAva.Internal.Models
 {
     internal class FanAvaCheckResultModel
     {
+        /// <summary>
+        /// The outcome of <see cref="FanAvaHelper.CreateCheckResult"/>, not a field of the bank's response.
+        /// </summary>
         [JsonIgnore]
         public bool IsSucceed { get; set; }
 

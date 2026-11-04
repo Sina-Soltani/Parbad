@@ -8,9 +8,11 @@ using Parbad.Gateway.FanAva.Internal.Models;
 using Parbad.Http;
 using Parbad.Internal;
 using Parbad.Options;
+using Parbad.Storage.Abstractions.Models;
 using Parbad.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,6 +21,10 @@ namespace Parbad.Gateway.FanAva.Internal
 {
     internal static class FanAvaHelper
     {
+        private const string SucceedResult = "erSucceed";
+        private const string TokenDatabaseKey = "FanAvaToken";
+        private const string RefNumDatabaseKey = "FanAvaRefNum";
+
         internal static FanAvaRequestModel CreateRequestModel(Invoice invoice, FanAvaGatewayAccount account)
         {
             var additionalData = invoice.GetFanAvaAdditionalData();
@@ -48,7 +54,7 @@ namespace Parbad.Gateway.FanAva.Internal
                 Amount = invoice.Amount,
                 RedirectUrl = invoice.CallbackUrl,
                 Email = additionalData?.Email,
-                MobileNo = additionalData?.Email,
+                MobileNo = additionalData?.MobileNumber,
                 GoodsReferenceId = additionalData?.GoodsReferenceId,
                 MerchantGoodReferenceId = additionalData?.MerchantGoodReferenceId,
                 ApportionmentAccountList = additionalData?.ApportionmentAccountList
@@ -70,17 +76,28 @@ namespace Parbad.Gateway.FanAva.Internal
 
             var result = JsonConvert.DeserializeObject<FanAvaRequestResultModel>(response);
 
+            if (result is not { IsSucceed: true } || string.IsNullOrEmpty(result.Token))
+            {
+                return PaymentRequestResult.Failed($"The gateway did not issue a payment token. Result: {result?.Result}", account.Name, result?.Result);
+            }
+
             var paymentPageUrl = QueryHelper.AddQueryString(gatewayOptions.PaymentPageUrl, new Dictionary<string, string>
             {
                 {"token", result.Token},
                 {"lang", "fa"}
             });
 
-            return PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, paymentPageUrl);
+            var requestResult = PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, paymentPageUrl);
+
+            // Stored so that the callback can be bound to this invoice (see CreateCallbackResult).
+            requestResult.DatabaseAdditionalData.Add(TokenDatabaseKey, result.Token);
+
+            return requestResult;
         }
 
         internal static async Task<FanAvaCallbackResultModel> CreateCallbackResult(
             HttpRequest httpRequest,
+            InvoiceContext context,
             MessagesOptions messagesOptions,
             FanAvaGatewayAccount gatewayAccount,
             CancellationToken cancellationToken)
@@ -98,6 +115,16 @@ namespace Parbad.Gateway.FanAva.Internal
 
             var invoiceNumber = await httpRequest.TryGetParamAsAsync<string>("RefNum", cancellationToken).ConfigureAwaitFalse();
             var token = await httpRequest.TryGetParamAsAsync<string>("token", cancellationToken).ConfigureAwaitFalse();
+
+            if (!IsTokenIssuedForThisInvoice(token.Value, context))
+            {
+                // The callback carries the token of another invoice (e.g. a cheaper one that was paid).
+                return new FanAvaCallbackResultModel
+                {
+                    IsSucceed = false,
+                    Message = messagesOptions.InvalidDataReceivedFromGateway
+                };
+            }
 
             var data = new FanAvaCheckRequestModel
             {
@@ -117,98 +144,130 @@ namespace Parbad.Gateway.FanAva.Internal
             };
         }
 
-        internal static async Task<FanAvaCheckResultModel> CreateCheckResult(HttpResponseMessage responseMessage, FanAvaGatewayAccount account, FanAvaCallbackResultModel callbackResult, MessagesOptions messagesOptions)
+        internal static async Task<FanAvaCheckResultModel> CreateCheckResult(HttpResponseMessage responseMessage, InvoiceContext context, FanAvaCallbackResultModel callbackResult, MessagesOptions messagesOptions)
         {
-            var response = await responseMessage.Content.ReadAsStringAsync();
+            var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
-            var result = JsonConvert.DeserializeObject<FanAvaCheckResultModel>(response);
+            var result = JsonConvert.DeserializeObject<FanAvaCheckResultModel>(response) ?? new FanAvaCheckResultModel();
 
-            bool isSucceed;
-            PaymentVerifyResult verifyResult = null;
+            var invoiceAmount = (long)context.Payment.Amount;
 
-            if (!result.IsSucceed)
+            if (!IsSucceedResult(result.Result))
             {
-                isSucceed = false;
-                verifyResult = PaymentVerifyResult.Failed(messagesOptions.InvalidDataReceivedFromGateway);
+                result.VerifyResult = PaymentVerifyResult.Failed(messagesOptions.PaymentFailed, result.Result);
             }
-            else
+            else if (result.InvoiceNumber != callbackResult.InvoiceNumber)
             {
-                isSucceed = result.Result.Equals("erSucceed", StringComparison.OrdinalIgnoreCase) &&
-                            result.InvoiceNumber == callbackResult.InvoiceNumber;
-
-                if (!isSucceed)
-                {
-                    verifyResult = PaymentVerifyResult.Failed(messagesOptions.PaymentFailed);
-                }
+                result.VerifyResult = PaymentVerifyResult.Failed(messagesOptions.PaymentFailed);
+            }
+            else if (result.Amount > 0 && result.Amount != invoiceAmount)
+            {
+                result.VerifyResult = PaymentVerifyResult.Failed($"{messagesOptions.PaymentFailed} The amount reported by the gateway ({result.Amount}) does not match the invoice amount ({invoiceAmount}).");
             }
 
-            return new FanAvaCheckResultModel
-            {
-                IsSucceed = isSucceed,
-                VerifyResult = verifyResult
-            };
+            result.IsSucceed = result.VerifyResult == null;
+
+            return result;
         }
 
-        internal static FanAvaVerifyRequestModel CreateVerifyRequest(InvoiceContext context, FanAvaCallbackResultModel callbackResult, FanAvaCheckResultModel checkResult)
+        internal static FanAvaVerifyRequestModel CreateVerifyRequest(InvoiceContext context, FanAvaCallbackResultModel callbackResult)
         {
             return new FanAvaVerifyRequestModel
             {
                 WSContext = callbackResult.CallbackCheckData.WSContext,
                 Token = callbackResult.CallbackCheckData.Token,
-                Amount = checkResult.Amount,
+                Amount = (long)context.Payment.Amount,
                 InvoiceNumber = callbackResult.InvoiceNumber
             };
         }
 
         internal static async Task<IPaymentVerifyResult> CreateVerifyResult(HttpResponseMessage responseMessage, FanAvaCallbackResultModel callbackResult, MessagesOptions messagesOptions)
         {
-            var response = await responseMessage.Content.ReadAsStringAsync();
+            var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
             var verifyResult = JsonConvert.DeserializeObject<FanAvaVerifyResultModel>(response);
 
-            if (!verifyResult.IsSucceed)
+            if (verifyResult is not { IsSucceed: true })
             {
-                return PaymentVerifyResult.Failed(messagesOptions.InvalidDataReceivedFromGateway);
+                return PaymentVerifyResult.Failed(messagesOptions.PaymentFailed, verifyResult?.Result);
             }
 
-            return new PaymentVerifyResult
-            {
-                IsSucceed = verifyResult.Result == "erSucceed",
-                Amount = Money.Parse(verifyResult.Amount),
-                TrackingNumber = long.Parse(verifyResult.InvoiceNumber),
-                Status = PaymentVerifyResultStatus.Succeed
-            };
+            var result = PaymentVerifyResult.Succeed(callbackResult.InvoiceNumber, messagesOptions.PaymentSucceed, verifyResult.Result);
+
+            // A refund may run long after the callback (e.g. from an admin action), so it reads them from here.
+            result.DatabaseAdditionalData.Add(TokenDatabaseKey, callbackResult.CallbackCheckData.Token);
+            result.DatabaseAdditionalData.Add(RefNumDatabaseKey, callbackResult.InvoiceNumber);
+
+            return result;
         }
 
-        internal static FanAvaVerifyRequestModel CreateRefundRequest(InvoiceContext context, FanAvaCallbackResultModel callbackResult, FanAvaCheckResultModel checkResult)
+        /// <summary>
+        /// Creates the refund request from the data stored by <see cref="CreateVerifyResult"/>, or returns null if
+        /// the payment has no successful verification with that data.
+        /// </summary>
+        internal static FanAvaVerifyRequestModel CreateRefundRequest(InvoiceContext context, FanAvaGatewayAccount account)
         {
+            var verifyTransaction = context.Transactions?.LastOrDefault(transaction => transaction.Type == TransactionType.Verify && transaction.IsSucceed);
+
+            if (string.IsNullOrEmpty(verifyTransaction?.AdditionalData))
+            {
+                return null;
+            }
+
+            var additionalData = verifyTransaction.ToDictionary();
+
+            if (additionalData == null ||
+                !additionalData.TryGetValue(TokenDatabaseKey, out var token) ||
+                !additionalData.TryGetValue(RefNumDatabaseKey, out var refNum))
+            {
+                return null;
+            }
+
             return new FanAvaVerifyRequestModel
             {
-                WSContext = callbackResult.CallbackCheckData.WSContext,
-                Token = callbackResult.CallbackCheckData.Token,
-                Amount = checkResult.Amount,
-                InvoiceNumber = callbackResult.InvoiceNumber
+                WSContext = new FanAvaRequestModel.WSContextModel
+                {
+                    UserId = account.UserId,
+                    Password = account.Password
+                },
+                Token = token,
+                Amount = (long)context.Payment.Amount,
+                InvoiceNumber = refNum
             };
         }
 
-        internal static async Task<IPaymentRefundResult> CreateRefundResult(HttpResponseMessage responseMessage, FanAvaCallbackResultModel callbackResult, MessagesOptions messagesOptions)
+        internal static async Task<IPaymentRefundResult> CreateRefundResult(HttpResponseMessage responseMessage)
         {
-            var response = await responseMessage.Content.ReadAsStringAsync();
+            var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
             var refundResult = JsonConvert.DeserializeObject<FanAvaVerifyResultModel>(response);
 
-            if (!refundResult.IsSucceed)
+            if (refundResult is not { IsSucceed: true })
             {
-                return PaymentRefundResult.Failed(messagesOptions.InvalidDataReceivedFromGateway);
+                return PaymentRefundResult.Failed($"The gateway rejected the refund. Result: {refundResult?.Result}", refundResult?.Result);
             }
 
-            return new PaymentRefundResult
+            return PaymentRefundResult.Succeed(gatewayResponseCode: refundResult.Result);
+        }
+
+        private static bool IsSucceedResult(string result) =>
+            string.Equals(result, SucceedResult, StringComparison.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// Checks that the callback's token is the one FanAva issued for this invoice. Invoices requested before
+        /// the token was stored have nothing to compare with and are accepted as before.
+        /// </summary>
+        private static bool IsTokenIssuedForThisInvoice(string callbackToken, InvoiceContext context)
+        {
+            var requestTransaction = context.Transactions?.SingleOrDefault(transaction => transaction.Type == TransactionType.Request);
+
+            if (string.IsNullOrEmpty(requestTransaction?.AdditionalData) ||
+                !requestTransaction.ToDictionary().TryGetValue(TokenDatabaseKey, out var issuedToken))
             {
-                IsSucceed = refundResult.IsSucceed,
-                Amount = Money.Parse(refundResult.Amount),
-                TrackingNumber = long.Parse(refundResult.InvoiceNumber),
-                Status = PaymentRefundResultStatus.Succeed
-            };
+                return true;
+            }
+
+            return string.Equals(issuedToken, callbackToken, StringComparison.Ordinal);
         }
     }
 }

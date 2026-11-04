@@ -16,8 +16,8 @@ namespace Parbad.PaymentFlow.Tests.Gateways;
 /// verifyMerchantTrans; refunds use reverseMerchantTrans.
 /// </summary>
 /// <remarks>
-/// Because verification can never succeed (G-C2), the attack scenarios pass for the wrong reason: nothing is
-/// ever verified. They become meaningful once G-C2 is fixed.
+/// The inquiry and the verification both count as <see cref="BankOperation.Verify"/>, so the lost-response
+/// scenario loses the inquiry's response, not verifyMerchantTrans's.
 /// </remarks>
 [TestClass]
 public class FanAvaConformanceTests : GatewayConformanceTests
@@ -32,15 +32,8 @@ public class FanAvaConformanceTests : GatewayConformanceTests
 
     protected override IReadOnlyDictionary<string, string> KnownIssues => new Dictionary<string, string>
     {
-        // The token response's Result is never checked: a rejected request redirects with token=null.
-        [nameof(Rejected_request_is_reported_as_failed)] = "G-C2",
-        // FanAvaCheckResultModel.IsSucceed is [JsonIgnore], so every inquiry is treated as failed.
-        [nameof(Paid_invoice_is_verified_and_recorded_as_paid)] = "G-C2",
-        [nameof(Lost_verification_response_is_recovered_when_the_callback_is_retried)] = "G-C2",
-        [nameof(Payment_is_verified_on_a_server_with_persian_culture)] = "G-C2",
-        [nameof(Payment_is_verified_on_a_server_with_german_culture)] = "G-C2",
-        [nameof(Full_refund_reaches_the_bank)] = "G-C2",
-        [nameof(Partial_refund_is_not_silently_turned_into_a_full_refund)] = "G-C2",
+        // The refund always sends the full payment amount.
+        [nameof(Partial_refund_is_not_silently_turned_into_a_full_refund)] = "ANALYSIS-02 §5 (partial refunds)",
         // The inquiry response is deserialised without checking the HTTP status.
         [nameof(Html_error_page_during_verification_does_not_crash_or_mark_the_payment_as_paid)] = "G-H9"
     };
