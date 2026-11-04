@@ -16,6 +16,10 @@ namespace Parbad.Gateway.Parsian.Internal
 {
     internal static class ParsianHelper
     {
+        // "The transaction was confirmed before". Taken from several integrations' copies of the PEC error list; the
+        // official document could not be found (ANALYSIS-02 §7.3).
+        private const string AlreadyConfirmedStatus = "-1533";
+
         public static string CreateRequestData(ParsianGatewayAccount account, Invoice invoice)
         {
             var additionalData = invoice.GetParsianAdditionalData();
@@ -169,7 +173,10 @@ namespace Parbad.Gateway.Parsian.Internal
                 "</soapenv:Envelope>";
         }
 
-        public static PaymentVerifyResult CreateVerifyResult(string webServiceResponse, MessagesOptions messagesOptions)
+        public static PaymentVerifyResult CreateVerifyResult(string webServiceResponse,
+                                                             ParsianCallbackResult callbackResult,
+                                                             InvoiceContext context,
+                                                             MessagesOptions messagesOptions)
         {
             var status = XmlHelper.GetNodeValueFromXml(webServiceResponse, "Status", "https://pec.Shaparak.ir/NewIPGServices/Confirm/ConfirmService");
             var rrn = XmlHelper.GetNodeValueFromXml(webServiceResponse, "RRN", "https://pec.Shaparak.ir/NewIPGServices/Confirm/ConfirmService");
@@ -179,16 +186,37 @@ namespace Parbad.Gateway.Parsian.Internal
                             status == "0" &&
                             !rrn.IsNullOrEmpty();
 
-            var message = isSucceed
-                ? messagesOptions.PaymentSucceed
-                : $"Error in Verifying section: {status}";
+            PaymentVerifyResult result;
 
-            var result = new PaymentVerifyResult
+            if (isSucceed)
             {
-                Status = isSucceed ? PaymentVerifyResultStatus.Succeed : PaymentVerifyResultStatus.Failed,
-                TransactionCode = rrn,
-                Message = message
-            };
+                result = PaymentVerifyResult.Succeed(rrn, messagesOptions.PaymentSucceed, status);
+            }
+            else if (status == AlreadyConfirmedStatus)
+            {
+                // The payment was confirmed before (e.g. the first response was lost). The bank may not return the
+                // RRN again, so a "0" is not stored as the transaction code.
+                var transactionCode = rrn.IsNullOrEmpty() || rrn == "0" ? null : rrn;
+
+                if (TryGetIssuedToken(context, out var issuedToken) &&
+                    string.Equals(issuedToken, callbackResult.Token, StringComparison.Ordinal))
+                {
+                    // The confirmed token is the one issued for this invoice, so it is this invoice's payment.
+                    result = PaymentVerifyResult.Succeed(transactionCode, messagesOptions.PaymentSucceed, status);
+                }
+                else
+                {
+                    // Invoices requested before the token was stored cannot be tied to the token; Parbad decides.
+                    result = PaymentVerifyResult.Failed($"Error in Verifying section: {status}", status);
+                    result.TransactionCode = transactionCode;
+                    result.IsAlreadyVerifiedAtBank = true;
+                }
+            }
+            else
+            {
+                result = PaymentVerifyResult.Failed($"Error in Verifying section: {status}", status);
+                result.TransactionCode = rrn;
+            }
 
             result.DatabaseAdditionalData.Add("token", token);
 
@@ -250,15 +278,19 @@ namespace Parbad.Gateway.Parsian.Internal
         /// </summary>
         private static bool IsTokenIssuedForThisInvoice(string callbackToken, InvoiceContext context)
         {
-            var requestTransaction = context.Transactions?.SingleOrDefault(transaction => transaction.Type == TransactionType.Request);
-
-            if (string.IsNullOrEmpty(requestTransaction?.AdditionalData) ||
-                !requestTransaction.ToDictionary().TryGetValue("token", out var issuedToken))
-            {
-                return true;
-            }
+            if (!TryGetIssuedToken(context, out var issuedToken)) return true;
 
             return string.Equals(issuedToken, callbackToken, StringComparison.Ordinal);
+        }
+
+        private static bool TryGetIssuedToken(InvoiceContext context, out string issuedToken)
+        {
+            issuedToken = null;
+
+            var requestTransaction = context.Transactions?.SingleOrDefault(transaction => transaction.Type == TransactionType.Request);
+
+            return !string.IsNullOrEmpty(requestTransaction?.AdditionalData) &&
+                   requestTransaction.ToDictionary().TryGetValue("token", out issuedToken);
         }
     }
 }

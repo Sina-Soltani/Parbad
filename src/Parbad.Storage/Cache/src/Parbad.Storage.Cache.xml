@@ -49,6 +49,9 @@
         <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.GetPaymentByTokenAsync(System.String,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
+        <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.FindPaidPaymentByTransactionCodeAsync(System.String,System.String,System.Int64,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
         <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.DoesPaymentExistAsync(System.Int64,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>

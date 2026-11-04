@@ -6,7 +6,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Parbad.Builder;
 using Parbad.Exceptions;
+using Parbad.Internal;
 using Parbad.InvoiceBuilder;
+using Parbad.Options;
 using Parbad.PaymentFlow.Tests.Infrastructure;
 using Parbad.Storage.Abstractions.Models;
 
@@ -20,6 +22,7 @@ namespace Parbad.PaymentFlow.Tests.Core;
 public class DefaultOnlinePaymentTests
 {
     private const long TrackingNumber = 1001;
+    private const long OtherTrackingNumber = 2002;
     private const decimal Amount = 1_250_000;
     private const string CallbackUrl = "https://shop.test/payment/callback";
 
@@ -234,6 +237,132 @@ public class DefaultOnlinePaymentTests
         Assert.IsFalse((await _host.GetPaymentAsync(TrackingNumber)).IsCompleted);
     }
 
+    // ---------- Verification rules enforced by the core (ANALYSIS-02 §6.1) ----------
+
+    [TestMethod]
+    public async Task Verify_is_accepted_when_the_bank_reports_the_amount_and_order_of_this_invoice()
+    {
+        _gateway.VerifyResult = _ => Succeed(FakeGateway.TransactionCode, bankAmount: Amount, bankOrderId: "1001");
+        await RequestAsync();
+
+        var result = await _host.OnlinePayment.VerifyAsync(TrackingNumber);
+
+        Assert.AreEqual(PaymentVerifyResultStatus.Succeed, result.Status, result.Message);
+        Assert.IsTrue((await _host.GetPaymentAsync(TrackingNumber)).IsPaid);
+    }
+
+    [TestMethod]
+    public async Task Verify_is_rejected_when_the_bank_reports_a_different_amount()
+    {
+        _gateway.VerifyResult = _ => Succeed(FakeGateway.TransactionCode, bankAmount: Amount - 1);
+        await RequestAsync();
+
+        var result = await _host.OnlinePayment.VerifyAsync(TrackingNumber);
+
+        Assert.AreEqual(PaymentVerifyResultStatus.Failed, result.Status);
+        Assert.AreEqual(new MessagesOptions().BankReportedDifferentAmount, result.Message);
+        await AssertRecordedAsUnpaidAsync(TrackingNumber);
+    }
+
+    [TestMethod]
+    public async Task Verify_is_rejected_when_the_bank_reports_a_different_invoice()
+    {
+        _gateway.VerifyResult = _ => Succeed(FakeGateway.TransactionCode, bankOrderId: "2002");
+        await RequestAsync();
+
+        var result = await _host.OnlinePayment.VerifyAsync(TrackingNumber);
+
+        Assert.AreEqual(PaymentVerifyResultStatus.Failed, result.Status);
+        Assert.AreEqual(new MessagesOptions().BankReportedDifferentInvoice, result.Message);
+        await AssertRecordedAsUnpaidAsync(TrackingNumber);
+    }
+
+    [TestMethod]
+    public async Task Transaction_code_that_settled_another_payment_cannot_settle_this_one()
+    {
+        await RequestAsync(OtherTrackingNumber);
+        await _host.OnlinePayment.VerifyAsync(OtherTrackingNumber);
+        await RequestAsync();
+
+        // The gateway reports the same bank transaction again, e.g. because the bank does not tie it to the invoice.
+        var result = await _host.OnlinePayment.VerifyAsync(TrackingNumber);
+
+        Assert.AreEqual(PaymentVerifyResultStatus.Failed, result.Status);
+        Assert.AreEqual(new MessagesOptions().TransactionCodeAlreadyUsed, result.Message);
+        await AssertRecordedAsUnpaidAsync(TrackingNumber);
+        Assert.IsTrue((await _host.GetPaymentAsync(OtherTrackingNumber)).IsPaid, "The first payment must stay paid.");
+    }
+
+    [TestMethod]
+    public async Task Already_verified_at_the_bank_is_recorded_as_paid_when_the_transaction_code_is_unused()
+    {
+        _gateway.VerifyResult = _ => AlreadyVerifiedAtBank(FakeGateway.TransactionCode);
+        await RequestAsync();
+
+        var result = await _host.OnlinePayment.VerifyAsync(TrackingNumber);
+
+        Assert.AreEqual(PaymentVerifyResultStatus.Succeed, result.Status, result.Message);
+
+        var payment = await _host.GetPaymentAsync(TrackingNumber);
+        Assert.IsTrue(payment.IsCompleted && payment.IsPaid);
+        Assert.AreEqual(FakeGateway.TransactionCode, payment.TransactionCode);
+    }
+
+    [TestMethod]
+    public async Task Already_verified_at_the_bank_is_not_recorded_as_paid_when_the_transaction_code_settled_another_payment()
+    {
+        await RequestAsync(OtherTrackingNumber);
+        await _host.OnlinePayment.VerifyAsync(OtherTrackingNumber);
+
+        _gateway.VerifyResult = _ => AlreadyVerifiedAtBank(FakeGateway.TransactionCode);
+        await RequestAsync();
+
+        var result = await _host.OnlinePayment.VerifyAsync(TrackingNumber);
+
+        Assert.AreEqual(PaymentVerifyResultStatus.Failed, result.Status);
+        Assert.AreEqual(new MessagesOptions().TransactionCodeAlreadyUsed, result.Message);
+        await AssertRecordedAsUnpaidAsync(TrackingNumber);
+    }
+
+    [TestMethod]
+    public async Task Already_verified_at_the_bank_without_a_transaction_code_is_not_recorded_as_paid()
+    {
+        _gateway.VerifyResult = _ => AlreadyVerifiedAtBank(transactionCode: null);
+        await RequestAsync();
+
+        var result = await _host.OnlinePayment.VerifyAsync(TrackingNumber);
+
+        Assert.AreEqual(PaymentVerifyResultStatus.Failed, result.Status);
+        Assert.AreEqual(new MessagesOptions().AlreadyVerifiedPaymentCannotBeConfirmed, result.Message);
+        await AssertRecordedAsUnpaidAsync(TrackingNumber);
+    }
+
+    [TestMethod]
+    public async Task Already_verified_at_the_bank_is_not_recorded_as_paid_when_the_storage_cannot_look_up_paid_payments()
+    {
+        await UseStorageWithoutPaidPaymentLookupAsync();
+        _gateway.VerifyResult = _ => AlreadyVerifiedAtBank(FakeGateway.TransactionCode);
+        await RequestAsync();
+
+        var result = await _host.OnlinePayment.VerifyAsync(TrackingNumber);
+
+        Assert.AreEqual(PaymentVerifyResultStatus.Failed, result.Status);
+        Assert.AreEqual(new MessagesOptions().AlreadyVerifiedPaymentCannotBeConfirmed, result.Message);
+        await AssertRecordedAsUnpaidAsync(TrackingNumber);
+    }
+
+    [TestMethod]
+    public async Task Storage_without_paid_payment_lookup_still_verifies_normal_payments()
+    {
+        await UseStorageWithoutPaidPaymentLookupAsync();
+        await RequestAsync();
+
+        var result = await _host.OnlinePayment.VerifyAsync(TrackingNumber);
+
+        Assert.AreEqual(PaymentVerifyResultStatus.Succeed, result.Status, result.Message);
+        Assert.IsTrue((await _host.GetPaymentAsync(TrackingNumber)).IsPaid);
+    }
+
     // ---------- Cancel ----------
 
     [TestMethod]
@@ -323,15 +452,54 @@ public class DefaultOnlinePaymentTests
 
     // ---------- helpers ----------
 
-    private Task<IPaymentRequestResult> RequestAsync()
+    private Task<IPaymentRequestResult> RequestAsync(long trackingNumber = TrackingNumber)
     {
         _host.StartCheckoutRequest();
 
         return _host.OnlinePayment.RequestAsync(invoice => invoice
-                                                           .SetTrackingNumber(TrackingNumber)
+                                                           .SetTrackingNumber(trackingNumber)
                                                            .SetAmount(Amount)
                                                            .SetCallbackUrl(CallbackUrl)
                                                            .SetGateway(FakeGateway.Name));
+    }
+
+    private static PaymentVerifyResult Succeed(string transactionCode, decimal? bankAmount = null, string? bankOrderId = null)
+    {
+        var result = PaymentVerifyResult.Succeed(transactionCode, "Paid.");
+        result.BankReportedAmount = bankAmount;
+        result.BankReportedOrderId = bankOrderId;
+
+        return result;
+    }
+
+    /// <summary>What a gateway returns when the bank answers "already verified" without tying it to the invoice.</summary>
+    private static PaymentVerifyResult AlreadyVerifiedAtBank(string? transactionCode)
+    {
+        var result = PaymentVerifyResult.Failed("Already verified.");
+        result.TransactionCode = transactionCode;
+        result.IsAlreadyVerifiedAtBank = true;
+
+        return result;
+    }
+
+    private async Task AssertRecordedAsUnpaidAsync(long trackingNumber)
+    {
+        var payment = await _host.GetPaymentAsync(trackingNumber);
+
+        Assert.IsTrue(payment.IsCompleted, "The rejected payment must be completed, so it is not verified again.");
+        Assert.IsFalse(payment.IsPaid, "The rejected payment was recorded as paid.");
+    }
+
+    private async Task UseStorageWithoutPaidPaymentLookupAsync()
+    {
+        await _host.DisposeAsync();
+
+        _host = ParbadTestHost.Create(
+            gateways => gateways
+                        .AddGateway<FakeGateway>()
+                        .WithAccounts<FakeGatewayAccount>(accounts => accounts.AddInMemory(_ => { })),
+            services => services.AddSingleton(_gateway),
+            storageSupportsPaidPaymentLookup: false);
     }
 
     private async Task ReceiveCallbackAsync() =>

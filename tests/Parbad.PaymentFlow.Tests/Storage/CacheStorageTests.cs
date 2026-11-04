@@ -243,6 +243,36 @@ public abstract class CacheStorageTests
         await AssertAllStoredAsync(CreateStorage(), payments);
     }
 
+    [TestMethod]
+    public async Task Paid_payment_lookup_finds_only_paid_payments_of_the_same_gateway_except_the_given_one()
+    {
+        var storage = CreateStorage();
+        var lookup = storage as IPaidPaymentLookup;
+        Assert.IsNotNull(lookup, $"{storage.GetType().Name} does not implement {nameof(IPaidPaymentLookup)}.");
+
+        var paid = NewPayment(1);
+        paid.TransactionCode = "RRN-1";
+        paid.IsCompleted = paid.IsPaid = true;
+
+        var unpaid = NewPayment(2);
+        unpaid.TransactionCode = "RRN-2";
+        unpaid.IsCompleted = true;
+
+        var otherGateway = NewPayment(3);
+        otherGateway.TransactionCode = "RRN-3";
+        otherGateway.GatewayName = "other";
+        otherGateway.IsCompleted = otherGateway.IsPaid = true;
+
+        foreach (var payment in new[] { paid, unpaid, otherGateway }) await storage.CreatePaymentAsync(payment);
+
+        lookup = (IPaidPaymentLookup)CreateStorage();
+
+        AssertSamePayment(paid, await lookup.FindPaidPaymentByTransactionCodeAsync("GATEWAY", "RRN-1", exceptTrackingNumber: 99));
+        Assert.IsNull(await lookup.FindPaidPaymentByTransactionCodeAsync("gateway", "RRN-1", exceptTrackingNumber: 1), "The excluded payment was returned.");
+        Assert.IsNull(await lookup.FindPaidPaymentByTransactionCodeAsync("gateway", "RRN-2", exceptTrackingNumber: 99), "An unpaid payment was returned.");
+        Assert.IsNull(await lookup.FindPaidPaymentByTransactionCodeAsync("gateway", "RRN-3", exceptTrackingNumber: 99), "A payment of another gateway was returned.");
+    }
+
     protected static async Task AssertAllStoredAsync(IStorage storage, IReadOnlyCollection<Payment> payments)
     {
         Assert.AreEqual(payments.Count, payments.Select(payment => payment.Id).Distinct().Count(), "Payment ids are not unique.");

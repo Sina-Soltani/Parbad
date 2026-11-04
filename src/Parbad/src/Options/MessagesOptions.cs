@@ -27,5 +27,13 @@ namespace Parbad.Options
         public string OnlyPaidPaymentCanBeRefunded { get; set; } = "Only a paid payment can be refunded.";
 
         public string RefundExceedsRemainingAmount { get; set; } = "The refund amount exceeds the amount that has not been refunded yet.";
+
+        public string BankReportedDifferentAmount { get; set; } = "The amount reported by the bank does not match the amount of the invoice.";
+
+        public string BankReportedDifferentInvoice { get; set; } = "The bank reported this payment for a different invoice.";
+
+        public string TransactionCodeAlreadyUsed { get; set; } = "The bank transaction has already settled another payment.";
+
+        public string AlreadyVerifiedPaymentCannotBeConfirmed { get; set; } = "The bank reports that this payment was verified before, but it cannot be confirmed that it belongs to this invoice.";
     }
 }

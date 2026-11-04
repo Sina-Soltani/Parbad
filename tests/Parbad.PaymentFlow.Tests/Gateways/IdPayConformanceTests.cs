@@ -28,9 +28,7 @@ public class IdPayConformanceTests : GatewayConformanceTests
     protected override IReadOnlyDictionary<string, string> KnownIssues => new Dictionary<string, string>
     {
         // An error body is deserialised as JSON whatever its content type.
-        [nameof(Html_error_page_during_verification_does_not_crash_or_mark_the_payment_as_paid)] = "G-H9",
-        // Status 101 (already verified) is reported as a failed verification.
-        [nameof(Lost_verification_response_is_recovered_when_the_callback_is_retried)] = "G-H1"
+        [nameof(Html_error_page_during_verification_does_not_crash_or_mark_the_payment_as_paid)] = "G-H9"
     };
 
     protected override void AddGateway(IGatewayBuilder gateways) =>
@@ -66,7 +64,9 @@ public class IdPayConformanceTests : GatewayConformanceTests
                 return Error(53, "The payment cannot be verified.");
             }
 
-            var status = transaction.Verified ? "101" : "100"; // 101 = already verified
+            // 101 = "already verified" (official IDPay docs, ANALYSIS-02 §7.3).
+            // Assumption (one library's sample only): the answer carries the same fields as 100.
+            var status = transaction.Verified ? "101" : "100";
             transaction.Verified = true;
 
             return FakeBank.Json(new

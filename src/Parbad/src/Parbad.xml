@@ -1085,6 +1085,13 @@
         <member name="M:Parbad.Internal.DefaultOnlinePayment.RefundAsync(Parbad.RefundInvoice,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
+        <member name="M:Parbad.Internal.DefaultOnlinePayment.EnforceVerificationRulesAsync(Parbad.Storage.Abstractions.Models.Payment,Parbad.Internal.PaymentVerifyResult,System.Threading.CancellationToken)">
+            <summary>
+            Checks that every gateway gets for free, so a gateway cannot forget them: the bank-reported amount and
+            order id must match the invoice, and one bank transaction can settle only one payment. An "already
+            verified" answer that the gateway could not tie to this invoice is accepted only after the last check.
+            </summary>
+        </member>
         <member name="T:Parbad.Internal.GatewayBuilder">
             <inheritdoc />
         </member>
@@ -1227,6 +1234,25 @@
         </member>
         <member name="P:Parbad.Internal.PaymentResult.AdditionalData">
             <inheritdoc />
+        </member>
+        <member name="P:Parbad.Internal.PaymentVerifyResult.BankReportedAmount">
+            <summary>
+            The amount the bank reported for the verified transaction, in Rial, or null when the bank does not report it.
+            When set, a successful verification is accepted only if it equals the amount of the invoice.
+            </summary>
+        </member>
+        <member name="P:Parbad.Internal.PaymentVerifyResult.BankReportedOrderId">
+            <summary>
+            The order id (tracking number) the bank reported for the verified transaction, or null when the bank does
+            not report it. When set, a successful verification is accepted only if it equals the tracking number of the invoice.
+            </summary>
+        </member>
+        <member name="P:Parbad.Internal.PaymentVerifyResult.IsAlreadyVerifiedAtBank">
+            <summary>
+            Set by a gateway whose bank answered "already verified" and which cannot prove from the bank's answer that
+            <see cref="P:Parbad.Internal.PaymentVerifyResult.TransactionCode"/> belongs to this invoice. The gateway returns a failed result; Parbad records it as
+            paid only when the storage confirms that no other paid payment has the same <see cref="P:Parbad.Internal.PaymentVerifyResult.TransactionCode"/>.
+            </summary>
         </member>
         <member name="M:Parbad.Internal.RandomNumberGenerator.NextInt64(System.Int64)">
             <summary>

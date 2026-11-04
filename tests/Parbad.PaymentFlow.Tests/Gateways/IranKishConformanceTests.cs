@@ -38,7 +38,8 @@ public class IranKishConformanceTests : GatewayConformanceTests
         [nameof(Html_error_page_during_verification_does_not_crash_or_mark_the_payment_as_paid)] = "G-H9",
         // The attack is blocked (the bank rejects the victim's token with the attacker's RRN/STAN), but the
         // rejection crashes on the null Result.
-        [nameof(Payment_of_another_invoice_cannot_settle_this_invoice_even_with_this_invoices_token)] = "G-H9"
+        [nameof(Payment_of_another_invoice_cannot_settle_this_invoice_even_with_this_invoices_token)] = "G-H9",
+        [nameof(Payment_that_settled_another_invoice_cannot_settle_this_invoice)] = "G-H9"
     };
 
     protected override void AddGateway(IGatewayBuilder gateways) =>

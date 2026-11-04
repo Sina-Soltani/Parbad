@@ -22,6 +22,7 @@ namespace Parbad.Gateway.IdPay.Internal
         public const string SandBoxKey = "X-SANDBOX";
         public const string SandBoxApiValue = "6a7f99eb-7c20-4412-a972-6dfb7cd253a4";
         public const string Succeed = "100";
+        public const string AlreadyVerified = "101";
         public const string ReadyForVerifying = "10";
         public const string RequestAdditionalDataKey = "IdPayRequestAdditional";
 
@@ -114,12 +115,18 @@ namespace Parbad.Gateway.IdPay.Internal
                 return PaymentVerifyResult.Failed(messagesOptions.InvalidDataReceivedFromGateway);
             }
 
-            if (result.Status != Succeed)
+            // 101: the payment was verified before (e.g. the first response was lost). The verify request sends the
+            // order_id, and Parbad compares the order_id and amount of the answer with the invoice.
+            if (result.Status != Succeed && result.Status != AlreadyVerified)
             {
                 return PaymentVerifyResult.Failed($"Verification failed. Status: {result.Status}");
             }
 
-            return PaymentVerifyResult.Succeed(result.TrackId, messagesOptions.PaymentSucceed);
+            var verifyResult = PaymentVerifyResult.Succeed(result.TrackId, messagesOptions.PaymentSucceed, result.Status);
+            verifyResult.BankReportedOrderId = result.OrderId;
+            verifyResult.BankReportedAmount = result.Amount;
+
+            return verifyResult;
         }
 
         public static void AssignHeaders(HttpRequestHeaders headers, IdPayGatewayAccount account)
