@@ -23,9 +23,9 @@ namespace Parbad.Tests
         }
 
         [TestCleanup]
-        public ValueTask Cleanup()
+        public async Task Cleanup()
         {
-            return _services.DisposeAsync();
+            await _services.DisposeAsync();
         }
 
         [TestMethod]
@@ -100,14 +100,15 @@ namespace Parbad.Tests
         }
 
         [TestMethod]
-        public void Invoice_Must_Throw_Exception_When_Duplicate_AdditionalKey_Is_Added()
+        public async Task Invoice_Must_Throw_Exception_When_Duplicate_AdditionalKey_Is_Added()
         {
             const string key = "key";
 
             _builder.AddProperty(key, "");
             _builder.AddProperty(key, "");
 
-            Assert.ThrowsExceptionAsync<ArgumentException>(() => _builder.BuildAsync());
+            // Without await, the assertion's task was discarded and the test could never fail.
+            await Assert.ThrowsExceptionAsync<ArgumentException>(() => _builder.BuildAsync());
         }
 
         [TestMethod]
