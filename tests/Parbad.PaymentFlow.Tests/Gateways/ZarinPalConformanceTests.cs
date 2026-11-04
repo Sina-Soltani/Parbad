@@ -27,8 +27,6 @@ public class ZarinPalConformanceTests : GatewayConformanceTests
 
     protected override IReadOnlyDictionary<string, string> KnownIssues => new Dictionary<string, string>
     {
-        // TryGetError runs JObject.Parse on any non-500 error body, including an HTML page.
-        [nameof(Html_error_page_during_verification_does_not_crash_or_mark_the_payment_as_paid)] = "G-H9",
         // The refund request has no amount, so a partial refund refunds everything.
         [nameof(Partial_refund_is_not_silently_turned_into_a_full_refund)] = "ANALYSIS-02 §5 (partial refunds)"
     };

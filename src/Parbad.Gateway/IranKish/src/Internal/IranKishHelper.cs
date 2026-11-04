@@ -162,6 +162,12 @@ namespace Parbad.Gateway.IranKish.Internal
                 return PaymentVerifyResult.Failed(messagesOptions.UnexpectedErrorText);
             }
 
+            // A rejection carries only the top-level code and description, without the transaction.
+            if (result.Result == null)
+            {
+                return PaymentVerifyResult.Failed(IranKishGatewayResultTranslator.Translate(result.ResponseCode, messagesOptions), result.ResponseCode);
+            }
+
             var responseCode = result.Result.ResponseCode;
             PaymentVerifyResultStatus status;
             string message;

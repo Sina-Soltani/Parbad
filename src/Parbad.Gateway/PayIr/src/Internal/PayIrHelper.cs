@@ -6,10 +6,12 @@ using Newtonsoft.Json;
 using Parbad.Abstraction;
 using Parbad.Http;
 using Parbad.Internal;
+using Parbad.Net;
 using Parbad.Options;
 using Parbad.Storage.Abstractions.Models;
 using System;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -40,9 +42,9 @@ namespace Parbad.Gateway.PayIr.Internal
             };
         }
 
-        public static PaymentRequestResult CreateRequestResult(string response, HttpContext httpContext, PayIrGatewayAccount account, PayIrGatewayOptions gatewayOptions)
+        public static PaymentRequestResult CreateRequestResult(HttpResponseMessage responseMessage, string response, HttpContext httpContext, PayIrGatewayAccount account, PayIrGatewayOptions gatewayOptions)
         {
-            var result = JsonConvert.DeserializeObject<PayIrRequestResponseModel>(response);
+            var result = GatewayResponse.DeserializeJson<PayIrRequestResponseModel>(responseMessage, response);
 
             if (!result.IsSucceed)
             {
@@ -101,9 +103,9 @@ namespace Parbad.Gateway.PayIr.Internal
             };
         }
 
-        public static PaymentVerifyResult CreateVerifyResult(string response, InvoiceContext context, MessagesOptions messagesOptions)
+        public static PaymentVerifyResult CreateVerifyResult(HttpResponseMessage responseMessage, string response, InvoiceContext context, MessagesOptions messagesOptions)
         {
-            var result = JsonConvert.DeserializeObject<PayIrVerifyResponseModel>(response);
+            var result = GatewayResponse.DeserializeJson<PayIrVerifyResponseModel>(responseMessage, response);
 
             PaymentVerifyResult verifyResult;
 

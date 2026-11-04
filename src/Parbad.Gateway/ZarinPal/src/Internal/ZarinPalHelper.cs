@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Parbad.Abstraction;
+using Parbad.Exceptions;
 using Parbad.Gateway.ZarinPal.Models;
 using Parbad.Http;
 using Parbad.Internal;
@@ -231,14 +232,30 @@ internal static class ZarinPalHelper
 
     public static async Task<(int? Code, string Message)> TryGetError(HttpResponseMessage httpResponseMessage, MessagesOptions messagesOptions)
     {
+        // A server error says nothing about whether ZarinPal processed the call, so it is not reported as a
+        // rejection: the payment stays open for a retry (G-H9).
         if (httpResponseMessage.StatusCode == HttpStatusCode.InternalServerError)
         {
-            return (null, messagesOptions.UnexpectedErrorText);
+            throw new GatewayResponseException(httpResponseMessage.StatusCode,
+                                               httpResponseMessage.Content?.Headers.ContentType?.MediaType,
+                                               "server error");
         }
 
         var jsonResponse = await httpResponseMessage.Content.ReadAsStringAsync();
 
-        JObject jsonObject = JObject.Parse(jsonResponse);
+        JObject jsonObject;
+
+        try
+        {
+            jsonObject = JObject.Parse(jsonResponse);
+        }
+        catch (JsonException)
+        {
+            // e.g. an HTML error page from a proxy: it is not known whether ZarinPal processed the call.
+            throw new GatewayResponseException(httpResponseMessage.StatusCode,
+                                               httpResponseMessage.Content.Headers.ContentType?.MediaType,
+                                               "not valid JSON");
+        }
         var errorsToken = jsonObject["errors"];
         if (errorsToken != null && errorsToken.Type == JTokenType.Object)
         {

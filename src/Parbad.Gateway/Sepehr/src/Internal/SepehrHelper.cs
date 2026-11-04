@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using Parbad.Abstraction;
 using Parbad.Http;
 using Parbad.Internal;
+using Parbad.Net;
 using Parbad.Options;
 using Parbad.Storage.Abstractions.Models;
 using System;
@@ -195,17 +196,14 @@ namespace Parbad.Gateway.Sepehr.Internal
         {
             if (!responseMessage.IsSuccessStatusCode)
             {
+                // A JSON error body is the bank's answer; anything else (e.g. a proxy's error page) throws, so the
+                // payment stays open for a retry.
+                await responseMessage.ReadJsonStringAsync().ConfigureAwaitFalse();
+
                 return PaymentVerifyResult.Failed($"Operation failed. Http Status: {responseMessage.StatusCode}");
             }
 
-            var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
-
-            var result = JsonConvert.DeserializeObject<VerificationRollbackResponseModel>(response);
-
-            if (result == null)
-            {
-                return PaymentVerifyResult.Failed(messagesOptions.InvalidDataReceivedFromGateway);
-            }
+            var result = await responseMessage.ReadJsonAsync<VerificationRollbackResponseModel>().ConfigureAwaitFalse();
 
             if (result.Status.IsNullOrWhiteSpace())
             {
@@ -311,17 +309,12 @@ namespace Parbad.Gateway.Sepehr.Internal
         {
             if (!responseMessage.IsSuccessStatusCode)
             {
+                await responseMessage.ReadJsonStringAsync().ConfigureAwaitFalse();
+
                 return PaymentRefundResult.Failed($"Operation failed. Http Status: {responseMessage.StatusCode}");
             }
 
-            var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
-
-            var result = JsonConvert.DeserializeObject<VerificationRollbackResponseModel>(response);
-
-            if (result == null)
-            {
-                return PaymentRefundResult.Failed(messagesOptions.InvalidDataReceivedFromGateway);
-            }
+            var result = await responseMessage.ReadJsonAsync<VerificationRollbackResponseModel>().ConfigureAwaitFalse();
 
             if (result.Status.IsNullOrWhiteSpace())
             {

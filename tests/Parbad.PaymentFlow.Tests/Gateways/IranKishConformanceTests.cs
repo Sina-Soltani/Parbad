@@ -31,17 +31,6 @@ public class IranKishConformanceTests : GatewayConformanceTests
 
     protected override bool SupportsRefund => false;
 
-    protected override IReadOnlyDictionary<string, string> KnownIssues => new Dictionary<string, string>
-    {
-        // CreateVerifyResult reads result.Result.ResponseCode although Result is null on errors.
-        [nameof(Bank_rejection_during_verification_is_recorded_as_failed)] = "G-H9",
-        [nameof(Html_error_page_during_verification_does_not_crash_or_mark_the_payment_as_paid)] = "G-H9",
-        // The attack is blocked (the bank rejects the victim's token with the attacker's RRN/STAN), but the
-        // rejection crashes on the null Result.
-        [nameof(Payment_of_another_invoice_cannot_settle_this_invoice_even_with_this_invoices_token)] = "G-H9",
-        [nameof(Payment_that_settled_another_invoice_cannot_settle_this_invoice)] = "G-H9"
-    };
-
     protected override void AddGateway(IGatewayBuilder gateways) =>
         gateways.AddIranKish()
                 .WithAccounts(accounts => accounts.AddInMemory(account =>

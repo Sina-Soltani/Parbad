@@ -51,12 +51,12 @@ namespace Parbad.Gateway.IdPay.Internal
 
             if (!responseMessage.IsSuccessStatusCode)
             {
-                var errorModel = JsonConvert.DeserializeObject<IdPayErrorModel>(response);
+                var errorModel = GatewayResponse.DeserializeJson<IdPayErrorModel>(responseMessage, response);
 
                 return PaymentRequestResult.Failed(errorModel.ToString(), account.Name);
             }
 
-            var result = JsonConvert.DeserializeObject<IdPayRequestResultModel>(response);
+            var result = GatewayResponse.DeserializeJson<IdPayRequestResultModel>(responseMessage, response);
 
             return PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, result.Link);
         }
@@ -98,12 +98,12 @@ namespace Parbad.Gateway.IdPay.Internal
 
             if (!responseMessage.IsSuccessStatusCode)
             {
-                var errorModel = JsonConvert.DeserializeObject<IdPayErrorModel>(response);
+                var errorModel = GatewayResponse.DeserializeJson<IdPayErrorModel>(responseMessage, response);
 
                 return PaymentVerifyResult.Failed(errorModel.ToString());
             }
 
-            var result = JsonConvert.DeserializeObject<IdPayVerifyResultModel>(response);
+            var result = GatewayResponse.DeserializeJson<IdPayVerifyResultModel>(responseMessage, response);
 
             if (result == null)
             {

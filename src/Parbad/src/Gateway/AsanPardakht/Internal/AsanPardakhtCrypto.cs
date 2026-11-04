@@ -30,7 +30,7 @@ namespace Parbad.Gateway.AsanPardakht.Internal
                 .PostXmlAsync(_gatewayOptions.EncryptUrl, xmlBody)
                 .ConfigureAwait(false);
 
-            var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
+            var response = await responseMessage.ReadSoapAsync().ConfigureAwaitFalse();
 
             var result = XmlHelper.GetNodeValueFromXml(response, "EncryptInAESResult", "http://tempuri.org/");
 
@@ -45,7 +45,7 @@ namespace Parbad.Gateway.AsanPardakht.Internal
                 .PostXmlAsync(_gatewayOptions.DecryptUrl, xmlBody)
                 .ConfigureAwait(false);
 
-            var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
+            var response = await responseMessage.ReadSoapAsync().ConfigureAwaitFalse();
 
             var result = XmlHelper.GetNodeValueFromXml(response, "DecryptInAESResult", "http://tempuri.org/");
 

@@ -34,8 +34,6 @@ public class FanAvaConformanceTests : GatewayConformanceTests
     {
         // The refund always sends the full payment amount.
         [nameof(Partial_refund_is_not_silently_turned_into_a_full_refund)] = "ANALYSIS-02 §5 (partial refunds)",
-        // The inquiry response is deserialised without checking the HTTP status.
-        [nameof(Html_error_page_during_verification_does_not_crash_or_mark_the_payment_as_paid)] = "G-H9"
     };
 
     protected override void AddGateway(IGatewayBuilder gateways) =>

@@ -132,13 +132,14 @@ namespace Parbad.Gateway.PayPing
             //Check if we ran into an Issue
             if (!response.IsSuccessStatusCode)
             {
+                // A JSON error body is PayPing's answer; anything else (e.g. a proxy's error page) throws, so the
+                // payment stays open for a retry.
+                await response.ReadJsonStringAsync().ConfigureAwaitFalse();
+
                 return PaymentVerifyResult.Failed(_options.Messages.PaymentFailed);
             }
 
-            //Get Response data 
-            var responseBody = await response.Content.ReadAsStringAsync();
-
-            var responseModel = JsonConvert.DeserializeObject<VerifyPayResponseModel>(responseBody);
+            var responseModel = await response.ReadJsonAsync<VerifyPayResponseModel>().ConfigureAwaitFalse();
 
             if (responseModel.Amount != (long)context.Payment.Amount)
             {

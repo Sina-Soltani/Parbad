@@ -33,6 +33,8 @@ public class ParbadVirtualConformanceTests : GatewayConformanceTests
         [nameof(Html_error_page_on_request_is_reported_as_failed)] = NoBank,
         [nameof(Bank_rejection_during_verification_is_recorded_as_failed)] = NoBank,
         [nameof(Html_error_page_during_verification_does_not_crash_or_mark_the_payment_as_paid)] = NoBank,
+        [nameof(Html_error_page_during_verification_leaves_the_payment_open_for_a_retry)] = NoBank,
+        [nameof(Server_error_during_verification_leaves_the_payment_open_for_a_retry)] = NoBank,
         [nameof(Lost_verification_response_is_recovered_when_the_callback_is_retried)] = NoBank,
         [nameof(Payment_of_a_cheaper_invoice_cannot_settle_this_invoice)] = NoBank,
         [nameof(Payment_of_another_invoice_with_the_same_amount_cannot_settle_this_invoice)] = NoBank,

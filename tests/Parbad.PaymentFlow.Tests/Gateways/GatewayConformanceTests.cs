@@ -223,6 +223,21 @@ public abstract class GatewayConformanceTests
             Assert.IsFalse((await Host.GetPaymentAsync(InvoiceTrackingNumber)).IsPaid);
         });
 
+    /// <summary>
+    /// An HTML error page says nothing about whether the bank processed the verification, so the payment must
+    /// stay open: recording it as failed would lose a payment the bank may have captured.
+    /// </summary>
+    [TestMethod]
+    public Task Html_error_page_during_verification_leaves_the_payment_open_for_a_retry() =>
+        RunAsync(nameof(Html_error_page_during_verification_leaves_the_payment_open_for_a_retry),
+                 () => UnreadableVerifyResponseLeavesThePaymentOpenAsync(BankFault.HtmlErrorPage));
+
+    /// <summary>An HTTP 500 with a plain-text body is just as uninformative as an HTML error page.</summary>
+    [TestMethod]
+    public Task Server_error_during_verification_leaves_the_payment_open_for_a_retry() =>
+        RunAsync(nameof(Server_error_during_verification_leaves_the_payment_open_for_a_retry),
+                 () => UnreadableVerifyResponseLeavesThePaymentOpenAsync(BankFault.ServerError));
+
     [TestMethod]
     public Task Lost_verification_response_is_recovered_when_the_callback_is_retried() =>
         RunAsync(nameof(Lost_verification_response_is_recovered_when_the_callback_is_retried), async () =>
@@ -392,6 +407,25 @@ public abstract class GatewayConformanceTests
         Assert.IsTrue(payment.IsCompleted && payment.IsPaid, "The payment is not recorded as paid.");
 
         if (HasBank) Assert.IsTrue(transaction.Verified, "The bank never received a successful verification.");
+    }
+
+    private async Task UnreadableVerifyResponseLeavesThePaymentOpenAsync(BankFault fault)
+    {
+        var transaction = await PayAsync(InvoiceTrackingNumber, InvoiceAmount);
+        Bank.VerifyFault = fault;
+
+        DeliverCallback(transaction, transaction, Claims(InvoiceTrackingNumber, InvoiceAmount));
+        var first = await FetchAndVerifyAsync();
+
+        first.AssertNoUnexpectedException();
+        Assert.IsFalse((await Host.GetPaymentAsync(InvoiceTrackingNumber)).IsCompleted,
+                       $"The payment was closed after an unreadable response ({fault}), so it can never be verified. {first.Describe()}");
+
+        Bank.VerifyFault = BankFault.None;
+        DeliverCallback(transaction, transaction, Claims(InvoiceTrackingNumber, InvoiceAmount));
+        var retry = await FetchAndVerifyAsync();
+
+        Assert.IsTrue((await Host.GetPaymentAsync(InvoiceTrackingNumber)).IsPaid, $"The retry did not verify the payment. {retry.Describe()}");
     }
 
     private async Task PaymentOfAnotherInvoiceCannotSettleThisInvoiceAsync(decimal attackerAmount, bool forgeVictimToken = false)

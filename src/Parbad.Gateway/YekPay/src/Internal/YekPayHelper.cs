@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Parbad.Abstraction;
 using Parbad.Internal;
+using Parbad.Net;
 using Parbad.Options;
 using Parbad.Storage.Abstractions.Models;
 using System;
@@ -53,9 +54,7 @@ namespace Parbad.Gateway.YekPay.Internal
             YekPayGatewayOptions gatewayOptions,
             MessagesOptions optionsMessages)
         {
-            var message = await responseMessage.Content.ReadAsStringAsync();
-
-            var response = JsonConvert.DeserializeObject<YekPayResponseModel>(message);
+            var response = await responseMessage.ReadJsonAsync<YekPayResponseModel>().ConfigureAwaitFalse();
 
             if (response == null)
             {
@@ -101,9 +100,7 @@ namespace Parbad.Gateway.YekPay.Internal
 
         public static async Task<PaymentVerifyResult> CreateVerifyResult(HttpResponseMessage responseMessage, MessagesOptions optionsMessages)
         {
-            var message = await responseMessage.Content.ReadAsStringAsync();
-
-            var response = JsonConvert.DeserializeObject<YekPayVerificationResponseModel>(message);
+            var response = await responseMessage.ReadJsonAsync<YekPayVerificationResponseModel>().ConfigureAwaitFalse();
 
             if (response == null)
             {

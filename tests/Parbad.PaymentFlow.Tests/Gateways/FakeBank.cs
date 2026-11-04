@@ -34,6 +34,9 @@ public enum BankFault
     /// <summary>A proxy or the bank answers with an HTML error page (HTTP 502) instead of the API response.</summary>
     HtmlErrorPage,
 
+    /// <summary>The bank answers HTTP 500 with a plain-text body instead of the API response.</summary>
+    ServerError,
+
     /// <summary>The bank processes the first call, but the response never reaches the merchant.</summary>
     LoseResponseOnce
 }
@@ -206,6 +209,7 @@ public sealed class FakeBank
             };
 
             if (fault == BankFault.HtmlErrorPage) return HtmlErrorPage();
+            if (fault == BankFault.ServerError) return Text("Internal Server Error", "text/plain", HttpStatusCode.InternalServerError);
 
             lock (_sync)
             {

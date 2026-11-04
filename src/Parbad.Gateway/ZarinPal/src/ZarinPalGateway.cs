@@ -192,12 +192,8 @@ public class ZarinPalGateway : GatewayBase<ZarinPalGatewayAccount>
         return httpClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"));
     }
 
-    private static async Task<T> ReadFromJsonAsync<T>(HttpResponseMessage httpResponseMessage) where T : class
-    {
-        var json = await httpResponseMessage.Content.ReadAsStringAsync();
-
-        return JsonConvert.DeserializeObject<T>(json);
-    }
+    private static Task<T> ReadFromJsonAsync<T>(HttpResponseMessage httpResponseMessage) where T : class =>
+        httpResponseMessage.ReadJsonAsync<T>();
 
     private async Task Log(HttpResponseMessage responseMessage)
     {
