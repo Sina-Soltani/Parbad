@@ -52,9 +52,9 @@ public class DistributedMemoryCacheTests
     }
 
     [TestCleanup]
-    public ValueTask Cleanup()
+    public async Task Cleanup()
     {
-        return _services.DisposeAsync();
+        await _services.DisposeAsync();
     }
 
     [TestMethod]

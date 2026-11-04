@@ -78,7 +78,7 @@ namespace Parbad.Tests.Helpers
 
             Assert.AreEqual(GatewayAccount.DefaultName, result.GatewayAccountName);
 
-            Assert.AreEqual(result.Amount, expectedAmount);
+            Assert.AreEqual(expectedAmount, result.Amount.Value);
 
             Assert.IsFalse(result.IsAlreadyVerified);
         }
@@ -102,7 +102,7 @@ namespace Parbad.Tests.Helpers
 
             Assert.AreEqual(GatewayAccount.DefaultName, result.GatewayAccountName);
 
-            Assert.AreEqual(result.Amount, expectedAmount);
+            Assert.AreEqual(expectedAmount, result.Amount.Value);
 
             Assert.IsNotNull(result.TransactionCode);
 

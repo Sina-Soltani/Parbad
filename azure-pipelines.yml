@@ -40,6 +40,8 @@ steps:
   inputs:
     command: 'test'
     projects: '**/*.Tests.csproj'
+    # A test project that runs no tests fails the build, so tests cannot silently stop running again (T-1).
+    arguments: '-- RunConfiguration.TreatNoTestsAsError=true'
 - task: DotNetCoreCLI@2
   displayName: 'packing'
   condition: eq(variables['build.sourceBranch'], 'refs/heads/dev')

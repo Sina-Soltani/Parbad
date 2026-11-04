@@ -54,9 +54,9 @@ namespace Parbad.Storage.EntityFrameworkCore.Tests
         }
 
         [TestCleanup]
-        public ValueTask Cleanup()
+        public async Task Cleanup()
         {
-            return _context.DisposeAsync();
+            await _context.DisposeAsync();
         }
 
         [TestMethod]
@@ -183,5 +183,32 @@ namespace Parbad.Storage.EntityFrameworkCore.Tests
 
             Assert.AreEqual(0, _storage.Transactions.Count());
         }
+
+        [TestMethod]
+        public async Task Paid_Payment_Lookup_Finds_Only_Paid_Payments_Of_The_Same_Gateway_Except_The_Given_One()
+        {
+            await _storage.CreatePaymentAsync(NewPayment(1, "RRN-1", "gateway", isPaid: true));
+            await _storage.CreatePaymentAsync(NewPayment(2, "RRN-2", "gateway", isPaid: false));
+            await _storage.CreatePaymentAsync(NewPayment(3, "RRN-3", "other", isPaid: true));
+
+            var found = await _storage.FindPaidPaymentByTransactionCodeAsync("gateway", "RRN-1", exceptTrackingNumber: 99);
+
+            Assert.AreEqual(1, found?.TrackingNumber);
+            Assert.IsNull(await _storage.FindPaidPaymentByTransactionCodeAsync("gateway", "RRN-1", exceptTrackingNumber: 1), "The excluded payment was returned.");
+            Assert.IsNull(await _storage.FindPaidPaymentByTransactionCodeAsync("gateway", "RRN-2", exceptTrackingNumber: 99), "An unpaid payment was returned.");
+            Assert.IsNull(await _storage.FindPaidPaymentByTransactionCodeAsync("gateway", "RRN-3", exceptTrackingNumber: 99), "A payment of another gateway was returned.");
+        }
+
+        private static Payment NewPayment(long trackingNumber, string transactionCode, string gatewayName, bool isPaid) => new()
+        {
+            TrackingNumber = trackingNumber,
+            Amount = 1000,
+            Token = $"token-{trackingNumber}",
+            TransactionCode = transactionCode,
+            GatewayName = gatewayName,
+            GatewayAccountName = "test",
+            IsCompleted = true,
+            IsPaid = isPaid
+        };
     }
 }
