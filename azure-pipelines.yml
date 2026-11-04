@@ -29,6 +29,16 @@ steps:
     command: 'restore'
     restoreSolution: '**/*.sln'
     feedsToUse: 'select'
+# Fails the build when a shipped package depends on a package with a known vulnerability, including
+# transitive dependencies of the netstandard and net462 builds (ANALYSIS-04 §3.1).
+- pwsh: |
+    $vulnerable = $false
+    Get-ChildItem src -Recurse -Filter *.csproj | Where-Object { $_.FullName -notmatch '[\\/](tests|bin|obj)[\\/]' } | ForEach-Object {
+      $output = dotnet list $_.FullName package --vulnerable --include-transitive 2>&1 | Out-String
+      if ($output -match 'has the following vulnerable packages') { Write-Host $output; $vulnerable = $true }
+    }
+    if ($vulnerable) { Write-Host '##vso[task.logissue type=error]Vulnerable packages found.'; exit 1 }
+  displayName: 'checking for vulnerable packages'
 - task: DotNetCoreCLI@2
   displayName: 'building'
   inputs:
