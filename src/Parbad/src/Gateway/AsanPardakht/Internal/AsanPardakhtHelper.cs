@@ -220,7 +220,9 @@ namespace Parbad.Gateway.AsanPardakht.Internal
 
             var result = XmlHelper.GetNodeValueFromXml(response, "RequestVerificationResult", "http://tempuri.org/");
 
-            var isSucceed = result == "500";
+            // 504: verification was already requested for this transaction (e.g. the first response was lost).
+            // The callback has been bound to this invoice (preInvoiceID), so the flow continues with settlement.
+            var isSucceed = result == "500" || result == "504";
 
             PaymentVerifyResult verifyResult = null;
 
@@ -268,7 +270,8 @@ namespace Parbad.Gateway.AsanPardakht.Internal
         {
             var result = XmlHelper.GetNodeValueFromXml(response, "RequestReconciliationResult", "http://tempuri.org/");
 
-            var isSucceed = result == "600";
+            // 606: settlement was already requested for this transaction.
+            var isSucceed = result == "600" || result == "606";
             string message;
 
             if (isSucceed)

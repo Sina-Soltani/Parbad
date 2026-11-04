@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
@@ -38,12 +37,6 @@ public class AsanPardakhtConformanceTests : GatewayConformanceTests
     protected override string GatewayName => AsanPardakhtGateway.Name;
 
     protected override bool SupportsRefund => false;
-
-    protected override IReadOnlyDictionary<string, string> KnownIssues => new Dictionary<string, string>
-    {
-        // The retry after a lost response gets 504 (verification already requested), which is mapped to Failed.
-        [nameof(Lost_verification_response_is_recovered_when_the_callback_is_retried)] = "G-H1"
-    };
 
     protected override void AddGateway(IGatewayBuilder gateways) =>
         gateways.AddAsanPardakht()

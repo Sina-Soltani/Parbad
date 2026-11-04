@@ -113,7 +113,9 @@ internal static class ZarinPalHelper
     {
         PaymentVerifyResult result;
 
-        if (IsSucceedCode(verificationResult.Data.Code))
+        // 101: this payment was verified before (e.g. the first response was lost). The Authority comes from
+        // the database, so it is this invoice's own payment and it counts as paid.
+        if (IsSucceedCode(verificationResult.Data.Code) || verificationResult.Data.Code == NumericAlreadyOkResult)
         {
             result = PaymentVerifyResult.Succeed(verificationResult.Data.RefId, messagesOptions.PaymentSucceed);
         }
@@ -121,13 +123,9 @@ internal static class ZarinPalHelper
         {
             var message = ZarinPalCodeTranslator.Translate(verificationResult.Data.Code, messagesOptions);
 
-            var verifyResultStatus = verificationResult.Data.Code == NumericAlreadyOkResult
-                ? PaymentVerifyResultStatus.AlreadyVerified
-                : PaymentVerifyResultStatus.Failed;
-
             result = new PaymentVerifyResult
                      {
-                         Status = verifyResultStatus,
+                         Status = PaymentVerifyResultStatus.Failed,
                          Message = message
                      };
         }

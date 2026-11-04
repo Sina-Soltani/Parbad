@@ -124,7 +124,7 @@ namespace Parbad.Gateway.Zibal.Internal
         private static string? GetMerchant(ZibalGatewayAccount account) =>
             account.IsSandbox ? "zibal" : account.Merchant;
 
-        public static async Task<PaymentVerifyResult> CreateVerifyResult(HttpResponseMessage responseMessage, MessagesOptions messagesOptions)
+        public static async Task<PaymentVerifyResult> CreateVerifyResult(HttpResponseMessage responseMessage, string? trackId, MessagesOptions messagesOptions)
         {
             var message = await responseMessage.Content.ReadAsStringAsync();
 
@@ -135,15 +135,20 @@ namespace Parbad.Gateway.Zibal.Internal
                 return PaymentVerifyResult.Failed(messagesOptions.InvalidDataReceivedFromGateway);
             }
 
+            // 201: this payment was verified before (e.g. the first response was lost). The trackId comes from
+            // the database, so it is this invoice's own payment and it counts as paid.
+            if (response.Result == PaymentAlreadyVerifiedCode)
+            {
+                var alreadyVerified = PaymentVerifyResult.Succeed(response.RefNumber?.ToString() ?? trackId, messagesOptions.PaymentSucceed);
+                alreadyVerified.GatewayResponseCode = response.Result.ToString();
+
+                return alreadyVerified;
+            }
+
             if (response.Result != SuccessCode)
             {
                 var verifyResult = PaymentVerifyResult.Failed(response.Message);
                 verifyResult.GatewayResponseCode = response.Result.ToString();
-
-                if (response.Result == PaymentAlreadyVerifiedCode)
-                {
-                    verifyResult.Status = PaymentVerifyResultStatus.AlreadyVerified;
-                }
 
                 return verifyResult;
             }
