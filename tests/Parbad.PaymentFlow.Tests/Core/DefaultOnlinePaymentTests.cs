@@ -280,32 +280,46 @@ public class DefaultOnlinePaymentTests
     }
 
     [TestMethod]
-    public Task Refund_of_an_unpaid_payment_is_rejected_without_calling_the_gateway() =>
-        KnownIssue.ReproducesAsync("C-3", async () =>
-        {
-            await RequestAsync();
-            await _host.OnlinePayment.CancelAsync(TrackingNumber);
+    public async Task Refund_of_an_unpaid_payment_is_rejected_without_calling_the_gateway()
+    {
+        await RequestAsync();
+        await _host.OnlinePayment.CancelAsync(TrackingNumber);
 
-            var result = await _host.OnlinePayment.RefundCompletelyAsync(TrackingNumber);
+        var result = await _host.OnlinePayment.RefundCompletelyAsync(TrackingNumber);
 
-            Assert.IsFalse(result.IsSucceed, "A cancelled (never paid) payment was refunded.");
-            Assert.AreEqual(0, _gateway.RefundedAmounts.Count, "The gateway was asked to refund a payment that was never paid.");
-        });
+        Assert.IsFalse(result.IsSucceed, "A cancelled (never paid) payment was refunded.");
+        Assert.AreEqual(0, _gateway.RefundedAmounts.Count, "The gateway was asked to refund a payment that was never paid.");
+    }
 
     [TestMethod]
-    public Task Refunds_cannot_exceed_the_paid_amount_in_total() =>
-        KnownIssue.ReproducesAsync("C-3", async () =>
-        {
-            await RequestAsync();
-            await _host.OnlinePayment.VerifyAsync(TrackingNumber);
+    public async Task Refunds_cannot_exceed_the_paid_amount_in_total()
+    {
+        await RequestAsync();
+        await _host.OnlinePayment.VerifyAsync(TrackingNumber);
 
-            var first = await _host.OnlinePayment.RefundAsync(new RefundInvoice(TrackingNumber, 800_000));
-            var second = await _host.OnlinePayment.RefundAsync(new RefundInvoice(TrackingNumber, 800_000));
+        var first = await _host.OnlinePayment.RefundAsync(new RefundInvoice(TrackingNumber, 800_000));
+        var second = await _host.OnlinePayment.RefundAsync(new RefundInvoice(TrackingNumber, 800_000));
 
-            Assert.IsTrue(first.IsSucceed, first.Message);
-            Assert.IsFalse(second.IsSucceed, "Two partial refunds of 800,000 were accepted for a payment of 1,250,000.");
-            Assert.AreEqual(1, _gateway.RefundedAmounts.Count);
-        });
+        Assert.IsTrue(first.IsSucceed, first.Message);
+        Assert.IsFalse(second.IsSucceed, "Two partial refunds of 800,000 were accepted for a payment of 1,250,000.");
+        Assert.AreEqual(1, _gateway.RefundedAmounts.Count);
+    }
+
+    [TestMethod]
+    public async Task Complete_refund_after_a_partial_refund_refunds_only_the_remaining_amount()
+    {
+        await RequestAsync();
+        await _host.OnlinePayment.VerifyAsync(TrackingNumber);
+
+        await _host.OnlinePayment.RefundAsync(new RefundInvoice(TrackingNumber, 800_000));
+        var rest = await _host.OnlinePayment.RefundCompletelyAsync(TrackingNumber);
+        var nothingLeft = await _host.OnlinePayment.RefundCompletelyAsync(TrackingNumber);
+
+        Assert.IsTrue(rest.IsSucceed, rest.Message);
+        Assert.AreEqual(Amount - 800_000, (decimal)rest.Amount);
+        Assert.IsFalse(nothingLeft.IsSucceed, "A fully refunded payment was refunded again.");
+        CollectionAssert.AreEqual(new[] { 800_000m, Amount - 800_000 }, _gateway.RefundedAmounts.ToArray());
+    }
 
     // ---------- helpers ----------
 
