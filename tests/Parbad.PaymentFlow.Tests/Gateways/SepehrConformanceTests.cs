@@ -29,9 +29,7 @@ public class SepehrConformanceTests : GatewayConformanceTests
         [nameof(Lost_verification_response_is_recovered_when_the_callback_is_retried)] = "G-H1",
         // The digital receipt comes from the browser and is not tied to this invoice; only the amount protects it.
         [nameof(Payment_of_another_invoice_with_the_same_amount_cannot_settle_this_invoice)] = "G-C1b",
-        [nameof(Payment_of_another_invoice_cannot_settle_this_invoice_even_with_this_invoices_token)] = "G-C1b",
-        // Rollback has no amount, so a partial refund refunds everything.
-        [nameof(Partial_refund_is_not_silently_turned_into_a_full_refund)] = "ANALYSIS-02 §5 (partial refunds)"
+        [nameof(Payment_of_another_invoice_cannot_settle_this_invoice_even_with_this_invoices_token)] = "G-C1b"
     };
 
     protected override void AddGateway(IGatewayBuilder gateways) =>

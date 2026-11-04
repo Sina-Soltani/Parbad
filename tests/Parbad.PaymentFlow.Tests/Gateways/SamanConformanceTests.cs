@@ -26,8 +26,7 @@ public class SamanConformanceTests : GatewayConformanceTests
     {
         // The callback RefNum is never compared with anything stored for this invoice; only the amount protects it.
         [nameof(Payment_of_another_invoice_with_the_same_amount_cannot_settle_this_invoice)] = "G-C1b",
-        [nameof(Payment_of_another_invoice_cannot_settle_this_invoice_even_with_this_invoices_token)] = "G-C1b",
-        [nameof(Partial_refund_is_not_silently_turned_into_a_full_refund)] = "ANALYSIS-02 §5 (partial refunds)"
+        [nameof(Payment_of_another_invoice_cannot_settle_this_invoice_even_with_this_invoices_token)] = "G-C1b"
     };
 
     protected override void AddGateway(IGatewayBuilder gateways) =>

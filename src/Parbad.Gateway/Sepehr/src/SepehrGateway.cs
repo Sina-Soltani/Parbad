@@ -125,6 +125,12 @@ namespace Parbad.Gateway.Sepehr
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
+            // Sepehr's Rollback has no amount: it always refunds the whole payment.
+            if (amount.Value != context.Payment.Amount)
+            {
+                return PaymentRefundResult.Failed(_options.Messages.PartialRefundNotSupported);
+            }
+
             var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 
             var data = SepehrHelper.CreateRefundData(context, account);

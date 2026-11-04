@@ -105,6 +105,12 @@ public class SamanGateway : GatewayBase<SamanGatewayAccount>
     {
         if (context == null) throw new ArgumentNullException(nameof(context));
 
+        // Saman's ReverseTransaction has no amount: it always refunds the whole payment.
+        if (amount.Value != context.Payment.Amount)
+        {
+            return PaymentRefundResult.Failed(_messageOptions.PartialRefundNotSupported);
+        }
+
         var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 
         var request = SamanHelper.CreateReverseRequest(context, account);

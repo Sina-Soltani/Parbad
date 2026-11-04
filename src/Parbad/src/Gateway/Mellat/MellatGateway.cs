@@ -127,6 +127,12 @@ namespace Parbad.Gateway.Mellat
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
+            // Mellat's reversal (bpReversalRequest) has no amount: it always refunds the whole payment.
+            if (amount.Value != context.Payment.Amount)
+            {
+                return PaymentRefundResult.Failed(_messagesOptions.Value.PartialRefundNotSupported);
+            }
+
             var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 
             var data = MellatHelper.CreateRefundData(context, account);
