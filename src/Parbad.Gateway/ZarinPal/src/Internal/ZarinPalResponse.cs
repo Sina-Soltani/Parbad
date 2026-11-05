@@ -48,7 +48,7 @@ internal class ZarinPalResponse<TData> where TData : class
     public static async Task<ZarinPalResponse<TData>> ReadAsync(HttpResponseMessage responseMessage, MessagesOptions messagesOptions)
     {
         // A server error says nothing about whether ZarinPal processed the call, so it is not reported as a
-        // rejection: the payment stays open for a retry (G-H9).
+        // rejection: the payment stays open for a retry.
         if ((int)responseMessage.StatusCode >= 500) throw CreateException(responseMessage, "server error");
 
         var body = await responseMessage.ReadJsonStringAsync().ConfigureAwaitFalse();

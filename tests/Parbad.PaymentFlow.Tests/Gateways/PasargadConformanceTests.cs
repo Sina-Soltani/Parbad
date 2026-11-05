@@ -130,12 +130,12 @@ public class PasargadConformanceTests : GatewayConformanceTests
             ("trackId", transaction.TraceNumber));
 
     /// <summary>
-    /// Open question from ANALYSIS-02 §5: Parbad declares the verify response's "data" as a string, while the
+    /// Open question: Parbad declares the verify response's "data" as a string, while the
     /// bank is believed to return an object. Confirm the real shape against the Pasargad sandbox.
     /// </summary>
     [TestMethod]
     public Task Verify_accepts_a_response_whose_data_is_an_object() =>
-        KnownIssue.ReproducesAsync("ANALYSIS-02 §5 (Pasargad verify data shape, unverified)", () =>
+        KnownIssue.ReproducesAsync("the shape of Pasargad's verify data (unverified)", () =>
             UnderCultureAsync(CultureInfo.InvariantCulture.Name, () =>
             {
                 _verifyDataIsObject = true;

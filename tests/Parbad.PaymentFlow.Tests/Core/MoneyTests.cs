@@ -5,7 +5,7 @@ using Parbad.PaymentFlow.Tests.Infrastructure;
 namespace Parbad.PaymentFlow.Tests.Core;
 
 /// <summary>
-/// Amount comparisons that payment checks depend on. Issue ids refer to ANALYSIS-01-CORE-ARCHITECTURE.md.
+/// Amount comparisons that payment checks depend on.
 /// </summary>
 [TestClass]
 public class MoneyTests
@@ -33,7 +33,7 @@ public class MoneyTests
 
     [TestMethod]
     public Task Amount_with_a_fraction_is_not_equal_to_its_truncated_value() =>
-        KnownIssue.ReproducesAsync("C-5", () =>
+        KnownIssue.ReproducesAsync("lossy implicit conversions of Money", () =>
         {
             Assert.IsFalse(new Money(10.5m).Equals(10L), "Money(10.5).Equals(10L) returned true.");
         });

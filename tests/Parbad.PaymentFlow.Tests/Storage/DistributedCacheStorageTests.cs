@@ -9,7 +9,7 @@ namespace Parbad.PaymentFlow.Tests.Storage;
 
 /// <summary>
 /// <see cref="DistributedCacheStorage"/>, registered with <c>UseDistributedCache</c> over a
-/// <c>MemoryDistributedCache</c>. Instances that write at the same time overwrite each other's data (S-2), so
+/// <c>MemoryDistributedCache</c>. Instances that write at the same time overwrite each other's data, so
 /// the tests use one instance for the writes; a new instance reads what was saved to the cache.
 /// </summary>
 [TestClass]

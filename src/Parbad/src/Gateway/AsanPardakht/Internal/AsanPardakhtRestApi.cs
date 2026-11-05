@@ -76,7 +76,7 @@ namespace Parbad.Gateway.AsanPardakht.Internal
 
             // AsanPardakht answers with the HTTP status code itself. A 4xx is the bank's answer about this request.
             // A 5xx (e.g. 571 "not yet processed", 572 "status undetermined", or a proxy's error page) says nothing
-            // about whether the bank processed the call, so the payment must stay open (G-H9).
+            // about whether the bank processed the call, so the payment must stay open.
             if ((int)response.StatusCode >= 500)
             {
                 throw new GatewayResponseException(response.StatusCode, response.Content?.Headers.ContentType?.MediaType, "server error");

@@ -50,7 +50,7 @@ public class MellatConformanceTests : GatewayConformanceTests
     protected override void UseGateway(IInvoiceBuilder invoice) => invoice.UseMellat();
 
     /// <summary>
-    /// G-H7: the SOAP envelope is built as a string, so every value must be XML-encoded. An unencoded "&amp;" or "&lt;"
+    /// The SOAP envelope is built as a string, so every value must be XML-encoded. An unencoded "&amp;" or "&lt;"
     /// makes the request invalid XML, or lets the value add elements of its own.
     /// </summary>
     [TestMethod]
@@ -117,7 +117,7 @@ public class MellatConformanceTests : GatewayConformanceTests
             return Return("0");
         }));
 
-        // Assumption: the bank accepts a reversal of a settled transaction (unverified, see ANALYSIS-02 §5).
+        // Assumption: the bank accepts a reversal of a settled transaction (unverified).
         http.When(ApiUrl).WithPartialContent("bpReversalRequest").Respond(Bank.Endpoint(BankOperation.Refund, call =>
         {
             var transaction = FindPaid(call);

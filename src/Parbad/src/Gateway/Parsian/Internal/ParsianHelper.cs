@@ -20,7 +20,7 @@ namespace Parbad.Gateway.Parsian.Internal
     internal static class ParsianHelper
     {
         // "The transaction was confirmed before". Taken from several integrations' copies of the PEC error list; the
-        // official document could not be found (ANALYSIS-02 §7.3).
+        // official document could not be found.
         private const string AlreadyConfirmedStatus = "-1533";
 
         public static string CreateRequestData(ParsianGatewayAccount account, Invoice invoice)

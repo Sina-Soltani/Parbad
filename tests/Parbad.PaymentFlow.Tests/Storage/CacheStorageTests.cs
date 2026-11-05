@@ -12,7 +12,7 @@ namespace Parbad.PaymentFlow.Tests.Storage;
 /// <summary>
 /// Behaviour that the cache storages must share with a database: updates persist every field, stored records
 /// cannot be changed through object references, tracking numbers and tokens are unique, and concurrent use
-/// loses nothing. Issue ids refer to ANALYSIS-03-STORAGE-AND-HOSTING.md (S-3 to S-5).
+/// loses nothing.
 /// <para>
 /// A subclass registers one storage. <see cref="CreateStorage"/> resolves a new (transient) instance, as each
 /// request would; a record is only considered persisted when a new instance can read it.
@@ -50,7 +50,7 @@ public abstract class CacheStorageTests
         var created = NewPayment(1001);
         await storage.CreatePaymentAsync(created);
 
-        // S-3: only Token, TrackingNumber and TransactionCode used to be copied.
+        // Only Token, TrackingNumber and TransactionCode used to be copied.
         var detached = new Payment
         {
             Id = created.Id,
@@ -80,7 +80,7 @@ public abstract class CacheStorageTests
         var created = NewTransaction(payment.Id);
         await storage.CreateTransactionAsync(created);
 
-        // S-3: only IsSucceed used to be copied.
+        // Only IsSucceed used to be copied.
         var detached = new Transaction
         {
             Id = created.Id,
@@ -232,7 +232,7 @@ public abstract class CacheStorageTests
         var storage = CreateStorage();
         var payments = Enumerable.Range(1, ParallelCreateCount).Select(i => NewPayment(1000 + i)).ToList();
 
-        // S-4: concurrent writes and reads on a plain List<T> lost most of the records.
+        // Concurrent writes and reads on a plain List<T> lost most of the records.
         await Task.WhenAll(payments.Select(payment => Task.Run(async () =>
         {
             await storage.CreatePaymentAsync(payment);

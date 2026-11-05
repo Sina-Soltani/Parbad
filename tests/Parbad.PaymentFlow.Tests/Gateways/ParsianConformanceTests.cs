@@ -48,7 +48,7 @@ public class ParsianConformanceTests : GatewayConformanceTests
     protected override void UseGateway(IInvoiceBuilder invoice) => invoice.UseParsian();
 
     /// <summary>
-    /// G-H7: the SOAP envelope is built as a string, so every value must be XML-encoded. An unencoded "&amp;" or "&lt;"
+    /// The SOAP envelope is built as a string, so every value must be XML-encoded. An unencoded "&amp;" or "&lt;"
     /// makes the request invalid XML, or lets the value add elements of its own.
     /// </summary>
     [TestMethod]
@@ -72,7 +72,7 @@ public class ParsianConformanceTests : GatewayConformanceTests
     }
 
     /// <summary>
-    /// G-H10: the callback is read asynchronously from the form or the query string. A synchronous Request.Form
+    /// The callback is read asynchronously from the form or the query string. A synchronous Request.Form
     /// threw on a GET request.
     /// </summary>
     [TestMethod]
@@ -119,7 +119,7 @@ public class ParsianConformanceTests : GatewayConformanceTests
 
             if (transaction.Verified)
             {
-                // -1533 = "already confirmed" (several integrations; no official document found, ANALYSIS-02 §7.3).
+                // -1533 = "already confirmed" (several integrations; no official document found).
                 // Assumption (unverified): the RRN is not returned again.
                 return Result(ConfirmNamespace, "ConfirmPaymentResult", ("Status", "-1533"), ("RRN", "0"), ("Token", transaction.Token));
             }
@@ -130,7 +130,7 @@ public class ParsianConformanceTests : GatewayConformanceTests
                           ("Status", "0"), ("RRN", transaction.Rrn), ("CardNumberMasked", transaction.MaskedCardNumber), ("Token", transaction.Token));
         }));
 
-        // Assumption: the SOAP 1.2 envelope posted as text/xml is accepted (unverified, see ANALYSIS-02 §5).
+        // Assumption: the SOAP 1.2 envelope posted as text/xml is accepted (unverified).
         http.When($"{BankUrl}/NewIPGServices/Reverse/ReversalService.asmx").Respond(Bank.Endpoint(BankOperation.Refund, call =>
         {
             var transaction = Bank.FindByToken(call.Xml("Token"));

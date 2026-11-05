@@ -17,8 +17,7 @@ namespace Parbad.PaymentFlow.Tests.Core;
 
 /// <summary>
 /// The HTML that Parbad writes to the browser: the auto-post form of <see cref="DefaultGatewayTransporter"/> and the
-/// Virtual Gateway pages. Issue ids refer to ANALYSIS-01-CORE-ARCHITECTURE.md (H-1, H-2) and
-/// ANALYSIS-02 (G-H11).
+/// Virtual Gateway pages.
 /// </summary>
 [TestClass]
 public class HtmlRenderingTests
@@ -41,7 +40,7 @@ public class HtmlRenderingTests
     [TestCleanup]
     public Task Cleanup() => _host.DisposeAsync().AsTask();
 
-    // ---------- Auto-post form (H-1) ----------
+    // ---------- Auto-post form ----------
 
     [TestMethod]
     public async Task Post_form_encodes_the_url_and_the_fields()
@@ -74,7 +73,7 @@ public class HtmlRenderingTests
         StringAssert.Contains(body, $"<script type=\"text/javascript\" nonce=\"{Nonce}\">document.getElementById('paymentForm').submit();</script>");
     }
 
-    // ---------- CORS headers (H-2) ----------
+    // ---------- CORS headers ----------
 
     [TestMethod]
     public async Task Post_transport_adds_no_cors_headers()
@@ -94,7 +93,7 @@ public class HtmlRenderingTests
         AssertNoCorsHeaders(response);
     }
 
-    // ---------- Virtual Gateway (G-H11) ----------
+    // ---------- Virtual Gateway ----------
 
     [TestMethod]
     [DataRow("Request", "javascript:alert(1)")]

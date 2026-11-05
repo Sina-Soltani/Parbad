@@ -25,8 +25,8 @@ public class SamanConformanceTests : GatewayConformanceTests
     protected override IReadOnlyDictionary<string, string> KnownIssues => new Dictionary<string, string>
     {
         // The callback RefNum is never compared with anything stored for this invoice; only the amount protects it.
-        [nameof(Payment_of_another_invoice_with_the_same_amount_cannot_settle_this_invoice)] = "G-C1b",
-        [nameof(Payment_of_another_invoice_cannot_settle_this_invoice_even_with_this_invoices_token)] = "G-C1b"
+        [nameof(Payment_of_another_invoice_with_the_same_amount_cannot_settle_this_invoice)] = "same-amount payment swap",
+        [nameof(Payment_of_another_invoice_cannot_settle_this_invoice_even_with_this_invoices_token)] = "same-amount payment swap"
     };
 
     protected override void AddGateway(IGatewayBuilder gateways) =>
@@ -68,7 +68,7 @@ public class SamanConformanceTests : GatewayConformanceTests
                 return FakeBank.Json(new { ResultCode = -2, ResultDescription = "Transaction not found.", Success = false });
             }
 
-            // 2 = "duplicate request" (official SEP guide v3.3, ANALYSIS-02 §7.3).
+            // 2 = "duplicate request" (official SEP guide v3.3).
             // Assumption (unverified): the answer still carries the TransactionDetail.
             var resultCode = transaction.Verified ? 2 : 0;
             transaction.Verified = true;

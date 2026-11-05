@@ -16,7 +16,6 @@ namespace Parbad.PaymentFlow.Tests.Core;
 
 /// <summary>
 /// Tests for the orchestration in <c>DefaultOnlinePayment</c>, independent of any bank protocol.
-/// Issue ids refer to ANALYSIS-01-CORE-ARCHITECTURE.md.
 /// </summary>
 [TestClass]
 public class DefaultOnlinePaymentTests
@@ -94,7 +93,7 @@ public class DefaultOnlinePaymentTests
 
     [TestMethod]
     public Task Request_failure_does_not_expose_internal_exception_details() =>
-        KnownIssue.ReproducesAsync("C-9", async () =>
+        KnownIssue.ReproducesAsync("a failed request exposes internal exception details", async () =>
         {
             const string internalDetails = "SOAP fault from https://10.0.0.5/ws (user=merchant01)";
             _gateway.RequestException = new InvalidOperationException(internalDetails);
@@ -304,7 +303,7 @@ public class DefaultOnlinePaymentTests
     [TestMethod]
     public async Task Database_failure_after_bank_confirmation_leaves_the_payment_retryable()
     {
-        // Characterises today's behaviour for C-2: the bank has confirmed, the database write fails,
+        // Characterises today's behaviour: the bank has confirmed, the database write fails,
         // and the payment stays open, so the only recovery is to verify again.
         await RequestAsync();
         _host.Storage.FailNextPaymentUpdate = new TimeoutException("Database timeout.");
@@ -315,7 +314,7 @@ public class DefaultOnlinePaymentTests
         Assert.IsFalse((await _host.GetPaymentAsync(TrackingNumber)).IsCompleted);
     }
 
-    // ---------- Verification rules enforced by the core (ANALYSIS-02 §6.1) ----------
+    // ---------- Verification rules enforced by the core ----------
 
     [TestMethod]
     public async Task Verify_is_accepted_when_the_bank_reports_the_amount_and_order_of_this_invoice()

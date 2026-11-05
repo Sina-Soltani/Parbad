@@ -12,7 +12,7 @@ namespace Parbad.PaymentFlow.Tests.Gateways;
 
 /// <summary>
 /// YekPay: payment/request → redirect → callback → payment/verify (with the Authority stored at request time).
-/// Fetch never inspects the callback (ANALYSIS-02 §5), so cancellations are only detected by the bank.
+/// Fetch never inspects the callback, so cancellations are only detected by the bank.
 /// </summary>
 [TestClass]
 public class YekPayConformanceTests : GatewayConformanceTests

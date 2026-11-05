@@ -11,7 +11,7 @@ namespace Parbad.PaymentFlow.Tests.Infrastructure;
 /// <summary>
 /// A thread-safe <see cref="IStorage"/> that stores copies of the records, like a real database.
 /// It enforces unique tracking numbers and tokens, so the tests observe Parbad's own behaviour and are
-/// not affected by the known problems of the cache storages (ANALYSIS-03, S-3 to S-5).
+/// not affected by the cache storages.
 /// </summary>
 public sealed class InMemoryStorage : IStorage, IPaidPaymentLookup, IPaymentCompletion
 {

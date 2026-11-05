@@ -107,7 +107,7 @@ public class AsanPardakhtConformanceTests : GatewayConformanceTests
 
             if (call.Reject || transaction == null) return Status(476); // not found or reversed
 
-            // Assumption (unverified; codes from mrdaghestani/AsanPardakht.IPG, ANALYSIS-02 §7.3): 473 = already verified.
+            // Assumption (unverified; codes from mrdaghestani/AsanPardakht.IPG): 473 = already verified.
             if (transaction.Verified) return Status(473);
 
             transaction.Verified = true;
@@ -141,7 +141,7 @@ public class AsanPardakhtConformanceTests : GatewayConformanceTests
         TestCallback.Post(("PayGateTranID", transaction.Reference), ("ReturningParams", claims.Paid ? "ok" : "cancelled"));
 
     /// <summary>
-    /// The REST API needs no encryption (G-H4): the credentials go only into the usr/pwd headers, never into a
+    /// The REST API needs no encryption: the credentials go only into the usr/pwd headers, never into a
     /// body or a URL.
     /// </summary>
     [TestMethod]
