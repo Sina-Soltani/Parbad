@@ -27,21 +27,12 @@ More information: https://github.com/Sina-Soltani/Parbad</Description>
     <NoWarn>1701;1702;1591</NoWarn>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>Parbad.Storage.EntityFrameworkCore.xml</DocumentationFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>Parbad.Storage.EntityFrameworkCore.xml</DocumentationFile>
-  </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\Abstractions\Parbad.Storage.Abstractions.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="icon.png" pack="true" Visible="false" PackagePath="" />
-    <None Include="Parbad.Storage.EntityFrameworkCore.xml" pack="true" Visible="false" PackagePath="" />
   </ItemGroup>
 
   <ItemGroup>

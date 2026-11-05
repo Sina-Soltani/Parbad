@@ -26,14 +26,6 @@ For more information see: https://github.com/Sina-Soltani/Parbad</Description>
     <NoWarn>1701;1702;1591</NoWarn>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>Parbad.Gateway.ZarinPal.xml</DocumentationFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>Parbad.Gateway.ZarinPal.xml</DocumentationFile>
-  </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\..\Parbad\src\Parbad.csproj" />
   </ItemGroup>
@@ -41,7 +33,6 @@ For more information see: https://github.com/Sina-Soltani/Parbad</Description>
   <ItemGroup>
     <None Include="icon.png" pack="true" Visible="false" PackagePath="" />
     <None Include="readme.txt" pack="true" PackagePath="." />
-    <None Include="Parbad.Gateway.ZarinPal.xml" pack="true" Visible="false" PackagePath="" />
   </ItemGroup>
 
 </Project>

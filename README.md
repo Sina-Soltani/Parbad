@@ -23,7 +23,7 @@ Parbad is a free and open-source integrated online payment library which helps d
   * [Saman](https://www.nuget.org/packages/Parbad/)
   * [Pasargad](https://www.nuget.org/packages/Parbad/)
   * [Parsian](https://www.nuget.org/packages/Parbad/)
-  * [Iran Kish](https://www.nuget.org/packages/Parbad/)
+  * [Iran Kish](https://www.nuget.org/packages/Parbad.Gateway.IranKish/)
   * [Asan Pardakht](https://www.nuget.org/packages/Parbad/)
   * [Sepehr](https://www.nuget.org/packages/Parbad.Gateway.Sepehr/)
   * [ZarinPal](https://www.nuget.org/packages/Parbad.Gateway.ZarinPal/)
@@ -32,6 +32,7 @@ Parbad is a free and open-source integrated online payment library which helps d
   * [YekPay](https://www.nuget.org/packages/Parbad.Gateway.YekPay/)
   * [PayPing](https://www.nuget.org/packages/Parbad.Gateway.PayPing/)
   * [Zibal](https://www.nuget.org/packages/Parbad.Gateway.Zibal/)
+  * [FanAva](https://www.nuget.org/packages/Parbad.Gateway.FanAva/)
 
 # How it works?
 ![image](https://raw.githubusercontent.com/Sina-Soltani/Parbad/master/images/How-it-works.png)
