@@ -27,13 +27,6 @@ For more information see: https://www.nuget.org/packages/Parbad/</Description>
     <PackageReleaseNotes>Additional data are added by sending Pay requets.</PackageReleaseNotes>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>Parbad.Gateway.PayIr.xml</DocumentationFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>Parbad.Gateway.PayIr.xml</DocumentationFile>
-  </PropertyGroup>
   
   <ItemGroup>
     <ProjectReference Include="..\..\..\Parbad\src\Parbad.csproj" />
@@ -42,7 +35,6 @@ For more information see: https://www.nuget.org/packages/Parbad/</Description>
   <ItemGroup>
     <None Include="icon.png" pack="true" Visible="false" PackagePath="" />
     <None Include="readme.txt" pack="true" PackagePath="." />
-    <None Include="Parbad.Gateway.PayIr.xml" pack="true" Visible="false" PackagePath="" />
   </ItemGroup>
 
 </Project>

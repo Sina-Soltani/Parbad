@@ -27,13 +27,6 @@ For more information see: https://www.nuget.org/packages/Parbad/</Description>
     <NoWarn>1701;1702;1591</NoWarn>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>Parbad.AspNetCore.xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>Parbad.AspNetCore.xml</DocumentationFile>
-  </PropertyGroup>
-
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1' ">
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.3.13" />
     <!-- Patched versions of vulnerable transitive dependencies of Microsoft.AspNetCore.Mvc 2.3. -->
@@ -53,7 +46,6 @@ For more information see: https://www.nuget.org/packages/Parbad/</Description>
   <ItemGroup>
     <None Include="icon.png" pack="true" Visible="false" PackagePath="" />
     <None Include="readme.txt" pack="true" PackagePath="." />
-    <None Include="Parbad.AspNetCore.xml" pack="true" Visible="false" PackagePath="" />
   </ItemGroup>
 
 </Project>

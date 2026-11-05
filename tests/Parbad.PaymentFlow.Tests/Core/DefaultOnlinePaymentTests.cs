@@ -459,18 +459,18 @@ public class DefaultOnlinePaymentTests
     }
 
     [TestMethod]
-    public Task Cancel_is_recorded_as_a_cancellation_not_as_a_verification() =>
-        KnownIssue.ReproducesAsync("C-8", async () =>
-        {
-            await RequestAsync();
-            await _host.OnlinePayment.CancelAsync(TrackingNumber, "Out of stock.");
+    public async Task Cancel_is_recorded_as_a_cancellation_not_as_a_verification()
+    {
+        await RequestAsync();
+        await _host.OnlinePayment.CancelAsync(TrackingNumber, "Out of stock.");
 
-            var payment = await _host.GetPaymentAsync(TrackingNumber);
-            var last = (await _host.Storage.GetTransactionsAsync(payment)).Last();
+        var payment = await _host.GetPaymentAsync(TrackingNumber);
+        var last = (await _host.Storage.GetTransactionsAsync(payment)).Last();
 
-            Assert.AreNotEqual(TransactionType.Verify, last.Type,
-                               "The cancellation is stored as a Verify transaction, so reports cannot tell it from a failed verification.");
-        });
+        Assert.AreEqual(TransactionType.Cancel, last.Type,
+                        "The cancellation is not stored as a Cancel transaction, so reports cannot tell it from a failed verification.");
+        Assert.AreEqual("Out of stock.", last.Message);
+    }
 
     // ---------- Refund ----------
 

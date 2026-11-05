@@ -30,13 +30,6 @@ More information: https://github.com/Sina-Soltani/Parbad
     <NoWarn>1701;1702;1591</NoWarn>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>Parbad.xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>Parbad.xml</DocumentationFile>
-  </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
@@ -75,7 +68,6 @@ More information: https://github.com/Sina-Soltani/Parbad
   <ItemGroup>
     <None Include="readme.txt" pack="true" Visible="false" PackagePath="." />
     <None Include="icon.png" pack="true" Visible="false" PackagePath="" />
-    <None Include="Parbad.xml" pack="true" Visible="false" PackagePath="" />
   </ItemGroup>
 
   <ItemGroup>

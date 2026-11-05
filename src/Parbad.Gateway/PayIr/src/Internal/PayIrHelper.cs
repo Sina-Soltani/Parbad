@@ -75,7 +75,7 @@ namespace Parbad.Gateway.PayIr.Internal
 
             if (!isSucceed)
             {
-                message = $"Error {status}";
+                message = $"Error {status.Value}";
             }
             else if (!IsTokenIssuedForThisInvoice(token.Value, context))
             {

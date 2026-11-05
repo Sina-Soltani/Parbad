@@ -21,9 +21,10 @@ public static class ParbadVirtualGatewayMiddlewareExtensions
     {
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-#if NETCOREAPP3_0 || Net_5 || Net_6 || Net_7 || Net_8
-            var hostEnvironment = builder.ApplicationServices.GetRequiredService<Hosting.IWebHostEnvironment>();
-            var isDevelopment = Microsoft.Extensions.Hosting.HostEnvironmentEnvExtensions.IsDevelopment(hostEnvironment);
+        // Net_5 etc. were not real symbols, so every target used the obsolete IHostingEnvironment (W-3).
+#if NETCOREAPP3_0_OR_GREATER
+        var hostEnvironment = builder.ApplicationServices.GetRequiredService<Hosting.IWebHostEnvironment>();
+        var isDevelopment = Microsoft.Extensions.Hosting.HostEnvironmentEnvExtensions.IsDevelopment(hostEnvironment);
 #else
         var hostEnvironment = builder.ApplicationServices.GetRequiredService<Hosting.IHostingEnvironment>();
         var isDevelopment = Hosting.HostingEnvironmentExtensions.IsDevelopment(hostEnvironment);

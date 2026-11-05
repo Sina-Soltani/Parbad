@@ -376,7 +376,7 @@ namespace Parbad.Internal
                 Amount = payment.Amount,
                 IsSucceed = false,
                 Message = message,
-                Type = TransactionType.Verify,
+                Type = TransactionType.Cancel,
                 PaymentId = payment.Id
             };
 

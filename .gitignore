@@ -262,3 +262,6 @@ __pycache__/
 
 # App Data like logs, etc.
 **/App_Data/*
+
+# XML documentation written next to the project files by builds before 3.12; the SDK now writes it to bin.
+src/**/Parbad*.xml
