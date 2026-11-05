@@ -1118,6 +1118,14 @@
             verified" answer that the gateway could not tie to this invoice is accepted only after the last check.
             </summary>
         </member>
+        <member name="M:Parbad.Internal.DefaultOnlinePayment.CompletePaymentAsync(Parbad.Storage.Abstractions.Models.Payment,System.Threading.CancellationToken)">
+            <summary>
+            Stores the completion of <paramref name="payment"/> (<see cref="P:Parbad.Storage.Abstractions.Models.Payment.IsCompleted"/>, <see cref="P:Parbad.Storage.Abstractions.Models.Payment.IsPaid"/>
+            and <see cref="P:Parbad.Storage.Abstractions.Models.Payment.TransactionCode"/>) unless another operation completed it first in a way that must be
+            kept: a paid payment is never changed, and an unpaid result never replaces another result.
+            </summary>
+            <returns>False if the payment was completed by another operation and nothing was stored.</returns>
+        </member>
         <member name="T:Parbad.Internal.GatewayBuilder">
             <inheritdoc />
         </member>
@@ -1170,6 +1178,17 @@
         </member>
         <member name="M:Parbad.Internal.InMemoryGatewayAccountSource`1.AddAccountsAsync(Parbad.GatewayBuilders.IGatewayAccountCollection{`0})">
             <inheritdoc />
+        </member>
+        <member name="T:Parbad.Internal.KeyedAsyncLock`1">
+            <summary>
+            An async lock per key. Entries exist only while someone holds or waits for the key, so the lock does not
+            grow with the number of keys ever used.
+            </summary>
+        </member>
+        <member name="M:Parbad.Internal.KeyedAsyncLock`1.AcquireAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Waits until no one else holds <paramref name="key"/>. Dispose the result to release it.
+            </summary>
         </member>
         <member name="T:Parbad.Internal.OnlinePaymentAccessor">
             <inheritdoc />

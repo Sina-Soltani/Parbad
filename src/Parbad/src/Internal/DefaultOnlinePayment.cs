@@ -21,6 +21,11 @@ namespace Parbad.Internal
     /// <inheritdoc />
     public class DefaultOnlinePayment : IOnlinePayment
     {
+        // Verifications and cancellations of one payment run one at a time within this process, so a double click or
+        // a refreshed callback page does not ask the bank twice. Across servers, the guarded write in
+        // CompletePaymentAsync keeps the first result.
+        private static readonly KeyedAsyncLock<long> PaymentLocks = new KeyedAsyncLock<long>();
+
         private readonly IStorageManager _storageManager;
         private readonly IPaymentTokenProvider _tokenProvider;
         private readonly IGatewayProvider _gatewayProvider;
@@ -205,6 +210,8 @@ namespace Parbad.Internal
         {
             _logger.LogInformation(LoggingEvents.VerifyPayment, "Verifying the invoice {TrackingNumber} is started", trackingNumber);
 
+            using var paymentLock = await PaymentLocks.AcquireAsync(trackingNumber, cancellationToken).ConfigureAwaitFalse();
+
             var payment = await _storageManager
                 .GetPaymentByTrackingNumberAsync(trackingNumber, cancellationToken)
                 .ConfigureAwaitFalse();
@@ -268,7 +275,30 @@ namespace Parbad.Internal
             payment.IsPaid = verifyResult.IsSucceed;
             payment.TransactionCode = verifyResult.TransactionCode;
 
-            await _storageManager.UpdatePaymentAsync(payment, cancellationToken).ConfigureAwaitFalse();
+            if (!await CompletePaymentAsync(payment, cancellationToken).ConfigureAwaitFalse())
+            {
+                // Another verification or a cancellation completed the payment first, e.g. on another server.
+                var storedPayment = await _storageManager
+                                          .GetPaymentByTrackingNumberAsync(trackingNumber, cancellationToken)
+                                          .ConfigureAwaitFalse();
+
+                _logger.LogWarning(LoggingEvents.VerifyPayment,
+                                   "Verifying the invoice {TrackingNumber}: another operation completed the payment first (paid: {StoredIsPaid}). This verification's result ({Status}) is not stored",
+                                   trackingNumber,
+                                   storedPayment.IsPaid,
+                                   verifyResult.Status);
+
+                return new PaymentVerifyResult
+                {
+                    TrackingNumber = storedPayment.TrackingNumber,
+                    Amount = storedPayment.Amount,
+                    GatewayName = storedPayment.GatewayName,
+                    GatewayAccountName = storedPayment.GatewayAccountName,
+                    TransactionCode = storedPayment.TransactionCode,
+                    Status = storedPayment.IsPaid ? PaymentVerifyResultStatus.AlreadyVerified : PaymentVerifyResultStatus.Failed,
+                    Message = _options.Messages.PaymentIsAlreadyProcessedBefore
+                };
+            }
 
             var transaction = new Transaction
             {
@@ -291,6 +321,8 @@ namespace Parbad.Internal
         public virtual async Task<IPaymentCancelResult> CancelAsync(long trackingNumber, string cancellationReason = null, CancellationToken cancellationToken = default)
         {
             _logger.LogInformation(LoggingEvents.CancelPayment, "Canceling the invoice {TrackingNumber} is started", trackingNumber);
+
+            using var paymentLock = await PaymentLocks.AcquireAsync(trackingNumber, cancellationToken).ConfigureAwaitFalse();
 
             var payment = await _storageManager
                 .GetPaymentByTrackingNumberAsync(trackingNumber, cancellationToken)
@@ -325,7 +357,19 @@ namespace Parbad.Internal
             payment.IsCompleted = true;
             payment.IsPaid = false;
 
-            await _storageManager.UpdatePaymentAsync(payment, cancellationToken).ConfigureAwaitFalse();
+            if (!await CompletePaymentAsync(payment, cancellationToken).ConfigureAwaitFalse())
+            {
+                // A verification completed the payment first, e.g. on another server.
+                return new PaymentCancelResult
+                {
+                    TrackingNumber = payment.TrackingNumber,
+                    Amount = payment.Amount,
+                    GatewayName = payment.GatewayName,
+                    GatewayAccountName = payment.GatewayAccountName,
+                    IsSucceed = false,
+                    Message = _options.Messages.PaymentIsAlreadyProcessedBefore
+                };
+            }
 
             var newTransaction = new Transaction
             {
@@ -538,6 +582,33 @@ namespace Parbad.Internal
                 verifyResult.Status = PaymentVerifyResultStatus.Succeed;
                 verifyResult.Message = _options.Messages.PaymentSucceed;
             }
+        }
+
+        /// <summary>
+        /// Stores the completion of <paramref name="payment"/> (<see cref="Payment.IsCompleted"/>, <see cref="Payment.IsPaid"/>
+        /// and <see cref="Payment.TransactionCode"/>) unless another operation completed it first in a way that must be
+        /// kept: a paid payment is never changed, and an unpaid result never replaces another result.
+        /// </summary>
+        /// <returns>False if the payment was completed by another operation and nothing was stored.</returns>
+        private async Task<bool> CompletePaymentAsync(Payment payment, CancellationToken cancellationToken)
+        {
+            var completion = _storageManager as IPaymentCompletion ?? Services.GetService<IStorage>() as IPaymentCompletion;
+
+            if (completion == null)
+            {
+                _logger.LogWarning(LoggingEvents.VerifyPayment,
+                                   "Completing the invoice {TrackingNumber}: the storage does not implement {Completion}, so a concurrent operation on another server could overwrite this result",
+                                   payment.TrackingNumber,
+                                   nameof(IPaymentCompletion));
+
+                await _storageManager.UpdatePaymentAsync(payment, cancellationToken).ConfigureAwaitFalse();
+
+                return true;
+            }
+
+            return await completion
+                         .TryCompletePaymentAsync(payment.Id, payment.IsPaid, payment.TransactionCode, cancellationToken)
+                         .ConfigureAwaitFalse();
         }
 
         private async Task<IPaymentFetchResult> FetchAsync(Payment payment, CancellationToken cancellationToken)

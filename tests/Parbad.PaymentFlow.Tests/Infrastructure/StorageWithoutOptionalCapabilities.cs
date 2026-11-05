@@ -8,14 +8,15 @@ using Parbad.Storage.Abstractions.Models;
 namespace Parbad.PaymentFlow.Tests.Infrastructure;
 
 /// <summary>
-/// A storage that implements only <see cref="IStorage"/>, like a custom storage written before
-/// <see cref="IPaidPaymentLookup"/> existed. It forwards everything to an <see cref="InMemoryStorage"/>.
+/// A storage that implements only <see cref="IStorage"/>, like a custom storage written before the optional
+/// capabilities (<see cref="IPaidPaymentLookup"/>, <see cref="IPaymentCompletion"/>) existed. It forwards
+/// everything to an <see cref="InMemoryStorage"/>.
 /// </summary>
-public sealed class StorageWithoutPaidPaymentLookup : IStorage
+public sealed class StorageWithoutOptionalCapabilities : IStorage
 {
     private readonly InMemoryStorage _inner;
 
-    public StorageWithoutPaidPaymentLookup(InMemoryStorage inner) => _inner = inner;
+    public StorageWithoutOptionalCapabilities(InMemoryStorage inner) => _inner = inner;
 
     public IQueryable<Payment> Payments => _inner.Payments;
 

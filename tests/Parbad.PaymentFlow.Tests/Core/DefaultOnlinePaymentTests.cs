@@ -202,26 +202,104 @@ public class DefaultOnlinePaymentTests
     }
 
     [TestMethod]
-    public Task Concurrent_verifications_of_the_same_payment_call_the_gateway_only_once() =>
-        KnownIssue.ReproducesAsync("C-1", async () =>
-        {
-            await RequestAsync();
+    public async Task Concurrent_verifications_of_the_same_payment_call_the_gateway_only_once()
+    {
+        await RequestAsync();
 
-            var gate = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-            _gateway.BeforeVerify = () => gate.Task;
+        var gate = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        _gateway.BeforeVerify = () => gate.Task;
 
-            // Two callbacks for the same payment arrive at the same time (double click, refresh, bank retry).
-            var first = Task.Run(() => _host.OnlinePayment.VerifyAsync(TrackingNumber));
-            var second = Task.Run(() => _host.OnlinePayment.VerifyAsync(TrackingNumber));
+        // Two callbacks for the same payment arrive at the same time (double click, refresh, bank retry).
+        var first = Task.Run(() => _host.OnlinePayment.VerifyAsync(TrackingNumber));
+        var second = Task.Run(() => _host.OnlinePayment.VerifyAsync(TrackingNumber));
 
-            await WaitUntilAsync(() => _gateway.VerifyCalls >= 2, TimeSpan.FromSeconds(2));
-            gate.SetResult();
-            await Task.WhenAll(first, second);
+        // One of them is at the bank; give the other one time to get there too, if nothing stops it.
+        await WaitUntilAsync(() => _gateway.VerifyCalls >= 1, TimeSpan.FromSeconds(2));
+        await Task.Delay(200);
+        gate.SetResult();
+        var results = await Task.WhenAll(first, second);
 
-            Assert.AreEqual(1, _gateway.VerifyCalls,
-                            "Both concurrent requests passed the IsCompleted check and asked the bank to verify the same payment.");
-            Assert.IsTrue((await _host.GetPaymentAsync(TrackingNumber)).IsPaid);
-        });
+        Assert.AreEqual(1, _gateway.VerifyCalls,
+                        "Both concurrent requests passed the IsCompleted check and asked the bank to verify the same payment.");
+        Assert.IsTrue((await _host.GetPaymentAsync(TrackingNumber)).IsPaid);
+        CollectionAssert.AreEquivalent(new[] { PaymentVerifyResultStatus.Succeed, PaymentVerifyResultStatus.AlreadyVerified },
+                                       results.Select(result => result.Status).ToArray());
+    }
+
+    [TestMethod]
+    public async Task Failed_verification_does_not_overwrite_a_payment_another_server_recorded_as_paid()
+    {
+        await RequestAsync();
+        var paymentId = (await _host.GetPaymentAsync(TrackingNumber)).Id;
+
+        // While this server waits for the bank, another server verifies the same payment successfully.
+        _gateway.BeforeVerify = () => _host.Storage.TryCompletePaymentAsync(paymentId, isPaid: true, "RRN-OTHER-SERVER");
+        _gateway.VerifyResult = _ => PaymentVerifyResult.Failed("Already being verified.");
+
+        var result = await _host.OnlinePayment.VerifyAsync(TrackingNumber);
+
+        Assert.AreEqual(PaymentVerifyResultStatus.AlreadyVerified, result.Status, result.Message);
+        Assert.AreEqual("RRN-OTHER-SERVER", result.TransactionCode);
+
+        var payment = await _host.GetPaymentAsync(TrackingNumber);
+        Assert.IsTrue(payment.IsPaid, "The failed result overwrote the payment the other server recorded as paid.");
+        Assert.AreEqual("RRN-OTHER-SERVER", payment.TransactionCode);
+    }
+
+    [TestMethod]
+    public async Task Successful_verification_replaces_a_failure_another_server_recorded()
+    {
+        await RequestAsync();
+        var paymentId = (await _host.GetPaymentAsync(TrackingNumber)).Id;
+
+        // The other server got an error from the bank and recorded the payment as failed; this server's verification
+        // succeeds, so the bank has the money.
+        _gateway.BeforeVerify = () => _host.Storage.TryCompletePaymentAsync(paymentId, isPaid: false, transactionCode: null);
+
+        var result = await _host.OnlinePayment.VerifyAsync(TrackingNumber);
+
+        Assert.AreEqual(PaymentVerifyResultStatus.Succeed, result.Status, result.Message);
+
+        var payment = await _host.GetPaymentAsync(TrackingNumber);
+        Assert.IsTrue(payment.IsCompleted && payment.IsPaid, "A payment the bank confirmed is recorded as unpaid.");
+        Assert.AreEqual(FakeGateway.TransactionCode, payment.TransactionCode);
+    }
+
+    [TestMethod]
+    public async Task Concurrent_cancellation_does_not_overwrite_a_successful_verification()
+    {
+        await RequestAsync();
+
+        var gate = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        _gateway.BeforeVerify = () => gate.Task;
+
+        var verification = Task.Run(() => _host.OnlinePayment.VerifyAsync(TrackingNumber));
+        await WaitUntilAsync(() => _gateway.VerifyCalls >= 1, TimeSpan.FromSeconds(2));
+
+        // The shop cancels the order while the bank is still answering the verification.
+        var cancellation = Task.Run(() => _host.OnlinePayment.CancelAsync(TrackingNumber));
+        await Task.Delay(200);
+        gate.SetResult();
+
+        var verifyResult = await verification;
+        var cancelResult = await cancellation;
+
+        Assert.AreEqual(PaymentVerifyResultStatus.Succeed, verifyResult.Status);
+        Assert.IsFalse(cancelResult.IsSucceed, "A payment the bank confirmed was cancelled.");
+        Assert.IsTrue((await _host.GetPaymentAsync(TrackingNumber)).IsPaid);
+    }
+
+    [TestMethod]
+    public async Task Storage_without_payment_completion_still_records_the_result()
+    {
+        await UseStorageWithoutOptionalCapabilitiesAsync();
+        await RequestAsync();
+
+        var result = await _host.OnlinePayment.VerifyAsync(TrackingNumber);
+
+        Assert.AreEqual(PaymentVerifyResultStatus.Succeed, result.Status, result.Message);
+        Assert.IsTrue((await _host.GetPaymentAsync(TrackingNumber)).IsPaid);
+    }
 
     [TestMethod]
     public async Task Database_failure_after_bank_confirmation_leaves_the_payment_retryable()
@@ -340,7 +418,7 @@ public class DefaultOnlinePaymentTests
     [TestMethod]
     public async Task Already_verified_at_the_bank_is_not_recorded_as_paid_when_the_storage_cannot_look_up_paid_payments()
     {
-        await UseStorageWithoutPaidPaymentLookupAsync();
+        await UseStorageWithoutOptionalCapabilitiesAsync();
         _gateway.VerifyResult = _ => AlreadyVerifiedAtBank(FakeGateway.TransactionCode);
         await RequestAsync();
 
@@ -354,7 +432,7 @@ public class DefaultOnlinePaymentTests
     [TestMethod]
     public async Task Storage_without_paid_payment_lookup_still_verifies_normal_payments()
     {
-        await UseStorageWithoutPaidPaymentLookupAsync();
+        await UseStorageWithoutOptionalCapabilitiesAsync();
         await RequestAsync();
 
         var result = await _host.OnlinePayment.VerifyAsync(TrackingNumber);
@@ -490,7 +568,7 @@ public class DefaultOnlinePaymentTests
         Assert.IsFalse(payment.IsPaid, "The rejected payment was recorded as paid.");
     }
 
-    private async Task UseStorageWithoutPaidPaymentLookupAsync()
+    private async Task UseStorageWithoutOptionalCapabilitiesAsync()
     {
         await _host.DisposeAsync();
 
@@ -499,7 +577,7 @@ public class DefaultOnlinePaymentTests
                         .AddGateway<FakeGateway>()
                         .WithAccounts<FakeGatewayAccount>(accounts => accounts.AddInMemory(_ => { })),
             services => services.AddSingleton(_gateway),
-            storageSupportsPaidPaymentLookup: false);
+            storageHasOptionalCapabilities: false);
     }
 
     private async Task ReceiveCallbackAsync() =>

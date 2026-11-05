@@ -277,7 +277,7 @@ namespace Parbad.Gateway.Sepehr.Internal
 
         public static VerificationRollbackRequestModel CreateRefundData(InvoiceContext context, SepehrGatewayAccount account)
         {
-            var verificationRecord = context.Transactions.SingleOrDefault(transaction => transaction.Type == TransactionType.Verify);
+            var verificationRecord = context.Transactions.LastOrDefault(transaction => transaction.Type == TransactionType.Verify && transaction.IsSucceed);
 
             if (verificationRecord == null)
             {

@@ -44,6 +44,12 @@
             Configures the entity.
             </summary>
         </member>
+        <member name="T:Parbad.Storage.EntityFrameworkCore.Configuration.PaymentColumnNames">
+            <summary>
+            Column names of the payment table that raw SQL refers to, shared with <see cref="T:Parbad.Storage.EntityFrameworkCore.Configuration.PaymentConfiguration"/> so they
+            cannot drift apart.
+            </summary>
+        </member>
         <member name="T:Parbad.Storage.EntityFrameworkCore.Configuration.PaymentConfiguration">
             <summary>
             Payment entity configuration.
@@ -118,6 +124,15 @@
         </member>
         <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorage.FindPaidPaymentByTransactionCodeAsync(System.String,System.String,System.Int64,System.Threading.CancellationToken)">
             <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorage.TryCompletePaymentAsync(System.Int64,System.Boolean,System.String,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorage.TryCompletePaymentWithoutSqlAsync(System.Int64,System.Boolean,System.String,System.Threading.CancellationToken)">
+            <summary>
+            The same rule as <see cref="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorage.TryCompletePaymentAsync(System.Int64,System.Boolean,System.String,System.Threading.CancellationToken)"/> for providers without SQL (e.g. InMemory), where it
+            cannot be one atomic step.
+            </summary>
         </member>
         <member name="M:Parbad.Storage.EntityFrameworkCore.EntityFrameworkCoreStorage.DoesPaymentExistAsync(System.Int64,System.Threading.CancellationToken)">
             <inheritdoc />

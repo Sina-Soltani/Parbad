@@ -225,7 +225,7 @@ namespace Parbad.Gateway.Parsian.Internal
 
         public static string CreateRefundData(ParsianGatewayAccount account, InvoiceContext context, Money amount)
         {
-            var transaction = context.Transactions.SingleOrDefault(item => item.Type == TransactionType.Verify);
+            var transaction = context.Transactions.LastOrDefault(item => item.Type == TransactionType.Verify && item.IsSucceed);
 
             if (transaction == null) throw new InvalidOperationException($"No transaction record found in database for payment with tracking number {context.Payment.TrackingNumber}.");
 
