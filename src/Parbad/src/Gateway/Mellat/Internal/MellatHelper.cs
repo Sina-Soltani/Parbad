@@ -131,12 +131,12 @@ namespace Parbad.Gateway.Mellat.Internal
                 "<int:bpVerifyRequest>" +
                 $"<terminalId>{account.TerminalId}</terminalId>" +
                 "<!--Optional:-->" +
-                $"<userName>{account.UserName}</userName>" +
+                $"<userName>{XmlHelper.EncodeXmlValue(account.UserName)}</userName>" +
                 "<!--Optional:-->" +
-                $"<userPassword>{account.UserPassword}</userPassword>" +
+                $"<userPassword>{XmlHelper.EncodeXmlValue(account.UserPassword)}</userPassword>" +
                 $"<orderId>{context.Payment.TrackingNumber}</orderId>" +
                 $"<saleOrderId>{context.Payment.TrackingNumber}</saleOrderId>" +
-                $"<saleReferenceId>{callbackResult.SaleReferenceId}</saleReferenceId>" +
+                $"<saleReferenceId>{XmlHelper.EncodeXmlValue(callbackResult.SaleReferenceId)}</saleReferenceId>" +
                 "</int:bpVerifyRequest>" +
                 "</soapenv:Body>" +
                 "</soapenv:Envelope>";
@@ -176,12 +176,12 @@ namespace Parbad.Gateway.Mellat.Internal
                 "<int:bpSettleRequest>" +
                 $"<terminalId>{account.TerminalId}</terminalId>" +
                 "<!--Optional:-->" +
-                $"<userName>{account.UserName}</userName>" +
+                $"<userName>{XmlHelper.EncodeXmlValue(account.UserName)}</userName>" +
                 "<!--Optional:-->" +
-                $"<userPassword>{account.UserPassword}</userPassword>" +
+                $"<userPassword>{XmlHelper.EncodeXmlValue(account.UserPassword)}</userPassword>" +
                 $"<orderId>{context.Payment.TrackingNumber}</orderId>" +
                 $"<saleOrderId>{context.Payment.TrackingNumber}</saleOrderId>" +
-                $"<saleReferenceId>{callbackResult.SaleReferenceId}</saleReferenceId>" +
+                $"<saleReferenceId>{XmlHelper.EncodeXmlValue(callbackResult.SaleReferenceId)}</saleReferenceId>" +
                 "</int:bpSettleRequest>" +
                 "</soapenv:Body>" +
                 "</soapenv:Envelope>";
@@ -214,12 +214,12 @@ namespace Parbad.Gateway.Mellat.Internal
                 "<int:bpReversalRequest>" +
                 $"<terminalId>{account.TerminalId}</terminalId>" +
                 "<!--Optional:-->" +
-                $"<userName>{account.UserName}</userName>" +
+                $"<userName>{XmlHelper.EncodeXmlValue(account.UserName)}</userName>" +
                 "<!--Optional:-->" +
-                $"<userPassword>{account.UserPassword}</userPassword>" +
+                $"<userPassword>{XmlHelper.EncodeXmlValue(account.UserPassword)}</userPassword>" +
                 $"<orderId>{context.Payment.TrackingNumber}</orderId>" +
                 $"<saleOrderId>{context.Payment.TrackingNumber}</saleOrderId>" +
-                $"<saleReferenceId>{context.Payment.TransactionCode}</saleReferenceId>" +
+                $"<saleReferenceId>{XmlHelper.EncodeXmlValue(context.Payment.TransactionCode)}</saleReferenceId>" +
                 "</int:bpReversalRequest>" +
                 "</soapenv:Body>" +
                 "</soapenv:Envelope>";
@@ -253,9 +253,9 @@ namespace Parbad.Gateway.Mellat.Internal
                 "<int:bpPayRequest>" +
                 $"<terminalId>{account.TerminalId}</terminalId>" +
                 "<!--Optional:-->" +
-                $"<userName>{account.UserName}</userName>" +
+                $"<userName>{XmlHelper.EncodeXmlValue(account.UserName)}</userName>" +
                 "<!--Optional:-->" +
-                $"<userPassword>{account.UserPassword}</userPassword>" +
+                $"<userPassword>{XmlHelper.EncodeXmlValue(account.UserPassword)}</userPassword>" +
                 $"<orderId>{invoice.TrackingNumber}</orderId>" +
                 $"<amount>{(long)invoice.Amount}</amount>" +
                 "<!--Optional:-->" +
@@ -263,11 +263,11 @@ namespace Parbad.Gateway.Mellat.Internal
                 "<!--Optional:-->" +
                 $"<localTime>{DateTime.Now.ToString("HHmmss", CultureInfo.InvariantCulture)}</localTime>" +
                 "<!--Optional:-->" +
-                $"<additionalData>{additionalData?.AdditionalData}</additionalData>" +
+                $"<additionalData>{XmlHelper.EncodeXmlValue(additionalData?.AdditionalData)}</additionalData>" +
                 "<!--Optional:-->" +
                 $"<callBackUrl>{XmlHelper.EncodeXmlValue(invoice.CallbackUrl)}</callBackUrl>" +
-                $"<payerId>{payerId}</payerId>" +
-                "'</int:bpPayRequest>" +
+                $"<payerId>{XmlHelper.EncodeXmlValue(payerId)}</payerId>" +
+                "</int:bpPayRequest>" +
                 "</soapenv:Body>" +
                 "</soapenv:Envelope>";
         }
@@ -290,9 +290,9 @@ namespace Parbad.Gateway.Mellat.Internal
                 "<int:bpCumulativeDynamicPayRequest>" +
                 $"<terminalId>{account.TerminalId}</terminalId>" +
                 "<!--Optional:-->" +
-                $"<userName>{account.UserName}</userName>" +
+                $"<userName>{XmlHelper.EncodeXmlValue(account.UserName)}</userName>" +
                 "<!--Optional:-->" +
-                $"<userPassword>{account.UserPassword}</userPassword>" +
+                $"<userPassword>{XmlHelper.EncodeXmlValue(account.UserPassword)}</userPassword>" +
                 $"<orderId>{invoice.TrackingNumber}</orderId>" +
                 $"<amount>{(long)invoice.Amount}</amount>" +
                 "<!--Optional:-->" +
@@ -300,7 +300,7 @@ namespace Parbad.Gateway.Mellat.Internal
                 "<!--Optional:-->" +
                 $"<localTime>{DateTime.Now.ToString("HHmmss", CultureInfo.InvariantCulture)}</localTime>" +
                 "<!--Optional:-->" +
-                $"<additionalData>{additionalData}</additionalData>" +
+                $"<additionalData>{XmlHelper.EncodeXmlValue(additionalData)}</additionalData>" +
                 "<!--Optional:-->" +
                 $"<callBackUrl>{XmlHelper.EncodeXmlValue(invoice.CallbackUrl)}</callBackUrl>" +
                 "</int:bpCumulativeDynamicPayRequest>" +

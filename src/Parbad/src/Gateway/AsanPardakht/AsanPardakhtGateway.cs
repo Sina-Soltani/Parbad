@@ -78,7 +78,8 @@ namespace Parbad.Gateway.AsanPardakht
                 account,
                 _httpContextAccessor.HttpContext.Request,
                 _crypto,
-                _messageOptions).ConfigureAwaitFalse();
+                _messageOptions,
+                cancellationToken).ConfigureAwaitFalse();
 
             if (callbackResult.IsSucceed)
             {
@@ -100,7 +101,8 @@ namespace Parbad.Gateway.AsanPardakht
                 account,
                 _httpContextAccessor.HttpContext.Request,
                 _crypto,
-                _messageOptions);
+                _messageOptions,
+                cancellationToken).ConfigureAwaitFalse();
 
             if (!callbackResult.IsSucceed)
             {

@@ -4,12 +4,14 @@
 using Microsoft.AspNetCore.Http;
 using Parbad.Abstraction;
 using Parbad.Gateway.AsanPardakht.Internal.Models;
+using Parbad.Http;
 using Parbad.Internal;
 using Parbad.Options;
 using Parbad.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Parbad.Gateway.AsanPardakht.Internal
@@ -21,9 +23,9 @@ namespace Parbad.Gateway.AsanPardakht.Internal
             return $@"<soap:Envelope xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:xsd='http://www.w3.org/2001/XMLSchema' xmlns:soap='http://schemas.xmlsoap.org/soap/envelope/'>
                 <soap:Body>
                 <EncryptInAES xmlns ='http://tempuri.org/'>
-                <aesKey>{key}</aesKey>
-                <aesVector>{iv}</aesVector>
-                <toBeEncrypted>{input}</toBeEncrypted>
+                <aesKey>{XmlHelper.EncodeXmlValue(key)}</aesKey>
+                <aesVector>{XmlHelper.EncodeXmlValue(iv)}</aesVector>
+                <toBeEncrypted>{XmlHelper.EncodeXmlValue(input)}</toBeEncrypted>
                 </EncryptInAES>
                 </soap:Body>
                 </soap:Envelope>";
@@ -34,9 +36,9 @@ namespace Parbad.Gateway.AsanPardakht.Internal
             return $@"<soap:Envelope xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:xsd='http://www.w3.org/2001/XMLSchema' xmlns:soap='http://schemas.xmlsoap.org/soap/envelope/'>
                 <soap:Body>
                 <DecryptInAES xmlns ='http://tempuri.org/'>
-                <aesKey>{key}</aesKey>
-                <aesVector>{iv}</aesVector>
-                <toBeDecrypted>{input}</toBeDecrypted>
+                <aesKey>{XmlHelper.EncodeXmlValue(key)}</aesKey>
+                <aesVector>{XmlHelper.EncodeXmlValue(iv)}</aesVector>
+                <toBeDecrypted>{XmlHelper.EncodeXmlValue(input)}</toBeDecrypted>
                 </DecryptInAES>
                 </soap:Body>
                 </soap:Envelope>";
@@ -64,7 +66,7 @@ namespace Parbad.Gateway.AsanPardakht.Internal
                 "<soapenv:Header/>" +
                 "<soapenv:Body>" +
                 "<tem:RequestOperation>" +
-                $"<tem:merchantConfigurationID>{account.MerchantConfigurationId}</tem:merchantConfigurationID>" +
+                $"<tem:merchantConfigurationID>{XmlHelper.EncodeXmlValue(account.MerchantConfigurationId)}</tem:merchantConfigurationID>" +
                 "<!--Optional:-->" +
                 $"<tem:encryptedRequest>{XmlHelper.EncodeXmlValue(encryptedRequest)}</tem:encryptedRequest>" +
                 "</tem:RequestOperation>" +
@@ -107,9 +109,11 @@ namespace Parbad.Gateway.AsanPardakht.Internal
             AsanPardakhtGatewayAccount account,
             HttpRequest httpRequest,
             IAsanPardakhtCrypto crypto,
-            MessagesOptions messagesOptions)
+            MessagesOptions messagesOptions,
+            CancellationToken cancellationToken = default)
         {
-            httpRequest.Form.TryGetValue("ReturningParams", out var returningParams);
+            // Read asynchronously: a synchronous Request.Form blocks a thread, and throws on a GET callback.
+            var (_, returningParams) = await httpRequest.TryGetParamAsync("ReturningParams", cancellationToken).ConfigureAwaitFalse();
 
             var isSucceed = false;
             string message = null;
@@ -195,10 +199,10 @@ namespace Parbad.Gateway.AsanPardakht.Internal
                 "<soapenv:Header/>" +
                 "<soapenv:Body>" +
                 "<tem:RequestVerification>" +
-                $"<tem:merchantConfigurationID>{account.MerchantConfigurationId}</tem:merchantConfigurationID>" +
+                $"<tem:merchantConfigurationID>{XmlHelper.EncodeXmlValue(account.MerchantConfigurationId)}</tem:merchantConfigurationID>" +
                 "<!--Optional:-->" +
                 $"<tem:encryptedCredentials>{XmlHelper.EncodeXmlValue(encryptedRequest)}</tem:encryptedCredentials>" +
-                $"<tem:payGateTranID>{callbackResult.PayGateTranId}</tem:payGateTranID>" +
+                $"<tem:payGateTranID>{XmlHelper.EncodeXmlValue(callbackResult.PayGateTranId)}</tem:payGateTranID>" +
                 "</tem:RequestVerification>" +
                 "</soapenv:Body>" +
                 "</soapenv:Envelope>";
@@ -254,10 +258,10 @@ namespace Parbad.Gateway.AsanPardakht.Internal
                 "<soapenv:Header/>" +
                 "<soapenv:Body>" +
                 "<tem:RequestReconciliation>" +
-                $"<tem:merchantConfigurationID>{account.MerchantConfigurationId}</tem:merchantConfigurationID>" +
+                $"<tem:merchantConfigurationID>{XmlHelper.EncodeXmlValue(account.MerchantConfigurationId)}</tem:merchantConfigurationID>" +
                 "<!--Optional:-->" +
                 $"<tem:encryptedCredentials>{XmlHelper.EncodeXmlValue(encryptedRequest)}</tem:encryptedCredentials>" +
-                $"<tem:payGateTranID>{callbackResult.PayGateTranId}</tem:payGateTranID>" +
+                $"<tem:payGateTranID>{XmlHelper.EncodeXmlValue(callbackResult.PayGateTranId)}</tem:payGateTranID>" +
                 "</tem:RequestReconciliation>" +
                 "</soapenv:Body>" +
                 "</soapenv:Envelope>";

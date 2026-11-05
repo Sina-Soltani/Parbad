@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Parbad.Builder;
 using Parbad.Gateway.Mellat;
@@ -22,6 +23,11 @@ public class MellatConformanceTests : GatewayConformanceTests
     private const string UserName = "merchant";
     private const string Password = "secret";
     private const string ApiUrl = BankUrl + "/pgwchannel/services/pgw";
+    private const string SpecialAdditionalData = "Order <42> & \"gift\" 'wrap' </additionalData>";
+    private const string SpecialSecondValue = "7&8<9>";
+
+    private string? _receivedAdditionalData;
+    private string? _receivedSecondValue;
 
     protected override string GatewayName => MellatGateway.Name;
 
@@ -43,11 +49,38 @@ public class MellatConformanceTests : GatewayConformanceTests
 
     protected override void UseGateway(IInvoiceBuilder invoice) => invoice.UseMellat();
 
+    /// <summary>
+    /// G-H7: the SOAP envelope is built as a string, so every value must be XML-encoded. An unencoded "&amp;" or "&lt;"
+    /// makes the request invalid XML, or lets the value add elements of its own.
+    /// </summary>
+    [TestMethod]
+    public async Task Request_values_with_xml_special_characters_reach_the_bank_unchanged()
+    {
+        Host.StartCheckoutRequest();
+
+        var result = await Host.OnlinePayment.RequestAsync(invoice =>
+        {
+            invoice.SetTrackingNumber(InvoiceTrackingNumber)
+                   .SetAmount(InvoiceAmount)
+                   .SetCallbackUrl(CallbackUrl);
+
+            UseGateway(invoice);
+            invoice.SetMellatAdditionalData(new MellatGatewayAdditionalDataRequest { AdditionalData = SpecialAdditionalData, PayerId = SpecialSecondValue });
+        });
+
+        Assert.IsTrue(result.IsSucceed, $"Request failed: {result.Message}");
+        Assert.AreEqual(SpecialAdditionalData, _receivedAdditionalData);
+        Assert.AreEqual(SpecialSecondValue, _receivedSecondValue);
+    }
+
     protected override void SetupBank(MockHttpMessageHandler http)
     {
         http.When(ApiUrl).WithPartialContent("bpPayRequest").Respond(Bank.Endpoint(BankOperation.Request, call =>
         {
             if (call.Reject || !IsMerchant(call)) return Return("21"); // invalid merchant
+
+            _receivedAdditionalData = call.Xml("additionalData");
+            _receivedSecondValue = call.Xml("payerId");
 
             if (!IsTodayInGregorianCalendar(call.Xml("localDate"))) return Return("34"); // invalid local date
 
