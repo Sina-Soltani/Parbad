@@ -8,8 +8,13 @@ using Parbad.Utilities;
 using System.Net.Http;
 using System.Threading.Tasks;
 
+#pragma warning disable CS0618 // The SOAP crypto service and its options are obsolete; kept until 4.0 for applications that use it.
+
 namespace Parbad.Gateway.AsanPardakht.Internal
 {
+    /// <summary>
+    /// The remote encryption service of AsanPardakht's former SOAP API. The gateway no longer uses it.
+    /// </summary>
     internal class AsanPardakhtCrypto : IAsanPardakhtCrypto
     {
         private readonly HttpClient _httpClient;
@@ -25,7 +30,7 @@ namespace Parbad.Gateway.AsanPardakht.Internal
 
         public async Task<string> Encrypt(string input, string key, string iv)
         {
-            var xmlBody = AsanPardakhtHelper.CreateEncryptData(key, iv, input);
+            var xmlBody = CreateEnvelope("EncryptInAES", "toBeEncrypted", key, iv, input);
 
             var responseMessage = await _httpClient
                 .PostXmlAsync(_gatewayOptions.EncryptUrl, xmlBody)
@@ -33,14 +38,12 @@ namespace Parbad.Gateway.AsanPardakht.Internal
 
             var response = await responseMessage.ReadSoapAsync().ConfigureAwaitFalse();
 
-            var result = XmlHelper.GetNodeValueFromXml(response, "EncryptInAESResult", "http://tempuri.org/");
-
-            return result;
+            return XmlHelper.GetNodeValueFromXml(response, "EncryptInAESResult", "http://tempuri.org/");
         }
 
         public async Task<string> Decrypt(string input, string key, string iv)
         {
-            var xmlBody = AsanPardakhtHelper.CreateDecryptData(key, iv, input);
+            var xmlBody = CreateEnvelope("DecryptInAES", "toBeDecrypted", key, iv, input);
 
             var responseMessage = await _httpClient
                 .PostXmlAsync(_gatewayOptions.DecryptUrl, xmlBody)
@@ -48,9 +51,18 @@ namespace Parbad.Gateway.AsanPardakht.Internal
 
             var response = await responseMessage.ReadSoapAsync().ConfigureAwaitFalse();
 
-            var result = XmlHelper.GetNodeValueFromXml(response, "DecryptInAESResult", "http://tempuri.org/");
-
-            return result;
+            return XmlHelper.GetNodeValueFromXml(response, "DecryptInAESResult", "http://tempuri.org/");
         }
+
+        private static string CreateEnvelope(string operation, string inputElement, string key, string iv, string input) =>
+            "<soap:Envelope xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:xsd='http://www.w3.org/2001/XMLSchema' xmlns:soap='http://schemas.xmlsoap.org/soap/envelope/'>" +
+            "<soap:Body>" +
+            $"<{operation} xmlns='http://tempuri.org/'>" +
+            $"<aesKey>{XmlHelper.EncodeXmlValue(key)}</aesKey>" +
+            $"<aesVector>{XmlHelper.EncodeXmlValue(iv)}</aesVector>" +
+            $"<{inputElement}>{XmlHelper.EncodeXmlValue(input)}</{inputElement}>" +
+            $"</{operation}>" +
+            "</soap:Body>" +
+            "</soap:Envelope>";
     }
 }

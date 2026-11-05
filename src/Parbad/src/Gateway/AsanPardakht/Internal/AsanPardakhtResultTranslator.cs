@@ -3,106 +3,92 @@
 
 using Parbad.Options;
 using System.Collections.Generic;
-using System.Globalization;
 
 namespace Parbad.Gateway.AsanPardakht.Internal
 {
+    internal enum AsanPardakhtOperation
+    {
+        Token,
+        TranResult,
+        Verify,
+        Settlement
+    }
+
+    /// <summary>
+    /// AsanPardakht's REST API answers with HTTP status codes, and their meaning depends on the operation (guide v1.6,
+    /// p.11). The guide refers to the online Swagger for the tables, which could not be read; the per-operation
+    /// meanings below follow mrdaghestani/AsanPardakht.IPG, by a co-author of the guide.
+    /// Assumption (unverified against the Swagger, ANALYSIS-02 §7.3).
+    /// </summary>
     internal static class AsanPardakhtResultTranslator
     {
-        public static string TranslateRequest(string result, MessagesOptions options) =>
-           Translate(result, RequestDictionary, options);
-
-        public static string TranslateVerification(string result, MessagesOptions options) =>
-            Translate(result, VerificationDictionary, options);
-
-        public static string TranslateReconcilation(string result, MessagesOptions options) =>
-            Translate(result, ReconcilationDictionary, options);
-
-        public static string TranslateReversal(string result, MessagesOptions options) =>
-            Translate(result, ReversalDictionary, options);
-
-        private static string Translate(string result, IDictionary<int, string> dictionary, MessagesOptions options)
+        public static string Translate(AsanPardakhtOperation operation, AsanPardakhtResponse response, MessagesOptions options)
         {
-            if (int.TryParse(result, NumberStyles.Integer, CultureInfo.InvariantCulture, out var code) &&
-                dictionary.TryGetValue(code, out var message))
+            if (OperationMessages.TryGetValue(operation, out var messages) && messages.TryGetValue(response.StatusCode, out var message))
             {
                 return message;
             }
 
-            return $"{options.UnexpectedErrorText} Response: {result}";
+            return CommonMessages.TryGetValue(response.StatusCode, out var commonMessage)
+                ? commonMessage
+                : $"{options.UnexpectedErrorText} Response: {response.StatusCode}";
         }
 
-        private static IDictionary<int, string> RequestDictionary => new Dictionary<int, string>
+        /// <summary>The bank says the transaction was verified before.</summary>
+        public static bool IsAlreadyVerified(AsanPardakhtResponse response) => AlreadyVerifiedCodes.Contains(response.StatusCode);
+
+        /// <summary>The bank says the transaction was settled before.</summary>
+        public static bool IsAlreadySettled(AsanPardakhtResponse response) => AlreadySettledCodes.Contains(response.StatusCode);
+
+        private static readonly HashSet<int> AlreadyVerifiedCodes = new HashSet<int> { 472, 473, 475 };
+
+        private static readonly HashSet<int> AlreadySettledCodes = new HashSet<int> { 474, 476 };
+
+        private static readonly IDictionary<int, string> CommonMessages = new Dictionary<int, string>
         {
-            {301, "پيكربندي پذيرنده اينترنتي نامعتبر است"},
-            {302, "كليدهاي رمزنگاري نامعتبر هستند"},
-            {303, "رمزنگاري نامعتبر است"},
-            {304, "تعداد عناصر درخواست نامعتبر است"},
-            {305, "نام كاربري يا رمز عبور پذيرنده نامعتبر است"},
-            {306, "با آسان پرداخت تماس بگيريد"},
-            {307, "سرور پذيرنده نامعتبر است"},
-            {308, "شناسه فاكتور مي بايست صرفا عدد باشد"},
-            {309, "مبلغ فاكتور نادرست ارسال شده است"},
-            {310, "طول فيلد تاريخ و زمان نامعتبر است"},
-            {311, "فرمت تاريخ و زمان ارسالي پذيرنده نامعتبر است"},
-            {312, "نوع سرويس نامعتبر است"},
-            {313, "شناسه پرداخت كننده نامعتبر است"},
-            {315, "فرمت توصيف شيوه تسهيم شبا نامعتبر است"},
-            {316, "شيوه تقسيم وجوه با مبلغ كل تراكنش همخواني ندارد"},
-            {317, "شبا متعلق به پذيرنده نيست"},
-            {318, "هيچ شبايي براي پذيرنده موجود نيست"},
-            {319, "خطاي داخلي. دوباره درخواست ارسال شود"},
-            {320, "شباي تكراري در رشته درخواست ارسال شده است"},
-            {-100, "تاريخ ارسالي محلي پذيرنده نامعتبر است"},
-            {-103, "مبلغ فاكتور براي پيكربندي فعلي پذيرنده معتبر نمي باشد"},
-            {-106, "سرويس وجود ندارد يا براي پذيرنده فعال نيست"},
-            {-109, "هيچ آدرس كال بكي براي درخواست پيكربندي نشده است"},
-            {-112, "شماره فاكتور نامعتبر يا تكراري است"},
-            {-115, "پذيرنده فعال نيست يا پيكربندي پذيرنده غيرمعتبر است"}
+            { 400, "درخواست نامعتبر است (Bad request)" },
+            { 401, "سرآیندهای احراز هویت نادرست است یا ارسال نشده است (Wrong or missing headers)" },
+            { 471, "هویت درخواست کننده معتبر نیست (Identity not trusted)" },
+            { 472, "رکوردی یافت نشد (No record found)" },
+            { 473, "نام کاربری یا رمز عبور پذیرنده نامعتبر است (Invalid merchant user name or password)" },
+            { 474, "آی پی درخواست کننده نامعتبر است (Invalid requesting IP)" },
+            { 475, "شناسه فاکتور باید عدد باشد (The invoice ID must be a number)" },
+            { 476, "مبلغ باید عدد باشد (The amount must be a number)" },
+            { 477, "تاریخ محلی نامعتبر است (Invalid local date)" },
+            { 478, "زمان محلی نامعتبر است (Invalid local time)" },
+            { 485, "تاریخ و زمان محلی نامعتبر است (Invalid local date and time)" },
+            { 486, "مبلغ خارج از محدوده مجاز است (Amount out of range)" },
+            { 489, "شناسه فاکتور تکراری است (Duplicate invoice ID)" },
+            { 490, "پذیرنده غیرفعال است (Merchant disabled)" }
         };
 
-        private static IDictionary<int, string> VerificationDictionary => new Dictionary<int, string>
-        {
-            {500, "بازبيني تراكنش با موفقيت انجام شد"},
-            {501, "پردازش هنوز انجام نشده است"},
-            {502, "وضعيت تراكنش نامشخص است"},
-            {503, "تراكنش اصلي ناموفق بوده است"},
-            {504, "قبلا درخواست بازبيني براي اين تراكنش داده شده است"},
-            {505, "قبلا درخواست تسويه براي اين تراكنش ارسال شده است"},
-            {506, "قبلا درخواست بازگشت براي اين تراكنش ارسال شده است"},
-            {507, "تراكنش در ليست تسويه قرار دارد"},
-            {508, "تراكنش در ليست بازگشت قرار دارد"},
-            {509, "امكان انجام عمليات به سبب وجود مشكل داخلي وجود ندارد"},
-            {510, "هويت درخواست كننده عمليات نامعتبر است"}
-        };
-
-        private static IDictionary<int, string> ReconcilationDictionary => new Dictionary<int, string>
-        {
-            {600, "درخواست تسويه تراكنش با موفقيت ارسال شد"},
-            {601, "پردازش هنوز انجام نشده است"},
-            {602, "وضعيت تراكنش نامشخص است"},
-            {603, "تراكنش اصلي ناموفق بوده است"},
-            {604, "تراكنش بازبيني نشده است"},
-            {605, "قبلا درخواست بازگشت براي اين تراكنش ارسال شده است"},
-            {606, "قبلا درخواست تسويه براي اين تراكنش ارسال شده است"},
-            {607, "امكان انجام عمليات به سبب وجود مشكل داخلي وجود ندارد"},
-            {608, "تراكنش در ليست منتظر بازگشت ها وجود دارد"},
-            {609, "تراكنش در ليست منتظر تسويه ها وجود دارد"},
-            {610, "هويت درخواست كننده عمليات نامعتبر است"}
-        };
-
-        private static IDictionary<int, string> ReversalDictionary => new Dictionary<int, string>
-        {
-            {700, "درخواست بازگشت تراكنش با موفقيت ارسال شد"},
-            {701, "پردازش هنوز انجام نشده است"},
-            {702, "وضعيت تراكنش نامشخص است"},
-            {703, "تراكنش اصلي ناموفق بوده است"},
-            {704, "امكان بازگشت يك تراكنش بازبيني شده وجود ندارد"},
-            {705, "قبلا درخواست بازگشت تراكنش براي اين تراكنش ارسال شده است"},
-            {706, "قبلا درخواست تسويه براي اين تراكنش ارسال شده است"},
-            {707, "امكان انجام عمليات به سبب وجود مشكل داخلي وجود ندارد"},
-            {708, "تراكنش در ليست منتظر بازگشت ها وجود دارد"},
-            {709, "تراكنش در ليست منتظر تسويه ها وجود دارد"}
-        };
+        private static readonly IDictionary<AsanPardakhtOperation, IDictionary<int, string>> OperationMessages =
+            new Dictionary<AsanPardakhtOperation, IDictionary<int, string>>
+            {
+                [AsanPardakhtOperation.TranResult] = new Dictionary<int, string>
+                {
+                    { 471, "هویت درخواست کننده معتبر نیست (Identity not trusted)" },
+                    { 472, "تراکنش یافت نشد یا توسط کاربر لغو شده است (No transaction found, or it was cancelled by the user)" }
+                },
+                [AsanPardakhtOperation.Verify] = new Dictionary<int, string>
+                {
+                    { 471, "تراکنش یافت نشد یا برگشت خورده است (Transaction not found or reversed)" },
+                    { 472, "این تراکنش قبلاً وریفای شده است (Already verified)" },
+                    { 473, "این تراکنش قبلاً وریفای شده است (Already verified)" },
+                    { 474, "تراکنش یافت نشد یا برگشت خورده است (Transaction not found or reversed)" },
+                    { 475, "این تراکنش قبلاً وریفای شده است (Already verified)" },
+                    { 476, "تراکنش یافت نشد یا برگشت خورده است (Transaction not found or reversed)" },
+                    { 477, "هویت یا آی پی درخواست کننده نامعتبر است (Invalid identity or IP)" }
+                },
+                [AsanPardakhtOperation.Settlement] = new Dictionary<int, string>
+                {
+                    { 471, "تراکنش یافت نشد (Transaction not found)" },
+                    { 473, "تراکنش یافت نشد (Transaction not found)" },
+                    { 474, "این تراکنش قبلاً تسویه شده است (Already settled)" },
+                    { 475, "تراکنش یافت نشد (Transaction not found)" },
+                    { 476, "این تراکنش قبلاً تسویه شده است (Already settled)" },
+                    { 477, "هویت درخواست کننده نامعتبر است (Invalid identity)" }
+                }
+            };
     }
 }
