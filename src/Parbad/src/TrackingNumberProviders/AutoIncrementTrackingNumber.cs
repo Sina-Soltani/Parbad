@@ -9,57 +9,56 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Parbad.TrackingNumberProviders
+namespace Parbad.TrackingNumberProviders;
+
+/// <summary>
+/// An Invoice Formatter which generates automatically and incrementally a Tracking Number
+/// depending on <see cref="IStorage"/> and <see cref="AutoIncrementTrackingNumberOptions"/>.
+/// </summary>
+public class AutoIncrementTrackingNumber : IInvoiceFormatter
 {
-    /// <summary>
-    /// An Invoice Formatter which generates automatically and incrementally a Tracking Number
-    /// depending on <see cref="IStorage"/> and <see cref="AutoIncrementTrackingNumberOptions"/>.
-    /// </summary>
-    public class AutoIncrementTrackingNumber : IInvoiceFormatter
+    private readonly IStorage _storage;
+    private readonly AutoIncrementTrackingNumberOptions _options;
+
+    public AutoIncrementTrackingNumber(IStorage storage, IOptions<AutoIncrementTrackingNumberOptions> options)
     {
-        private readonly IStorage _storage;
-        private readonly AutoIncrementTrackingNumberOptions _options;
+        _storage = storage;
+        _options = options.Value;
+    }
 
-        public AutoIncrementTrackingNumber(IStorage storage, IOptions<AutoIncrementTrackingNumberOptions> options)
+    /// <summary>
+    /// Generates the Tracking Number.
+    /// </summary>
+    /// <param name="invoice"></param>
+    /// <param name="cancellationToken"></param>
+    public virtual Task FormatAsync(Invoice invoice, CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        long trackingNumber;
+
+        var minimumValue = _options.MinimumValue;
+
+        if (!_storage.Payments.Any())
         {
-            _storage = storage;
-            _options = options.Value;
+            trackingNumber = minimumValue;
         }
-
-        /// <summary>
-        /// Generates the Tracking Number.
-        /// </summary>
-        /// <param name="invoice"></param>
-        /// <param name="cancellationToken"></param>
-        public virtual Task FormatAsync(Invoice invoice, CancellationToken cancellationToken = default)
+        else
         {
-            cancellationToken.ThrowIfCancellationRequested();
+            trackingNumber = _storage.Payments.Max(model => model.TrackingNumber);
 
-            long trackingNumber;
-
-            var minimumValue = _options.MinimumValue;
-
-            if (!_storage.Payments.Any())
+            if (trackingNumber < minimumValue)
             {
                 trackingNumber = minimumValue;
             }
             else
             {
-                trackingNumber = _storage.Payments.Max(model => model.TrackingNumber);
-
-                if (trackingNumber < minimumValue)
-                {
-                    trackingNumber = minimumValue;
-                }
-                else
-                {
-                    trackingNumber += _options.Increment;
-                }
+                trackingNumber += _options.Increment;
             }
-
-            invoice.TrackingNumber = trackingNumber;
-
-            return Task.CompletedTask;
         }
+
+        invoice.TrackingNumber = trackingNumber;
+
+        return Task.CompletedTask;
     }
 }

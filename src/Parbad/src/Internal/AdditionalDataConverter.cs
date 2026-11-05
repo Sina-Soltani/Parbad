@@ -6,20 +6,19 @@ using Parbad.Storage.Abstractions.Models;
 using System;
 using System.Collections.Generic;
 
-namespace Parbad.Internal
+namespace Parbad.Internal;
+
+public static class AdditionalDataConverter
 {
-    public static class AdditionalDataConverter
+    public static IDictionary<string, string> ToDictionary(this Transaction transaction)
     {
-        public static IDictionary<string, string> ToDictionary(this Transaction transaction)
-        {
-            return JsonConvert.DeserializeObject<IDictionary<string, string>>(transaction.AdditionalData);
-        }
+        return JsonConvert.DeserializeObject<IDictionary<string, string>>(transaction.AdditionalData);
+    }
 
-        internal static string ToJson(PaymentResult paymentResult)
-        {
-            if (paymentResult == null) throw new ArgumentNullException(nameof(paymentResult));
+    internal static string ToJson(PaymentResult paymentResult)
+    {
+        if (paymentResult == null) throw new ArgumentNullException(nameof(paymentResult));
 
-            return JsonConvert.SerializeObject(paymentResult.DatabaseAdditionalData);
-        }
+        return JsonConvert.SerializeObject(paymentResult.DatabaseAdditionalData);
     }
 }

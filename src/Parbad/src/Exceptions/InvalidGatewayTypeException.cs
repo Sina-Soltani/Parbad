@@ -3,13 +3,12 @@
 
 using System;
 
-namespace Parbad.Exceptions
+namespace Parbad.Exceptions;
+
+[Serializable]
+public class InvalidGatewayTypeException : Exception
 {
-    [Serializable]
-    public class InvalidGatewayTypeException : Exception
+    public InvalidGatewayTypeException(Type type) : base($"The type {type} is not a valid gateway type.")
     {
-        public InvalidGatewayTypeException(Type type) : base($"The type {type} is not a valid gateway type.")
-        {
-        }
     }
 }

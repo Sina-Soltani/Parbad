@@ -5,67 +5,66 @@ using Parbad.Options;
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Parbad.Tests
+namespace Parbad.Tests;
+
+[TestClass]
+public class LoggerTests
 {
-    [TestClass]
-    public class LoggerTests
+    [TestMethod]
+    public void No_Logs_Must_Be_Written_When_Logger_Is_Disabled()
     {
-        [TestMethod]
-        public void No_Logs_Must_Be_Written_When_Logger_Is_Disabled()
-        {
-            var options = new OptionsWrapper<ParbadOptions>(new ParbadOptions
-            {
-                EnableLogging = false
-            });
+        var options = new OptionsWrapper<ParbadOptions>(new ParbadOptions
+                                                        {
+                                                            EnableLogging = false
+                                                        });
 
-            var fakeLogger = new FakeLogger<LoggerTests>();
+        var fakeLogger = new FakeLogger<LoggerTests>();
 
-            IParbadLogger<LoggerTests> parbadLogger = new ParbadLogger<LoggerTests>(fakeLogger, options);
+        IParbadLogger<LoggerTests> parbadLogger = new ParbadLogger<LoggerTests>(fakeLogger, options);
 
-            parbadLogger.LogInformation("Test");
+        parbadLogger.LogInformation("Test");
 
-            Assert.IsFalse(fakeLogger.LogReceived);
-        }
-
-        [TestMethod]
-        public void Logs_Must_Be_Written_When_Logger_Is_Enabled()
-        {
-            var options = new OptionsWrapper<ParbadOptions>(new ParbadOptions
-            {
-                EnableLogging = true
-            });
-
-            var fakeLogger = new FakeLogger<LoggerTests>();
-
-            IParbadLogger<LoggerTests> parbadLogger = new ParbadLogger<LoggerTests>(fakeLogger, options);
-
-            parbadLogger.LogInformation("Test");
-
-            Assert.IsTrue(fakeLogger.LogReceived);
-        }
+        Assert.IsFalse(fakeLogger.LogReceived);
     }
 
-    internal class FakeLogger<T> : ILogger<T>, IDisposable
+    [TestMethod]
+    public void Logs_Must_Be_Written_When_Logger_Is_Enabled()
     {
-        public bool LogReceived { get; private set; }
+        var options = new OptionsWrapper<ParbadOptions>(new ParbadOptions
+                                                        {
+                                                            EnableLogging = true
+                                                        });
 
-        public IDisposable BeginScope<TState>(TState state)
-        {
-            return this;
-        }
+        var fakeLogger = new FakeLogger<LoggerTests>();
 
-        public bool IsEnabled(LogLevel logLevel)
-        {
-            return true;
-        }
+        IParbadLogger<LoggerTests> parbadLogger = new ParbadLogger<LoggerTests>(fakeLogger, options);
 
-        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
-        {
-            LogReceived = true;
-        }
+        parbadLogger.LogInformation("Test");
 
-        public void Dispose()
-        {
-        }
+        Assert.IsTrue(fakeLogger.LogReceived);
+    }
+}
+
+internal class FakeLogger<T> : ILogger<T>, IDisposable
+{
+    public bool LogReceived { get; private set; }
+
+    public IDisposable BeginScope<TState>(TState state)
+    {
+        return this;
+    }
+
+    public bool IsEnabled(LogLevel logLevel)
+    {
+        return true;
+    }
+
+    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+    {
+        LogReceived = true;
+    }
+
+    public void Dispose()
+    {
     }
 }

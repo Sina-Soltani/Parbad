@@ -6,87 +6,86 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Parbad.Internal
+namespace Parbad.Internal;
+
+/// <summary>
+/// An async lock per key. Entries exist only while someone holds or waits for the key, so the lock does not
+/// grow with the number of keys ever used.
+/// </summary>
+internal sealed class KeyedAsyncLock<TKey>
 {
+    private readonly Dictionary<TKey, Entry> _entries = new Dictionary<TKey, Entry>();
+
     /// <summary>
-    /// An async lock per key. Entries exist only while someone holds or waits for the key, so the lock does not
-    /// grow with the number of keys ever used.
+    /// Waits until no one else holds <paramref name="key"/>. Dispose the result to release it.
     /// </summary>
-    internal sealed class KeyedAsyncLock<TKey>
+    public async Task<IDisposable> AcquireAsync(TKey key, CancellationToken cancellationToken)
     {
-        private readonly Dictionary<TKey, Entry> _entries = new Dictionary<TKey, Entry>();
+        Entry entry;
 
-        /// <summary>
-        /// Waits until no one else holds <paramref name="key"/>. Dispose the result to release it.
-        /// </summary>
-        public async Task<IDisposable> AcquireAsync(TKey key, CancellationToken cancellationToken)
+        lock (_entries)
         {
-            Entry entry;
-
-            lock (_entries)
+            if (!_entries.TryGetValue(key, out entry))
             {
-                if (!_entries.TryGetValue(key, out entry))
-                {
-                    entry = new Entry();
-                    _entries.Add(key, entry);
-                }
-
-                entry.References++;
+                entry = new Entry();
+                _entries.Add(key, entry);
             }
 
-            try
-            {
-                await entry.Semaphore.WaitAsync(cancellationToken).ConfigureAwaitFalse();
-            }
-            catch
-            {
-                Release(key, entry, acquired: false);
-                throw;
-            }
-
-            return new Releaser(this, key, entry);
+            entry.References++;
         }
 
-        private void Release(TKey key, Entry entry, bool acquired)
+        try
         {
-            if (acquired) entry.Semaphore.Release();
-
-            lock (_entries)
-            {
-                if (--entry.References == 0)
-                {
-                    _entries.Remove(key);
-                    entry.Semaphore.Dispose();
-                }
-            }
+            await entry.Semaphore.WaitAsync(cancellationToken).ConfigureAwaitFalse();
+        }
+        catch
+        {
+            Release(key, entry, acquired: false);
+            throw;
         }
 
-        private sealed class Entry
-        {
-            public readonly SemaphoreSlim Semaphore = new SemaphoreSlim(1, 1);
+        return new Releaser(this, key, entry);
+    }
 
-            public int References;
+    private void Release(TKey key, Entry entry, bool acquired)
+    {
+        if (acquired) entry.Semaphore.Release();
+
+        lock (_entries)
+        {
+            if (--entry.References == 0)
+            {
+                _entries.Remove(key);
+                entry.Semaphore.Dispose();
+            }
+        }
+    }
+
+    private sealed class Entry
+    {
+        public readonly SemaphoreSlim Semaphore = new SemaphoreSlim(1, 1);
+
+        public int References;
+    }
+
+    private sealed class Releaser : IDisposable
+    {
+        private readonly KeyedAsyncLock<TKey> _owner;
+        private readonly TKey _key;
+        private Entry _entry;
+
+        public Releaser(KeyedAsyncLock<TKey> owner, TKey key, Entry entry)
+        {
+            _owner = owner;
+            _key = key;
+            _entry = entry;
         }
 
-        private sealed class Releaser : IDisposable
+        public void Dispose()
         {
-            private readonly KeyedAsyncLock<TKey> _owner;
-            private readonly TKey _key;
-            private Entry _entry;
+            var entry = Interlocked.Exchange(ref _entry, null);
 
-            public Releaser(KeyedAsyncLock<TKey> owner, TKey key, Entry entry)
-            {
-                _owner = owner;
-                _key = key;
-                _entry = entry;
-            }
-
-            public void Dispose()
-            {
-                var entry = Interlocked.Exchange(ref _entry, null);
-
-                if (entry != null) _owner.Release(_key, entry, acquired: true);
-            }
+            if (entry != null) _owner.Release(_key, entry, acquired: true);
         }
     }
 }

@@ -6,31 +6,30 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Parbad.Gateway.Parsian;
 
-namespace Parbad.Tests.Gateway.Parsian
+namespace Parbad.Tests.Gateway.Parsian;
+
+[TestClass]
+public class ParsianCommonTests
 {
-    [TestClass]
-    public class ParsianCommonTests
+    private IInvoiceBuilder _invoiceBuilder;
+
+    [TestInitialize]
+    public void Setup()
     {
-        private IInvoiceBuilder _invoiceBuilder;
+        var mockServiceProvider = new Mock<IServiceProvider>();
 
-        [TestInitialize]
-        public void Setup()
-        {
-            var mockServiceProvider = new Mock<IServiceProvider>();
+        _invoiceBuilder = new DefaultInvoiceBuilder(mockServiceProvider.Object);
+    }
 
-            _invoiceBuilder = new DefaultInvoiceBuilder(mockServiceProvider.Object);
-        }
+    [TestMethod]
+    public async Task Invoice_Must_Have_Correct_GatewayName()
+    {
+        _invoiceBuilder.UseParsian();
 
-        [TestMethod]
-        public async Task Invoice_Must_Have_Correct_GatewayName()
-        {
-            _invoiceBuilder.UseParsian();
+        var invoice = await _invoiceBuilder.BuildAsync();
 
-            var invoice = await _invoiceBuilder.BuildAsync();
-
-            Assert.IsNotNull(invoice);
-            Assert.IsNotNull(invoice.GatewayName);
-            Assert.IsTrue(invoice.GatewayName.Equals("Parsian", StringComparison.OrdinalIgnoreCase));
-        }
+        Assert.IsNotNull(invoice);
+        Assert.IsNotNull(invoice.GatewayName);
+        Assert.IsTrue(invoice.GatewayName.Equals("Parsian", StringComparison.OrdinalIgnoreCase));
     }
 }

@@ -5,50 +5,49 @@ using Microsoft.Extensions.DependencyInjection;
 using Parbad.GatewayBuilders;
 using System;
 
-namespace Parbad.Gateway.Sepehr
+namespace Parbad.Gateway.Sepehr;
+
+public static class SepehrGatewayBuilderExtensions
 {
-    public static class SepehrGatewayBuilderExtensions
+    /// <summary>
+    /// Adds the Sepehr gateway to Parbad services.
+    /// </summary>
+    /// <param name="builder"></param>
+    public static IGatewayConfigurationBuilder<SepehrGateway> AddSepehr(this IGatewayBuilder builder)
     {
-        /// <summary>
-        /// Adds the Sepehr gateway to Parbad services.
-        /// </summary>
-        /// <param name="builder"></param>
-        public static IGatewayConfigurationBuilder<SepehrGateway> AddSepehr(this IGatewayBuilder builder)
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            return builder
-                .AddGateway<SepehrGateway>()
-                .WithHttpClient(clientBuilder => { })
-                .WithOptions(options => { });
-        }
+        return builder
+              .AddGateway<SepehrGateway>()
+              .WithHttpClient(clientBuilder => { })
+              .WithOptions(options => { });
+    }
 
-        /// <summary>
-        /// Configures the accounts for Sepehr gateway.
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="configureAccounts">Configures the accounts.</param>
-        public static IGatewayConfigurationBuilder<SepehrGateway> WithAccounts(
-            this IGatewayConfigurationBuilder<SepehrGateway> builder,
-            Action<IGatewayAccountBuilder<SepehrGatewayAccount>> configureAccounts)
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
+    /// <summary>
+    /// Configures the accounts for Sepehr gateway.
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <param name="configureAccounts">Configures the accounts.</param>
+    public static IGatewayConfigurationBuilder<SepehrGateway> WithAccounts(
+        this IGatewayConfigurationBuilder<SepehrGateway> builder,
+        Action<IGatewayAccountBuilder<SepehrGatewayAccount>> configureAccounts)
+    {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            return builder.WithAccounts(configureAccounts);
-        }
+        return builder.WithAccounts(configureAccounts);
+    }
 
-        /// <summary>
-        /// Configures the options for Sepehr Gateway.
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="configureOptions">Configuration</param>
-        public static IGatewayConfigurationBuilder<SepehrGateway> WithOptions(
-            this IGatewayConfigurationBuilder<SepehrGateway> builder,
-            Action<SepehrGatewayOptions> configureOptions)
-        {
-            builder.Services.Configure(configureOptions);
+    /// <summary>
+    /// Configures the options for Sepehr Gateway.
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <param name="configureOptions">Configuration</param>
+    public static IGatewayConfigurationBuilder<SepehrGateway> WithOptions(
+        this IGatewayConfigurationBuilder<SepehrGateway> builder,
+        Action<SepehrGatewayOptions> configureOptions)
+    {
+        builder.Services.Configure(configureOptions);
 
-            return builder;
-        }
+        return builder;
     }
 }

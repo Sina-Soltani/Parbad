@@ -101,7 +101,7 @@ internal static class SamanHelper
                    Amount = amount.Value,
                    Wage = wage.Value,
                    SecurePan = securePan.Value,
-                   HashedCardNumber = hashedCardNumber.Value,
+                   HashedCardNumber = hashedCardNumber.Value
                };
     }
 

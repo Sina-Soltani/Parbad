@@ -4,27 +4,26 @@
 using System;
 using Parbad.Internal;
 
-namespace Parbad.Abstraction
+namespace Parbad.Abstraction;
+
+/// <summary>
+/// Describes the type of a gateway.
+/// </summary>
+public class GatewayDescriptor
 {
     /// <summary>
-    /// Describes the type of a gateway.
+    /// Initializes an instance of <see cref="GatewayDescriptor"/>.
     /// </summary>
-    public class GatewayDescriptor
+    /// <param name="gatewayType">Type of the gateway.</param>
+    public GatewayDescriptor(Type gatewayType)
     {
-        /// <summary>
-        /// Initializes an instance of <see cref="GatewayDescriptor"/>.
-        /// </summary>
-        /// <param name="gatewayType">Type of the gateway.</param>
-        public GatewayDescriptor(Type gatewayType)
-        {
-            GatewayHelper.IsGateway(gatewayType, throwException: true);
+        GatewayHelper.IsGateway(gatewayType, throwException: true);
 
-            GatewayType = gatewayType;
-        }
-
-        /// <summary>
-        /// Gets the type of the gateway.
-        /// </summary>
-        public Type GatewayType { get; }
+        GatewayType = gatewayType;
     }
+
+    /// <summary>
+    /// Gets the type of the gateway.
+    /// </summary>
+    public Type GatewayType { get; }
 }

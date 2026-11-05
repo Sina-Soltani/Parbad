@@ -3,19 +3,18 @@
 
 using Newtonsoft.Json;
 
-namespace Parbad.Gateway.IdPay.Internal
+namespace Parbad.Gateway.IdPay.Internal;
+
+internal class IdPayVerifyResultModel
 {
-    internal class IdPayVerifyResultModel
-    {
-        public string Status { get; set; }
+    public string Status { get; set; }
 
-        [JsonProperty("track_id")]
-        public string TrackId { get; set; }
+    [JsonProperty("track_id")]
+    public string TrackId { get; set; }
 
-        [JsonProperty("order_id")]
-        public string OrderId { get; set; }
+    [JsonProperty("order_id")]
+    public string OrderId { get; set; }
 
-        [JsonProperty("amount")]
-        public long? Amount { get; set; }
-    }
+    [JsonProperty("amount")]
+    public long? Amount { get; set; }
 }

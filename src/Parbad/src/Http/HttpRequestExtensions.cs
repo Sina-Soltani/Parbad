@@ -9,45 +9,44 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Parbad.Internal;
 
-namespace Parbad.Http
+namespace Parbad.Http;
+
+public static class HttpRequestExtensions
 {
-    public static class HttpRequestExtensions
+    public static async Task<(bool Exists, StringValues Value)> TryGetParamAsync(this HttpRequest httpRequest, string key, CancellationToken cancellationToken)
     {
-        public static async Task<(bool Exists, StringValues Value)> TryGetParamAsync(this HttpRequest httpRequest, string key, CancellationToken cancellationToken)
+        if (httpRequest == null) throw new ArgumentNullException(nameof(httpRequest));
+        if (key == null) throw new ArgumentNullException(nameof(key));
+
+        var hasForm = (HttpMethods.IsPost(httpRequest.Method) ||
+                       HttpMethods.IsPut(httpRequest.Method) ||
+                       HttpMethods.IsDelete(httpRequest.Method) ||
+                       HttpMethods.IsPatch(httpRequest.Method)) &&
+                      httpRequest.HasFormContentType;
+
+        var exists = httpRequest.Query.TryGetValue(key, out var value);
+
+        if (!exists && hasForm)
         {
-            if (httpRequest == null) throw new ArgumentNullException(nameof(httpRequest));
-            if (key == null) throw new ArgumentNullException(nameof(key));
+            var form = await httpRequest.ReadFormAsync(cancellationToken).ConfigureAwaitFalse();
 
-            var hasForm = (HttpMethods.IsPost(httpRequest.Method) ||
-                           HttpMethods.IsPut(httpRequest.Method) ||
-                           HttpMethods.IsDelete(httpRequest.Method) ||
-                           HttpMethods.IsPatch(httpRequest.Method)) &&
-                          httpRequest.HasFormContentType;
-
-            var exists = httpRequest.Query.TryGetValue(key, out var value);
-
-            if (!exists && hasForm)
-            {
-                var form = await httpRequest.ReadFormAsync(cancellationToken).ConfigureAwaitFalse();
-
-                exists = form.TryGetValue(key, out value);
-            }
-
-            return (exists, value);
+            exists = form.TryGetValue(key, out value);
         }
 
-        public static async Task<(bool Exists, T Value)> TryGetParamAsAsync<T>(this HttpRequest httpRequest, string key, CancellationToken cancellationToken)
+        return (exists, value);
+    }
+
+    public static async Task<(bool Exists, T Value)> TryGetParamAsAsync<T>(this HttpRequest httpRequest, string key, CancellationToken cancellationToken)
+    {
+        var result = await TryGetParamAsync(httpRequest, key, cancellationToken).ConfigureAwaitFalse();
+
+        T value = default;
+
+        if (result.Exists)
         {
-            var result = await TryGetParamAsync(httpRequest, key, cancellationToken).ConfigureAwaitFalse();
-
-            T value = default;
-
-            if (result.Exists)
-            {
-                value = (T)Convert.ChangeType((string)result.Value, typeof(T), CultureInfo.InvariantCulture);
-            }
-
-            return (result.Exists, value);
+            value = (T)Convert.ChangeType((string)result.Value, typeof(T), CultureInfo.InvariantCulture);
         }
+
+        return (result.Exists, value);
     }
 }

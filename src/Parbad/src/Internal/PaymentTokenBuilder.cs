@@ -5,25 +5,24 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 using Parbad.PaymentTokenProviders;
 
-namespace Parbad.Internal
+namespace Parbad.Internal;
+
+internal class PaymentTokenBuilder : IPaymentTokenBuilder
 {
-    internal class PaymentTokenBuilder : IPaymentTokenBuilder
+    public PaymentTokenBuilder(IServiceCollection services)
     {
-        public PaymentTokenBuilder(IServiceCollection services)
-        {
-            Services = services;
-        }
+        Services = services;
+    }
 
-        public IServiceCollection Services { get; }
+    public IServiceCollection Services { get; }
 
-        public void AddPaymentTokenProvider<TProvider>(ServiceLifetime serviceLifetime) where TProvider : class, IPaymentTokenProvider
-        {
-            Services.AddOrUpdate<IPaymentTokenProvider, TProvider>(serviceLifetime);
-        }
+    public void AddPaymentTokenProvider<TProvider>(ServiceLifetime serviceLifetime) where TProvider : class, IPaymentTokenProvider
+    {
+        Services.AddOrUpdate<IPaymentTokenProvider, TProvider>(serviceLifetime);
+    }
 
-        public void AddPaymentTokenProvider(Func<IServiceProvider, IPaymentTokenProvider> factory, ServiceLifetime serviceLifetime)
-        {
-            Services.AddOrUpdate(factory, serviceLifetime);
-        }
+    public void AddPaymentTokenProvider(Func<IServiceProvider, IPaymentTokenProvider> factory, ServiceLifetime serviceLifetime)
+    {
+        Services.AddOrUpdate(factory, serviceLifetime);
     }
 }

@@ -3,26 +3,25 @@
 
 using Newtonsoft.Json;
 
-namespace Parbad.Gateway.FanAva.Internal.Models
+namespace Parbad.Gateway.FanAva.Internal.Models;
+
+internal class FanAvaCheckResultModel
 {
-    internal class FanAvaCheckResultModel
-    {
-        /// <summary>
-        /// The outcome of <see cref="FanAvaHelper.CreateCheckResult"/>, not a field of the bank's response.
-        /// </summary>
-        [JsonIgnore]
-        public bool IsSucceed { get; set; }
+    /// <summary>
+    /// The outcome of <see cref="FanAvaHelper.CreateCheckResult"/>, not a field of the bank's response.
+    /// </summary>
+    [JsonIgnore]
+    public bool IsSucceed { get; set; }
 
-        [JsonIgnore]
-        public IPaymentVerifyResult VerifyResult { get; set; }
+    [JsonIgnore]
+    public IPaymentVerifyResult VerifyResult { get; set; }
 
-        [JsonProperty("Result")]
-        public string Result { get; set; }
+    [JsonProperty("Result")]
+    public string Result { get; set; }
 
-        [JsonProperty("ReferenceNum")]
-        public string InvoiceNumber { get; set; }
+    [JsonProperty("ReferenceNum")]
+    public string InvoiceNumber { get; set; }
 
-        [JsonProperty("Amount")]
-        public decimal Amount { get; set; }
-    }
+    [JsonProperty("Amount")]
+    public decimal Amount { get; set; }
 }

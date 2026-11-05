@@ -5,18 +5,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using Parbad.Abstraction;
 
-namespace Parbad.InvoiceBuilder
+namespace Parbad.InvoiceBuilder;
+
+/// <summary>
+/// A formatter that can change an invoice.
+/// </summary>
+public interface IInvoiceFormatter
 {
     /// <summary>
-    /// A formatter that can change an invoice.
+    /// Formats the given <paramref name="invoice"/>.
     /// </summary>
-    public interface IInvoiceFormatter
-    {
-        /// <summary>
-        /// Formats the given <paramref name="invoice"/>.
-        /// </summary>
-        /// <param name="invoice"></param>
-        /// <param name="cancellationToken"></param>
-        Task FormatAsync(Invoice invoice, CancellationToken cancellationToken = default);
-    }
+    /// <param name="invoice"></param>
+    /// <param name="cancellationToken"></param>
+    Task FormatAsync(Invoice invoice, CancellationToken cancellationToken = default);
 }

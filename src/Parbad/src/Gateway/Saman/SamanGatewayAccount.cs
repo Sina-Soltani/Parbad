@@ -3,12 +3,11 @@
 
 using Parbad.Abstraction;
 
-namespace Parbad.Gateway.Saman
-{
-    public class SamanGatewayAccount : GatewayAccount
-    {
-        public string TerminalId { get; set; }
+namespace Parbad.Gateway.Saman;
 
-        public string Password { get; set; }
-    }
+public class SamanGatewayAccount : GatewayAccount
+{
+    public string TerminalId { get; set; }
+
+    public string Password { get; set; }
 }

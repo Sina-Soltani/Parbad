@@ -3,34 +3,33 @@
 
 using Newtonsoft.Json;
 
-namespace Parbad.Gateway.AsanPardakht.Internal.Models
+namespace Parbad.Gateway.AsanPardakht.Internal.Models;
+
+/// <summary>
+/// The answer of TranResult: the bank's record of the payment of an invoice.
+/// </summary>
+internal class AsanPardakhtTransactionResult
 {
-    /// <summary>
-    /// The answer of TranResult: the bank's record of the payment of an invoice.
-    /// </summary>
-    internal class AsanPardakhtTransactionResult
-    {
-        [JsonProperty("cardNumber")]
-        public string CardNumber { get; set; }
+    [JsonProperty("cardNumber")]
+    public string CardNumber { get; set; }
 
-        [JsonProperty("rrn")]
-        public string Rrn { get; set; }
+    [JsonProperty("rrn")]
+    public string Rrn { get; set; }
 
-        /// <summary>The RefId (token) that the payment was started with.</summary>
-        [JsonProperty("refID")]
-        public string RefId { get; set; }
+    /// <summary>The RefId (token) that the payment was started with.</summary>
+    [JsonProperty("refID")]
+    public string RefId { get; set; }
 
-        /// <summary>The amount in rials.</summary>
-        [JsonProperty("amount")]
-        public string Amount { get; set; }
+    /// <summary>The amount in rials.</summary>
+    [JsonProperty("amount")]
+    public string Amount { get; set; }
 
-        [JsonProperty("payGateTranID")]
-        public string PayGateTranId { get; set; }
+    [JsonProperty("payGateTranID")]
+    public string PayGateTranId { get; set; }
 
-        [JsonProperty("salesOrderID")]
-        public string SalesOrderId { get; set; }
+    [JsonProperty("salesOrderID")]
+    public string SalesOrderId { get; set; }
 
-        [JsonProperty("serviceStatusCode")]
-        public string ServiceStatusCode { get; set; }
-    }
+    [JsonProperty("serviceStatusCode")]
+    public string ServiceStatusCode { get; set; }
 }

@@ -4,21 +4,20 @@
 using System;
 using Parbad.Internal;
 
-namespace Parbad
-{
-    public static class GatewayTransporterExtensions
-    {
-        /// <summary>
-        /// Transports the client to the specified gateway.
-        /// </summary>
-        public static void Transport(this IGatewayTransporter transporter)
-        {
-            if (transporter == null) throw new ArgumentNullException(nameof(transporter));
+namespace Parbad;
 
-            transporter.TransportAsync()
-                .ConfigureAwaitFalse()
-                .GetAwaiter()
-                .GetResult();
-        }
+public static class GatewayTransporterExtensions
+{
+    /// <summary>
+    /// Transports the client to the specified gateway.
+    /// </summary>
+    public static void Transport(this IGatewayTransporter transporter)
+    {
+        if (transporter == null) throw new ArgumentNullException(nameof(transporter));
+
+        transporter.TransportAsync()
+                   .ConfigureAwaitFalse()
+                   .GetAwaiter()
+                   .GetResult();
     }
 }

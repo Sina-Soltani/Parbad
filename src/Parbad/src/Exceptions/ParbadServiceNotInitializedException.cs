@@ -4,13 +4,12 @@
 using System;
 using Parbad.Properties;
 
-namespace Parbad.Exceptions
+namespace Parbad.Exceptions;
+
+[Serializable]
+public class ParbadServiceNotInitializedException : Exception
 {
-    [Serializable]
-    public class ParbadServiceNotInitializedException : Exception
+    public ParbadServiceNotInitializedException() : base(Resources.CannotGetParbadServiceException)
     {
-        public ParbadServiceNotInitializedException() : base(Resources.CannotGetParbadServiceException)
-        {
-        }
     }
 }

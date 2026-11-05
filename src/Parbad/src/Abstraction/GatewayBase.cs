@@ -8,75 +8,74 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Parbad.Abstraction
+namespace Parbad.Abstraction;
+
+/// <inheritdoc />
+public abstract class GatewayBase<TAccount> : IGateway where TAccount : GatewayAccount
 {
-    /// <inheritdoc />
-    public abstract class GatewayBase<TAccount> : IGateway where TAccount : GatewayAccount
+    protected GatewayBase(IGatewayAccountProvider<TAccount> accountProvider)
     {
-        protected GatewayBase(IGatewayAccountProvider<TAccount> accountProvider)
+        AccountProvider = accountProvider;
+    }
+
+    protected IGatewayAccountProvider<TAccount> AccountProvider { get; }
+
+    /// <inheritdoc />
+    public abstract Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default);
+
+    /// <inheritdoc />
+    public abstract Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default);
+
+    /// <inheritdoc />
+    public abstract Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default);
+
+    /// <inheritdoc />
+    public abstract Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets a gateway account using the specified account name in the given invoice. If no account is given on the invoice, the first account will be retrieved.
+    /// </summary>
+    /// <exception cref="ArgumentNullException"></exception>
+    /// <exception cref="Exception"></exception>
+    protected virtual async Task<TAccount> GetAccountAsync(Invoice invoice)
+    {
+        var accountName = invoice.GetAccountName();
+
+        var accounts = await AccountProvider.LoadAccountsAsync();
+
+        TAccount account;
+
+        if (accountName.IsNullOrEmpty())
         {
-            AccountProvider = accountProvider;
+            account = accounts.GetDefaultAccount();
+
+            if (account == null) throw new Exception($"No accounts of type {typeof(TAccount).Name} exist.");
+        }
+        else
+        {
+            account = accounts.Get(accountName);
+
+            if (account == null) throw new Exception($"Account {accountName} does not exist.");
         }
 
-        protected IGatewayAccountProvider<TAccount> AccountProvider { get; }
+        return account;
+    }
 
-        /// <inheritdoc />
-        public abstract Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default);
+    /// <summary>
+    /// Gets a gateway account using the specified account name in the given <paramref name="payment"/>.
+    /// </summary>
+    /// <exception cref="ArgumentNullException"></exception>
+    /// <exception cref="Exception"></exception>
+    protected virtual async Task<TAccount> GetAccountAsync(Payment payment)
+    {
+        if (payment == null) throw new ArgumentNullException(nameof(payment));
 
-        /// <inheritdoc />
-        public abstract Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default);
+        var accounts = await AccountProvider.LoadAccountsAsync();
 
-        /// <inheritdoc />
-        public abstract Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default);
+        var account = accounts.Get(payment.GatewayAccountName);
 
-        /// <inheritdoc />
-        public abstract Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default);
+        if (account == null) throw new Exception($"The account \"{payment.GatewayAccountName}\" of type {typeof(TAccount).Name} does not exist.");
 
-        /// <summary>
-        /// Gets a gateway account using the specified account name in the given invoice. If no account is given on the invoice, the first account will be retrieved.
-        /// </summary>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <exception cref="Exception"></exception>
-        protected virtual async Task<TAccount> GetAccountAsync(Invoice invoice)
-        {
-            var accountName = invoice.GetAccountName();
-
-            var accounts = await AccountProvider.LoadAccountsAsync();
-
-            TAccount account;
-
-            if (accountName.IsNullOrEmpty())
-            {
-                account = accounts.GetDefaultAccount();
-
-                if (account == null) throw new Exception($"No accounts of type {typeof(TAccount).Name} exist.");
-            }
-            else
-            {
-                account = accounts.Get(accountName);
-
-                if (account == null) throw new Exception($"Account {accountName} does not exist.");
-            }
-
-            return account;
-        }
-
-        /// <summary>
-        /// Gets a gateway account using the specified account name in the given <paramref name="payment"/>.
-        /// </summary>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <exception cref="Exception"></exception>
-        protected virtual async Task<TAccount> GetAccountAsync(Payment payment)
-        {
-            if (payment == null) throw new ArgumentNullException(nameof(payment));
-
-            var accounts = await AccountProvider.LoadAccountsAsync();
-
-            var account = accounts.Get(payment.GatewayAccountName);
-
-            if (account == null) throw new Exception($"The account \"{payment.GatewayAccountName}\" of type {typeof(TAccount).Name} does not exist.");
-
-            return account;
-        }
+        return account;
     }
 }

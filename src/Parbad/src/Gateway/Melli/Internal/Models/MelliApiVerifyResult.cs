@@ -3,21 +3,20 @@
 
 using System;
 
-namespace Parbad.Gateway.Melli.Internal.Models
+namespace Parbad.Gateway.Melli.Internal.Models;
+
+[Serializable]
+internal class MelliApiVerifyResult
 {
-    [Serializable]
-    internal class MelliApiVerifyResult
-    {
-        public int? ResCode { get; set; }
+    public int? ResCode { get; set; }
 
-        public long Amount { get; set; }
+    public long Amount { get; set; }
 
-        public string Description { get; set; }
+    public string Description { get; set; }
 
-        public string RetrivalRefNo { get; set; }
+    public string RetrivalRefNo { get; set; }
 
-        public string SystemTraceNo { get; set; }
+    public string SystemTraceNo { get; set; }
 
-        public long OrderId { get; set; }
-    }
+    public long OrderId { get; set; }
 }

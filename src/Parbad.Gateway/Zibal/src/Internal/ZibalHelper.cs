@@ -16,166 +16,165 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Parbad.Gateway.Zibal.Internal
+namespace Parbad.Gateway.Zibal.Internal;
+
+internal static class ZibalHelper
 {
-    internal static class ZibalHelper
+    private const int SuccessCode = 100;
+    private const int FetchSuccessCode = 2;
+    private const int PaymentAlreadyVerifiedCode = 201;
+
+    public static string ZibalRequestAdditionalKeyName => "ZibalRequest";
+    public static string TrackIdAdditionalDataKey => "TrackId";
+
+    public static object CreateRequestData(Invoice invoice, ZibalGatewayAccount account)
     {
-        private const int SuccessCode = 100;
-        private const int FetchSuccessCode = 2;
-        private const int PaymentAlreadyVerifiedCode = 201;
+        var requestAdditionalData = invoice.GetZibalRequestData();
 
-        public static string ZibalRequestAdditionalKeyName => "ZibalRequest";
-        public static string TrackIdAdditionalDataKey => "TrackId";
+        return new ZibalPaymentRequestModel
+               {
+                   Merchant = GetMerchant(account),
+                   Amount = invoice.Amount,
+                   Mobile = requestAdditionalData?.MobileNumber,
+                   OrderId = invoice.TrackingNumber.ToString(),
+                   CallbackUrl = invoice.CallbackUrl,
+                   Description = requestAdditionalData?.Description,
+                   FeeMode = requestAdditionalData?.FeeMode,
+                   Sms = requestAdditionalData?.SendPaymentLinkViaSms,
+                   AllowedCards = requestAdditionalData?.AllowedCards
+               };
+    }
 
-        public static object CreateRequestData(Invoice invoice, ZibalGatewayAccount account)
+    public static async Task<PaymentRequestResult> CreateRequestResult(
+        HttpResponseMessage responseMessage,
+        HttpContext httpContext,
+        ZibalGatewayAccount account,
+        ZibalGatewayOptions gatewayOptions,
+        MessagesOptions messagesOptions)
+    {
+        var response = await responseMessage.ReadJsonAsync<ZibalResponseModel>().ConfigureAwaitFalse();
+
+        if (response == null)
         {
-            var requestAdditionalData = invoice.GetZibalRequestData();
-
-            return new ZibalPaymentRequestModel
-            {
-                Merchant = GetMerchant(account),
-                Amount = invoice.Amount,
-                Mobile = requestAdditionalData?.MobileNumber,
-                OrderId = invoice.TrackingNumber.ToString(),
-                CallbackUrl = invoice.CallbackUrl,
-                Description = requestAdditionalData?.Description,
-                FeeMode = requestAdditionalData?.FeeMode,
-                Sms = requestAdditionalData?.SendPaymentLinkViaSms,
-                AllowedCards = requestAdditionalData?.AllowedCards
-            };
+            return PaymentRequestResult.Failed(messagesOptions.InvalidDataReceivedFromGateway, account.Name);
         }
 
-        public static async Task<PaymentRequestResult> CreateRequestResult(
-            HttpResponseMessage responseMessage,
-            HttpContext httpContext,
-            ZibalGatewayAccount account,
-            ZibalGatewayOptions gatewayOptions,
-            MessagesOptions messagesOptions)
+        if (response.Result != SuccessCode)
         {
-            var response = await responseMessage.ReadJsonAsync<ZibalResponseModel>().ConfigureAwaitFalse();
+            var failureMessage = ZibalTranslator.TranslateResult(response.Result) ?? response.Message ?? messagesOptions.PaymentFailed;
 
-            if (response == null)
-            {
-                return PaymentRequestResult.Failed(messagesOptions.InvalidDataReceivedFromGateway, account.Name);
-            }
-
-            if (response.Result != SuccessCode)
-            {
-                var failureMessage = ZibalTranslator.TranslateResult(response.Result) ?? response.Message ?? messagesOptions.PaymentFailed;
-
-                return PaymentRequestResult.Failed(failureMessage, account.Name, response.Result.ToString());
-            }
-
-            var paymentPageUrl = string.IsNullOrEmpty(response.PayLink)
-                                ? GetPaymentPageUrl(gatewayOptions.PaymentPageUrl, response.TrackId)
-                                : response.PayLink;
-
-            var result = PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, paymentPageUrl);
-
-            result.DatabaseAdditionalData.Add(TrackIdAdditionalDataKey, response.TrackId.ToString());
-
-            return result;
+            return PaymentRequestResult.Failed(failureMessage, account.Name, response.Result.ToString());
         }
 
-        public static async Task<IPaymentFetchResult> CreateFetchResult(HttpRequest httpRequest, InvoiceContext invoiceContext, MessagesOptions messagesOptions, CancellationToken cancellationToken)
+        var paymentPageUrl = string.IsNullOrEmpty(response.PayLink)
+            ? GetPaymentPageUrl(gatewayOptions.PaymentPageUrl, response.TrackId)
+            : response.PayLink;
+
+        var result = PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, paymentPageUrl);
+
+        result.DatabaseAdditionalData.Add(TrackIdAdditionalDataKey, response.TrackId.ToString());
+
+        return result;
+    }
+
+    public static async Task<IPaymentFetchResult> CreateFetchResult(HttpRequest httpRequest, InvoiceContext invoiceContext, MessagesOptions messagesOptions, CancellationToken cancellationToken)
+    {
+        var trackId = await httpRequest.TryGetParamAsync("trackId", cancellationToken).ConfigureAwaitFalse();
+        var status = await httpRequest.TryGetParamAsAsync<int>("status", cancellationToken).ConfigureAwaitFalse();
+
+        var trackIdInDatabase = GetTrackId(invoiceContext.Transactions);
+
+        var isSucceed = status.Exists && status.Value == FetchSuccessCode &&
+                        trackId.Exists && trackId.Value == trackIdInDatabase;
+
+        string? message;
+
+        if (isSucceed)
         {
-            var trackId = await httpRequest.TryGetParamAsync("trackId", cancellationToken).ConfigureAwaitFalse();
-            var status = await httpRequest.TryGetParamAsAsync<int>("status", cancellationToken).ConfigureAwaitFalse();
-
-            var trackIdInDatabase = GetTrackId(invoiceContext.Transactions);
-
-            var isSucceed = status.Exists && status.Value == FetchSuccessCode &&
-                            trackId.Exists && trackId.Value == trackIdInDatabase;
-
-            string? message;
-
-            if (isSucceed)
-            {
-                message = messagesOptions.PaymentSucceed;
-            }
-            else
-            {
-                message = ZibalTranslator.TranslateStatus(status.Value) ?? messagesOptions.PaymentFailed;
-            }
-
-            return new PaymentFetchResult
-            {
-                Status = isSucceed ? PaymentFetchResultStatus.ReadyForVerifying : PaymentFetchResultStatus.Failed,
-                GatewayResponseCode = status.Value.ToString(),
-                Message = message,
-            };
+            message = messagesOptions.PaymentSucceed;
+        }
+        else
+        {
+            message = ZibalTranslator.TranslateStatus(status.Value) ?? messagesOptions.PaymentFailed;
         }
 
-        public static ZibalPaymentVerifyModel CreateVerifyData(
-            IEnumerable<Transaction> transactions,
-            ZibalGatewayAccount account)
-        {
-            var trackId = GetTrackId(transactions);
+        return new PaymentFetchResult
+               {
+                   Status = isSucceed ? PaymentFetchResultStatus.ReadyForVerifying : PaymentFetchResultStatus.Failed,
+                   GatewayResponseCode = status.Value.ToString(),
+                   Message = message
+               };
+    }
 
-            return new ZibalPaymentVerifyModel
-            {
-                Merchant = GetMerchant(account),
-                TrackId = trackId
-            };
+    public static ZibalPaymentVerifyModel CreateVerifyData(
+        IEnumerable<Transaction> transactions,
+        ZibalGatewayAccount account)
+    {
+        var trackId = GetTrackId(transactions);
+
+        return new ZibalPaymentVerifyModel
+               {
+                   Merchant = GetMerchant(account),
+                   TrackId = trackId
+               };
+    }
+
+    // In sandbox mode Zibal expects the merchant "zibal", for the request and for the verification.
+    private static string? GetMerchant(ZibalGatewayAccount account) =>
+        account.IsSandbox ? "zibal" : account.Merchant;
+
+    public static async Task<PaymentVerifyResult> CreateVerifyResult(HttpResponseMessage responseMessage, string? trackId, MessagesOptions messagesOptions)
+    {
+        var response = await responseMessage.ReadJsonAsync<ZibalPaymentVerifyResponseModel>().ConfigureAwaitFalse();
+
+        if (response == null)
+        {
+            return PaymentVerifyResult.Failed(messagesOptions.InvalidDataReceivedFromGateway);
         }
 
-        // In sandbox mode Zibal expects the merchant "zibal", for the request and for the verification.
-        private static string? GetMerchant(ZibalGatewayAccount account) =>
-            account.IsSandbox ? "zibal" : account.Merchant;
-
-        public static async Task<PaymentVerifyResult> CreateVerifyResult(HttpResponseMessage responseMessage, string? trackId, MessagesOptions messagesOptions)
+        // 201: this payment was verified before (e.g. the first response was lost). The trackId comes from
+        // the database, so it is this invoice's own payment and it counts as paid.
+        if (response.Result == PaymentAlreadyVerifiedCode)
         {
-            var response = await responseMessage.ReadJsonAsync<ZibalPaymentVerifyResponseModel>().ConfigureAwaitFalse();
+            var alreadyVerified = PaymentVerifyResult.Succeed(response.RefNumber?.ToString() ?? trackId, messagesOptions.PaymentSucceed);
+            alreadyVerified.GatewayResponseCode = response.Result.ToString();
 
-            if (response == null)
-            {
-                return PaymentVerifyResult.Failed(messagesOptions.InvalidDataReceivedFromGateway);
-            }
-
-            // 201: this payment was verified before (e.g. the first response was lost). The trackId comes from
-            // the database, so it is this invoice's own payment and it counts as paid.
-            if (response.Result == PaymentAlreadyVerifiedCode)
-            {
-                var alreadyVerified = PaymentVerifyResult.Succeed(response.RefNumber?.ToString() ?? trackId, messagesOptions.PaymentSucceed);
-                alreadyVerified.GatewayResponseCode = response.Result.ToString();
-
-                return alreadyVerified;
-            }
-
-            if (response.Result != SuccessCode)
-            {
-                var verifyResult = PaymentVerifyResult.Failed(response.Message);
-                verifyResult.GatewayResponseCode = response.Result.ToString();
-
-                return verifyResult;
-            }
-
-            return PaymentVerifyResult.Succeed(response.RefNumber.ToString(), messagesOptions.PaymentSucceed);
+            return alreadyVerified;
         }
 
-        private static string GetPaymentPageUrl(string paymentUrl, long trackId)
+        if (response.Result != SuccessCode)
         {
-            if (string.IsNullOrEmpty(paymentUrl)) throw new ArgumentNullException(nameof(paymentUrl), $"'{nameof(paymentUrl)}' cannot be null or empty.");
+            var verifyResult = PaymentVerifyResult.Failed(response.Message);
+            verifyResult.GatewayResponseCode = response.Result.ToString();
 
-            paymentUrl = paymentUrl.ToggleStringAtEnd("/", false);
-
-            return $"{paymentUrl}/{trackId}";
+            return verifyResult;
         }
 
-        private static string GetTrackId(IEnumerable<Transaction> transactions)
+        return PaymentVerifyResult.Succeed(response.RefNumber.ToString(), messagesOptions.PaymentSucceed);
+    }
+
+    private static string GetPaymentPageUrl(string paymentUrl, long trackId)
+    {
+        if (string.IsNullOrEmpty(paymentUrl)) throw new ArgumentNullException(nameof(paymentUrl), $"'{nameof(paymentUrl)}' cannot be null or empty.");
+
+        paymentUrl = paymentUrl.ToggleStringAtEnd("/", false);
+
+        return $"{paymentUrl}/{trackId}";
+    }
+
+    private static string GetTrackId(IEnumerable<Transaction> transactions)
+    {
+        var transactionRecord = transactions.SingleOrDefault(transaction => transaction.Type == TransactionType.Request);
+
+        if (transactionRecord == null) throw new Exception("Cannot find any transaction with the type \"Request\"");
+
+        var additionalData = JsonConvert.DeserializeObject<IDictionary<string, string>>(transactionRecord.AdditionalData);
+
+        if (!additionalData.TryGetValue(TrackIdAdditionalDataKey, out var id))
         {
-            var transactionRecord = transactions.SingleOrDefault(transaction => transaction.Type == TransactionType.Request);
-
-            if (transactionRecord == null) throw new Exception("Cannot find any transaction with the type \"Request\"");
-
-            var additionalData = JsonConvert.DeserializeObject<IDictionary<string, string>>(transactionRecord.AdditionalData);
-
-            if (!additionalData.TryGetValue(TrackIdAdditionalDataKey, out var id))
-            {
-                throw new Exception("Cannot find the TrackId.");
-            }
-
-            return id;
+            throw new Exception("Cannot find the TrackId.");
         }
+
+        return id;
     }
 }

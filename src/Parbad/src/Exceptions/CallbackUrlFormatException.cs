@@ -3,13 +3,12 @@
 
 using System;
 
-namespace Parbad.Exceptions
+namespace Parbad.Exceptions;
+
+[Serializable]
+public class CallbackUrlFormatException : Exception
 {
-    [Serializable]
-    public class CallbackUrlFormatException : Exception
+    public CallbackUrlFormatException(string url) : base($"The format of the given URL: {url} is not valid. A valid URL would be like: http(s)://www.site.com/foo/bar")
     {
-        public CallbackUrlFormatException(string url) : base($"The format of the given URL: {url} is not valid. A valid URL would be like: http(s)://www.site.com/foo/bar")
-        {
-        }
     }
 }

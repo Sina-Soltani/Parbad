@@ -14,112 +14,111 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Parbad.Gateway.Parsian
+namespace Parbad.Gateway.Parsian;
+
+[Gateway(Name)]
+public class ParsianGateway : GatewayBase<ParsianGatewayAccount>
 {
-    [Gateway(Name)]
-    public class ParsianGateway : GatewayBase<ParsianGatewayAccount>
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly HttpClient _httpClient;
+    private readonly ParsianGatewayOptions _gatewayOptions;
+    private readonly MessagesOptions _messageOptions;
+
+    public const string Name = "Parsian";
+
+    public ParsianGateway(
+        IHttpContextAccessor httpContextAccessor,
+        IHttpClientFactory httpClientFactory,
+        IGatewayAccountProvider<ParsianGatewayAccount> accountProvider,
+        IOptions<ParsianGatewayOptions> gatewayOptions,
+        IOptions<MessagesOptions> messageOptions) : base(accountProvider)
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly HttpClient _httpClient;
-        private readonly ParsianGatewayOptions _gatewayOptions;
-        private readonly MessagesOptions _messageOptions;
+        _httpContextAccessor = httpContextAccessor;
+        _httpClient = httpClientFactory.CreateClient(this);
+        _gatewayOptions = gatewayOptions.Value;
+        _messageOptions = messageOptions.Value;
+    }
 
-        public const string Name = "Parsian";
+    /// <inheritdoc />
+    public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
+    {
+        if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-        public ParsianGateway(
-            IHttpContextAccessor httpContextAccessor,
-            IHttpClientFactory httpClientFactory,
-            IGatewayAccountProvider<ParsianGatewayAccount> accountProvider,
-            IOptions<ParsianGatewayOptions> gatewayOptions,
-            IOptions<MessagesOptions> messageOptions) : base(accountProvider)
+        var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
+
+        var data = ParsianHelper.CreateRequestData(account, invoice);
+
+        var responseMessage = await _httpClient
+                                   .PostXmlAsync(_gatewayOptions.ApiRequestUrl, data, cancellationToken)
+                                   .ConfigureAwaitFalse();
+
+        var response = await responseMessage.ReadSoapAsync().ConfigureAwaitFalse();
+
+        return ParsianHelper.CreateRequestResult(response, _httpContextAccessor.HttpContext, account, _gatewayOptions, _messageOptions);
+    }
+
+    /// <inheritdoc />
+    public override async Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default)
+    {
+        if (context == null) throw new ArgumentNullException(nameof(context));
+
+        var callbackResult = await ParsianHelper
+                                  .CreateCallbackResultAsync(_httpContextAccessor.HttpContext.Request, context, _messageOptions, cancellationToken)
+                                  .ConfigureAwaitFalse();
+
+        return callbackResult.IsSucceed
+            ? PaymentFetchResult.ReadyForVerifying()
+            : PaymentFetchResult.Failed(callbackResult.Message);
+    }
+
+    /// <inheritdoc />
+    public override async Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default)
+    {
+        if (context == null) throw new ArgumentNullException(nameof(context));
+
+        var callbackResult = await ParsianHelper
+                                  .CreateCallbackResultAsync(_httpContextAccessor.HttpContext.Request, context, _messageOptions, cancellationToken)
+                                  .ConfigureAwaitFalse();
+
+        if (!callbackResult.IsSucceed)
         {
-            _httpContextAccessor = httpContextAccessor;
-            _httpClient = httpClientFactory.CreateClient(this);
-            _gatewayOptions = gatewayOptions.Value;
-            _messageOptions = messageOptions.Value;
+            return PaymentVerifyResult.Failed(callbackResult.Message);
         }
 
-        /// <inheritdoc />
-        public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
+        var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
+
+        var data = ParsianHelper.CreateVerifyData(account, callbackResult);
+
+        var responseMessage = await _httpClient
+                                   .PostXmlAsync(_gatewayOptions.ApiVerificationUrl, data, cancellationToken)
+                                   .ConfigureAwaitFalse();
+
+        var response = await responseMessage.ReadSoapAsync().ConfigureAwaitFalse();
+
+        return ParsianHelper.CreateVerifyResult(response, callbackResult, context, _messageOptions);
+    }
+
+    /// <inheritdoc />
+    public override async Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default)
+    {
+        if (context == null) throw new ArgumentNullException(nameof(context));
+
+        // Parsian's ReversalRequest has no amount: it always refunds the whole payment.
+        if (amount.Value != context.Payment.Amount)
         {
-            if (invoice == null) throw new ArgumentNullException(nameof(invoice));
-
-            var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
-
-            var data = ParsianHelper.CreateRequestData(account, invoice);
-
-            var responseMessage = await _httpClient
-                .PostXmlAsync(_gatewayOptions.ApiRequestUrl, data, cancellationToken)
-                .ConfigureAwaitFalse();
-
-            var response = await responseMessage.ReadSoapAsync().ConfigureAwaitFalse();
-
-            return ParsianHelper.CreateRequestResult(response, _httpContextAccessor.HttpContext, account, _gatewayOptions, _messageOptions);
+            return PaymentRefundResult.Failed(_messageOptions.PartialRefundNotSupported);
         }
 
-        /// <inheritdoc />
-        public override async Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default)
-        {
-            if (context == null) throw new ArgumentNullException(nameof(context));
+        var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 
-            var callbackResult = await ParsianHelper
-                                       .CreateCallbackResultAsync(_httpContextAccessor.HttpContext.Request, context, _messageOptions, cancellationToken)
-                                       .ConfigureAwaitFalse();
+        var data = ParsianHelper.CreateRefundData(account, context, amount);
 
-            return callbackResult.IsSucceed
-                ? PaymentFetchResult.ReadyForVerifying()
-                : PaymentFetchResult.Failed(callbackResult.Message);
-        }
+        var responseMessage = await _httpClient
+                                   .PostXmlAsync(_gatewayOptions.ApiRefundUrl, data, cancellationToken)
+                                   .ConfigureAwaitFalse();
 
-        /// <inheritdoc />
-        public override async Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default)
-        {
-            if (context == null) throw new ArgumentNullException(nameof(context));
+        var response = await responseMessage.ReadSoapAsync().ConfigureAwaitFalse();
 
-            var callbackResult = await ParsianHelper
-                                       .CreateCallbackResultAsync(_httpContextAccessor.HttpContext.Request, context, _messageOptions, cancellationToken)
-                                       .ConfigureAwaitFalse();
-
-            if (!callbackResult.IsSucceed)
-            {
-                return PaymentVerifyResult.Failed(callbackResult.Message);
-            }
-
-            var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
-
-            var data = ParsianHelper.CreateVerifyData(account, callbackResult);
-
-            var responseMessage = await _httpClient
-                .PostXmlAsync(_gatewayOptions.ApiVerificationUrl, data, cancellationToken)
-                .ConfigureAwaitFalse();
-
-            var response = await responseMessage.ReadSoapAsync().ConfigureAwaitFalse();
-
-            return ParsianHelper.CreateVerifyResult(response, callbackResult, context, _messageOptions);
-        }
-
-        /// <inheritdoc />
-        public override async Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default)
-        {
-            if (context == null) throw new ArgumentNullException(nameof(context));
-
-            // Parsian's ReversalRequest has no amount: it always refunds the whole payment.
-            if (amount.Value != context.Payment.Amount)
-            {
-                return PaymentRefundResult.Failed(_messageOptions.PartialRefundNotSupported);
-            }
-
-            var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
-
-            var data = ParsianHelper.CreateRefundData(account, context, amount);
-
-            var responseMessage = await _httpClient
-                .PostXmlAsync(_gatewayOptions.ApiRefundUrl, data, cancellationToken)
-                .ConfigureAwaitFalse();
-
-            var response = await responseMessage.ReadSoapAsync().ConfigureAwaitFalse();
-
-            return ParsianHelper.CreateRefundResult(response, _messageOptions);
-        }
+        return ParsianHelper.CreateRefundResult(response, _messageOptions);
     }
 }

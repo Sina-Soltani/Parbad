@@ -3,10 +3,9 @@
 
 using Parbad.Abstraction;
 
-namespace Parbad.Gateway.Parsian
+namespace Parbad.Gateway.Parsian;
+
+public class ParsianGatewayAccount : GatewayAccount
 {
-    public class ParsianGatewayAccount : GatewayAccount
-    {
-        public string LoginAccount { get; set; }
-    }
+    public string LoginAccount { get; set; }
 }

@@ -9,96 +9,95 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 
-namespace Parbad.Utilities
+namespace Parbad.Utilities;
+
+public static class XmlHelper
 {
-    public static class XmlHelper
+    public static string GetNodeValueFromXml(string xml, string nodeName, string nameSpace = "")
     {
-        public static string GetNodeValueFromXml(string xml, string nodeName, string nameSpace = "")
+        if (xml.IsNullOrEmpty())
         {
-            if (xml.IsNullOrEmpty())
-            {
-                throw new ArgumentNullException(nameof(xml));
-            }
-
-            var document = new XmlDocument();
-
-            try
-            {
-                document.LoadXml(xml);
-            }
-            catch (XmlException exception)
-            {
-                throw new InvalidOperationException($"XML loading exception. {exception.Message}");
-            }
-            catch (Exception exception)
-            {
-                throw new InvalidOperationException($"XML exception. {exception.Message}");
-            }
-
-            if (string.IsNullOrEmpty(nameSpace))
-            {
-                return document.SelectSingleNode($"//{nodeName}")?.InnerXml ?? string.Empty;
-            }
-
-            var xmlNameSpaceManager = new XmlNamespaceManager(document.NameTable);
-
-            xmlNameSpaceManager.AddNamespace("TheNameSpace", nameSpace);
-
-            return document.SelectSingleNode($"//TheNameSpace:{nodeName}", xmlNameSpaceManager)?.InnerXml ?? string.Empty;
+            throw new ArgumentNullException(nameof(xml));
         }
 
-        public static byte[] Serialize(object obj)
+        var document = new XmlDocument();
+
+        try
         {
-            var xmlWriterSettings = new XmlWriterSettings
-            {
-                Encoding = Encoding.UTF8,
-                Indent = true
-            };
-
-            var xmlSerializer = new XmlSerializer(obj.GetType());
-
-            byte[] contents;
-
-            using (var memoryStream = new MemoryStream())
-            {
-                using (var xmlWriter = XmlWriter.Create(memoryStream, xmlWriterSettings))
-                {
-                    xmlSerializer.Serialize(xmlWriter, obj);
-                }
-
-                contents = memoryStream.ToArray();
-            }
-
-            return contents;
+            document.LoadXml(xml);
+        }
+        catch (XmlException exception)
+        {
+            throw new InvalidOperationException($"XML loading exception. {exception.Message}");
+        }
+        catch (Exception exception)
+        {
+            throw new InvalidOperationException($"XML exception. {exception.Message}");
         }
 
-        public static bool TryDeserialize<T>(Stream stream, out T obj)
+        if (string.IsNullOrEmpty(nameSpace))
         {
-            try
-            {
-                var xmlSerializer = new XmlSerializer(typeof(T));
-
-                using (var xmlReader = XmlReader.Create(stream))
-                {
-                    obj = (T)xmlSerializer.Deserialize(xmlReader);
-                    return true;
-                }
-            }
-            catch
-            {
-                obj = default(T);
-                return false;
-            }
+            return document.SelectSingleNode($"//{nodeName}")?.InnerXml ?? string.Empty;
         }
 
-        public static string EncodeXmlValue(string value)
+        var xmlNameSpaceManager = new XmlNamespaceManager(document.NameTable);
+
+        xmlNameSpaceManager.AddNamespace("TheNameSpace", nameSpace);
+
+        return document.SelectSingleNode($"//TheNameSpace:{nodeName}", xmlNameSpaceManager)?.InnerXml ?? string.Empty;
+    }
+
+    public static byte[] Serialize(object obj)
+    {
+        var xmlWriterSettings = new XmlWriterSettings
+                                {
+                                    Encoding = Encoding.UTF8,
+                                    Indent = true
+                                };
+
+        var xmlSerializer = new XmlSerializer(obj.GetType());
+
+        byte[] contents;
+
+        using (var memoryStream = new MemoryStream())
         {
-            if (value.IsNullOrEmpty())
+            using (var xmlWriter = XmlWriter.Create(memoryStream, xmlWriterSettings))
             {
-                return value;
+                xmlSerializer.Serialize(xmlWriter, obj);
             }
 
-            return new XElement("t", value).LastNode.ToString();
+            contents = memoryStream.ToArray();
         }
+
+        return contents;
+    }
+
+    public static bool TryDeserialize<T>(Stream stream, out T obj)
+    {
+        try
+        {
+            var xmlSerializer = new XmlSerializer(typeof(T));
+
+            using (var xmlReader = XmlReader.Create(stream))
+            {
+                obj = (T)xmlSerializer.Deserialize(xmlReader);
+                return true;
+            }
+        }
+        catch
+        {
+            obj = default(T);
+            return false;
+        }
+    }
+
+    public static string EncodeXmlValue(string value)
+    {
+        if (value.IsNullOrEmpty())
+        {
+            return value;
+        }
+
+        return new XElement("t", value).LastNode.ToString();
     }
 }

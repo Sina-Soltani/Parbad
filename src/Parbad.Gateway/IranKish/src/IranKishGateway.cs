@@ -15,107 +15,104 @@ using Parbad.Internal;
 using Parbad.Net;
 using Parbad.Options;
 
-namespace Parbad.Gateway.IranKish
+namespace Parbad.Gateway.IranKish;
+
+[Gateway(Name)]
+public class IranKishGateway : GatewayBase<IranKishGatewayAccount>
 {
-    [Gateway(Name)]
-    public class IranKishGateway : GatewayBase<IranKishGatewayAccount>
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly HttpClient _httpClient;
+    private readonly IranKishGatewayOptions _gatewayOptions;
+    private readonly IOptions<MessagesOptions> _messageOptions;
+
+    public const string Name = "IranKish";
+
+    public IranKishGateway(
+        IHttpContextAccessor httpContextAccessor,
+        IHttpClientFactory httpClientFactory,
+        IGatewayAccountProvider<IranKishGatewayAccount> accountProvider,
+        IOptions<IranKishGatewayOptions> gatewayOptions,
+        IOptions<MessagesOptions> messageOptions) : base(accountProvider)
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly HttpClient _httpClient;
-        private readonly IranKishGatewayOptions _gatewayOptions;
-        private readonly IOptions<MessagesOptions> _messageOptions;
+        _httpContextAccessor = httpContextAccessor;
+        _httpClient = httpClientFactory.CreateClient(this);
+        _gatewayOptions = gatewayOptions.Value;
+        _messageOptions = messageOptions;
+    }
 
-        public const string Name = "IranKish";
+    /// <inheritdoc />
+    public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
+    {
+        if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-        public IranKishGateway(
-            IHttpContextAccessor httpContextAccessor,
-            IHttpClientFactory httpClientFactory,
-            IGatewayAccountProvider<IranKishGatewayAccount> accountProvider,
-            IOptions<IranKishGatewayOptions> gatewayOptions,
-            IOptions<MessagesOptions> messageOptions) : base(accountProvider)
+        var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
+
+        var data = IranKishHelper.CreateRequestData(invoice, account);
+
+        var result = await _httpClient
+                          .PostJsonAsync<IranKishTokenResult>(_gatewayOptions.ApiTokenUrl, data, cancellationToken: cancellationToken)
+                          .ConfigureAwaitFalse();
+
+        return IranKishHelper.CreateRequestResult(result, _httpContextAccessor.HttpContext, account, _gatewayOptions, _messageOptions.Value);
+    }
+
+    /// <inheritdoc />
+    public override async Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default)
+    {
+        if (context == null) throw new ArgumentNullException(nameof(context));
+
+        var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
+
+        var callbackResult = await IranKishHelper.CreateCallbackResultAsync(
+                                                                            context,
+                                                                            _httpContextAccessor.HttpContext.Request,
+                                                                            _messageOptions.Value,
+                                                                            cancellationToken);
+
+        if (callbackResult.IsSucceed)
         {
-            _httpContextAccessor = httpContextAccessor;
-            _httpClient = httpClientFactory.CreateClient(this);
-            _gatewayOptions = gatewayOptions.Value;
-            _messageOptions = messageOptions;
+            return PaymentFetchResult.ReadyForVerifying();
         }
 
-        /// <inheritdoc />
-        public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
+        return PaymentFetchResult.Failed(callbackResult.Message);
+    }
+
+    /// <inheritdoc />
+    public override async Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default)
+    {
+        if (context == null) throw new ArgumentNullException(nameof(context));
+
+        var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
+
+        var callbackResult = await IranKishHelper.CreateCallbackResultAsync(
+                                                                            context,
+                                                                            _httpContextAccessor.HttpContext.Request,
+                                                                            _messageOptions.Value,
+                                                                            cancellationToken);
+
+        if (!callbackResult.IsSucceed)
         {
-            if (invoice == null) throw new ArgumentNullException(nameof(invoice));
-
-            var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
-
-            var data = IranKishHelper.CreateRequestData(invoice, account);
-
-            var result = await _httpClient
-                               .PostJsonAsync<IranKishTokenResult>(_gatewayOptions.ApiTokenUrl, data, cancellationToken: cancellationToken)
-                               .ConfigureAwaitFalse();
-
-            return IranKishHelper.CreateRequestResult(result, _httpContextAccessor.HttpContext, account, _gatewayOptions, _messageOptions.Value);
+            return PaymentVerifyResult.Failed(callbackResult.Message);
         }
 
-        /// <inheritdoc />
-        public override async Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default)
-        {
-            if (context == null) throw new ArgumentNullException(nameof(context));
+        var data = new IranKishVerifyRequest
+                   {
+                       TerminalId = account.TerminalId,
+                       RetrievalReferenceNumber = callbackResult.RetrievalReferenceNumber,
+                       SystemTraceAuditNumber = callbackResult.SystemTraceAuditNumber,
+                       TokenIdentity = callbackResult.Token
+                   };
 
-            var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
+        var result = await _httpClient
+                          .PostJsonAsync<IranKishVerifyResult>(_gatewayOptions.ApiVerificationUrl, data, cancellationToken: cancellationToken)
+                          .ConfigureAwaitFalse();
 
-            var callbackResult = await IranKishHelper.CreateCallbackResultAsync(
-                                                                                context,
-                                                                                account,
-                                                                                _httpContextAccessor.HttpContext.Request,
-                                                                                _messageOptions.Value,
-                                                                                cancellationToken);
+        return IranKishHelper.CreateVerifyResult(result, context, _messageOptions.Value);
+    }
 
-            if (callbackResult.IsSucceed)
-            {
-                return PaymentFetchResult.ReadyForVerifying();
-            }
-
-            return PaymentFetchResult.Failed(callbackResult.Message);
-        }
-
-        /// <inheritdoc />
-        public override async Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default)
-        {
-            if (context == null) throw new ArgumentNullException(nameof(context));
-
-            var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
-
-            var callbackResult = await IranKishHelper.CreateCallbackResultAsync(
-                                                                                context,
-                                                                                account,
-                                                                                _httpContextAccessor.HttpContext.Request,
-                                                                                _messageOptions.Value,
-                                                                                cancellationToken);
-
-            if (!callbackResult.IsSucceed)
-            {
-                return PaymentVerifyResult.Failed(callbackResult.Message);
-            }
-
-            var data = new IranKishVerifyRequest
-                       {
-                           TerminalId = account.TerminalId,
-                           RetrievalReferenceNumber = callbackResult.RetrievalReferenceNumber,
-                           SystemTraceAuditNumber = callbackResult.SystemTraceAuditNumber,
-                           TokenIdentity = callbackResult.Token,
-                       };
-
-            var result = await _httpClient
-                               .PostJsonAsync<IranKishVerifyResult>(_gatewayOptions.ApiVerificationUrl, data, cancellationToken: cancellationToken)
-                               .ConfigureAwaitFalse();
-
-            return IranKishHelper.CreateVerifyResult(result, context, _messageOptions.Value);
-        }
-
-        /// <inheritdoc />
-        public override Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default)
-        {
-            return PaymentRefundResult.Failed("The Refund operation is not supported by this gateway.").ToInterfaceAsync();
-        }
+    /// <inheritdoc />
+    public override Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default)
+    {
+        return PaymentRefundResult.Failed("The Refund operation is not supported by this gateway.").ToInterfaceAsync();
     }
 }

@@ -3,31 +3,30 @@
 
 using Newtonsoft.Json;
 
-namespace Parbad.Gateway.PayPing.Internal
+namespace Parbad.Gateway.PayPing.Internal;
+
+/// <summary>
+/// The answer of POST /v3/pay/verify. An "already verified" answer carries the same fields in PascalCase, which
+/// Newtonsoft.Json matches case-insensitively.
+/// </summary>
+internal class VerifyPayResponseModel
 {
-    /// <summary>
-    /// The answer of POST /v3/pay/verify. An "already verified" answer carries the same fields in PascalCase, which
-    /// Newtonsoft.Json matches case-insensitively.
-    /// </summary>
-    internal class VerifyPayResponseModel
-    {
-        [JsonProperty("amount")]
-        public long? Amount { get; set; }
+    [JsonProperty("amount")]
+    public long? Amount { get; set; }
 
-        [JsonProperty("clientRefId")]
-        public string ClientRefId { get; set; }
+    [JsonProperty("clientRefId")]
+    public string ClientRefId { get; set; }
 
-        [JsonProperty("paymentRefId")]
-        public long? PaymentRefId { get; set; }
+    [JsonProperty("paymentRefId")]
+    public long? PaymentRefId { get; set; }
 
-        /// <summary>The payment code.</summary>
-        [JsonProperty("code")]
-        public string Code { get; set; }
+    /// <summary>The payment code.</summary>
+    [JsonProperty("code")]
+    public string Code { get; set; }
 
-        [JsonProperty("cardNumber")]
-        public string CardNumber { get; set; }
+    [JsonProperty("cardNumber")]
+    public string CardNumber { get; set; }
 
-        [JsonProperty("cardHashPan")]
-        public string CardHashPan { get; set; }
-    }
+    [JsonProperty("cardHashPan")]
+    public string CardHashPan { get; set; }
 }

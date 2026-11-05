@@ -9,85 +9,84 @@ using Parbad.TrackingNumberProviders;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Parbad.Tests
+namespace Parbad.Tests;
+
+[TestClass]
+public class AutoIncrementTrackingNumberTests
 {
-    [TestClass]
-    public class AutoIncrementTrackingNumberTests
+    private IStorage _storage;
+    private IOptions<AutoIncrementTrackingNumberOptions> _options;
+    private AutoIncrementTrackingNumber _instance;
+    private Invoice _invoice;
+
+    [TestInitialize]
+    public void Setup()
     {
-        private IStorage _storage;
-        private IOptions<AutoIncrementTrackingNumberOptions> _options;
-        private AutoIncrementTrackingNumber _instance;
-        private Invoice _invoice;
+        var services = new ServiceCollection()
+                      .AddMemoryCache()
+                      .BuildServiceProvider();
 
-        [TestInitialize]
-        public void Setup()
-        {
-            var services = new ServiceCollection()
-                           .AddMemoryCache()
-                           .BuildServiceProvider();
+        var memoryCache = services.GetRequiredService<IMemoryCache>();
+        var memoryCacheOptions = new OptionsWrapper<MemoryCacheStorageOptions>(new MemoryCacheStorageOptions());
+        _storage = new MemoryCacheStorage(memoryCache, memoryCacheOptions);
 
-            var memoryCache = services.GetRequiredService<IMemoryCache>();
-            var memoryCacheOptions = new OptionsWrapper<MemoryCacheStorageOptions>(new MemoryCacheStorageOptions());
-            _storage = new MemoryCacheStorage(memoryCache, memoryCacheOptions);
+        _options = new OptionsWrapper<AutoIncrementTrackingNumberOptions>(new AutoIncrementTrackingNumberOptions());
 
-            _options = new OptionsWrapper<AutoIncrementTrackingNumberOptions>(new AutoIncrementTrackingNumberOptions());
+        _instance = new AutoIncrementTrackingNumber(_storage, _options);
 
-            _instance = new AutoIncrementTrackingNumber(_storage, _options);
+        _invoice = new Invoice();
+    }
 
-            _invoice = new Invoice();
-        }
+    [TestCleanup]
+    public async Task TrackingNumber_Must_Be_A_Positive_Number()
+    {
+        await _instance.FormatAsync(_invoice);
 
-        [TestCleanup]
-        public async Task TrackingNumber_Must_Be_A_Positive_Number()
-        {
-            await _instance.FormatAsync(_invoice);
+        Assert.IsTrue(_invoice.TrackingNumber > 0);
+    }
 
-            Assert.IsTrue(_invoice.TrackingNumber > 0);
-        }
+    [TestMethod]
+    public async Task NewTrackingNumber_Must_Be_Greater_Than_Latest_Number()
+    {
+        var expectedNumber = AutoIncrementTrackingNumberOptions.DefaultMinimumNumber + 1;
 
-        [TestMethod]
-        public async Task NewTrackingNumber_Must_Be_Greater_Than_Latest_Number()
-        {
-            var expectedNumber = AutoIncrementTrackingNumberOptions.DefaultMinimumNumber + 1;
+        await _storage.CreatePaymentAsync(new Payment
+                                          {
+                                              TrackingNumber = AutoIncrementTrackingNumberOptions.DefaultMinimumNumber
+                                          });
 
-            await _storage.CreatePaymentAsync(new Payment
-                                              {
-                                                  TrackingNumber = AutoIncrementTrackingNumberOptions.DefaultMinimumNumber
-                                              });
+        await _instance.FormatAsync(_invoice);
 
-            await _instance.FormatAsync(_invoice);
+        Assert.AreEqual(expectedNumber, _invoice.TrackingNumber);
+    }
 
-            Assert.AreEqual(expectedNumber, _invoice.TrackingNumber);
-        }
+    [TestMethod]
+    public async Task TrackingNumber_Must_Be_Equal_With_MinimumNumber()
+    {
+        const long expectedMinimumNumber = 5;
 
-        [TestMethod]
-        public async Task TrackingNumber_Must_Be_Equal_With_MinimumNumber()
-        {
-            const long expectedMinimumNumber = 5;
+        _options.Value.MinimumValue = expectedMinimumNumber;
 
-            _options.Value.MinimumValue = expectedMinimumNumber;
+        await _instance.FormatAsync(_invoice);
 
-            await _instance.FormatAsync(_invoice);
+        Assert.AreEqual(expectedMinimumNumber, _invoice.TrackingNumber);
+    }
 
-            Assert.AreEqual(expectedMinimumNumber, _invoice.TrackingNumber);
-        }
+    [TestMethod]
+    public async Task TrackingNumber_Must_Increment_Correctly()
+    {
+        const long expectedNumber = 3;
 
-        [TestMethod]
-        public async Task TrackingNumber_Must_Increment_Correctly()
-        {
-            const long expectedNumber = 3;
+        _options.Value.MinimumValue = 1;
+        _options.Value.Increment = 2;
 
-            _options.Value.MinimumValue = 1;
-            _options.Value.Increment = 2;
+        await _storage.CreatePaymentAsync(new Payment
+                                          {
+                                              TrackingNumber = 1
+                                          });
 
-            await _storage.CreatePaymentAsync(new Payment
-                                              {
-                                                  TrackingNumber = 1
-                                              });
+        await _instance.FormatAsync(_invoice);
 
-            await _instance.FormatAsync(_invoice);
-
-            Assert.AreEqual(expectedNumber, _invoice.TrackingNumber);
-        }
+        Assert.AreEqual(expectedNumber, _invoice.TrackingNumber);
     }
 }

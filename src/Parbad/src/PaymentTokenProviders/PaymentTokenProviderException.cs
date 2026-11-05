@@ -3,12 +3,11 @@
 
 using System;
 
-namespace Parbad.PaymentTokenProviders
+namespace Parbad.PaymentTokenProviders;
+
+public class PaymentTokenProviderException : Exception
 {
-    public class PaymentTokenProviderException : Exception
+    public PaymentTokenProviderException(string message) : base(message)
     {
-        public PaymentTokenProviderException(string message) : base(message)
-        {
-        }
     }
 }

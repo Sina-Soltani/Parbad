@@ -6,41 +6,40 @@ using Parbad.Internal;
 using Parbad.InvoiceBuilder;
 using System;
 
-namespace Parbad
+namespace Parbad;
+
+public static class GatewayAccountInvoiceExtensions
 {
-    public static class GatewayAccountInvoiceExtensions
+    /// <summary>
+    /// Gateway Account key in <see cref="Invoice.Properties"/> property.
+    /// </summary>
+    public const string GatewayAccountKeyName = "AccountName";
+
+    /// <summary>
+    /// Uses the given account to communicate with the gateway.
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <param name="accountName">Name of the account.</param>
+    public static IInvoiceBuilder UseAccount(this IInvoiceBuilder builder, string accountName)
     {
-        /// <summary>
-        /// Gateway Account key in <see cref="Invoice.Properties"/> property.
-        /// </summary>
-        public const string GatewayAccountKeyName = "AccountName";
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
+        if (accountName.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(accountName));
 
-        /// <summary>
-        /// Uses the given account to communicate with the gateway.
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="accountName">Name of the account.</param>
-        public static IInvoiceBuilder UseAccount(this IInvoiceBuilder builder, string accountName)
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-            if (accountName.IsNullOrWhiteSpace()) throw new ArgumentNullException(nameof(accountName));
+        builder.AddProperty(GatewayAccountKeyName, accountName);
 
-            builder.AddProperty(GatewayAccountKeyName, accountName);
+        return builder;
+    }
 
-            return builder;
-        }
+    /// <summary>
+    /// Gets the account name if specified.
+    /// </summary>
+    /// <param name="invoice"></param>
+    public static string GetAccountName(this Invoice invoice)
+    {
+        if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-        /// <summary>
-        /// Gets the account name if specified.
-        /// </summary>
-        /// <param name="invoice"></param>
-        public static string GetAccountName(this Invoice invoice)
-        {
-            if (invoice == null) throw new ArgumentNullException(nameof(invoice));
+        if (!invoice.Properties.ContainsKey(GatewayAccountKeyName)) return null;
 
-            if (!invoice.Properties.ContainsKey(GatewayAccountKeyName)) return null;
-
-            return (string)invoice.Properties[GatewayAccountKeyName];
-        }
+        return (string)invoice.Properties[GatewayAccountKeyName];
     }
 }

@@ -14,185 +14,184 @@ using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Parbad.Gateway.IdPay.Internal
+namespace Parbad.Gateway.IdPay.Internal;
+
+internal static class IdPayHelper
 {
-    internal static class IdPayHelper
+    public const string ApiKey = "X-API-KEY";
+    public const string SandBoxKey = "X-SANDBOX";
+    public const string SandBoxApiValue = "6a7f99eb-7c20-4412-a972-6dfb7cd253a4";
+    public const string Succeed = "100";
+    public const string AlreadyVerified = "101";
+    public const string ReadyForVerifying = "10";
+    public const string RequestAdditionalDataKey = "IdPayRequestAdditional";
+
+    public static object CreateRequestData(Invoice invoice)
     {
-        public const string ApiKey = "X-API-KEY";
-        public const string SandBoxKey = "X-SANDBOX";
-        public const string SandBoxApiValue = "6a7f99eb-7c20-4412-a972-6dfb7cd253a4";
-        public const string Succeed = "100";
-        public const string AlreadyVerified = "101";
-        public const string ReadyForVerifying = "10";
-        public const string RequestAdditionalDataKey = "IdPayRequestAdditional";
+        var additionalData = invoice.GetIdPayAdditionalData();
 
-        public static object CreateRequestData(Invoice invoice)
+        return new IdPayRequestModel
+               {
+                   OrderId = invoice.TrackingNumber,
+                   Amount = invoice.Amount,
+                   Name = additionalData?.Name,
+                   Phone = additionalData?.Phone,
+                   Email = additionalData?.Email,
+                   Desc = additionalData?.Desc,
+                   Callback = invoice.CallbackUrl
+               };
+    }
+
+    public static async Task<PaymentRequestResult> CreateRequestResult(
+        HttpResponseMessage responseMessage,
+        HttpContext httpContext,
+        IdPayGatewayAccount account)
+    {
+        var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
+
+        if (!responseMessage.IsSuccessStatusCode)
         {
-            var additionalData = invoice.GetIdPayAdditionalData();
+            var errorModel = GatewayResponse.DeserializeJson<IdPayErrorModel>(responseMessage, response);
 
-            return new IdPayRequestModel
-                   {
-                       OrderId = invoice.TrackingNumber,
-                       Amount = invoice.Amount,
-                       Name = additionalData?.Name,
-                       Phone = additionalData?.Phone,
-                       Email = additionalData?.Email,
-                       Desc = additionalData?.Desc,
-                       Callback = invoice.CallbackUrl
-                   };
+            return PaymentRequestResult.Failed(errorModel.ToString(), account.Name);
         }
 
-        public static async Task<PaymentRequestResult> CreateRequestResult(
-            HttpResponseMessage responseMessage,
-            HttpContext httpContext,
-            IdPayGatewayAccount account)
+        var result = GatewayResponse.DeserializeJson<IdPayRequestResultModel>(responseMessage, response);
+
+        return PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, result.Link);
+    }
+
+    public static async Task<IdPayCallbackResult> CreateCallbackResultAsync(
+        InvoiceContext context,
+        HttpRequest httpRequest,
+        MessagesOptions messagesOptions,
+        CancellationToken cancellationToken)
+    {
+        var status = await httpRequest.TryGetParamAsync("status", cancellationToken).ConfigureAwaitFalse();
+        var id = await httpRequest.TryGetParamAsync("id", cancellationToken).ConfigureAwaitFalse();
+        var trackId = await httpRequest.TryGetParamAsync("track_id", cancellationToken).ConfigureAwaitFalse();
+        var orderId = await httpRequest.TryGetParamAsync("order_id", cancellationToken).ConfigureAwaitFalse();
+        var amount = await httpRequest.TryGetParamAsync("amount", cancellationToken).ConfigureAwaitFalse();
+
+        var (isSucceed, message) = CheckCallback(status.Value, orderId.Value, id.Value, trackId.Value, amount.Value, context, messagesOptions);
+
+        return new IdPayCallbackResult
+               {
+                   Id = id.Value,
+                   IsSucceed = isSucceed,
+                   Message = message
+               };
+    }
+
+    public static IdPayVerifyModel CreateVerifyData(InvoiceContext context, IdPayCallbackResult callbackResult)
+    {
+        return new IdPayVerifyModel
+               {
+                   Id = callbackResult.Id,
+                   OrderId = context.Payment.TrackingNumber
+               };
+    }
+
+    public static async Task<PaymentVerifyResult> CreateVerifyResult(HttpResponseMessage responseMessage, MessagesOptions messagesOptions)
+    {
+        var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
+
+        if (!responseMessage.IsSuccessStatusCode)
         {
-            var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
+            var errorModel = GatewayResponse.DeserializeJson<IdPayErrorModel>(responseMessage, response);
 
-            if (!responseMessage.IsSuccessStatusCode)
-            {
-                var errorModel = GatewayResponse.DeserializeJson<IdPayErrorModel>(responseMessage, response);
-
-                return PaymentRequestResult.Failed(errorModel.ToString(), account.Name);
-            }
-
-            var result = GatewayResponse.DeserializeJson<IdPayRequestResultModel>(responseMessage, response);
-
-            return PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, result.Link);
+            return PaymentVerifyResult.Failed(errorModel.ToString());
         }
 
-        public static async Task<IdPayCallbackResult> CreateCallbackResultAsync(
-            InvoiceContext context,
-            HttpRequest httpRequest,
-            MessagesOptions messagesOptions,
-            CancellationToken cancellationToken)
+        var result = GatewayResponse.DeserializeJson<IdPayVerifyResultModel>(responseMessage, response);
+
+        if (result == null)
         {
-            var status = await httpRequest.TryGetParamAsync("status", cancellationToken).ConfigureAwaitFalse();
-            var id = await httpRequest.TryGetParamAsync("id", cancellationToken).ConfigureAwaitFalse();
-            var trackId = await httpRequest.TryGetParamAsync("track_id", cancellationToken).ConfigureAwaitFalse();
-            var orderId = await httpRequest.TryGetParamAsync("order_id", cancellationToken).ConfigureAwaitFalse();
-            var amount = await httpRequest.TryGetParamAsync("amount", cancellationToken).ConfigureAwaitFalse();
-
-            var (isSucceed, message) = CheckCallback(status.Value, orderId.Value, id.Value, trackId.Value, amount.Value, context, messagesOptions);
-
-            return new IdPayCallbackResult
-                   {
-                       Id = id.Value,
-                       IsSucceed = isSucceed,
-                       Message = message
-                   };
+            return PaymentVerifyResult.Failed(messagesOptions.InvalidDataReceivedFromGateway);
         }
 
-        public static IdPayVerifyModel CreateVerifyData(InvoiceContext context, IdPayCallbackResult callbackResult)
+        if (result.Status.IsNullOrEmpty() || result.TrackId.IsNullOrEmpty())
         {
-            return new IdPayVerifyModel
-                   {
-                       Id = callbackResult.Id,
-                       OrderId = context.Payment.TrackingNumber
-                   };
+            return PaymentVerifyResult.Failed(messagesOptions.InvalidDataReceivedFromGateway);
         }
 
-        public static async Task<PaymentVerifyResult> CreateVerifyResult(HttpResponseMessage responseMessage, MessagesOptions messagesOptions)
+        // 101: the payment was verified before (e.g. the first response was lost). The verify request sends the
+        // order_id, and Parbad compares the order_id and amount of the answer with the invoice.
+        if (result.Status != Succeed && result.Status != AlreadyVerified)
         {
-            var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
-
-            if (!responseMessage.IsSuccessStatusCode)
-            {
-                var errorModel = GatewayResponse.DeserializeJson<IdPayErrorModel>(responseMessage, response);
-
-                return PaymentVerifyResult.Failed(errorModel.ToString());
-            }
-
-            var result = GatewayResponse.DeserializeJson<IdPayVerifyResultModel>(responseMessage, response);
-
-            if (result == null)
-            {
-                return PaymentVerifyResult.Failed(messagesOptions.InvalidDataReceivedFromGateway);
-            }
-
-            if (result.Status.IsNullOrEmpty() || result.TrackId.IsNullOrEmpty())
-            {
-                return PaymentVerifyResult.Failed(messagesOptions.InvalidDataReceivedFromGateway);
-            }
-
-            // 101: the payment was verified before (e.g. the first response was lost). The verify request sends the
-            // order_id, and Parbad compares the order_id and amount of the answer with the invoice.
-            if (result.Status != Succeed && result.Status != AlreadyVerified)
-            {
-                return PaymentVerifyResult.Failed($"Verification failed. Status: {result.Status}");
-            }
-
-            var verifyResult = PaymentVerifyResult.Succeed(result.TrackId, messagesOptions.PaymentSucceed, result.Status);
-            verifyResult.BankReportedOrderId = result.OrderId;
-            verifyResult.BankReportedAmount = result.Amount;
-
-            return verifyResult;
+            return PaymentVerifyResult.Failed($"Verification failed. Status: {result.Status}");
         }
 
-        public static void AssignHeaders(HttpRequestHeaders headers, IdPayGatewayAccount account)
+        var verifyResult = PaymentVerifyResult.Succeed(result.TrackId, messagesOptions.PaymentSucceed, result.Status);
+        verifyResult.BankReportedOrderId = result.OrderId;
+        verifyResult.BankReportedAmount = result.Amount;
+
+        return verifyResult;
+    }
+
+    public static void AssignHeaders(HttpRequestHeaders headers, IdPayGatewayAccount account)
+    {
+        var api = account.IsTestAccount ? SandBoxApiValue : account.Api;
+
+        headers.AddOrUpdate(ApiKey, api);
+
+        if (account.IsTestAccount)
         {
-            var api = account.IsTestAccount ? SandBoxApiValue : account.Api;
+            headers.AddOrUpdate(SandBoxKey, "1");
+        }
+        else if (headers.Contains(SandBoxKey))
+        {
+            headers.Remove(SandBoxKey);
+        }
+    }
 
-            headers.AddOrUpdate(ApiKey, api);
-
-            if (account.IsTestAccount)
-            {
-                headers.AddOrUpdate(SandBoxKey, "1");
-            }
-            else if (headers.Contains(SandBoxKey))
-            {
-                headers.Remove(SandBoxKey);
-            }
+    private static (bool IsSucceed, string Message) CheckCallback(
+        string status,
+        string orderId,
+        string id,
+        string trackId,
+        string amount,
+        InvoiceContext context,
+        MessagesOptions messagesOptions)
+    {
+        if (status.IsNullOrEmpty())
+        {
+            return (false, messagesOptions.InvalidDataReceivedFromGateway);
         }
 
-        private static (bool IsSucceed, string Message) CheckCallback(
-            string status,
-            string orderId,
-            string id,
-            string trackId,
-            string amount,
-            InvoiceContext context,
-            MessagesOptions messagesOptions)
+        if (status != ReadyForVerifying)
         {
-            if (status.IsNullOrEmpty())
-            {
-                return (false, messagesOptions.InvalidDataReceivedFromGateway);
-            }
-
-            if (status != ReadyForVerifying)
-            {
-                return (false, IdPayResultTranslator.TranslateStatus(status, messagesOptions));
-            }
-
-            if (orderId.IsNullOrEmpty() ||
-                id.IsNullOrEmpty() ||
-                trackId.IsNullOrEmpty() ||
-                amount.IsNullOrEmpty())
-            {
-                return (false, messagesOptions.InvalidDataReceivedFromGateway);
-            }
-
-            if (!long.TryParse(orderId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var integerOrderId))
-            {
-                return (false, messagesOptions.InvalidDataReceivedFromGateway);
-            }
-
-            if (integerOrderId != context.Payment.TrackingNumber)
-            {
-                return (false, messagesOptions.InvalidDataReceivedFromGateway);
-            }
-
-            if (!long.TryParse(amount, NumberStyles.Integer, CultureInfo.InvariantCulture, out var integerAmount))
-            {
-                return (false, messagesOptions.InvalidDataReceivedFromGateway);
-            }
-
-            if (integerAmount != context.Payment.Amount)
-            {
-                return (false, messagesOptions.InvalidDataReceivedFromGateway);
-            }
-
-            return (true, null);
+            return (false, IdPayResultTranslator.TranslateStatus(status, messagesOptions));
         }
+
+        if (orderId.IsNullOrEmpty() ||
+            id.IsNullOrEmpty() ||
+            trackId.IsNullOrEmpty() ||
+            amount.IsNullOrEmpty())
+        {
+            return (false, messagesOptions.InvalidDataReceivedFromGateway);
+        }
+
+        if (!long.TryParse(orderId, NumberStyles.Integer, CultureInfo.InvariantCulture, out var integerOrderId))
+        {
+            return (false, messagesOptions.InvalidDataReceivedFromGateway);
+        }
+
+        if (integerOrderId != context.Payment.TrackingNumber)
+        {
+            return (false, messagesOptions.InvalidDataReceivedFromGateway);
+        }
+
+        if (!long.TryParse(amount, NumberStyles.Integer, CultureInfo.InvariantCulture, out var integerAmount))
+        {
+            return (false, messagesOptions.InvalidDataReceivedFromGateway);
+        }
+
+        if (integerAmount != context.Payment.Amount)
+        {
+            return (false, messagesOptions.InvalidDataReceivedFromGateway);
+        }
+
+        return (true, null);
     }
 }

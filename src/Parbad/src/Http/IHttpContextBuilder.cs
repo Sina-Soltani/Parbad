@@ -5,14 +5,13 @@ using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Parbad.Http
+namespace Parbad.Http;
+
+public interface IHttpContextBuilder
 {
-    public interface IHttpContextBuilder
-    {
-        IServiceCollection Services { get; }
+    IServiceCollection Services { get; }
 
-        void AddHttpContext<THttpContext>(ServiceLifetime serviceLifetime) where THttpContext : class, IHttpContextAccessor;
+    void AddHttpContext<THttpContext>(ServiceLifetime serviceLifetime) where THttpContext : class, IHttpContextAccessor;
 
-        void AddHttpContext(Func<IServiceProvider, IHttpContextAccessor> factory, ServiceLifetime serviceLifetime);
-    }
+    void AddHttpContext(Func<IServiceProvider, IHttpContextAccessor> factory, ServiceLifetime serviceLifetime);
 }

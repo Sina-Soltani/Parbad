@@ -3,10 +3,9 @@
 
 using System.Threading.Tasks;
 
-namespace Parbad.Gateway.ParbadVirtual.MiddlewareInvoker
+namespace Parbad.Gateway.ParbadVirtual.MiddlewareInvoker;
+
+public interface IParbadVirtualGatewayMiddlewareInvoker
 {
-    public interface IParbadVirtualGatewayMiddlewareInvoker
-    {
-        Task InvokeAsync();
-    }
+    Task InvokeAsync();
 }

@@ -3,17 +3,16 @@
 
 using System;
 
-namespace Parbad.Exceptions
-{
-    [Serializable]
-    public class InvalidTrackingNumberException : Exception
-    {
-        public InvalidTrackingNumberException(long trackingNumber) :
-            base($"The provided tracking number {trackingNumber} is not valid. A valid tracking number must be greater than zero.")
-        {
-            TrackingNumber = trackingNumber;
-        }
+namespace Parbad.Exceptions;
 
-        public long TrackingNumber { get; }
+[Serializable]
+public class InvalidTrackingNumberException : Exception
+{
+    public InvalidTrackingNumberException(long trackingNumber) :
+        base($"The provided tracking number {trackingNumber} is not valid. A valid tracking number must be greater than zero.")
+    {
+        TrackingNumber = trackingNumber;
     }
+
+    public long TrackingNumber { get; }
 }

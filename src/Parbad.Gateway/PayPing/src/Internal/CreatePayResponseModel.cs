@@ -3,15 +3,14 @@
 
 using Newtonsoft.Json;
 
-namespace Parbad.Gateway.PayPing.Internal
-{
-    /// <summary>The answer of POST /v3/pay.</summary>
-    internal class CreatePayResponseModel
-    {
-        [JsonProperty("paymentCode")]
-        public string PaymentCode { get; set; }
+namespace Parbad.Gateway.PayPing.Internal;
 
-        [JsonProperty("url")]
-        public string Url { get; set; }
-    }
+/// <summary>The answer of POST /v3/pay.</summary>
+internal class CreatePayResponseModel
+{
+    [JsonProperty("paymentCode")]
+    public string PaymentCode { get; set; }
+
+    [JsonProperty("url")]
+    public string Url { get; set; }
 }

@@ -9,197 +9,197 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Parbad.Storage.EntityFrameworkCore.Tests
+namespace Parbad.Storage.EntityFrameworkCore.Tests;
+
+[TestClass]
+public class EntityFrameworkCoreStorageTests
 {
-    [TestClass]
-    public class EntityFrameworkCoreStorageTests
+    private ParbadDataContext _context;
+    private EntityFrameworkCoreStorage _storage;
+
+    private static readonly Payment PaymentTestData = new()
+                                                      {
+                                                          TrackingNumber = 1,
+                                                          Amount = 1000,
+                                                          Token = "token",
+                                                          TransactionCode = "test",
+                                                          GatewayName = "gateway",
+                                                          GatewayAccountName = "test",
+                                                          IsPaid = false,
+                                                          IsCompleted = false
+                                                      };
+
+    private static readonly Transaction TransactionTestData = new()
+                                                              {
+                                                                  PaymentId = 1,
+                                                                  Amount = 1000,
+                                                                  IsSucceed = false,
+                                                                  Message = "test",
+                                                                  Type = TransactionType.Request,
+                                                                  AdditionalData = "test"
+                                                              };
+
+    [TestInitialize]
+    public void Setup()
     {
-        private ParbadDataContext _context;
-        private EntityFrameworkCoreStorage _storage;
+        var contextOptions = new DbContextOptionsBuilder<ParbadDataContext>()
+                            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                            .Options;
 
-        private static readonly Payment PaymentTestData = new()
-                                                          {
-                                                              TrackingNumber = 1,
-                                                              Amount = 1000,
-                                                              Token = "token",
-                                                              TransactionCode = "test",
-                                                              GatewayName = "gateway",
-                                                              GatewayAccountName = "test",
-                                                              IsPaid = false,
-                                                              IsCompleted = false
-                                                          };
+        var efCoreOptions = new OptionsWrapper<EntityFrameworkCoreOptions>(new EntityFrameworkCoreOptions());
 
-        private static readonly Transaction TransactionTestData = new()
-                                                                  {
-                                                                      PaymentId = 1,
-                                                                      Amount = 1000,
-                                                                      IsSucceed = false,
-                                                                      Message = "test",
-                                                                      Type = TransactionType.Request,
-                                                                      AdditionalData = "test"
-                                                                  };
+        _context = new ParbadDataContext(contextOptions, efCoreOptions);
 
-        [TestInitialize]
-        public void Setup()
-        {
-            var contextOptions = new DbContextOptionsBuilder<ParbadDataContext>()
-                                 .UseInMemoryDatabase(Guid.NewGuid().ToString())
-                                 .Options;
+        _storage = new EntityFrameworkCoreStorage(_context);
+    }
 
-            var efCoreOptions = new OptionsWrapper<EntityFrameworkCoreOptions>(new EntityFrameworkCoreOptions());
+    [TestCleanup]
+    public async Task Cleanup()
+    {
+        await _context.DisposeAsync();
+    }
 
-            _context = new ParbadDataContext(contextOptions, efCoreOptions);
+    [TestMethod]
+    public async Task Create_Payment_Works()
+    {
+        await _storage.CreatePaymentAsync(PaymentTestData);
 
-            _storage = new EntityFrameworkCoreStorage(_context);
-        }
+        var payment = _storage.Payments.SingleOrDefault();
 
-        [TestCleanup]
-        public async Task Cleanup()
-        {
-            await _context.DisposeAsync();
-        }
+        Assert.IsNotNull(payment);
+        Assert.AreEqual(1, _storage.Payments.Count());
 
-        [TestMethod]
-        public async Task Create_Payment_Works()
-        {
-            await _storage.CreatePaymentAsync(PaymentTestData);
+        payment.ShouldCompare(PaymentTestData);
+    }
 
-            var payment = _storage.Payments.SingleOrDefault();
+    [TestMethod]
+    public async Task Update_Payment_Works()
+    {
+        await _storage.CreatePaymentAsync(PaymentTestData);
 
-            Assert.IsNotNull(payment);
-            Assert.AreEqual(1, _storage.Payments.Count());
+        var payment = _storage.Payments.SingleOrDefault();
 
-            payment.ShouldCompare(PaymentTestData);
-        }
+        Assert.IsNotNull(payment);
 
-        [TestMethod]
-        public async Task Update_Payment_Works()
-        {
-            await _storage.CreatePaymentAsync(PaymentTestData);
+        payment.TrackingNumber = 2;
+        payment.Amount = 2000;
+        payment.Token = "NewToken";
+        payment.TransactionCode = "NewCode";
+        payment.GatewayName = "NewGateway";
+        payment.GatewayAccountName = "NewAccount";
+        payment.IsPaid = true;
+        payment.IsCompleted = true;
 
-            var payment = _storage.Payments.SingleOrDefault();
+        await _storage.UpdatePaymentAsync(payment);
 
-            Assert.IsNotNull(payment);
+        var newPayment = _storage.Payments.SingleOrDefault();
 
-            payment.TrackingNumber = 2;
-            payment.Amount = 2000;
-            payment.Token = "NewToken";
-            payment.TransactionCode = "NewCode";
-            payment.GatewayName = "NewGateway";
-            payment.GatewayAccountName = "NewAccount";
-            payment.IsPaid = true;
-            payment.IsCompleted = true;
+        Assert.IsNotNull(newPayment);
+        newPayment.ShouldCompare(payment);
+    }
 
-            await _storage.UpdatePaymentAsync(payment);
+    [TestMethod]
+    public async Task Delete_Payment_Works()
+    {
+        await _storage.CreatePaymentAsync(PaymentTestData);
 
-            var newPayment = _storage.Payments.SingleOrDefault();
+        var payment = _storage.Payments.SingleOrDefault();
 
-            Assert.IsNotNull(newPayment);
-            newPayment.ShouldCompare(payment);
-        }
+        await _storage.DeletePaymentAsync(payment);
 
-        [TestMethod]
-        public async Task Delete_Payment_Works()
-        {
-            await _storage.CreatePaymentAsync(PaymentTestData);
+        Assert.AreEqual(0, _storage.Payments.Count());
+    }
 
-            var payment = _storage.Payments.SingleOrDefault();
+    [TestMethod]
+    public async Task Create_Transaction_Works()
+    {
+        await _storage.CreatePaymentAsync(PaymentTestData);
 
-            await _storage.DeletePaymentAsync(payment);
+        var payment = _storage.Payments.SingleOrDefault();
 
-            Assert.AreEqual(0, _storage.Payments.Count());
-        }
+        Assert.IsNotNull(payment);
 
-        [TestMethod]
-        public async Task Create_Transaction_Works()
-        {
-            await _storage.CreatePaymentAsync(PaymentTestData);
+        TransactionTestData.PaymentId = payment.Id;
 
-            var payment = _storage.Payments.SingleOrDefault();
+        await _storage.CreateTransactionAsync(TransactionTestData);
 
-            Assert.IsNotNull(payment);
+        var transaction = _storage.Transactions.SingleOrDefault();
 
-            TransactionTestData.PaymentId = payment.Id;
+        Assert.IsNotNull(transaction);
+        Assert.AreEqual(1, _storage.Transactions.Count());
 
-            await _storage.CreateTransactionAsync(TransactionTestData);
+        transaction.ShouldCompare(TransactionTestData);
+    }
 
-            var transaction = _storage.Transactions.SingleOrDefault();
+    [TestMethod]
+    public async Task Update_Transaction_Works()
+    {
+        await _storage.CreatePaymentAsync(PaymentTestData);
 
-            Assert.IsNotNull(transaction);
-            Assert.AreEqual(1, _storage.Transactions.Count());
+        var payment = _storage.Payments.SingleOrDefault();
 
-            transaction.ShouldCompare(TransactionTestData);
-        }
+        Assert.IsNotNull(payment);
 
-        [TestMethod]
-        public async Task Update_Transaction_Works()
-        {
-            await _storage.CreatePaymentAsync(PaymentTestData);
+        TransactionTestData.PaymentId = payment.Id;
 
-            var payment = _storage.Payments.SingleOrDefault();
+        await _storage.CreateTransactionAsync(TransactionTestData);
 
-            Assert.IsNotNull(payment);
+        var transaction = _storage.Transactions.SingleOrDefault();
 
-            TransactionTestData.PaymentId = payment.Id;
+        Assert.IsNotNull(transaction);
 
-            await _storage.CreateTransactionAsync(TransactionTestData);
+        transaction.Amount = 2000;
+        transaction.IsSucceed = true;
+        transaction.Message = "NewMessage";
+        transaction.Type = TransactionType.Verify;
+        transaction.AdditionalData = "NewAdditionalData";
 
-            var transaction = _storage.Transactions.SingleOrDefault();
+        await _storage.UpdateTransactionAsync(transaction);
 
-            Assert.IsNotNull(transaction);
+        var newTransaction = _storage.Transactions.SingleOrDefault();
 
-            transaction.Amount = 2000;
-            transaction.IsSucceed = true;
-            transaction.Message = "NewMessage";
-            transaction.Type = TransactionType.Verify;
-            transaction.AdditionalData = "NewAdditionalData";
+        Assert.IsNotNull(newTransaction);
+        Assert.AreEqual(1, _storage.Transactions.Count());
 
-            await _storage.UpdateTransactionAsync(transaction);
+        newTransaction.ShouldCompare(transaction);
+    }
 
-            var newTransaction = _storage.Transactions.SingleOrDefault();
+    [TestMethod]
+    public async Task Delete_Transaction_Works()
+    {
+        await _storage.CreatePaymentAsync(PaymentTestData);
 
-            Assert.IsNotNull(newTransaction);
-            Assert.AreEqual(1, _storage.Transactions.Count());
+        var payment = _storage.Payments.SingleOrDefault();
 
-            newTransaction.ShouldCompare(transaction);
-        }
+        Assert.IsNotNull(payment);
 
-        [TestMethod]
-        public async Task Delete_Transaction_Works()
-        {
-            await _storage.CreatePaymentAsync(PaymentTestData);
+        TransactionTestData.PaymentId = payment.Id;
 
-            var payment = _storage.Payments.SingleOrDefault();
+        await _storage.CreateTransactionAsync(TransactionTestData);
 
-            Assert.IsNotNull(payment);
+        var transaction = _storage.Transactions.SingleOrDefault();
 
-            TransactionTestData.PaymentId = payment.Id;
+        await _storage.DeleteTransactionAsync(transaction);
 
-            await _storage.CreateTransactionAsync(TransactionTestData);
+        Assert.AreEqual(0, _storage.Transactions.Count());
+    }
 
-            var transaction = _storage.Transactions.SingleOrDefault();
+    [TestMethod]
+    public async Task Paid_Payment_Lookup_Finds_Only_Paid_Payments_Of_The_Same_Gateway_Except_The_Given_One()
+    {
+        await _storage.CreatePaymentAsync(NewPayment(1, "RRN-1", "gateway", isPaid: true));
+        await _storage.CreatePaymentAsync(NewPayment(2, "RRN-2", "gateway", isPaid: false));
+        await _storage.CreatePaymentAsync(NewPayment(3, "RRN-3", "other", isPaid: true));
 
-            await _storage.DeleteTransactionAsync(transaction);
+        var found = await _storage.FindPaidPaymentByTransactionCodeAsync("gateway", "RRN-1", exceptTrackingNumber: 99);
 
-            Assert.AreEqual(0, _storage.Transactions.Count());
-        }
+        Assert.AreEqual(1, found?.TrackingNumber);
+        Assert.IsNull(await _storage.FindPaidPaymentByTransactionCodeAsync("gateway", "RRN-1", exceptTrackingNumber: 1), "The excluded payment was returned.");
+        Assert.IsNull(await _storage.FindPaidPaymentByTransactionCodeAsync("gateway", "RRN-2", exceptTrackingNumber: 99), "An unpaid payment was returned.");
+        Assert.IsNull(await _storage.FindPaidPaymentByTransactionCodeAsync("gateway", "RRN-3", exceptTrackingNumber: 99), "A payment of another gateway was returned.");
+    }
 
-        [TestMethod]
-        public async Task Paid_Payment_Lookup_Finds_Only_Paid_Payments_Of_The_Same_Gateway_Except_The_Given_One()
-        {
-            await _storage.CreatePaymentAsync(NewPayment(1, "RRN-1", "gateway", isPaid: true));
-            await _storage.CreatePaymentAsync(NewPayment(2, "RRN-2", "gateway", isPaid: false));
-            await _storage.CreatePaymentAsync(NewPayment(3, "RRN-3", "other", isPaid: true));
-
-            var found = await _storage.FindPaidPaymentByTransactionCodeAsync("gateway", "RRN-1", exceptTrackingNumber: 99);
-
-            Assert.AreEqual(1, found?.TrackingNumber);
-            Assert.IsNull(await _storage.FindPaidPaymentByTransactionCodeAsync("gateway", "RRN-1", exceptTrackingNumber: 1), "The excluded payment was returned.");
-            Assert.IsNull(await _storage.FindPaidPaymentByTransactionCodeAsync("gateway", "RRN-2", exceptTrackingNumber: 99), "An unpaid payment was returned.");
-            Assert.IsNull(await _storage.FindPaidPaymentByTransactionCodeAsync("gateway", "RRN-3", exceptTrackingNumber: 99), "A payment of another gateway was returned.");
-        }
-
-        private static Payment NewPayment(long trackingNumber, string transactionCode, string gatewayName, bool isPaid) => new()
+    private static Payment NewPayment(long trackingNumber, string transactionCode, string gatewayName, bool isPaid) => new()
         {
             TrackingNumber = trackingNumber,
             Amount = 1000,
@@ -210,5 +210,4 @@ namespace Parbad.Storage.EntityFrameworkCore.Tests
             IsCompleted = true,
             IsPaid = isPaid
         };
-    }
 }

@@ -7,25 +7,24 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Owin;
 using Parbad.Gateway.ParbadVirtual.MiddlewareInvoker;
 
-namespace Parbad.Owin.VirtualGateway
+namespace Parbad.Owin.VirtualGateway;
+
+public class ParbadVirtualGatewayMiddleware : OwinMiddleware
 {
-    public class ParbadVirtualGatewayMiddleware : OwinMiddleware
-    {
-        private readonly IServiceProvider _services;
+    private readonly IServiceProvider _services;
 
-        public ParbadVirtualGatewayMiddleware(OwinMiddleware next, IServiceProvider services)
+    public ParbadVirtualGatewayMiddleware(OwinMiddleware next, IServiceProvider services)
         : base(next)
-        {
-            _services = services;
-        }
+    {
+        _services = services;
+    }
 
-        public override Task Invoke(IOwinContext context)
-        {
-            if (context == null) throw new ArgumentNullException(nameof(context));
+    public override Task Invoke(IOwinContext context)
+    {
+        if (context == null) throw new ArgumentNullException(nameof(context));
 
-            var invoker = _services.GetRequiredService<IParbadVirtualGatewayMiddlewareInvoker>();
+        var invoker = _services.GetRequiredService<IParbadVirtualGatewayMiddlewareInvoker>();
 
-            return invoker.InvokeAsync();
-        }
+        return invoker.InvokeAsync();
     }
 }

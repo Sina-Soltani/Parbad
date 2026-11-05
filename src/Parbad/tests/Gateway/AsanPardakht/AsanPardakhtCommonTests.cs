@@ -6,31 +6,30 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Parbad.Gateway.AsanPardakht;
 
-namespace Parbad.Tests.Gateway.AsanPardakht
+namespace Parbad.Tests.Gateway.AsanPardakht;
+
+[TestClass]
+public class AsanPardakhtCommonTests
 {
-    [TestClass]
-    public class AsanPardakhtCommonTests
+    private IInvoiceBuilder _invoiceBuilder;
+
+    [TestInitialize]
+    public void Initialize()
     {
-        private IInvoiceBuilder _invoiceBuilder;
+        var mockServiceProvider = new Mock<IServiceProvider>();
 
-        [TestInitialize]
-        public void Initialize()
-        {
-            var mockServiceProvider = new Mock<IServiceProvider>();
+        _invoiceBuilder = new DefaultInvoiceBuilder(mockServiceProvider.Object);
+    }
 
-            _invoiceBuilder = new DefaultInvoiceBuilder(mockServiceProvider.Object);
-        }
+    [TestMethod]
+    public async Task Invoice_Must_Have_Correct_GatewayName()
+    {
+        _invoiceBuilder.UseAsanPardakht();
 
-        [TestMethod]
-        public async Task Invoice_Must_Have_Correct_GatewayName()
-        {
-            _invoiceBuilder.UseAsanPardakht();
+        var invoice = await _invoiceBuilder.BuildAsync();
 
-            var invoice = await _invoiceBuilder.BuildAsync();
-
-            Assert.IsNotNull(invoice);
-            Assert.IsNotNull(invoice.GatewayName);
-            Assert.IsTrue(invoice.GatewayName.Equals("AsanPardakht", StringComparison.OrdinalIgnoreCase));
-        }
+        Assert.IsNotNull(invoice);
+        Assert.IsNotNull(invoice.GatewayName);
+        Assert.IsTrue(invoice.GatewayName.Equals("AsanPardakht", StringComparison.OrdinalIgnoreCase));
     }
 }

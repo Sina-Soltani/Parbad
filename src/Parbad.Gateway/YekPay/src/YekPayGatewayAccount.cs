@@ -3,10 +3,9 @@
 
 using Parbad.Abstraction;
 
-namespace Parbad.Gateway.YekPay
+namespace Parbad.Gateway.YekPay;
+
+public class YekPayGatewayAccount : GatewayAccount
 {
-    public class YekPayGatewayAccount : GatewayAccount
-    {
-        public string MerchantId { get; set; }
-    }
+    public string MerchantId { get; set; }
 }

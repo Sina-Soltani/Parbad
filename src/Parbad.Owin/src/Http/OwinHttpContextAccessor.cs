@@ -7,17 +7,16 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Owin;
 using Microsoft.Owin;
 
-namespace Parbad.Owin.Http
+namespace Parbad.Owin.Http;
+
+public class OwinHttpContextAccessor : IHttpContextAccessor
 {
-    public class OwinHttpContextAccessor : IHttpContextAccessor
+    public OwinHttpContextAccessor(IOwinContext owinContext)
     {
-        public OwinHttpContextAccessor(IOwinContext owinContext)
-        {
-            if (owinContext == null) throw new ArgumentNullException(nameof(owinContext));
+        if (owinContext == null) throw new ArgumentNullException(nameof(owinContext));
 
-            HttpContext = new DefaultHttpContext(new FeatureCollection(new OwinFeatureCollection(owinContext.Environment)));
-        }
-
-        public HttpContext HttpContext { get; set; }
+        HttpContext = new DefaultHttpContext(new FeatureCollection(new OwinFeatureCollection(owinContext.Environment)));
     }
+
+    public HttpContext HttpContext { get; set; }
 }

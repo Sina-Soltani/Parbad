@@ -4,92 +4,91 @@
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 
-namespace Parbad.Internal
+namespace Parbad.Internal;
+
+public class PaymentRequestResult : PaymentResult, IPaymentRequestResult
 {
-    public class PaymentRequestResult : PaymentResult, IPaymentRequestResult
+    /// <inheritdoc />
+    public PaymentRequestResultStatus Status { get; set; }
+
+    /// <inheritdoc />
+    public IGatewayTransporter GatewayTransporter { get; set; }
+
+    public override bool IsSucceed => Status == PaymentRequestResultStatus.Succeed;
+
+    /// <summary>
+    /// Creates an instance of <see cref="PaymentRequestResult"/> which indicates a successful result and a Gateway Transporter with type of Post.
+    /// </summary>
+    /// <param name="gatewayAccountName"></param>
+    /// <param name="httpContext"></param>
+    /// <param name="url">Page URL.</param>
+    /// <param name="form">Form to post.</param>
+    public static PaymentRequestResult SucceedWithPost(
+        string gatewayAccountName,
+        HttpContext httpContext,
+        string url,
+        IEnumerable<KeyValuePair<string, string>> form)
     {
-        /// <inheritdoc />
-        public PaymentRequestResultStatus Status { get; set; }
+        var descriptor = GatewayTransporterDescriptor.CreatePost(url, form);
 
-        /// <inheritdoc />
-        public IGatewayTransporter GatewayTransporter { get; set; }
+        var transporter = new DefaultGatewayTransporter(httpContext, descriptor);
 
-        public override bool IsSucceed => Status == PaymentRequestResultStatus.Succeed;
+        return Succeed(transporter, gatewayAccountName);
+    }
 
-        /// <summary>
-        /// Creates an instance of <see cref="PaymentRequestResult"/> which indicates a successful result and a Gateway Transporter with type of Post.
-        /// </summary>
-        /// <param name="gatewayAccountName"></param>
-        /// <param name="httpContext"></param>
-        /// <param name="url">Page URL.</param>
-        /// <param name="form">Form to post.</param>
-        public static PaymentRequestResult SucceedWithPost(
-            string gatewayAccountName,
-            HttpContext httpContext,
-            string url,
-            IEnumerable<KeyValuePair<string, string>> form)
-        {
-            var descriptor = GatewayTransporterDescriptor.CreatePost(url, form);
+    /// <summary>
+    /// Creates an instance of <see cref="PaymentRequestResult"/> which indicates a successful result and a Gateway Transporter with type of Redirect.
+    /// </summary>
+    /// <param name="gatewayAccountName"></param>
+    /// <param name="httpContext"></param>
+    /// <param name="url">Page URL.</param>
+    public static PaymentRequestResult SucceedWithRedirect(
+        string gatewayAccountName,
+        HttpContext httpContext,
+        string url)
+    {
+        var descriptor = GatewayTransporterDescriptor.CreateRedirect(url);
 
-            var transporter = new DefaultGatewayTransporter(httpContext, descriptor);
+        var transporter = new DefaultGatewayTransporter(httpContext, descriptor);
 
-            return Succeed(transporter, gatewayAccountName);
-        }
+        return Succeed(transporter, gatewayAccountName);
+    }
 
-        /// <summary>
-        /// Creates an instance of <see cref="PaymentRequestResult"/> which indicates a successful result and a Gateway Transporter with type of Redirect.
-        /// </summary>
-        /// <param name="gatewayAccountName"></param>
-        /// <param name="httpContext"></param>
-        /// <param name="url">Page URL.</param>
-        public static PaymentRequestResult SucceedWithRedirect(
-            string gatewayAccountName,
-            HttpContext httpContext,
-            string url)
-        {
-            var descriptor = GatewayTransporterDescriptor.CreateRedirect(url);
+    /// <summary>
+    /// Creates an instance of <see cref="PaymentRequestResult"/> which indicates a successful result.
+    /// </summary>
+    public static PaymentRequestResult Succeed(IGatewayTransporter gatewayTransporter, string gatewayAccountName)
+    {
+        return new PaymentRequestResult
+               {
+                   GatewayAccountName = gatewayAccountName,
+                   GatewayTransporter = gatewayTransporter,
+                   Status = PaymentRequestResultStatus.Succeed
+               };
+    }
 
-            var transporter = new DefaultGatewayTransporter(httpContext, descriptor);
+    /// <summary>
+    /// Creates an instance of <see cref="PaymentRequestResult"/> which indicates a failure result.
+    /// </summary>
+    public static PaymentRequestResult Failed(string message) => Failed(message, null);
 
-            return Succeed(transporter, gatewayAccountName);
-        }
+    /// <summary>
+    /// Creates an instance of <see cref="PaymentRequestResult"/> which indicates a failure result.
+    /// </summary>
+    public static PaymentRequestResult Failed(string message, string gatewayAccountName) => Failed(message, gatewayAccountName, null);
 
-        /// <summary>
-        /// Creates an instance of <see cref="PaymentRequestResult"/> which indicates a successful result.
-        /// </summary>
-        public static PaymentRequestResult Succeed(IGatewayTransporter gatewayTransporter, string gatewayAccountName)
-        {
-            return new PaymentRequestResult
-            {
-                GatewayAccountName = gatewayAccountName,
-                GatewayTransporter = gatewayTransporter,
-                Status = PaymentRequestResultStatus.Succeed
-            };
-        }
-
-        /// <summary>
-        /// Creates an instance of <see cref="PaymentRequestResult"/> which indicates a failure result.
-        /// </summary>
-        public static PaymentRequestResult Failed(string message) => Failed(message, null);
-
-        /// <summary>
-        /// Creates an instance of <see cref="PaymentRequestResult"/> which indicates a failure result.
-        /// </summary>
-        public static PaymentRequestResult Failed(string message, string gatewayAccountName) => Failed(message, gatewayAccountName, null);
-
-        /// <summary>
-        /// Creates an instance of <see cref="PaymentRequestResult"/> which indicates a failure result.
-        /// </summary>
-        public static PaymentRequestResult Failed(string message, string gatewayAccountName, string gatewayResponseCode)
-        {
-            return new PaymentRequestResult
-            {
-                Status = PaymentRequestResultStatus.Failed,
-                Message = message,
-                GatewayResponseCode = gatewayResponseCode,
-                GatewayAccountName = gatewayAccountName,
-                GatewayTransporter = new NullGatewayTransporter()
-            };
-        }
+    /// <summary>
+    /// Creates an instance of <see cref="PaymentRequestResult"/> which indicates a failure result.
+    /// </summary>
+    public static PaymentRequestResult Failed(string message, string gatewayAccountName, string gatewayResponseCode)
+    {
+        return new PaymentRequestResult
+               {
+                   Status = PaymentRequestResultStatus.Failed,
+                   Message = message,
+                   GatewayResponseCode = gatewayResponseCode,
+                   GatewayAccountName = gatewayAccountName,
+                   GatewayTransporter = new NullGatewayTransporter()
+               };
     }
 }

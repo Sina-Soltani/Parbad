@@ -6,27 +6,26 @@ using System.Threading.Tasks;
 using Parbad.Abstraction;
 using Parbad.GatewayBuilders;
 
-namespace Parbad.Internal
+namespace Parbad.Internal;
+
+public class GatewayAccountProvider<TAccount> : IGatewayAccountProvider<TAccount> where TAccount : GatewayAccount
 {
-    public class GatewayAccountProvider<TAccount> : IGatewayAccountProvider<TAccount> where TAccount : GatewayAccount
+    private readonly IEnumerable<IGatewayAccountSource<TAccount>> _sources;
+
+    public GatewayAccountProvider(IEnumerable<IGatewayAccountSource<TAccount>> sources)
     {
-        private readonly IEnumerable<IGatewayAccountSource<TAccount>> _sources;
+        _sources = sources;
+    }
 
-        public GatewayAccountProvider(IEnumerable<IGatewayAccountSource<TAccount>> sources)
+    public virtual async Task<IGatewayAccountCollection<TAccount>> LoadAccountsAsync()
+    {
+        var accounts = new GatewayAccountCollection<TAccount>();
+
+        foreach (var source in _sources)
         {
-            _sources = sources;
+            await source.AddAccountsAsync(accounts);
         }
 
-        public virtual async Task<IGatewayAccountCollection<TAccount>> LoadAccountsAsync()
-        {
-            var accounts = new GatewayAccountCollection<TAccount>();
-
-            foreach (var source in _sources)
-            {
-                await source.AddAccountsAsync(accounts);
-            }
-
-            return accounts;
-        }
+        return accounts;
     }
 }

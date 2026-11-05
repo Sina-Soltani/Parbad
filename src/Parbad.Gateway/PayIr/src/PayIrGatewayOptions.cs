@@ -1,11 +1,10 @@
-﻿namespace Parbad.Gateway.PayIr
+﻿namespace Parbad.Gateway.PayIr;
+
+public class PayIrGatewayOptions
 {
-    public class PayIrGatewayOptions
-    {
-        public string ApiRequestUrl { get; set; } = "https://pay.ir/pg/send";
+    public string ApiRequestUrl { get; set; } = "https://pay.ir/pg/send";
 
-        public string ApiVerificationUrl { get; set; } = "https://pay.ir/pg/verify";
+    public string ApiVerificationUrl { get; set; } = "https://pay.ir/pg/verify";
 
-        public string PaymentPageUrl { get; set; } = "https://pay.ir/pg/";
-    }
+    public string PaymentPageUrl { get; set; } = "https://pay.ir/pg/";
 }

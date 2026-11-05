@@ -16,81 +16,80 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Parbad.Gateway.Zibal
+namespace Parbad.Gateway.Zibal;
+
+[Gateway(Name)]
+public class ZibalGateway : GatewayBase<ZibalGatewayAccount>
 {
-    [Gateway(Name)]
-    public class ZibalGateway : GatewayBase<ZibalGatewayAccount>
+    public const string Name = "Zibal";
+
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly HttpClient _httpClient;
+    private readonly ZibalGatewayOptions _gatewayOptions;
+    private readonly ParbadOptions _options;
+
+    private static JsonSerializerSettings DefaultSerializerSettings => new()
+                                                                       {
+                                                                           ContractResolver = new CamelCasePropertyNamesContractResolver()
+                                                                       };
+
+    public ZibalGateway(
+        IGatewayAccountProvider<ZibalGatewayAccount> accountProvider,
+        IHttpContextAccessor httpContextAccessor,
+        IHttpClientFactory httpClientFactory,
+        IOptions<ZibalGatewayOptions> gatewayOptions,
+        IOptions<ParbadOptions> options) : base(accountProvider)
     {
-        public const string Name = "Zibal";
+        _httpContextAccessor = httpContextAccessor;
+        // The client must be created by the gateway's type name: that is the name WithHttpClient and
+        // WithProxy configure.
+        _httpClient = httpClientFactory.CreateClient(this);
+        _gatewayOptions = gatewayOptions.Value;
+        _options = options.Value;
+    }
 
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly HttpClient _httpClient;
-        private readonly ZibalGatewayOptions _gatewayOptions;
-        private readonly ParbadOptions _options;
+    public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
+    {
+        if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-        private static JsonSerializerSettings DefaultSerializerSettings => new()
-        {
-            ContractResolver = new CamelCasePropertyNamesContractResolver()
-        };
+        var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
 
-        public ZibalGateway(
-            IGatewayAccountProvider<ZibalGatewayAccount> accountProvider,
-            IHttpContextAccessor httpContextAccessor,
-            IHttpClientFactory httpClientFactory,
-            IOptions<ZibalGatewayOptions> gatewayOptions,
-            IOptions<ParbadOptions> options) : base(accountProvider)
-        {
-            _httpContextAccessor = httpContextAccessor;
-            // The client must be created by the gateway's type name: that is the name WithHttpClient and
-            // WithProxy configure.
-            _httpClient = httpClientFactory.CreateClient(this);
-            _gatewayOptions = gatewayOptions.Value;
-            _options = options.Value;
-        }
+        var data = ZibalHelper.CreateRequestData(invoice, account);
 
-        public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
-        {
-            if (invoice == null) throw new ArgumentNullException(nameof(invoice));
+        var responseMessage = await _httpClient
+                                   .PostJsonAsync(_gatewayOptions.ApiRequestUrl, data, DefaultSerializerSettings, cancellationToken)
+                                   .ConfigureAwaitFalse();
 
-            var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
+        return await ZibalHelper.CreateRequestResult(responseMessage, _httpContextAccessor.HttpContext, account, _gatewayOptions, _options.Messages);
+    }
 
-            var data = ZibalHelper.CreateRequestData(invoice, account);
+    public override Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default)
+    {
+        if (context == null) throw new ArgumentNullException(nameof(context));
 
-            var responseMessage = await _httpClient
-                .PostJsonAsync(_gatewayOptions.ApiRequestUrl, data, DefaultSerializerSettings, cancellationToken)
-                .ConfigureAwaitFalse();
+        return ZibalHelper.CreateFetchResult(_httpContextAccessor.HttpContext.Request,
+                                             context,
+                                             _options.Messages,
+                                             cancellationToken);
+    }
 
-            return await ZibalHelper.CreateRequestResult(responseMessage, _httpContextAccessor.HttpContext, account, _gatewayOptions, _options.Messages);
-        }
+    public override async Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default)
+    {
+        if (context == null) throw new ArgumentNullException(nameof(context));
 
-        public override Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default)
-        {
-            if (context == null) throw new ArgumentNullException(nameof(context));
+        var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 
-            return ZibalHelper.CreateFetchResult(_httpContextAccessor.HttpContext.Request,
-                                                                        context,
-                                                                        _options.Messages,
-                                                                        cancellationToken);
-        }
+        var data = ZibalHelper.CreateVerifyData(context.Transactions, account);
 
-        public override async Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default)
-        {
-            if (context == null) throw new ArgumentNullException(nameof(context));
+        var responseMessage = await _httpClient
+                                   .PostJsonAsync(_gatewayOptions.ApiVerificationUrl, data, DefaultSerializerSettings, cancellationToken)
+                                   .ConfigureAwaitFalse();
 
-            var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
+        return await ZibalHelper.CreateVerifyResult(responseMessage, data.TrackId, _options.Messages);
+    }
 
-            var data = ZibalHelper.CreateVerifyData(context.Transactions, account);
-
-            var responseMessage = await _httpClient
-                .PostJsonAsync(_gatewayOptions.ApiVerificationUrl, data, DefaultSerializerSettings, cancellationToken)
-                .ConfigureAwaitFalse();
-
-            return await ZibalHelper.CreateVerifyResult(responseMessage, data.TrackId, _options.Messages);
-        }
-
-        public override Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default)
-        {
-            return PaymentRefundResult.Failed("The Refund operation is not supported by this gateway.").ToInterfaceAsync();
-        }
+    public override Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default)
+    {
+        return PaymentRefundResult.Failed("The Refund operation is not supported by this gateway.").ToInterfaceAsync();
     }
 }

@@ -1,9 +1,8 @@
 ﻿using Parbad.Abstraction;
 
-namespace Parbad.Tests
+namespace Parbad.Tests;
+
+internal class TestableGatewayAccount : GatewayAccount
 {
-    internal class TestableGatewayAccount : GatewayAccount
-    {
-        public int Id { get; set; }
-    }
+    public int Id { get; set; }
 }

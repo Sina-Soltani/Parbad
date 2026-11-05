@@ -4,13 +4,12 @@
 using System;
 using Parbad.Properties;
 
-namespace Parbad.Exceptions
+namespace Parbad.Exceptions;
+
+[Serializable]
+public class DatabaseSaveRecordException : Exception
 {
-    [Serializable]
-    public class DatabaseSaveRecordException : Exception
+    public DatabaseSaveRecordException() : base(Resources.NoRecordsSavedInDatabase)
     {
-        public DatabaseSaveRecordException() : base(Resources.NoRecordsSavedInDatabase)
-        {
-        }
     }
 }

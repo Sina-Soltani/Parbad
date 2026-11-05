@@ -5,150 +5,149 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Parbad.Tests
+namespace Parbad.Tests;
+
+[TestClass]
+public class InvoiceBuilderTests
 {
-    [TestClass]
-    public class InvoiceBuilderTests
+    private ServiceProvider _services;
+    private IInvoiceBuilder _builder;
+
+    [TestInitialize]
+    public void Setup()
     {
-        private ServiceProvider _services;
-        private IInvoiceBuilder _builder;
+        _services = new ServiceCollection()
+           .BuildServiceProvider();
 
-        [TestInitialize]
-        public void Setup()
-        {
-            _services = new ServiceCollection()
-                .BuildServiceProvider();
+        _builder = new DefaultInvoiceBuilder(_services);
+    }
 
-            _builder = new DefaultInvoiceBuilder(_services);
-        }
+    [TestCleanup]
+    public async Task Cleanup()
+    {
+        await _services.DisposeAsync();
+    }
 
-        [TestCleanup]
-        public async Task Cleanup()
-        {
-            await _services.DisposeAsync();
-        }
+    [TestMethod]
+    public async Task Build_Must_Return_An_Invoice()
+    {
+        var invoice = await _builder.BuildAsync();
 
-        [TestMethod]
-        public async Task Build_Must_Return_An_Invoice()
-        {
-            var invoice = await _builder.BuildAsync();
+        Assert.IsNotNull(invoice);
+    }
 
-            Assert.IsNotNull(invoice);
-        }
+    [TestMethod]
+    public async Task Invoice_Must_Have_The_Expected_TrackingNumber()
+    {
+        const long expectedValue = 1000;
 
-        [TestMethod]
-        public async Task Invoice_Must_Have_The_Expected_TrackingNumber()
-        {
-            const long expectedValue = 1000;
+        _builder.SetTrackingNumber(expectedValue);
 
-            _builder.SetTrackingNumber(expectedValue);
+        var invoice = await _builder.BuildAsync();
 
-            var invoice = await _builder.BuildAsync();
+        Assert.AreEqual(expectedValue, invoice.TrackingNumber);
+    }
 
-            Assert.AreEqual(expectedValue, invoice.TrackingNumber);
-        }
+    [TestMethod]
+    public async Task Invoice_Must_Have_The_Expected_Amount()
+    {
+        const decimal expectedValue = 1000;
 
-        [TestMethod]
-        public async Task Invoice_Must_Have_The_Expected_Amount()
-        {
-            const decimal expectedValue = 1000;
+        _builder.SetAmount(expectedValue);
 
-            _builder.SetAmount(expectedValue);
+        var invoice = await _builder.BuildAsync();
 
-            var invoice = await _builder.BuildAsync();
+        Assert.AreEqual(expectedValue, (decimal)invoice.Amount);
+    }
 
-            Assert.AreEqual(expectedValue, (decimal)invoice.Amount);
-        }
+    [TestMethod]
+    public async Task Invoice_Must_Have_The_Expected_CallbackUrl()
+    {
+        const string expectedValue = "http://test.com";
 
-        [TestMethod]
-        public async Task Invoice_Must_Have_The_Expected_CallbackUrl()
-        {
-            const string expectedValue = "http://test.com";
+        _builder.SetCallbackUrl(expectedValue);
 
-            _builder.SetCallbackUrl(expectedValue);
+        var invoice = await _builder.BuildAsync();
 
-            var invoice = await _builder.BuildAsync();
+        Assert.AreEqual(expectedValue, (string)invoice.CallbackUrl);
+    }
 
-            Assert.AreEqual(expectedValue, (string)invoice.CallbackUrl);
-        }
+    [TestMethod]
+    public async Task Invoice_Must_Have_The_Expected_GatewayName()
+    {
+        const string expectedValue = "Gateway";
 
-        [TestMethod]
-        public async Task Invoice_Must_Have_The_Expected_GatewayName()
-        {
-            const string expectedValue = "Gateway";
+        _builder.SetGateway(expectedValue);
 
-            _builder.SetGateway(expectedValue);
+        var invoice = await _builder.BuildAsync();
 
-            var invoice = await _builder.BuildAsync();
+        Assert.AreEqual(expectedValue, invoice.GatewayName);
+    }
 
-            Assert.AreEqual(expectedValue, invoice.GatewayName);
-        }
+    [TestMethod]
+    public async Task Invoice_Must_Have_The_Expected_AdditionalData()
+    {
+        const string expectedKey = "key";
+        const string expectedValue = "value";
 
-        [TestMethod]
-        public async Task Invoice_Must_Have_The_Expected_AdditionalData()
-        {
-            const string expectedKey = "key";
-            const string expectedValue = "value";
+        _builder.AddProperty(expectedKey, expectedValue);
 
-            _builder.AddProperty(expectedKey, expectedValue);
+        var invoice = await _builder.BuildAsync();
 
-            var invoice = await _builder.BuildAsync();
+        Assert.IsNotNull(invoice.Properties);
+        Assert.IsTrue(invoice.Properties.ContainsKey(expectedKey));
+        Assert.AreEqual(expectedValue, invoice.Properties[expectedKey]);
+    }
 
-            Assert.IsNotNull(invoice.Properties);
-            Assert.IsTrue(invoice.Properties.ContainsKey(expectedKey));
-            Assert.AreEqual(expectedValue, invoice.Properties[expectedKey]);
-        }
+    [TestMethod]
+    public async Task Invoice_Must_Throw_Exception_When_Duplicate_AdditionalKey_Is_Added()
+    {
+        const string key = "key";
 
-        [TestMethod]
-        public async Task Invoice_Must_Throw_Exception_When_Duplicate_AdditionalKey_Is_Added()
-        {
-            const string key = "key";
+        _builder.AddProperty(key, "");
+        _builder.AddProperty(key, "");
 
-            _builder.AddProperty(key, "");
-            _builder.AddProperty(key, "");
+        // Without await, the assertion's task was discarded and the test could never fail.
+        await Assert.ThrowsExceptionAsync<ArgumentException>(() => _builder.BuildAsync());
+    }
 
-            // Without await, the assertion's task was discarded and the test could never fail.
-            await Assert.ThrowsExceptionAsync<ArgumentException>(() => _builder.BuildAsync());
-        }
+    [TestMethod]
+    public async Task Invoice_Must_Have_The_Updated_AdditionalData_Value()
+    {
+        const string expectedKey = "key";
+        const string expectedValue = "value";
 
-        [TestMethod]
-        public async Task Invoice_Must_Have_The_Updated_AdditionalData_Value()
-        {
-            const string expectedKey = "key";
-            const string expectedValue = "value";
+        _builder.AddProperty(expectedKey, "");
+        _builder.AddOrUpdateProperty(expectedKey, expectedValue);
 
-            _builder.AddProperty(expectedKey, "");
-            _builder.AddOrUpdateProperty(expectedKey, expectedValue);
+        var invoice = await _builder.BuildAsync();
 
-            var invoice = await _builder.BuildAsync();
+        Assert.IsNotNull(invoice.Properties);
+        Assert.IsTrue(invoice.Properties.ContainsKey(expectedKey));
+        Assert.AreEqual(expectedValue, invoice.Properties[expectedKey]);
+    }
 
-            Assert.IsNotNull(invoice.Properties);
-            Assert.IsTrue(invoice.Properties.ContainsKey(expectedKey));
-            Assert.AreEqual(expectedValue, invoice.Properties[expectedKey]);
-        }
+    [TestMethod]
+    public async Task Invoice_Formatter_Must_Apply_Value_Correctly()
+    {
+        const long expectedTrackingNumber = 1000;
+        const decimal expectedAmount = 1000;
+        const string expectedCallbackUrl = "http://test.com";
+        const string expectedGateway = "Gateway";
 
-        [TestMethod]
-        public async Task Invoice_Formatter_Must_Apply_Value_Correctly()
-        {
-            const long expectedTrackingNumber = 1000;
-            const decimal expectedAmount = 1000;
-            const string expectedCallbackUrl = "http://test.com";
-            const string expectedGateway = "Gateway";
+        _builder.AddFormatter(_ =>
+                              {
+                                  _.TrackingNumber = expectedTrackingNumber;
+                                  _.Amount = expectedAmount;
+                                  _.CallbackUrl = new CallbackUrl(expectedCallbackUrl);
+                                  _.GatewayName = expectedGateway;
+                              });
 
-            _builder.AddFormatter(_ =>
-            {
-                _.TrackingNumber = expectedTrackingNumber;
-                _.Amount = expectedAmount;
-                _.CallbackUrl = new CallbackUrl(expectedCallbackUrl);
-                _.GatewayName = expectedGateway;
-            });
+        var invoice = await _builder.BuildAsync();
 
-            var invoice = await _builder.BuildAsync();
-
-            Assert.AreEqual(expectedTrackingNumber, invoice.TrackingNumber);
-            Assert.AreEqual(expectedAmount, (decimal)invoice.Amount);
-            Assert.AreEqual(expectedCallbackUrl, (string)invoice.CallbackUrl);
-            Assert.AreEqual(expectedGateway, invoice.GatewayName);
-        }
+        Assert.AreEqual(expectedTrackingNumber, invoice.TrackingNumber);
+        Assert.AreEqual(expectedAmount, (decimal)invoice.Amount);
+        Assert.AreEqual(expectedCallbackUrl, (string)invoice.CallbackUrl);
+        Assert.AreEqual(expectedGateway, invoice.GatewayName);
     }
 }

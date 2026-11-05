@@ -8,25 +8,24 @@ using Owin;
 using Parbad.Gateway.ParbadVirtual;
 using Parbad.Owin.VirtualGateway;
 
-namespace Parbad.Builder
+namespace Parbad.Builder;
+
+public static class ParbadVirtualGatewayOwinExtensions
 {
-    public static class ParbadVirtualGatewayOwinExtensions
+    /// <summary>
+    /// Adds the Parbad Virtual Gateway middleware to the pipeline.
+    /// </summary>
+    /// <param name="app"></param>
+    /// <param name="serviceProvider"></param>
+    /// <returns></returns>
+    public static IAppBuilder UseParbadVirtualGateway(this IAppBuilder app, IServiceProvider serviceProvider)
     {
-        /// <summary>
-        /// Adds the Parbad Virtual Gateway middleware to the pipeline.
-        /// </summary>
-        /// <param name="app"></param>
-        /// <param name="serviceProvider"></param>
-        /// <returns></returns>
-        public static IAppBuilder UseParbadVirtualGateway(this IAppBuilder app, IServiceProvider serviceProvider)
-        {
-            if (app == null) throw new ArgumentNullException(nameof(app));
-            if (serviceProvider == null) throw new ArgumentNullException(nameof(serviceProvider));
+        if (app == null) throw new ArgumentNullException(nameof(app));
+        if (serviceProvider == null) throw new ArgumentNullException(nameof(serviceProvider));
 
-            var options = serviceProvider.GetRequiredService<IOptions<ParbadVirtualGatewayOptions>>();
+        var options = serviceProvider.GetRequiredService<IOptions<ParbadVirtualGatewayOptions>>();
 
-            return app.Map(options.Value.GatewayPath,
-                builder => builder.Use<ParbadVirtualGatewayMiddleware>(serviceProvider));
-        }
+        return app.Map(options.Value.GatewayPath,
+                       builder => builder.Use<ParbadVirtualGatewayMiddleware>(serviceProvider));
     }
 }

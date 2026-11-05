@@ -4,21 +4,20 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Parbad
+namespace Parbad;
+
+/// <summary>
+/// Defines a mechanism for transporting the client to a gateway.
+/// </summary>
+public interface IGatewayTransporter
 {
     /// <summary>
-    /// Defines a mechanism for transporting the client to a gateway.
+    /// Describes a gateway transporter.
     /// </summary>
-    public interface IGatewayTransporter
-    {
-        /// <summary>
-        /// Describes a gateway transporter.
-        /// </summary>
-        GatewayTransporterDescriptor Descriptor { get; }
+    GatewayTransporterDescriptor Descriptor { get; }
 
-        /// <summary>
-        /// Transports the client to the specified gateway.
-        /// </summary>
-        Task TransportAsync(CancellationToken cancellationToken = default);
-    }
+    /// <summary>
+    /// Transports the client to the specified gateway.
+    /// </summary>
+    Task TransportAsync(CancellationToken cancellationToken = default);
 }

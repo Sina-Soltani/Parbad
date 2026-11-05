@@ -3,15 +3,14 @@
 
 using System;
 
-namespace Parbad.Gateway.Melli.Internal.Models
+namespace Parbad.Gateway.Melli.Internal.Models;
+
+[Serializable]
+internal class MelliApiRequestResult
 {
-    [Serializable]
-    internal class MelliApiRequestResult
-    {
-        public int? ResCode { get; set; }
+    public int? ResCode { get; set; }
 
-        public string Token { get; set; }
+    public string Token { get; set; }
 
-        public string Description { get; set; }
-    }
+    public string Description { get; set; }
 }

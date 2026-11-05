@@ -3,13 +3,12 @@
 
 using Microsoft.Extensions.Logging;
 
-namespace Parbad
+namespace Parbad;
+
+/// <summary>
+/// Parbad Logger is a Proxy for Microsoft Logging.
+/// </summary>
+/// <typeparam name="TCategoryName"></typeparam>
+public interface IParbadLogger<out TCategoryName> : ILogger<TCategoryName>
 {
-    /// <summary>
-    /// Parbad Logger is a Proxy for Microsoft Logging.
-    /// </summary>
-    /// <typeparam name="TCategoryName"></typeparam>
-    public interface IParbadLogger<out TCategoryName> : ILogger<TCategoryName>
-    {
-    }
 }
