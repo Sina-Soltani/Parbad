@@ -17,7 +17,10 @@ namespace Parbad.Gateway.AsanPardakht
         {
             if (builder == null) throw new ArgumentNullException(nameof(builder));
 
+            // Still registered for applications that use it; the gateway itself no longer does.
+#pragma warning disable CS0618
             builder.Services.AddSingleton<IAsanPardakhtCrypto, AsanPardakhtCrypto>();
+#pragma warning restore CS0618
 
             return builder
                 .AddGateway<AsanPardakhtGateway>()
