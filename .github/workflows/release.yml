@@ -1,0 +1,148 @@
+name: Release
+
+# Publishes the NuGet packages of a release branch (release/...) to nuget.org.
+#
+# The project files decide what is published. A package is published when its version (VersionPrefix, plus
+# VersionSuffix for a prerelease) is not on nuget.org yet; every other package is left alone.
+#
+# Releasing, alpha/beta/rc included:
+#   1. Create release/vX-Y-Z from master and bump the VersionPrefix of every package that changes.
+#   2. For a prerelease, also set <VersionSuffix>alpha.1</VersionSuffix> (beta.1, rc.1, ...) in those projects.
+#      Every bumped package needs the suffix until the final release, or it is published as stable.
+#   3. Push the branch. ci.yml builds, tests and packs; the "plan" job finds the new versions; publishing waits for
+#      an approval. The next prerelease raises the suffix (alpha.2, beta.1, ...).
+#   4. For the stable release, remove the VersionSuffix lines and push. Then open the pull request to master.
+#
+
+on:
+  push:
+    branches: [ 'release/**' ]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    uses: ./.github/workflows/ci.yml
+    with:
+      pack: true
+
+  plan:
+    name: Find the new package versions
+    needs: build
+    runs-on: ubuntu-latest
+    outputs:
+      has-new: ${{ steps.plan.outputs.has-new }}
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: packages
+          path: artifacts
+
+      # Keeps only the packages whose version is not on nuget.org yet, and stops a prerelease whose stable version
+      # is already published: 1.5.0-beta.1 sorts before 1.5.0, so users on 1.5.0 would never see it as newer.
+      - name: Compare with nuget.org
+        id: plan
+        shell: pwsh
+        run: |
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          New-Item -ItemType Directory -Force publish | Out-Null
+          $new = @()
+          $errors = @()
+
+          foreach ($file in Get-ChildItem artifacts -Filter *.nupkg) {
+            $zip = [IO.Compression.ZipFile]::OpenRead($file.FullName)
+            try {
+              $entry = $zip.Entries | Where-Object { $_.FullName -like '*.nuspec' -and $_.FullName -notlike '*/*' } | Select-Object -First 1
+              $reader = New-Object IO.StreamReader($entry.Open())
+              [xml]$nuspec = $reader.ReadToEnd()
+              $reader.Dispose()
+            }
+            finally {
+              $zip.Dispose()
+            }
+
+            $id = $nuspec.package.metadata.id
+            $version = $nuspec.package.metadata.version
+            $url = "https://api.nuget.org/v3-flatcontainer/$($id.ToLowerInvariant())/index.json"
+            $response = Invoke-RestMethod $url -SkipHttpErrorCheck -StatusCodeVariable status
+
+            $published = @()
+            if ($status -eq 200) { $published = @($response.versions) }
+            elseif ($status -ne 404) { throw "nuget.org answered $status for $id." }
+
+            if ($published -contains $version.ToLowerInvariant()) {
+              Write-Host "$id $version is already on nuget.org."
+              continue
+            }
+
+            if ($version.Contains('-')) {
+              $stable = $version.Split('-')[0]
+              if ($published -contains $stable.ToLowerInvariant()) {
+                $errors += "$id $version is a prerelease of $stable, which is already published. Bump the VersionPrefix first."
+                continue
+              }
+            }
+
+            Write-Host "$id $version will be published."
+            Copy-Item $file.FullName publish/
+            $new += "| $id | $version |"
+          }
+
+          if ($errors.Count -gt 0) {
+            $errors | ForEach-Object { Write-Host "::error::$_" }
+            exit 1
+          }
+
+          if ($new.Count -gt 0) {
+            "has-new=true" >> $env:GITHUB_OUTPUT
+            @('### Packages to publish', '', '| Package | Version |', '|---|---|') + $new | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          }
+          else {
+            "has-new=false" >> $env:GITHUB_OUTPUT
+            'Nothing to publish: every package version is already on nuget.org.' | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          }
+
+      - name: Upload the packages to publish
+        if: steps.plan.outputs.has-new == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: publish
+          path: publish/*.nupkg
+          if-no-files-found: error
+
+  publish:
+    name: Publish to nuget.org
+    needs: plan
+    # No approval is requested when the push contains no new package version.
+    if: needs.plan.outputs.has-new == 'true'
+    runs-on: ubuntu-latest
+    environment: nuget
+    permissions:
+      id-token: write # requested by NuGet/login for Trusted Publishing
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: publish
+          path: publish
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Log in to nuget.org
+        id: login
+        uses: NuGet/login@v1
+        with:
+          # The nuget.org profile name that owns the packages;
+          user: ${{ vars.NUGET_USER }}
+
+      # --skip-duplicate is only a safety net: the plan job already removed the versions that exist.
+      - name: Push
+        run: dotnet nuget push "publish/*.nupkg" --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
