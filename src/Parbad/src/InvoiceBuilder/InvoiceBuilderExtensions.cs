@@ -30,7 +30,9 @@ namespace Parbad
         /// Sets the amount of the invoice.
         /// </summary>
         /// <param name="builder"></param>
-        /// <param name="amount">The amount of invoice.</param>
+        /// <param name="amount">
+        /// The amount of invoice, in the unit the gateway expects. Parbad sends it as given and never converts it.
+        /// </param>
         public static IInvoiceBuilder SetAmount(this IInvoiceBuilder builder, Money amount)
             => AddFormatter(builder, invoice => invoice.Amount = amount);
 

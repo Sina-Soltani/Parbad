@@ -7,11 +7,11 @@ using System.Globalization;
 namespace Parbad
 {
     /// <summary>
-    /// Defines money unit.
+    /// An amount of money.
     /// <para>
-    /// Note: The official unit of currency in Iran is the Iranian rial (IR).
-    /// It means the amount of the invoice will be sent to Iranian gateways automatically
-    /// as <see cref="Int64"/> by Parbad.
+    /// Parbad never converts the amount. It is sent to the gateway exactly as given, as a whole number
+    /// (<see cref="Int64"/>; a fraction is dropped). Set it in the unit the gateway expects: most Iranian gateways
+    /// expect Iranian rials (IRR), but some payment providers work in tomans. Check the gateway's documentation.
     /// </para>
     /// <para>Examples:
     /// <para>decimal a = new Money(1000)</para>
@@ -23,11 +23,9 @@ namespace Parbad
     public readonly struct Money : IComparable<Money>, IEquatable<Money>, IEquatable<decimal>, IEquatable<long>
     {
         /// <summary>
-        /// Defines money unit.
+        /// Initializes an amount of money.
         /// <para>
-        /// Note: The official unit of currency in Iran is the Iranian rial (IR).
-        /// It means the amount of the invoice will be sent to Iranian gateways automatically
-        /// as <see cref="Int64"/> by Parbad.
+        /// Parbad never converts the amount. Set it in the unit the gateway expects (see <see cref="Money"/>).
         /// </para>
         /// </summary>
         /// <param name="value">The amount of money.</param>

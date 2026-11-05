@@ -24,6 +24,10 @@ public class Invoice
 
     /// <summary>
     /// Gets or sets the amount of the invoice.
+    /// <para>
+    /// Parbad sends it to the gateway exactly as given and never converts it (e.g. between rials and tomans).
+    /// Set it in the unit the gateway expects.
+    /// </para>
     /// <para>Note: You can also enter long and decimal numbers. It can also be parsed to long and decimal.</para>
     /// <para>Examples:</para>
     /// <para>long a = invoice.Amount;</para>
