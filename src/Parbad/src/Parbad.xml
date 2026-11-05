@@ -1815,6 +1815,13 @@
             <typeparam name="TGateway"></typeparam>
             <param name="services"></param>
         </member>
+        <member name="M:Parbad.Net.GatewayHttpClientExtensions.ConfigureParbadDefaults(Microsoft.Extensions.DependencyInjection.IHttpClientBuilder)">
+            <summary>
+            Applies Parbad's defaults to a gateway's <see cref="T:System.Net.Http.HttpClient"/>: the <see cref="P:Parbad.Options.ParbadOptions.GatewayTimeout"/>.
+            Call it before any other configuration of the client, so that configuration can override the defaults.
+            </summary>
+            <param name="httpClientBuilder"></param>
+        </member>
         <member name="M:Parbad.Net.GatewayHttpClientExtensions.CreateClient(System.Net.Http.IHttpClientFactory,Parbad.Abstraction.IGateway)">
             <summary>
             Creates a <see cref="T:System.Net.Http.HttpClient"/> for the specified gateway.
@@ -2064,6 +2071,17 @@
             <summary>
             A factory to represent Nonce. The value will be used in inline-scripts and CSS links
             to support CSP (Content-Security-Policy). If your application doesn't include any CSP, you can leave this property null. 
+            </summary>
+        </member>
+        <member name="P:Parbad.Options.ParbadOptions.GatewayTimeout">
+            <summary>
+            The timeout of each HTTP call Parbad makes to a gateway. The default value is 30 seconds, instead of the
+            100 seconds of <see cref="T:System.Net.Http.HttpClient"/>. Use <see cref="F:System.Threading.Timeout.InfiniteTimeSpan"/>
+            for no timeout.
+            <para>
+            A verification that times out throws and leaves the payment open, so it can be verified again. A timeout
+            set for one gateway with <c>WithHttpClient</c> takes precedence.
+            </para>
             </summary>
         </member>
         <member name="T:Parbad.ParbadBuilder">

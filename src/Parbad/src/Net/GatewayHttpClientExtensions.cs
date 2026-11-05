@@ -4,8 +4,10 @@
 using System;
 using System.Net.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Parbad.Abstraction;
 using Parbad.Internal;
+using Parbad.Options;
 
 namespace Parbad.Net
 {
@@ -23,7 +25,24 @@ namespace Parbad.Net
         {
             if (services == null) throw new ArgumentNullException(nameof(services));
 
-            return services.AddHttpClient(GatewayHelper.GetCompleteGatewayName<TGateway>());
+            return services.AddHttpClient(GatewayHelper.GetCompleteGatewayName<TGateway>()).ConfigureParbadDefaults();
+        }
+
+        /// <summary>
+        /// Applies Parbad's defaults to a gateway's <see cref="HttpClient"/>: the <see cref="ParbadOptions.GatewayTimeout"/>.
+        /// Call it before any other configuration of the client, so that configuration can override the defaults.
+        /// </summary>
+        /// <param name="httpClientBuilder"></param>
+        public static IHttpClientBuilder ConfigureParbadDefaults(this IHttpClientBuilder httpClientBuilder)
+        {
+            if (httpClientBuilder == null) throw new ArgumentNullException(nameof(httpClientBuilder));
+
+            return httpClientBuilder.ConfigureHttpClient((serviceProvider, httpClient) =>
+            {
+                var options = serviceProvider.GetService<IOptions<ParbadOptions>>();
+
+                if (options != null) httpClient.Timeout = options.Value.GatewayTimeout;
+            });
         }
 
         /// <summary>

@@ -59,7 +59,10 @@ internal class GatewayConfigurationBuilder<TGateway> : IGatewayConfigurationBuil
     {
         if (configureHttpClient == null) throw new ArgumentNullException(nameof(configureHttpClient));
 
-        var httpClientBuilder = Services.AddHttpClient<TGatewayApi, TGatewayApiImplementation>(configureHttpClient);
+        // Parbad's defaults first, so the gateway's and the application's configuration can override them.
+        var httpClientBuilder = Services.AddHttpClient<TGatewayApi, TGatewayApiImplementation>()
+                                        .ConfigureParbadDefaults()
+                                        .ConfigureHttpClient(configureHttpClient);
 
         if (configureHttpClientBuilder != null)
         {
