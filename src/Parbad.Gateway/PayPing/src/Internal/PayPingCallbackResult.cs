@@ -9,6 +9,9 @@ namespace Parbad.Gateway.PayPing.Internal
 
         public string Message { get; set; }
 
-        public string RefId { get; set; }
+        public long PaymentRefId { get; set; }
+
+        /// <summary>The payment code stored at request time, which the callback has matched.</summary>
+        public string PaymentCode { get; set; }
     }
 }
