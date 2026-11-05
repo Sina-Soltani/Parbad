@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Parbad.Storage.Cache</PackageId>
-    <VersionPrefix>1.5.0</VersionPrefix>
+    <VersionPrefix>1.6.0</VersionPrefix>
     <LangVersion>latest</LangVersion>
     <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.0;netcoreapp3.1;net5.0;net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
     <Nullable>enable</Nullable>
@@ -20,18 +20,11 @@ More information: https://github.com/Sina-Soltani/Parbad</Description>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Authors>Sina Soltani</Authors>
     <Product>Parbad.Storage.Cache</Product>
-    <PackageReleaseNotes>https://github.com/Sina-Soltani/Parbad/releases/tag/v3.10.0</PackageReleaseNotes>
+    <PackageReleaseNotes>https://github.com/Sina-Soltani/Parbad/releases/tag/v3.12.0</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup>
     <NoWarn>1701;1702;1591</NoWarn>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>Parbad.Storage.Cache.xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>Parbad.Storage.Cache.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -52,7 +45,6 @@ More information: https://github.com/Sina-Soltani/Parbad</Description>
 
   <ItemGroup>
     <None Include="icon.png" pack="true" Visible="false" PackagePath="" />
-    <None Include="Parbad.Storage.Cache.xml" pack="true" Visible="false" PackagePath="" />
   </ItemGroup>
 
 </Project>

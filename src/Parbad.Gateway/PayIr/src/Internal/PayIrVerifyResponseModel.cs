@@ -3,30 +3,29 @@
 
 using System;
 
-namespace Parbad.Gateway.PayIr.Internal
+namespace Parbad.Gateway.PayIr.Internal;
+
+internal class PayIrVerifyResponseModel
 {
-    internal class PayIrVerifyResponseModel
-    {
-        public long Amount { get; set; }
+    public long Amount { get; set; }
 
-        public string Status { get; set; }
+    public string Status { get; set; }
 
-        public string TransId { get; set; }
+    public string TransId { get; set; }
 
-        public string Message { get; set; }
+    public string Message { get; set; }
 
-        public string ErrorCode { get; set; }
+    public string ErrorCode { get; set; }
 
-        public string ErrorMessage { get; set; }
+    public string ErrorMessage { get; set; }
 
-        public bool IsSucceed => string.Equals(Status, "1", StringComparison.InvariantCultureIgnoreCase);
+    public bool IsSucceed => string.Equals(Status, "1", StringComparison.InvariantCultureIgnoreCase);
 
-        public string FactorNumber { get; set; }
+    public string FactorNumber { get; set; }
 
-        public string Mobile { get; set; }
+    public string Mobile { get; set; }
 
-        public string Description { get; set; }
+    public string Description { get; set; }
 
-        public string CardNumber { get; set; }
-    }
+    public string CardNumber { get; set; }
 }

@@ -5,28 +5,27 @@ using System.Threading;
 using System.Threading.Tasks;
 using Parbad.Abstraction;
 
-namespace Parbad.InvoiceBuilder
+namespace Parbad.InvoiceBuilder;
+
+/// <summary>
+/// A builder which helps to build an invoice.
+/// </summary>
+public interface IInvoiceBuilder
 {
     /// <summary>
-    /// A builder which helps to build an invoice.
+    /// Adds the given <paramref name="formatter"/> to the list of formatters.
     /// </summary>
-    public interface IInvoiceBuilder
-    {
-        /// <summary>
-        /// Adds the given <paramref name="formatter"/> to the list of formatters.
-        /// </summary>
-        /// <param name="formatter"></param>
-        IInvoiceBuilder AddFormatter(IInvoiceFormatter formatter);
+    /// <param name="formatter"></param>
+    IInvoiceBuilder AddFormatter(IInvoiceFormatter formatter);
 
-        /// <summary>
-        /// Adds the given formatter to the list of formatters.
-        /// </summary>
-        /// <typeparam name="T">Type of the formatter.</typeparam>
-        IInvoiceBuilder AddFormatter<T>() where T : class, IInvoiceFormatter;
+    /// <summary>
+    /// Adds the given formatter to the list of formatters.
+    /// </summary>
+    /// <typeparam name="T">Type of the formatter.</typeparam>
+    IInvoiceBuilder AddFormatter<T>() where T : class, IInvoiceFormatter;
 
-        /// <summary>
-        /// Builds an invoice with the given data.
-        /// </summary>
-        Task<Invoice> BuildAsync(CancellationToken cancellationToken = default);
-    }
+    /// <summary>
+    /// Builds an invoice with the given data.
+    /// </summary>
+    Task<Invoice> BuildAsync(CancellationToken cancellationToken = default);
 }

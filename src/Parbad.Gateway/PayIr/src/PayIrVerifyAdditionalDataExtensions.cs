@@ -3,27 +3,26 @@
 
 using System;
 
-namespace Parbad.Gateway.PayIr
+namespace Parbad.Gateway.PayIr;
+
+public static class PayIrVerifyAdditionalDataExtensions
 {
-    public static class PayIrVerifyAdditionalDataExtensions
+    private const string AdditionalDataKey = "PayIrVerificationAdditionalData";
+
+    public static PayIrVerifyAdditionalData GetPayIrAdditionalData(this IPaymentVerifyResult result)
     {
-        private const string AdditionalDataKey = "PayIrVerificationAdditionalData";
+        if (result == null) throw new ArgumentNullException(nameof(result));
 
-        public static PayIrVerifyAdditionalData GetPayIrAdditionalData(this IPaymentVerifyResult result)
-        {
-            if (result == null) throw new ArgumentNullException(nameof(result));
+        result.AdditionalData.TryGetValue(AdditionalDataKey, out var additionalData);
 
-            result.AdditionalData.TryGetValue(AdditionalDataKey, out var additionalData);
+        return additionalData as PayIrVerifyAdditionalData;
+    }
 
-            return additionalData as PayIrVerifyAdditionalData;
-        }
+    internal static void SetPayIrAdditionalData(this IPaymentVerifyResult result, PayIrVerifyAdditionalData additionalData)
+    {
+        if (result == null) throw new ArgumentNullException(nameof(result));
+        if (additionalData == null) throw new ArgumentNullException(nameof(additionalData));
 
-        internal static void SetPayIrAdditionalData(this IPaymentVerifyResult result, PayIrVerifyAdditionalData additionalData)
-        {
-            if (result == null) throw new ArgumentNullException(nameof(result));
-            if (additionalData == null) throw new ArgumentNullException(nameof(additionalData));
-
-            result.AdditionalData.Add(AdditionalDataKey, additionalData);
-        }
+        result.AdditionalData.Add(AdditionalDataKey, additionalData);
     }
 }

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <PackageId>Parbad.Gateway.Sepehr</PackageId>
     <Product>Parbad.Gateway.Sepehr</Product>
-    <VersionPrefix>1.7.0</VersionPrefix>
+    <VersionPrefix>1.8.0</VersionPrefix>
     <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.0;net5.0;net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <Authors>Sina Soltani</Authors>
@@ -16,7 +16,7 @@
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageTags>parbad Payment gateway bank Iran shetab sepehr mabna پرداخت درگاه بانک ایران شتاب سپهر مبنا کارت</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <PackageReleaseNotes>https://github.com/Sina-Soltani/Parbad/releases/tag/v3.11.0</PackageReleaseNotes>
+    <PackageReleaseNotes>https://github.com/Sina-Soltani/Parbad/releases/tag/v3.12.0</PackageReleaseNotes>
     <Description>Sepehr Gateway for Parbad project.
 
 For more information see: https://www.nuget.org/packages/Parbad/</Description>
@@ -26,14 +26,6 @@ For more information see: https://www.nuget.org/packages/Parbad/</Description>
     <NoWarn>1701;1702;1591</NoWarn>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>Parbad.Gateway.Sepehr.xml</DocumentationFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>Parbad.Gateway.Sepehr.xml</DocumentationFile>
-  </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\..\Parbad\src\Parbad.csproj" />
   </ItemGroup>
@@ -41,7 +33,6 @@ For more information see: https://www.nuget.org/packages/Parbad/</Description>
   <ItemGroup>
     <None Include="icon.png" pack="true" Visible="false" PackagePath="" />
     <None Include="readme.txt" pack="true" PackagePath="." />
-    <None Include="Parbad.Gateway.Sepehr.xml" pack="true" Visible="false" PackagePath="" />
   </ItemGroup>
 
 </Project>

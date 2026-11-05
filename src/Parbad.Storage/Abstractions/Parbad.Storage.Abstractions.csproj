@@ -3,7 +3,7 @@
   <PropertyGroup>
     <PackageId>Parbad.Storage.Abstractions</PackageId>
     <Product>Parbad.Storage.Abstractions</Product>
-    <VersionPrefix>1.3.0</VersionPrefix>
+    <VersionPrefix>1.4.0</VersionPrefix>
     <LangVersion>latest</LangVersion>
     <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.0;netcoreapp3.1;net5.0;net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
     <Nullable>enable</Nullable>
@@ -20,18 +20,11 @@ More information: https://github.com/Sina-Soltani/Parbad</Description>
     <PackageTags>parbad storage</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Authors>Sina Soltani</Authors>
-    <PackageReleaseNotes>https://github.com/Sina-Soltani/Parbad/releases/tag/v3.10.0</PackageReleaseNotes>
+    <PackageReleaseNotes>https://github.com/Sina-Soltani/Parbad/releases/tag/v3.12.0</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup>
     <NoWarn>1701;1702;1591</NoWarn>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>Parbad.Storage.Abstractions.xml</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>Parbad.Storage.Abstractions.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1' ">
@@ -46,7 +39,6 @@ More information: https://github.com/Sina-Soltani/Parbad</Description>
 
   <ItemGroup>
     <None Include="icon.png" pack="true" Visible="false" PackagePath="" />
-    <None Include="Parbad.Storage.Abstractions.xml" pack="true" Visible="false" PackagePath="" />
   </ItemGroup>
 
 </Project>

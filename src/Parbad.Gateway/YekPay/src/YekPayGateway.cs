@@ -16,86 +16,85 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Parbad.Gateway.YekPay
+namespace Parbad.Gateway.YekPay;
+
+/// <summary>
+/// Sepehr Gateway.
+/// </summary>
+[Gateway(Name)]
+public class YekPayGateway : GatewayBase<YekPayGatewayAccount>
 {
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly HttpClient _httpClient;
+    private readonly YekPayGatewayOptions _gatewayOptions;
+    private readonly ParbadOptions _options;
+
+    public const string Name = "YekPay";
+
+    private static JsonSerializerSettings DefaultSerializerSettings => new JsonSerializerSettings
+                                                                       {
+                                                                           ContractResolver = new CamelCasePropertyNamesContractResolver()
+                                                                       };
+
     /// <summary>
-    /// Sepehr Gateway.
+    /// Initializes an instance of <see cref="YekPayGateway"/>.
     /// </summary>
-    [Gateway(Name)]
-    public class YekPayGateway : GatewayBase<YekPayGatewayAccount>
+    public YekPayGateway(
+        IGatewayAccountProvider<YekPayGatewayAccount> accountProvider,
+        IHttpContextAccessor httpContextAccessor,
+        IHttpClientFactory httpClientFactory,
+        IOptions<YekPayGatewayOptions> gatewayOptions,
+        IOptions<ParbadOptions> options) : base(accountProvider)
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly HttpClient _httpClient;
-        private readonly YekPayGatewayOptions _gatewayOptions;
-        private readonly ParbadOptions _options;
+        _httpContextAccessor = httpContextAccessor;
+        _httpClient = httpClientFactory.CreateClient(this);
+        _gatewayOptions = gatewayOptions.Value;
+        _options = options.Value;
+    }
 
-        public const string Name = "YekPay";
+    /// <inheritdoc />
+    public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
+    {
+        if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-        private static JsonSerializerSettings DefaultSerializerSettings => new JsonSerializerSettings
-        {
-            ContractResolver = new CamelCasePropertyNamesContractResolver()
-        };
+        var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
 
-        /// <summary>
-        /// Initializes an instance of <see cref="YekPayGateway"/>.
-        /// </summary>
-        public YekPayGateway(
-            IGatewayAccountProvider<YekPayGatewayAccount> accountProvider,
-            IHttpContextAccessor httpContextAccessor,
-            IHttpClientFactory httpClientFactory,
-            IOptions<YekPayGatewayOptions> gatewayOptions,
-            IOptions<ParbadOptions> options) : base(accountProvider)
-        {
-            _httpContextAccessor = httpContextAccessor;
-            _httpClient = httpClientFactory.CreateClient(this);
-            _gatewayOptions = gatewayOptions.Value;
-            _options = options.Value;
-        }
+        var data = YekPayHelper.CreateRequestData(invoice, account);
 
-        /// <inheritdoc />
-        public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
-        {
-            if (invoice == null) throw new ArgumentNullException(nameof(invoice));
+        var responseMessage = await _httpClient
+                                   .PostJsonAsync(_gatewayOptions.ApiRequestUrl, data, DefaultSerializerSettings, cancellationToken)
+                                   .ConfigureAwaitFalse();
 
-            var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
+        return await YekPayHelper.CreateRequestResult(responseMessage, _httpContextAccessor.HttpContext, account, _gatewayOptions, _options.Messages);
+    }
 
-            var data = YekPayHelper.CreateRequestData(invoice, account);
+    /// <inheritdoc />
+    public override Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default)
+    {
+        IPaymentFetchResult result = PaymentFetchResult.ReadyForVerifying();
 
-            var responseMessage = await _httpClient
-                .PostJsonAsync(_gatewayOptions.ApiRequestUrl, data, DefaultSerializerSettings, cancellationToken)
-                .ConfigureAwaitFalse();
+        return Task.FromResult(result);
+    }
 
-            return await YekPayHelper.CreateRequestResult(responseMessage, _httpContextAccessor.HttpContext, account, _gatewayOptions, _options.Messages);
-        }
+    /// <inheritdoc />
+    public override async Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default)
+    {
+        if (context == null) throw new ArgumentNullException(nameof(context));
 
-        /// <inheritdoc />
-        public override Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default)
-        {
-            IPaymentFetchResult result = PaymentFetchResult.ReadyForVerifying();
+        var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 
-            return Task.FromResult(result);
-        }
+        var data = YekPayHelper.CreateVerifyData(context.Transactions, account);
 
-        /// <inheritdoc />
-        public override async Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default)
-        {
-            if (context == null) throw new ArgumentNullException(nameof(context));
+        var responseMessage = await _httpClient
+                                   .PostJsonAsync(_gatewayOptions.ApiVerificationUrl, data, DefaultSerializerSettings, cancellationToken)
+                                   .ConfigureAwaitFalse();
 
-            var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
+        return await YekPayHelper.CreateVerifyResult(responseMessage, _options.Messages);
+    }
 
-            var data = YekPayHelper.CreateVerifyData(context.Transactions, account);
-
-            var responseMessage = await _httpClient
-                .PostJsonAsync(_gatewayOptions.ApiVerificationUrl, data, DefaultSerializerSettings, cancellationToken)
-                .ConfigureAwaitFalse();
-
-            return await YekPayHelper.CreateVerifyResult(responseMessage, _options.Messages);
-        }
-
-        /// <inheritdoc />
-        public override Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default)
-        {
-            return PaymentRefundResult.Failed("The Refund operation is not supported by this gateway.").ToInterfaceAsync();
-        }
+    /// <inheritdoc />
+    public override Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default)
+    {
+        return PaymentRefundResult.Failed("The Refund operation is not supported by this gateway.").ToInterfaceAsync();
     }
 }

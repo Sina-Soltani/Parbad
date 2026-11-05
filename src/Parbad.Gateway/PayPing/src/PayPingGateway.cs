@@ -3,157 +3,185 @@
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Parbad.Abstraction;
+using Parbad.Exceptions;
 using Parbad.Gateway.PayPing.Internal;
 using Parbad.GatewayBuilders;
 using Parbad.Internal;
 using Parbad.Net;
 using Parbad.Options;
 using System;
+using System.Globalization;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Parbad.Gateway.PayPing
+namespace Parbad.Gateway.PayPing;
+
+/// <summary>
+/// PayPing Gateway (PayPing API v3). PayPing expects the amount in Toman; Parbad sends the invoice amount as it is.
+/// </summary>
+[Gateway(Name)]
+public class PayPingGateway : GatewayBase<PayPingGatewayAccount>
 {
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly HttpClient _httpClient;
+    private readonly PayPingGatewayOptions _pingGatewayOptions;
+    private readonly ParbadOptions _options;
+
+    public const string Name = "PayPing";
+
     /// <summary>
-    /// PayPing Gateway.
+    /// Initializes an instance of <see cref="PayPingGateway"/>.
     /// </summary>
-    [Gateway(Name)]
-    public class PayPingGateway : GatewayBase<PayPingGatewayAccount>
+    public PayPingGateway(
+        IGatewayAccountProvider<PayPingGatewayAccount> accountProvider,
+        IHttpContextAccessor httpContextAccessor,
+        IHttpClientFactory httpClientFactory,
+        IOptions<PayPingGatewayOptions> gatewayOptions,
+        IOptions<ParbadOptions> options) : base(accountProvider)
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly HttpClient _httpClient;
-        private readonly PayPingGatewayOptions _pingGatewayOptions;
-        private readonly ParbadOptions _options;
+        _httpContextAccessor = httpContextAccessor;
+        _httpClient = httpClientFactory.CreateClient(this);
+        _pingGatewayOptions = gatewayOptions.Value;
+        _options = options.Value;
+    }
 
-        public const string Name = "PayPing";
+    /// <inheritdoc />
+    public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
+    {
+        if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-        /// <summary>
-        /// Initializes an instance of <see cref="PayPingGateway"/>.
-        /// </summary>
-        public PayPingGateway(
-            IGatewayAccountProvider<PayPingGatewayAccount> accountProvider,
-            IHttpContextAccessor httpContextAccessor,
-            IHttpClientFactory httpClientFactory,
-            IOptions<PayPingGatewayOptions> gatewayOptions,
-            IOptions<ParbadOptions> options) : base(accountProvider)
+        var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
+
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", account.AccessToken);
+
+        var body = new CreatePayRequestModel
+                   {
+                       Amount = invoice.Amount,
+                       Description = invoice.GetPayPingRequest()?.Description,
+                       PayerIdentity = invoice.GetPayPingRequest()?.Mobile,
+                       PayerName = invoice.GetPayPingRequest()?.PayerName,
+                       ReturnUrl = invoice.CallbackUrl,
+                       ClientRefId = invoice.TrackingNumber.ToString(CultureInfo.InvariantCulture)
+                   };
+
+        var response = await _httpClient.PostJsonAsync(_pingGatewayOptions.ApiRequestUrl, body, cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
         {
-            _httpContextAccessor = httpContextAccessor;
-            _httpClient = httpClientFactory.CreateClient(this);
-            _pingGatewayOptions = gatewayOptions.Value;
-            _options = options.Value;
+            var problem = await PayPingGatewayHelper.ReadProblemAsync(response, _options.Messages).ConfigureAwaitFalse();
+
+            return PaymentRequestResult.Failed(problem.Message, account.Name, problem.Code?.ToString(CultureInfo.InvariantCulture));
         }
 
-        /// <inheritdoc />
-        public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
+        var createPayResult = await response.ReadJsonAsync<CreatePayResponseModel>().ConfigureAwaitFalse();
+
+        if (string.IsNullOrEmpty(createPayResult.PaymentCode))
         {
-            if (invoice == null) throw new ArgumentNullException(nameof(invoice));
-
-            var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
-
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", account.AccessToken);
-
-            var body = new CreatePayRequestModel
-            {
-                Amount = invoice.Amount,
-                Description = invoice.GetPayPingRequest()?.Description,
-                PayerIdentity = invoice.GetPayPingRequest()?.Mobile,
-                PayerName = invoice.GetPayPingRequest()?.PayerName,
-                ReturnUrl = invoice.CallbackUrl,
-                ClientRefId = invoice.TrackingNumber.ToString()
-            };
-
-            //Send Create pay Request
-            var response = await _httpClient.PostJsonAsync(_pingGatewayOptions.ApiRequestUrl, body, cancellationToken);
-
-            //Check if we ran into an Issue
-            response.EnsureSuccessStatusCode();
-
-            //Get Response data 
-            var responseBody = await response.Content.ReadAsStringAsync();
-
-            //Convert Response data to Model and get PayCode
-            var createPayResult = JsonConvert.DeserializeObject<CreatePayResponseModel>(responseBody);
-
-            //Redirect User to gateway with the Code
-
-            var url = _pingGatewayOptions.PaymentPageUrl.ToggleStringAtEnd("/", shouldHave: true) + createPayResult.Code;
-
-            return PaymentRequestResult.SucceedWithRedirect(account.Name, _httpContextAccessor.HttpContext, url);
+            return PaymentRequestResult.Failed($"{_options.Messages.InvalidDataReceivedFromGateway}PaymentCode isn't received.", account.Name);
         }
 
-        /// <inheritdoc />
-        public override async Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default)
+        var url = _pingGatewayOptions.PaymentPageUrl.ToggleStringAtEnd("/", shouldHave: true) + Uri.EscapeDataString(createPayResult.PaymentCode);
+
+        var result = PaymentRequestResult.SucceedWithRedirect(account.Name, _httpContextAccessor.HttpContext, url);
+
+        // The callback and the verification must use the payment code PayPing issued for this invoice.
+        result.DatabaseAdditionalData.Add(PayPingGatewayHelper.PaymentCodeKey, createPayResult.PaymentCode);
+
+        return result;
+    }
+
+    /// <inheritdoc />
+    public override async Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default)
+    {
+        if (context == null) throw new ArgumentNullException(nameof(context));
+
+        var callbackResult = await PayPingGatewayHelper.GetCallbackResult(
+                                                                          _httpContextAccessor.HttpContext.Request,
+                                                                          context,
+                                                                          _options.Messages,
+                                                                          cancellationToken);
+
+        if (callbackResult.IsSucceed)
         {
-            if (context == null) throw new ArgumentNullException(nameof(context));
+            return PaymentFetchResult.ReadyForVerifying();
+        }
 
-            var callbackResult = await PayPingGatewayHelper.GetCallbackResult(
-                _httpContextAccessor.HttpContext.Request,
-                context,
-                _options.Messages,
-                cancellationToken);
+        return PaymentFetchResult.Failed(callbackResult.Message);
+    }
 
-            if (callbackResult.IsSucceed)
+    /// <inheritdoc />
+    public override async Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default)
+    {
+        if (context == null) throw new ArgumentNullException(nameof(context));
+
+        var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
+
+        var callbackResult = await PayPingGatewayHelper.GetCallbackResult(
+                                                                          _httpContextAccessor.HttpContext.Request,
+                                                                          context,
+                                                                          _options.Messages,
+                                                                          cancellationToken);
+
+        if (!callbackResult.IsSucceed)
+        {
+            return PaymentVerifyResult.Failed(callbackResult.Message);
+        }
+
+        var verificationModel = PayPingGatewayHelper.CreateVerificationModel(context, callbackResult);
+
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", account.AccessToken);
+
+        var response = await _httpClient.PostJsonAsync(_pingGatewayOptions.ApiVerificationUrl, verificationModel, cancellationToken);
+
+        // 202: PayPing is still verifying; 5xx: it is unknown whether it verified. Either way the payment stays
+        // open, and the verification is retried with the same payment.
+        if (response.StatusCode == HttpStatusCode.Accepted || (int)response.StatusCode >= 500)
+        {
+            throw new GatewayResponseException(response.StatusCode,
+                                               response.Content?.Headers.ContentType?.MediaType,
+                                               response.StatusCode == HttpStatusCode.Accepted ? "verification in progress" : "server error");
+        }
+
+        PaymentVerifyResult result;
+
+        if (response.IsSuccessStatusCode)
+        {
+            var responseModel = await response.ReadJsonAsync<VerifyPayResponseModel>().ConfigureAwaitFalse();
+
+            result = PayPingGatewayHelper.CreateVerifyResult(responseModel, callbackResult, _options.Messages);
+        }
+        else
+        {
+            var problem = await PayPingGatewayHelper.ReadProblemAsync(response, _options.Messages).ConfigureAwaitFalse();
+
+            // 409 with code 110: verified before (e.g. the first answer was lost). The payment code comes from the
+            // database, so it is this invoice's payment.
+            if (response.StatusCode == HttpStatusCode.Conflict && problem.Code == PayPingGatewayHelper.AlreadyVerifiedCode)
             {
-                return PaymentFetchResult.ReadyForVerifying();
+                var verifiedTransaction = PayPingGatewayHelper.TryParseVerifyResponse(problem.Details) ?? new VerifyPayResponseModel();
+
+                result = PayPingGatewayHelper.CreateVerifyResult(verifiedTransaction, callbackResult, _options.Messages);
+            }
+            else
+            {
+                result = PaymentVerifyResult.Failed(problem.Message);
             }
 
-            return PaymentFetchResult.Failed(callbackResult.Message);
+            result.GatewayResponseCode = problem.Code?.ToString(CultureInfo.InvariantCulture);
         }
 
-        /// <inheritdoc />
-        public override async Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default)
-        {
-            if (context == null) throw new ArgumentNullException(nameof(context));
+        result.GatewayAccountName = account.Name;
 
-            var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
+        return result;
+    }
 
-            var callbackResult = await PayPingGatewayHelper.GetCallbackResult(
-                _httpContextAccessor.HttpContext.Request,
-                context,
-                _options.Messages,
-                cancellationToken);
-
-            if (!callbackResult.IsSucceed)
-            {
-                return PaymentVerifyResult.Failed(callbackResult.Message);
-            }
-
-            var verificationModel = PayPingGatewayHelper.CreateVerificationModel(context, callbackResult);
-
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", account.AccessToken);
-
-            //Send Verify pay Request
-            var response = await _httpClient.PostJsonAsync(_pingGatewayOptions.ApiVerificationUrl, verificationModel, cancellationToken);
-
-            //Check if we ran into an Issue
-            if (!response.IsSuccessStatusCode)
-            {
-                return PaymentVerifyResult.Failed(_options.Messages.PaymentFailed);
-            }
-
-            //Get Response data 
-            var responseBody = await response.Content.ReadAsStringAsync();
-
-            var responseModel = JsonConvert.DeserializeObject<VerifyPayResponseModel>(responseBody);
-
-            if (responseModel.Amount != (long)context.Payment.Amount)
-            {
-                var message = $"{_options.Messages.PaymentFailed} Amount is not valid.";
-
-                return PaymentVerifyResult.Failed(message);
-            }
-
-            return PaymentVerifyResult.Succeed(callbackResult.RefId, _options.Messages.PaymentSucceed);
-        }
-
-        /// <inheritdoc />
-        public override Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default)
-        {
-            return PaymentRefundResult.Failed("The Refund operation is not supported by this gateway.").ToInterfaceAsync();
-        }
+    /// <inheritdoc />
+    public override Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default)
+    {
+        return PaymentRefundResult.Failed("The Refund operation is not supported by this gateway.").ToInterfaceAsync();
     }
 }

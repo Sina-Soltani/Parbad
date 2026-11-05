@@ -3,44 +3,43 @@
 
 using System.Collections.Generic;
 
-namespace Parbad.Internal
+namespace Parbad.Internal;
+
+/// <inheritdoc />
+public class PaymentResult : IPaymentResult
 {
-    /// <inheritdoc />
-    public class PaymentResult : IPaymentResult
+    /// <summary>
+    /// Initializes an instance of <see cref="PaymentResult"/>.
+    /// </summary>
+    public PaymentResult()
     {
-        /// <summary>
-        /// Initializes an instance of <see cref="PaymentResult"/>.
-        /// </summary>
-        public PaymentResult()
-        {
-            AdditionalData = new Dictionary<string, object>();
-            DatabaseAdditionalData = new Dictionary<string, string>();
-        }
-
-        /// <inheritdoc />
-        public long TrackingNumber { get; set; }
-
-        /// <inheritdoc />
-        public Money Amount { get; set; }
-
-        /// <inheritdoc />
-        public virtual bool IsSucceed { get; set; }
-
-        /// <inheritdoc />
-        public string GatewayName { get; set; }
-
-        /// <inheritdoc />
-        public string GatewayAccountName { get; set; }
-
-        /// <inheritdoc />
-        public string GatewayResponseCode { get; set; }
-
-        /// <inheritdoc />
-        public string Message { get; set; }
-
-        /// <inheritdoc />
-        public IDictionary<string, object> AdditionalData { get; protected set; }
-
-        public IDictionary<string, string> DatabaseAdditionalData { get; protected set; }
+        AdditionalData = new Dictionary<string, object>();
+        DatabaseAdditionalData = new Dictionary<string, string>();
     }
+
+    /// <inheritdoc />
+    public long TrackingNumber { get; set; }
+
+    /// <inheritdoc />
+    public Money Amount { get; set; }
+
+    /// <inheritdoc />
+    public virtual bool IsSucceed { get; set; }
+
+    /// <inheritdoc />
+    public string GatewayName { get; set; }
+
+    /// <inheritdoc />
+    public string GatewayAccountName { get; set; }
+
+    /// <inheritdoc />
+    public string GatewayResponseCode { get; set; }
+
+    /// <inheritdoc />
+    public string Message { get; set; }
+
+    /// <inheritdoc />
+    public IDictionary<string, object> AdditionalData { get; protected set; }
+
+    public IDictionary<string, string> DatabaseAdditionalData { get; protected set; }
 }

@@ -26,7 +26,7 @@ internal static class PasargadHelper
                    InvoiceId = invoiceId.Value,
                    Status = (PasargadCallbackResultStatus)Enum.Parse(typeof(PasargadCallbackResultStatus), status.Value, ignoreCase: true),
                    ReferenceNumber = referenceNumber.Value,
-                   TrackId = trackId.Value,
+                   TrackId = trackId.Value
                };
     }
 }

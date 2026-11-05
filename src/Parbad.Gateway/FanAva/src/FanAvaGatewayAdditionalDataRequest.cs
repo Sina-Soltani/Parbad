@@ -4,50 +4,49 @@
 using System;
 using System.Collections.Generic;
 
-namespace Parbad.Gateway.FanAva
+namespace Parbad.Gateway.FanAva;
+
+public class FanAvaGatewayAdditionalDataRequest
 {
-    public class FanAvaGatewayAdditionalDataRequest
+    public static string InvoicePropertyKey => "FanAvaRequestAdditionalData";
+
+    public FanAvaGatewayAdditionalDataRequestType Type { get; set; } = FanAvaGatewayAdditionalDataRequestType.Goods;
+
+    public string MobileNumber { get; set; }
+
+    public string Email { get; set; }
+
+    public string GoodsReferenceId { get; set; }
+
+    public string MerchantGoodReferenceId { get; set; }
+
+    public IEnumerable<FanAvaGatewayApportionmentAccount> ApportionmentAccountList { get; set; }
+}
+
+public enum FanAvaGatewayAdditionalDataRequestType
+{
+    Goods,
+    Bill
+}
+
+public class FanAvaGatewayApportionmentAccount
+{
+    public FanAvaGatewayApportionmentAccount(string accountIban, long amount, FanAvaGatewayApportionmentAccountType type)
     {
-        public static string InvoicePropertyKey => "FanAvaRequestAdditionalData";
-
-        public FanAvaGatewayAdditionalDataRequestType Type { get; set; } = FanAvaGatewayAdditionalDataRequestType.Goods;
-
-        public string MobileNumber { get; set; }
-
-        public string Email { get; set; }
-
-        public string GoodsReferenceId { get; set; }
-
-        public string MerchantGoodReferenceId { get; set; }
-
-        public IEnumerable<FanAvaGatewayApportionmentAccount> ApportionmentAccountList { get; set; }
+        AccountIban = accountIban ?? throw new ArgumentNullException(nameof(accountIban));
+        Amount = amount;
+        Type = type;
     }
 
-    public enum FanAvaGatewayAdditionalDataRequestType
-    {
-        Goods,
-        Bill
-    }
+    public string AccountIban { get; }
 
-    public class FanAvaGatewayApportionmentAccount
-    {
-        public FanAvaGatewayApportionmentAccount(string accountIban, long amount, FanAvaGatewayApportionmentAccountType type)
-        {
-            AccountIban = accountIban ?? throw new ArgumentNullException(nameof(accountIban));
-            Amount = amount;
-            Type = type;
-        }
+    public long Amount { get; }
 
-        public string AccountIban { get; }
+    public FanAvaGatewayApportionmentAccountType Type { get; }
+}
 
-        public long Amount { get; }
-
-        public FanAvaGatewayApportionmentAccountType Type { get; }
-    }
-
-    public enum FanAvaGatewayApportionmentAccountType
-    {
-        enMain,
-        enOther
-    }
+public enum FanAvaGatewayApportionmentAccountType
+{
+    enMain,
+    enOther
 }

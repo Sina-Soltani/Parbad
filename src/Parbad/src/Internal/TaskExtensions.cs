@@ -5,22 +5,21 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-namespace Parbad.Internal
+namespace Parbad.Internal;
+
+public static class TaskExtensions
 {
-    public static class TaskExtensions
+    public static ConfiguredTaskAwaitable ConfigureAwaitFalse(this Task task)
     {
-        public static ConfiguredTaskAwaitable ConfigureAwaitFalse(this Task task)
-        {
-            if (task == null) throw new ArgumentNullException(nameof(task));
+        if (task == null) throw new ArgumentNullException(nameof(task));
 
-            return task.ConfigureAwait(false);
-        }
+        return task.ConfigureAwait(false);
+    }
 
-        public static ConfiguredTaskAwaitable<TResult> ConfigureAwaitFalse<TResult>(this Task<TResult> task)
-        {
-            if (task == null) throw new ArgumentNullException(nameof(task));
+    public static ConfiguredTaskAwaitable<TResult> ConfigureAwaitFalse<TResult>(this Task<TResult> task)
+    {
+        if (task == null) throw new ArgumentNullException(nameof(task));
 
-            return task.ConfigureAwait(false);
-        }
+        return task.ConfigureAwait(false);
     }
 }

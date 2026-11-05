@@ -6,7 +6,7 @@ Parbad is a free and open-source integrated online payment library which helps d
 
 [![NuGet version](https://img.shields.io/nuget/v/parbad.svg?style=flat&label=nuget)](https://www.nuget.org/packages/Parbad/)
 [![Nuget Downloads](https://img.shields.io/nuget/dt/parbad.svg?color=blue&label=Downloads)](https://www.nuget.org/packages/Parbad/)
-[![Build Status](https://dev.azure.com/ssoltani/Parbad/_apis/build/status/Sina-Soltani.Parbad?branchName=master)](https://dev.azure.com/ssoltani/Parbad/_build/latest?definitionId=5&branchName=master)
+[![CI](https://github.com/Sina-Soltani/Parbad/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/Sina-Soltani/Parbad/actions/workflows/ci.yml)
 
 # Benefits and features
 * Free and open-source
@@ -23,7 +23,7 @@ Parbad is a free and open-source integrated online payment library which helps d
   * [Saman](https://www.nuget.org/packages/Parbad/)
   * [Pasargad](https://www.nuget.org/packages/Parbad/)
   * [Parsian](https://www.nuget.org/packages/Parbad/)
-  * [Iran Kish](https://www.nuget.org/packages/Parbad/)
+  * [Iran Kish](https://www.nuget.org/packages/Parbad.Gateway.IranKish/)
   * [Asan Pardakht](https://www.nuget.org/packages/Parbad/)
   * [Sepehr](https://www.nuget.org/packages/Parbad.Gateway.Sepehr/)
   * [ZarinPal](https://www.nuget.org/packages/Parbad.Gateway.ZarinPal/)
@@ -32,6 +32,7 @@ Parbad is a free and open-source integrated online payment library which helps d
   * [YekPay](https://www.nuget.org/packages/Parbad.Gateway.YekPay/)
   * [PayPing](https://www.nuget.org/packages/Parbad.Gateway.PayPing/)
   * [Zibal](https://www.nuget.org/packages/Parbad.Gateway.Zibal/)
+  * [FanAva](https://www.nuget.org/packages/Parbad.Gateway.FanAva/)
 
 # How it works?
 ![image](https://raw.githubusercontent.com/Sina-Soltani/Parbad/master/images/How-it-works.png)

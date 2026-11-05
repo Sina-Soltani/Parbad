@@ -4,18 +4,17 @@
 using Newtonsoft.Json;
 using System;
 
-namespace Parbad.Gateway.FanAva.Internal.Models
+namespace Parbad.Gateway.FanAva.Internal.Models;
+
+internal class FanAvaVerifyResultModel
 {
-    internal class FanAvaVerifyResultModel
-    {
-        public bool IsSucceed => !string.IsNullOrWhiteSpace(Result) &&
-                                 Result.Equals("erSucceed", StringComparison.OrdinalIgnoreCase);
+    public bool IsSucceed => !string.IsNullOrWhiteSpace(Result) &&
+                             Result.Equals("erSucceed", StringComparison.OrdinalIgnoreCase);
 
-        public string Result { get; set; }
+    public string Result { get; set; }
 
-        public string Amount { get; set; }
+    public string Amount { get; set; }
 
-        [JsonProperty("RefNum")]
-        public string InvoiceNumber { get; set; }
-    }
+    [JsonProperty("RefNum")]
+    public string InvoiceNumber { get; set; }
 }

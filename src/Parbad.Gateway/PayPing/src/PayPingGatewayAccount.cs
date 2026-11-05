@@ -3,10 +3,9 @@
 
 using Parbad.Abstraction;
 
-namespace Parbad.Gateway.PayPing
+namespace Parbad.Gateway.PayPing;
+
+public class PayPingGatewayAccount : GatewayAccount
 {
-    public class PayPingGatewayAccount : GatewayAccount
-    {
-        public string AccessToken { get; set; }
-    }
+    public string AccessToken { get; set; }
 }

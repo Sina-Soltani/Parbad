@@ -4,29 +4,28 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Parbad.Internal
+namespace Parbad.Internal;
+
+public static class TaskHelper
 {
-    public static class TaskHelper
+    public static Task<IPaymentRequestResult> ToInterfaceAsync(this PaymentRequestResult requestResult)
     {
-        public static Task<IPaymentRequestResult> ToInterfaceAsync(this PaymentRequestResult requestResult)
-        {
-            if (requestResult == null) throw new ArgumentNullException(nameof(requestResult));
+        if (requestResult == null) throw new ArgumentNullException(nameof(requestResult));
 
-            return Task.FromResult<IPaymentRequestResult>(requestResult);
-        }
+        return Task.FromResult<IPaymentRequestResult>(requestResult);
+    }
 
-        public static Task<IPaymentVerifyResult> ToInterfaceAsync(this PaymentVerifyResult verifyResult)
-        {
-            if (verifyResult == null) throw new ArgumentNullException(nameof(verifyResult));
+    public static Task<IPaymentVerifyResult> ToInterfaceAsync(this PaymentVerifyResult verifyResult)
+    {
+        if (verifyResult == null) throw new ArgumentNullException(nameof(verifyResult));
 
-            return Task.FromResult<IPaymentVerifyResult>(verifyResult);
-        }
+        return Task.FromResult<IPaymentVerifyResult>(verifyResult);
+    }
 
-        public static Task<IPaymentRefundResult> ToInterfaceAsync(this PaymentRefundResult refundResult)
-        {
-            if (refundResult == null) throw new ArgumentNullException(nameof(refundResult));
+    public static Task<IPaymentRefundResult> ToInterfaceAsync(this PaymentRefundResult refundResult)
+    {
+        if (refundResult == null) throw new ArgumentNullException(nameof(refundResult));
 
-            return Task.FromResult<IPaymentRefundResult>(refundResult);
-        }
+        return Task.FromResult<IPaymentRefundResult>(refundResult);
     }
 }

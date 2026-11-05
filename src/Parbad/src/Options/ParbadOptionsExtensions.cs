@@ -6,35 +6,34 @@ using Microsoft.Extensions.Options;
 using Parbad.Options;
 using System;
 
-namespace Parbad.Builder
+namespace Parbad.Builder;
+
+public static class ParbadOptionsExtensions
 {
-    public static class ParbadOptionsExtensions
+    /// <summary>
+    /// Configures the Parbad options.
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <param name="setupOptions"></param>
+    public static IParbadBuilder ConfigureOptions(this IParbadBuilder builder, Action<ParbadOptions> setupOptions)
     {
-        /// <summary>
-        /// Configures the Parbad options.
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="setupOptions"></param>
-        public static IParbadBuilder ConfigureOptions(this IParbadBuilder builder, Action<ParbadOptions> setupOptions)
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-            if (setupOptions == null) throw new ArgumentNullException(nameof(setupOptions));
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
+        if (setupOptions == null) throw new ArgumentNullException(nameof(setupOptions));
 
-            builder.Services.Configure(setupOptions);
+        builder.Services.Configure(setupOptions);
 
-            RegisterMessagesOptions(builder);
+        RegisterMessagesOptions(builder);
 
-            return builder;
-        }
+        return builder;
+    }
 
-        private static void RegisterMessagesOptions(IParbadBuilder builder)
-        {
-            builder.Services.AddTransient<IOptions<MessagesOptions>>(provider =>
-            {
-                var messages = provider.GetRequiredService<IOptions<ParbadOptions>>().Value.Messages;
+    private static void RegisterMessagesOptions(IParbadBuilder builder)
+    {
+        builder.Services.AddTransient<IOptions<MessagesOptions>>(provider =>
+                                                                 {
+                                                                     var messages = provider.GetRequiredService<IOptions<ParbadOptions>>().Value.Messages;
 
-                return new OptionsWrapper<MessagesOptions>(messages);
-            });
-        }
+                                                                     return new OptionsWrapper<MessagesOptions>(messages);
+                                                                 });
     }
 }

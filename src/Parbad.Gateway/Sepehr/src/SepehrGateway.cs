@@ -16,124 +16,129 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Parbad.Gateway.Sepehr
+namespace Parbad.Gateway.Sepehr;
+
+/// <summary>
+/// Sepehr Gateway.
+/// </summary>
+[Gateway(Name)]
+public class SepehrGateway : GatewayBase<SepehrGatewayAccount>
 {
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly HttpClient _httpClient;
+    private readonly SepehrGatewayOptions _gatewayOptions;
+    private readonly ParbadOptions _options;
+
+    public const string Name = "Sepehr";
+
+    private static JsonSerializerSettings DefaultSerializerSettings => new JsonSerializerSettings
+                                                                       {
+                                                                           ContractResolver = new CamelCasePropertyNamesContractResolver()
+                                                                       };
+
     /// <summary>
-    /// Sepehr Gateway.
+    /// Initializes an instance of <see cref="SepehrGateway"/>.
     /// </summary>
-    [Gateway(Name)]
-    public class SepehrGateway : GatewayBase<SepehrGatewayAccount>
+    public SepehrGateway(
+        IGatewayAccountProvider<SepehrGatewayAccount> accountProvider,
+        IHttpContextAccessor httpContextAccessor,
+        IHttpClientFactory httpClientFactory,
+        IOptions<SepehrGatewayOptions> gatewayOptions,
+        IOptions<ParbadOptions> options) : base(accountProvider)
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly HttpClient _httpClient;
-        private readonly SepehrGatewayOptions _gatewayOptions;
-        private readonly ParbadOptions _options;
+        _httpContextAccessor = httpContextAccessor;
+        _httpClient = httpClientFactory.CreateClient(this);
+        _gatewayOptions = gatewayOptions.Value;
+        _options = options.Value;
+    }
 
-        public const string Name = "Sepehr";
+    /// <inheritdoc />
+    public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
+    {
+        if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-        private static JsonSerializerSettings DefaultSerializerSettings => new JsonSerializerSettings
+        var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
+
+        var data = SepehrHelper.CreateRequestData(invoice, account);
+
+        var responseMessage = await _httpClient
+                                   .PostJsonAsync(_gatewayOptions.ApiTokenUrl, data, DefaultSerializerSettings, cancellationToken)
+                                   .ConfigureAwaitFalse();
+
+        return await SepehrHelper.CreateRequestResult(responseMessage, _httpContextAccessor.HttpContext, account, _gatewayOptions, _options.Messages);
+    }
+
+    /// <inheritdoc />
+    public override async Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default)
+    {
+        if (context == null) throw new ArgumentNullException(nameof(context));
+
+        var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
+
+        var callbackResult = await SepehrHelper.CreateCallbackResultAsync(
+                                                                          context,
+                                                                          _httpContextAccessor.HttpContext.Request,
+                                                                          account,
+                                                                          _options.Messages,
+                                                                          cancellationToken)
+                                               .ConfigureAwaitFalse();
+
+        if (callbackResult.IsSucceed)
         {
-            ContractResolver = new CamelCasePropertyNamesContractResolver()
-        };
-
-        /// <summary>
-        /// Initializes an instance of <see cref="SepehrGateway"/>.
-        /// </summary>
-        public SepehrGateway(
-            IGatewayAccountProvider<SepehrGatewayAccount> accountProvider,
-            IHttpContextAccessor httpContextAccessor,
-            IHttpClientFactory httpClientFactory,
-            IOptions<SepehrGatewayOptions> gatewayOptions,
-            IOptions<ParbadOptions> options) : base(accountProvider)
-        {
-            _httpContextAccessor = httpContextAccessor;
-            _httpClient = httpClientFactory.CreateClient(this);
-            _gatewayOptions = gatewayOptions.Value;
-            _options = options.Value;
+            return PaymentFetchResult.ReadyForVerifying();
         }
 
-        /// <inheritdoc />
-        public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
+        return PaymentFetchResult.Failed(callbackResult.Message);
+    }
+
+    /// <inheritdoc />
+    public override async Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default)
+    {
+        if (context == null) throw new ArgumentNullException(nameof(context));
+
+        var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
+
+        var callbackResult = await SepehrHelper.CreateCallbackResultAsync(
+                                                                          context,
+                                                                          _httpContextAccessor.HttpContext.Request,
+                                                                          account,
+                                                                          _options.Messages,
+                                                                          cancellationToken)
+                                               .ConfigureAwaitFalse();
+
+        if (!callbackResult.IsSucceed)
         {
-            if (invoice == null) throw new ArgumentNullException(nameof(invoice));
-
-            var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
-
-            var data = SepehrHelper.CreateRequestData(invoice, account);
-
-            var responseMessage = await _httpClient
-                .PostJsonAsync(_gatewayOptions.ApiTokenUrl, data, DefaultSerializerSettings, cancellationToken)
-                .ConfigureAwaitFalse();
-
-            return await SepehrHelper.CreateRequestResult(responseMessage, _httpContextAccessor.HttpContext, account, _gatewayOptions, _options.Messages);
+            return PaymentVerifyResult.Failed(callbackResult.Message);
         }
 
-        /// <inheritdoc />
-        public override async Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default)
+        var data = SepehrHelper.CreateVerifyData(callbackResult, account);
+
+        var responseMessage = await _httpClient
+                                   .PostJsonAsync(_gatewayOptions.ApiAdviceUrl, data, DefaultSerializerSettings, cancellationToken)
+                                   .ConfigureAwaitFalse();
+
+        return await SepehrHelper.CreateVerifyResult(context, responseMessage, callbackResult, _options.Messages);
+    }
+
+    /// <inheritdoc />
+    public override async Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default)
+    {
+        if (context == null) throw new ArgumentNullException(nameof(context));
+
+        // Sepehr's Rollback has no amount: it always refunds the whole payment.
+        if (amount.Value != context.Payment.Amount)
         {
-            if (context == null) throw new ArgumentNullException(nameof(context));
-
-            var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
-
-            var callbackResult = await SepehrHelper.CreateCallbackResultAsync(
-                    context,
-                    _httpContextAccessor.HttpContext.Request,
-                    account,
-                    _options.Messages,
-                    cancellationToken)
-                .ConfigureAwaitFalse();
-
-            if (callbackResult.IsSucceed)
-            {
-                return PaymentFetchResult.ReadyForVerifying();
-            }
-
-            return PaymentFetchResult.Failed(callbackResult.Message);
+            return PaymentRefundResult.Failed(_options.Messages.PartialRefundNotSupported);
         }
 
-        /// <inheritdoc />
-        public override async Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default)
-        {
-            if (context == null) throw new ArgumentNullException(nameof(context));
+        var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 
-            var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
+        var data = SepehrHelper.CreateRefundData(context, account);
 
-            var callbackResult = await SepehrHelper.CreateCallbackResultAsync(
-                    context,
-                    _httpContextAccessor.HttpContext.Request,
-                    account,
-                    _options.Messages,
-                    cancellationToken)
-                .ConfigureAwaitFalse();
+        var responseMessage = await _httpClient
+                                   .PostJsonAsync(_gatewayOptions.ApiRollbackUrl, data, DefaultSerializerSettings, cancellationToken)
+                                   .ConfigureAwaitFalse();
 
-            if (!callbackResult.IsSucceed)
-            {
-                return PaymentVerifyResult.Failed(callbackResult.Message);
-            }
-
-            var data = SepehrHelper.CreateVerifyData(callbackResult, account);
-
-            var responseMessage = await _httpClient
-                .PostJsonAsync(_gatewayOptions.ApiAdviceUrl, data, DefaultSerializerSettings, cancellationToken)
-                .ConfigureAwaitFalse();
-
-            return await SepehrHelper.CreateVerifyResult(context, responseMessage, callbackResult, _options.Messages);
-        }
-
-        /// <inheritdoc />
-        public override async Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default)
-        {
-            if (context == null) throw new ArgumentNullException(nameof(context));
-
-            var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
-
-            var data = SepehrHelper.CreateRefundData(context, account);
-
-            var responseMessage = await _httpClient
-                .PostJsonAsync(_gatewayOptions.ApiRollbackUrl, data, DefaultSerializerSettings, cancellationToken)
-                .ConfigureAwaitFalse();
-
-            return await SepehrHelper.CreateRefundResult(context, responseMessage, _options.Messages);
-        }
+        return await SepehrHelper.CreateRefundResult(context, responseMessage, _options.Messages);
     }
 }

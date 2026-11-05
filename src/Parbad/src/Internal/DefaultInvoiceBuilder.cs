@@ -10,57 +10,56 @@ using Microsoft.Extensions.DependencyInjection;
 using Parbad.Abstraction;
 using Parbad.InvoiceBuilder;
 
-namespace Parbad.Internal
+namespace Parbad.Internal;
+
+/// <inheritdoc />
+public class DefaultInvoiceBuilder : IInvoiceBuilder
 {
-    /// <inheritdoc />
-    public class DefaultInvoiceBuilder : IInvoiceBuilder
+    private readonly IServiceProvider _services;
+    private readonly List<IInvoiceFormatter> _formatters;
+    private readonly List<Type> _formatterTypes;
+
+    /// <summary>
+    /// Initializes an instance of <see cref="DefaultInvoiceBuilder"/>.
+    /// </summary>
+    public DefaultInvoiceBuilder(IServiceProvider services)
     {
-        private readonly IServiceProvider _services;
-        private readonly List<IInvoiceFormatter> _formatters;
-        private readonly List<Type> _formatterTypes;
+        _services = services ?? throw new ArgumentNullException(nameof(services));
+        _formatters = new List<IInvoiceFormatter>();
+        _formatterTypes = new List<Type>();
+    }
 
-        /// <summary>
-        /// Initializes an instance of <see cref="DefaultInvoiceBuilder"/>.
-        /// </summary>
-        public DefaultInvoiceBuilder(IServiceProvider services)
+    /// <inheritdoc />
+    public IInvoiceBuilder AddFormatter(IInvoiceFormatter formatter)
+    {
+        if (formatter == null) throw new ArgumentNullException(nameof(formatter));
+
+        _formatters.Add(formatter);
+
+        return this;
+    }
+
+    /// <inheritdoc />
+    public IInvoiceBuilder AddFormatter<T>() where T : class, IInvoiceFormatter
+    {
+        _formatterTypes.Add(typeof(T));
+
+        return this;
+    }
+
+    /// <inheritdoc />
+    public virtual async Task<Invoice> BuildAsync(CancellationToken cancellationToken = default)
+    {
+        var invoice = new Invoice();
+
+        var formatters = _formatters.ToList();
+        formatters.AddRange(_formatterTypes.Select(type => (IInvoiceFormatter)_services.GetRequiredService(type)));
+
+        foreach (var formatter in formatters)
         {
-            _services = services ?? throw new ArgumentNullException(nameof(services));
-            _formatters = new List<IInvoiceFormatter>();
-            _formatterTypes = new List<Type>();
+            await formatter.FormatAsync(invoice, cancellationToken);
         }
 
-        /// <inheritdoc />
-        public IInvoiceBuilder AddFormatter(IInvoiceFormatter formatter)
-        {
-            if (formatter == null) throw new ArgumentNullException(nameof(formatter));
-
-            _formatters.Add(formatter);
-
-            return this;
-        }
-
-        /// <inheritdoc />
-        public IInvoiceBuilder AddFormatter<T>() where T : class, IInvoiceFormatter
-        {
-            _formatterTypes.Add(typeof(T));
-
-            return this;
-        }
-
-        /// <inheritdoc />
-        public virtual async Task<Invoice> BuildAsync(CancellationToken cancellationToken = default)
-        {
-            var invoice = new Invoice();
-
-            var formatters = _formatters.ToList();
-            formatters.AddRange(_formatterTypes.Select(type => (IInvoiceFormatter)_services.GetRequiredService(type)));
-
-            foreach (var formatter in formatters)
-            {
-                await formatter.FormatAsync(invoice, cancellationToken);
-            }
-
-            return invoice;
-        }
+        return invoice;
     }
 }

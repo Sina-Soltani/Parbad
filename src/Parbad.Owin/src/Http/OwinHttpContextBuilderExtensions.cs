@@ -10,41 +10,40 @@ using Microsoft.Owin;
 using Parbad.Http;
 using Parbad.Owin.Http;
 
-namespace Parbad.Builder
+namespace Parbad.Builder;
+
+public static class OwinHttpContextBuilderExtensions
 {
-    public static class OwinHttpContextBuilderExtensions
+    public static IHttpContextBuilder UseOwinFromCurrentHttpContext(this IHttpContextBuilder builder)
     {
-        public static IHttpContextBuilder UseOwinFromCurrentHttpContext(this IHttpContextBuilder builder)
-        {
-            return builder.UseOwinFromHttpContext(provider => new HttpContextWrapper(HttpContext.Current));
-        }
+        return builder.UseOwinFromHttpContext(provider => new HttpContextWrapper(HttpContext.Current));
+    }
 
-        public static IHttpContextBuilder UseOwinFromHttpContext(
-            this IHttpContextBuilder builder,
-            Func<IServiceProvider, HttpContextBase> httpContextFactory,
-            ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
-        {
-            return builder.UseOwin(provider => httpContextFactory(provider).GetOwinContext(), serviceLifetime);
-        }
+    public static IHttpContextBuilder UseOwinFromHttpContext(
+        this IHttpContextBuilder builder,
+        Func<IServiceProvider, HttpContextBase> httpContextFactory,
+        ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
+    {
+        return builder.UseOwin(provider => httpContextFactory(provider).GetOwinContext(), serviceLifetime);
+    }
 
-        public static IHttpContextBuilder UseOwinEnvironment(
-            this IHttpContextBuilder builder,
-            Func<IServiceProvider, IDictionary<string, object>> environmentFactory,
-            ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
-        {
-            return builder.UseOwin(provider => new OwinContext(environmentFactory(provider)), serviceLifetime);
-        }
+    public static IHttpContextBuilder UseOwinEnvironment(
+        this IHttpContextBuilder builder,
+        Func<IServiceProvider, IDictionary<string, object>> environmentFactory,
+        ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
+    {
+        return builder.UseOwin(provider => new OwinContext(environmentFactory(provider)), serviceLifetime);
+    }
 
-        public static IHttpContextBuilder UseOwin(
-            this IHttpContextBuilder builder,
-            Func<IServiceProvider, IOwinContext> owinContextFactory,
-            ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
-        {
-            builder.Services.TryAdd(ServiceDescriptor.Describe(typeof(IOwinContext), owinContextFactory, serviceLifetime));
+    public static IHttpContextBuilder UseOwin(
+        this IHttpContextBuilder builder,
+        Func<IServiceProvider, IOwinContext> owinContextFactory,
+        ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
+    {
+        builder.Services.TryAdd(ServiceDescriptor.Describe(typeof(IOwinContext), owinContextFactory, serviceLifetime));
 
-            builder.AddHttpContext<OwinHttpContextAccessor>(serviceLifetime);
+        builder.AddHttpContext<OwinHttpContextAccessor>(serviceLifetime);
 
-            return builder;
-        }
+        return builder;
     }
 }

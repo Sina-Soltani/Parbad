@@ -6,282 +6,126 @@ using Parbad.Abstraction;
 using Parbad.Gateway.AsanPardakht.Internal.Models;
 using Parbad.Internal;
 using Parbad.Options;
-using Parbad.Utilities;
+using Parbad.Storage.Abstractions.Models;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Globalization;
+using System.Linq;
 
-namespace Parbad.Gateway.AsanPardakht.Internal
+namespace Parbad.Gateway.AsanPardakht.Internal;
+
+internal static class AsanPardakhtHelper
 {
-    internal class AsanPardakhtHelper
+    public const string RefIdDatabaseKey = "RefId";
+    public const string PayGateTranIdDatabaseKey = "PayGateTranId";
+    public const string CardNumberDatabaseKey = "CardNumber";
+    public const string SettlementResultDatabaseKey = "SettlementResult";
+
+    public static bool TryGetMerchantConfigurationId(AsanPardakhtGatewayAccount account, out long merchantConfigurationId) =>
+        long.TryParse(account.MerchantConfigurationId, NumberStyles.Integer, CultureInfo.InvariantCulture, out merchantConfigurationId);
+
+    public static string InvalidMerchantConfigurationIdMessage(AsanPardakhtGatewayAccount account) =>
+        $"The AsanPardakht account \"{account.Name}\" has no valid MerchantConfigurationId (a number is expected).";
+
+    public static object CreateTokenRequest(Invoice invoice, long merchantConfigurationId, string localDate) => new
+                                                                                                                {
+                                                                                                                    serviceTypeId = 1, // sale
+                                                                                                                    merchantConfigurationId,
+                                                                                                                    localInvoiceId = invoice.TrackingNumber,
+                                                                                                                    amountInRials = (long)invoice.Amount,
+                                                                                                                    localDate,
+                                                                                                                    callbackURL = invoice.CallbackUrl.Url,
+                                                                                                                    paymentId = "0",
+                                                                                                                    additionalData = ""
+                                                                                                                };
+
+    public static PaymentRequestResult CreateRequestResult(AsanPardakhtResponse response,
+                                                           AsanPardakhtGatewayAccount account,
+                                                           HttpContext httpContext,
+                                                           AsanPardakhtGatewayOptions gatewayOptions,
+                                                           MessagesOptions messagesOptions)
     {
-        public static string CreateEncryptData(string key, string iv, string input)
+        var refId = response.IsSucceed ? response.ReadString() : null;
+
+        if (string.IsNullOrWhiteSpace(refId))
         {
-            return $@"<soap:Envelope xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:xsd='http://www.w3.org/2001/XMLSchema' xmlns:soap='http://schemas.xmlsoap.org/soap/envelope/'>
-                <soap:Body>
-                <EncryptInAES xmlns ='http://tempuri.org/'>
-                <aesKey>{key}</aesKey>
-                <aesVector>{iv}</aesVector>
-                <toBeEncrypted>{input}</toBeEncrypted>
-                </EncryptInAES>
-                </soap:Body>
-                </soap:Envelope>";
+            return PaymentRequestResult.Failed(AsanPardakhtResultTranslator.Translate(AsanPardakhtOperation.Token, response, messagesOptions),
+                                               account.Name,
+                                               response.Code);
         }
 
-        public static string CreateDecryptData(string key, string iv, string input)
+        var result = PaymentRequestResult.SucceedWithPost(account.Name,
+                                                          httpContext,
+                                                          gatewayOptions.PaymentPageUrl,
+                                                          new Dictionary<string, string> { { "RefId", refId } });
+
+        // Stored to check later that the bank's record of the payment belongs to this request.
+        result.DatabaseAdditionalData.Add(RefIdDatabaseKey, refId);
+
+        return result;
+    }
+
+    /// <summary>
+    /// Checks the bank's record of the payment (TranResult). It is looked up by this invoice's own id, so it
+    /// cannot belong to another invoice; the RefId and the amount are compared as well.
+    /// </summary>
+    public static (bool IsSucceed, string Message, AsanPardakhtTransactionResult Result) CheckTransactionResult(AsanPardakhtResponse response,
+                                                                                                                InvoiceContext context,
+                                                                                                                MessagesOptions messagesOptions)
+    {
+        if (!response.IsSucceed)
         {
-            return $@"<soap:Envelope xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xmlns:xsd='http://www.w3.org/2001/XMLSchema' xmlns:soap='http://schemas.xmlsoap.org/soap/envelope/'>
-                <soap:Body>
-                <DecryptInAES xmlns ='http://tempuri.org/'>
-                <aesKey>{key}</aesKey>
-                <aesVector>{iv}</aesVector>
-                <toBeDecrypted>{input}</toBeDecrypted>
-                </DecryptInAES>
-                </soap:Body>
-                </soap:Envelope>";
+            // E.g. no record: the payment was cancelled or failed at the bank.
+            return (false, AsanPardakhtResultTranslator.Translate(AsanPardakhtOperation.TranResult, response, messagesOptions), null);
         }
 
-        public static async Task<string> CreateRequestData(Invoice invoice, AsanPardakhtGatewayAccount account, IAsanPardakhtCrypto crypto)
+        var result = response.ReadJson<AsanPardakhtTransactionResult>();
+
+        if (!long.TryParse(result.PayGateTranId, NumberStyles.Integer, CultureInfo.InvariantCulture, out _))
         {
-            var requestToEncrypt = string.Format("{0},{1},{2},{3},{4},{5:yyyyMMdd hhmmss},{6},{7},{8}",
-                1,
-                account.UserName,
-                account.Password,
-                invoice.TrackingNumber,
-                invoice.Amount.ToLongString(),
-                DateTime.Now,
-                "",
-                invoice.CallbackUrl,
-                "0"
-            );
-
-            var encryptedRequest = await crypto.Encrypt(requestToEncrypt, account.Key, account.IV);
-
-            return
-                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tem=\"http://tempuri.org/\">" +
-                "<soapenv:Header/>" +
-                "<soapenv:Body>" +
-                "<tem:RequestOperation>" +
-                $"<tem:merchantConfigurationID>{account.MerchantConfigurationId}</tem:merchantConfigurationID>" +
-                "<!--Optional:-->" +
-                $"<tem:encryptedRequest>{XmlHelper.EncodeXmlValue(encryptedRequest)}</tem:encryptedRequest>" +
-                "</tem:RequestOperation>" +
-                "</soapenv:Body>" +
-                "</soapenv:Envelope>";
+            return (false, messagesOptions.InvalidDataReceivedFromGateway, null);
         }
 
-        public static PaymentRequestResult CreateRequestResult(
-            string response,
-            AsanPardakhtGatewayAccount account,
-            HttpContext httpContext,
-            AsanPardakhtGatewayOptions gatewayOptions,
-            MessagesOptions messagesOptions)
+        if (!long.TryParse(result.Amount, NumberStyles.Integer, CultureInfo.InvariantCulture, out var amount) ||
+            amount != (long)context.Payment.Amount)
         {
-            var result = XmlHelper.GetNodeValueFromXml(response, "RequestOperationResult", "http://tempuri.org/");
-
-            var splitedResult = result.Split(',');
-
-            var isSucceed = splitedResult.Length == 2 && splitedResult[0] == "0";
-
-            if (!isSucceed)
-            {
-                var message = AsanPardakhtResultTranslator.TranslateRequest(splitedResult[0], messagesOptions);
-
-                return PaymentRequestResult.Failed(message, account.Name);
-            }
-
-            return PaymentRequestResult.SucceedWithPost(
-                account.Name,
-                httpContext,
-                gatewayOptions.PaymentPageUrl,
-                new Dictionary<string, string>
-                {
-                    {"RefId", splitedResult[1]}
-                });
+            return (false, $"{messagesOptions.PaymentFailed} The amount reported by the gateway ({result.Amount}) does not match the invoice amount ({(long)context.Payment.Amount}).", null);
         }
 
-        public static async Task<AsanPardakhtCallbackResult> CreateCallbackResult(
-            InvoiceContext context,
-            AsanPardakhtGatewayAccount account,
-            HttpRequest httpRequest,
-            IAsanPardakhtCrypto crypto,
-            MessagesOptions messagesOptions)
+        var issuedRefId = GetIssuedRefId(context);
+
+        if (issuedRefId != null && !string.Equals(issuedRefId, result.RefId, StringComparison.Ordinal))
         {
-            httpRequest.Form.TryGetValue("ReturningParams", out var returningParams);
-
-            var isSucceed = false;
-            string message = null;
-            string payGateTranId = null;
-            string rrn = null;
-            string lastFourDigitOfPAN = null;
-
-            if (returningParams.IsNullOrEmpty())
-            {
-                isSucceed = false;
-
-                message = messagesOptions.InvalidDataReceivedFromGateway;
-            }
-            else
-            {
-                var decryptedResult = await crypto.Decrypt(returningParams, account.Key, account.IV);
-
-                var splitedResult = decryptedResult.Split(',');
-
-                var amount = splitedResult[0];
-                var preInvoiceID = splitedResult[1];
-                var token = splitedResult[2];
-                var resCode = splitedResult[3];
-                var messageText = splitedResult[4];
-                payGateTranId = splitedResult[5];
-                rrn = splitedResult[6];
-                lastFourDigitOfPAN = splitedResult[7];
-
-                isSucceed = resCode == "0" || resCode == "00";
-
-                if (!isSucceed)
-                {
-                    message = messageText.IsNullOrEmpty()
-                        ? AsanPardakhtResultTranslator.TranslateRequest(resCode, messagesOptions)
-                        : messageText;
-                }
-                else
-                {
-                    if (long.TryParse(amount, out var longAmount))
-                    {
-                        if (longAmount != (long)context.Payment.Amount)
-                        {
-                            isSucceed = false;
-                            message = "مبلغ پرداخت شده با مبلغ درخواست شده مطابقت ندارد.";
-                        }
-                    }
-                    else
-                    {
-                        isSucceed = false;
-                        message = "مبلغ پرداخت شده نامشخص است.";
-                    }
-                }
-            }
-
-            return new AsanPardakhtCallbackResult
-            {
-                IsSucceed = isSucceed,
-                PayGateTranId = payGateTranId,
-                Rrn = rrn,
-                LastFourDigitOfPAN = lastFourDigitOfPAN,
-                Message = message
-            };
+            return (false, $"{messagesOptions.PaymentFailed} The payment reported by the gateway was not started by this invoice's request.", null);
         }
 
-        public static async Task<string> CreateVerifyData(
-            AsanPardakhtCallbackResult callbackResult,
-            AsanPardakhtGatewayAccount account,
-            IAsanPardakhtCrypto crypto)
-        {
-            var requestToEncrypt = account.UserName + "," + account.Password;
-            var encryptedRequest = await crypto.Encrypt(requestToEncrypt, account.Key, account.IV);
+        return (true, null, result);
+    }
 
-            return
-                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tem=\"http://tempuri.org/\">" +
-                "<soapenv:Header/>" +
-                "<soapenv:Body>" +
-                "<tem:RequestVerification>" +
-                $"<tem:merchantConfigurationID>{account.MerchantConfigurationId}</tem:merchantConfigurationID>" +
-                "<!--Optional:-->" +
-                $"<tem:encryptedCredentials>{XmlHelper.EncodeXmlValue(encryptedRequest)}</tem:encryptedCredentials>" +
-                $"<tem:payGateTranID>{callbackResult.PayGateTranId}</tem:payGateTranID>" +
-                "</tem:RequestVerification>" +
-                "</soapenv:Body>" +
-                "</soapenv:Envelope>";
+    public static PaymentVerifyResult CreateVerifyResult(AsanPardakhtTransactionResult transaction, MessagesOptions messagesOptions)
+    {
+        var result = PaymentVerifyResult.Succeed(transaction.Rrn, messagesOptions.PaymentSucceed);
+
+        result.BankReportedAmount = long.Parse(transaction.Amount, NumberStyles.Integer, CultureInfo.InvariantCulture);
+        result.DatabaseAdditionalData.Add(PayGateTranIdDatabaseKey, transaction.PayGateTranId);
+
+        if (!transaction.CardNumber.IsNullOrEmpty())
+        {
+            result.DatabaseAdditionalData.Add(CardNumberDatabaseKey, transaction.CardNumber);
         }
 
-        public static AsanPardakhtVerifyResult CheckVerifyResult(
-            string response,
-            AsanPardakhtCallbackResult callbackResult,
-            MessagesOptions messagesOptions)
-        {
-            if (!callbackResult.IsSucceed)
-            {
-                return new AsanPardakhtVerifyResult
-                {
-                    IsSucceed = false,
-                    Result = PaymentVerifyResult.Failed(callbackResult.Message)
-                };
-            }
+        return result;
+    }
 
-            var result = XmlHelper.GetNodeValueFromXml(response, "RequestVerificationResult", "http://tempuri.org/");
+    /// <summary>
+    /// The RefId stored when this invoice was requested. Invoices requested before 3.12 (SOAP) stored none.
+    /// </summary>
+    private static string GetIssuedRefId(InvoiceContext context)
+    {
+        var requestTransaction = context.Transactions?.SingleOrDefault(transaction => transaction.Type == TransactionType.Request);
 
-            var isSucceed = result == "500";
+        if (string.IsNullOrEmpty(requestTransaction?.AdditionalData)) return null;
 
-            PaymentVerifyResult verifyResult = null;
-
-            if (!isSucceed)
-            {
-                var message = AsanPardakhtResultTranslator.TranslateVerification(result, messagesOptions);
-
-                verifyResult = PaymentVerifyResult.Failed(message);
-                verifyResult.Message = message;
-            }
-
-            return new AsanPardakhtVerifyResult
-            {
-                IsSucceed = isSucceed,
-                Result = verifyResult
-            };
-        }
-
-        public static async Task<string> CreateSettleData(
-            AsanPardakhtCallbackResult callbackResult,
-            AsanPardakhtGatewayAccount account,
-            IAsanPardakhtCrypto crypto)
-        {
-            var requestToEncrypt = $"{account.UserName},{account.Password}";
-            var encryptedRequest = await crypto.Encrypt(requestToEncrypt, account.Key, account.IV);
-
-            return
-                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:tem=\"http://tempuri.org/\">" +
-                "<soapenv:Header/>" +
-                "<soapenv:Body>" +
-                "<tem:RequestReconciliation>" +
-                $"<tem:merchantConfigurationID>{account.MerchantConfigurationId}</tem:merchantConfigurationID>" +
-                "<!--Optional:-->" +
-                $"<tem:encryptedCredentials>{XmlHelper.EncodeXmlValue(encryptedRequest)}</tem:encryptedCredentials>" +
-                $"<tem:payGateTranID>{callbackResult.PayGateTranId}</tem:payGateTranID>" +
-                "</tem:RequestReconciliation>" +
-                "</soapenv:Body>" +
-                "</soapenv:Envelope>";
-        }
-
-        public static PaymentVerifyResult CreateSettleResult(
-            string response,
-            AsanPardakhtCallbackResult callbackResult,
-            MessagesOptions messagesOptions)
-        {
-            var result = XmlHelper.GetNodeValueFromXml(response, "RequestReconciliationResult", "http://tempuri.org/");
-
-            var isSucceed = result == "600";
-            string message;
-
-            if (isSucceed)
-            {
-                message = messagesOptions.PaymentSucceed;
-            }
-            else
-            {
-                message = AsanPardakhtResultTranslator.TranslateReconcilation(result, messagesOptions) ??
-                          messagesOptions.PaymentFailed;
-            }
-
-            var verifyResult = new PaymentVerifyResult
-            {
-                Status = isSucceed ? PaymentVerifyResultStatus.Succeed : PaymentVerifyResultStatus.Failed,
-                TransactionCode = callbackResult.Rrn,
-                Message = message
-            };
-
-            verifyResult.DatabaseAdditionalData.Add("PayGateTranId", callbackResult.PayGateTranId);
-            verifyResult.DatabaseAdditionalData.Add("LastFourDigitOfPAN", callbackResult.LastFourDigitOfPAN);
-
-            return verifyResult;
-        }
+        return requestTransaction.ToDictionary().TryGetValue(RefIdDatabaseKey, out var refId) ? refId : null;
     }
 }

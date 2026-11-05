@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Parbad.Abstraction;
+using Parbad.Exceptions;
 using Parbad.Gateway.ZarinPal.Models;
 using Parbad.Http;
 using Parbad.Internal;
@@ -47,25 +48,25 @@ internal static class ZarinPalHelper
                };
     }
 
-    public static PaymentRequestResult CreateRequestResult(ZarinPalRequestResultModel resultModel,
+    public static PaymentRequestResult CreateRequestResult(ZarinPalRequestResultModelData data,
                                                            HttpContext httpContext,
                                                            ZarinPalGatewayAccount account,
                                                            ZarinPalGatewayOptions gatewayOptions,
                                                            MessagesOptions messagesOptions)
     {
-        if (!IsSucceedCode(resultModel.Data.Code))
+        if (!IsSucceedCode(data.Code))
         {
-            var message = ZarinPalCodeTranslator.Translate(resultModel.Data.Code, messagesOptions);
+            var message = ZarinPalCodeTranslator.Translate(data.Code, messagesOptions);
 
-            return PaymentRequestResult.Failed(message, account.Name);
+            return PaymentRequestResult.Failed(message, account.Name, data.Code.ToString());
         }
 
-        var paymentPageUrl = GetPaymentPageUrl(account.IsSandbox, gatewayOptions) + resultModel.Data.Authority;
+        var paymentPageUrl = GetPaymentPageUrl(account.IsSandbox, gatewayOptions) + data.Authority;
 
         var result = PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, paymentPageUrl);
 
-        result.GatewayResponseCode = resultModel.Data.Code.ToString();
-        result.DatabaseAdditionalData.Add(AuthorityDatabaseKey, resultModel.Data.Authority);
+        result.GatewayResponseCode = data.Code.ToString();
+        result.DatabaseAdditionalData.Add(AuthorityDatabaseKey, data.Authority);
 
         return result;
     }
@@ -107,34 +108,32 @@ internal static class ZarinPalHelper
                };
     }
 
-    public static PaymentVerifyResult CreateVerifyResult(ZarinPalResultModel<ZarinPalOriginalVerificationResult> verificationResult,
+    public static PaymentVerifyResult CreateVerifyResult(ZarinPalOriginalVerificationResult verificationResult,
                                                          ZarinPalGatewayAccount account,
                                                          MessagesOptions messagesOptions)
     {
         PaymentVerifyResult result;
 
-        if (IsSucceedCode(verificationResult.Data.Code))
+        // 101: this payment was verified before (e.g. the first response was lost). The Authority comes from
+        // the database, so it is this invoice's own payment and it counts as paid.
+        if (IsSucceedCode(verificationResult.Code) || verificationResult.Code == NumericAlreadyOkResult)
         {
-            result = PaymentVerifyResult.Succeed(verificationResult.Data.RefId, messagesOptions.PaymentSucceed);
+            result = PaymentVerifyResult.Succeed(verificationResult.RefId, messagesOptions.PaymentSucceed);
         }
         else
         {
-            var message = ZarinPalCodeTranslator.Translate(verificationResult.Data.Code, messagesOptions);
-
-            var verifyResultStatus = verificationResult.Data.Code == NumericAlreadyOkResult
-                ? PaymentVerifyResultStatus.AlreadyVerified
-                : PaymentVerifyResultStatus.Failed;
+            var message = ZarinPalCodeTranslator.Translate(verificationResult.Code, messagesOptions);
 
             result = new PaymentVerifyResult
                      {
-                         Status = verifyResultStatus,
+                         Status = PaymentVerifyResultStatus.Failed,
                          Message = message
                      };
         }
 
         result.GatewayAccountName = account.Name;
-        result.GatewayResponseCode = verificationResult.Data.Code.ToString();
-        result.SetZarinPalOriginalVerificationResult(verificationResult.Data);
+        result.GatewayResponseCode = verificationResult.Code.ToString();
+        result.SetZarinPalOriginalVerificationResult(verificationResult);
 
         return result;
     }
@@ -148,15 +147,15 @@ internal static class ZarinPalHelper
                };
     }
 
-    public static PaymentRefundResult CreateRefundResult(ZarinPalRefundResultModel resultModel, ZarinPalGatewayAccount account, MessagesOptions messagesOptions)
+    public static PaymentRefundResult CreateRefundResult(ZarinPalRefundResultModelData data, ZarinPalGatewayAccount account, MessagesOptions messagesOptions)
     {
         var result = new PaymentRefundResult
                      {
-                         GatewayResponseCode = resultModel.Data.Code.ToString(),
+                         GatewayResponseCode = data.Code.ToString(),
                          GatewayAccountName = account.Name
                      };
 
-        if (IsSucceedCode(resultModel.Data.Code))
+        if (IsSucceedCode(data.Code))
         {
             result.Status = PaymentRefundResultStatus.Succeed;
 
@@ -164,9 +163,9 @@ internal static class ZarinPalHelper
         }
         else
         {
-            result.Status = resultModel.Data.Code == NumericAlreadyOkResult ? PaymentRefundResultStatus.AlreadyRefunded : PaymentRefundResultStatus.Failed;
+            result.Status = data.Code == NumericAlreadyOkResult ? PaymentRefundResultStatus.AlreadyRefunded : PaymentRefundResultStatus.Failed;
 
-            result.Message = ZarinPalCodeTranslator.Translate(resultModel.Data.Code, messagesOptions);
+            result.Message = ZarinPalCodeTranslator.Translate(data.Code, messagesOptions);
         }
 
         return result;
@@ -229,41 +228,6 @@ internal static class ZarinPalHelper
         return isSandbox
             ? gatewayOptions.SandboxPaymentPageUrl
             : gatewayOptions.PaymentPageUrl;
-    }
-
-    public static async Task<(int? Code, string Message)> TryGetError(HttpResponseMessage httpResponseMessage, MessagesOptions messagesOptions)
-    {
-        if (httpResponseMessage.StatusCode == HttpStatusCode.InternalServerError)
-        {
-            return (null, messagesOptions.UnexpectedErrorText);
-        }
-
-        var jsonResponse = await httpResponseMessage.Content.ReadAsStringAsync();
-
-        JObject jsonObject = JObject.Parse(jsonResponse);
-        var errorsToken = jsonObject["errors"];
-        if (errorsToken != null && errorsToken.Type == JTokenType.Object)
-        {
-            jsonObject["errors"] = new JArray(errorsToken);
-        }
-
-        var failedResult = JsonConvert.DeserializeObject<ZarinPalFailedResult>(jsonObject.ToString());
-
-        string message;
-        int? errorCode = null;
-
-        if (failedResult?.Errors != null && failedResult.Errors.Any())
-        {
-            errorCode = failedResult.Errors.First().Code;
-
-            message = ZarinPalCodeTranslator.Translate(errorCode.Value, messagesOptions);
-        }
-        else
-        {
-            message = $"ZarinPal HTTP request failed. Status code {httpResponseMessage.StatusCode}";
-        }
-
-        return (errorCode, message);
     }
 
     private static bool IsSucceedCode(int status) => status == NumericOkResult;

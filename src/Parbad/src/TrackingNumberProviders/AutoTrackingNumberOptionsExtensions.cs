@@ -5,30 +5,29 @@ using Microsoft.Extensions.DependencyInjection;
 using Parbad.TrackingNumberProviders;
 using System;
 
-namespace Parbad.Builder
+namespace Parbad.Builder;
+
+public static class AutoTrackingNumberOptionsExtensions
 {
-    public static class AutoTrackingNumberOptionsExtensions
+    public static IParbadBuilder ConfigureAutoIncrementTrackingNumber(
+        this IParbadBuilder builder,
+        Action<AutoIncrementTrackingNumberOptions> configureOptions)
     {
-        public static IParbadBuilder ConfigureAutoIncrementTrackingNumber(
-            this IParbadBuilder builder,
-            Action<AutoIncrementTrackingNumberOptions> configureOptions)
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            builder.Services.Configure(configureOptions);
+        builder.Services.Configure(configureOptions);
 
-            return builder;
-        }
+        return builder;
+    }
 
-        public static IParbadBuilder ConfigureAutoRandomTrackingNumber(
-            this IParbadBuilder builder,
-            Action<AutoRandomTrackingNumberOptions> configureOptions)
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
+    public static IParbadBuilder ConfigureAutoRandomTrackingNumber(
+        this IParbadBuilder builder,
+        Action<AutoRandomTrackingNumberOptions> configureOptions)
+    {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            builder.Services.Configure(configureOptions);
+        builder.Services.Configure(configureOptions);
 
-            return builder;
-        }
+        return builder;
     }
 }

@@ -5,67 +5,66 @@ using Parbad.Abstraction;
 using Parbad.InvoiceBuilder;
 using System;
 
-namespace Parbad.Gateway.YekPay
+namespace Parbad.Gateway.YekPay;
+
+public static class YekPayGatewayInvoiceBuilderExtensions
 {
-    public static class YekPayGatewayInvoiceBuilderExtensions
+    private const string YekPayRequestKey = "YekPayRequest";
+
+    /// <summary>
+    /// The invoice will be sent to YekPay gateway.
+    /// </summary>
+    public static IInvoiceBuilder UseYekPay(this IInvoiceBuilder builder)
     {
-        private const string YekPayRequestKey = "YekPayRequest";
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        /// <summary>
-        /// The invoice will be sent to YekPay gateway.
-        /// </summary>
-        public static IInvoiceBuilder UseYekPay(this IInvoiceBuilder builder)
+        return builder.SetGateway(YekPayGateway.Name);
+    }
+
+    /// <summary>
+    /// The invoice will be sent to YekPay gateway.
+    /// </summary>
+    public static IInvoiceBuilder SetYekPayData(this IInvoiceBuilder builder, Action<YekPayRequest> configureYekPay)
+    {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
+        if (configureYekPay == null) throw new ArgumentNullException(nameof(configureYekPay));
+
+        var yekPayRequest = new YekPayRequest();
+        configureYekPay(yekPayRequest);
+
+        return SetYekPayData(builder, yekPayRequest);
+    }
+
+    /// <summary>
+    /// The invoice will be sent to YekPay gateway.
+    /// </summary>
+    public static IInvoiceBuilder SetYekPayData(this IInvoiceBuilder builder, YekPayRequest yekPayRequest)
+    {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
+        if (yekPayRequest == null) throw new ArgumentNullException(nameof(yekPayRequest));
+
+        SetYekPayRequest(builder, yekPayRequest);
+
+        return builder;
+    }
+
+    internal static void SetYekPayRequest(IInvoiceBuilder builder, YekPayRequest yekPayRequest)
+    {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
+        if (yekPayRequest == null) throw new ArgumentNullException(nameof(yekPayRequest));
+
+        builder.AddOrUpdateProperty(YekPayRequestKey, yekPayRequest);
+    }
+
+    internal static YekPayRequest GetYekPayRequest(this Invoice invoice)
+    {
+        if (invoice == null) throw new ArgumentNullException(nameof(invoice));
+
+        if (invoice.Properties.ContainsKey(YekPayRequestKey))
         {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-
-            return builder.SetGateway(YekPayGateway.Name);
+            return (YekPayRequest)invoice.Properties[YekPayRequestKey];
         }
 
-        /// <summary>
-        /// The invoice will be sent to YekPay gateway.
-        /// </summary>
-        public static IInvoiceBuilder SetYekPayData(this IInvoiceBuilder builder, Action<YekPayRequest> configureYekPay)
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-            if (configureYekPay == null) throw new ArgumentNullException(nameof(configureYekPay));
-
-            var yekPayRequest = new YekPayRequest();
-            configureYekPay(yekPayRequest);
-
-            return SetYekPayData(builder, yekPayRequest);
-        }
-
-        /// <summary>
-        /// The invoice will be sent to YekPay gateway.
-        /// </summary>
-        public static IInvoiceBuilder SetYekPayData(this IInvoiceBuilder builder, YekPayRequest yekPayRequest)
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-            if (yekPayRequest == null) throw new ArgumentNullException(nameof(yekPayRequest));
-
-            SetYekPayRequest(builder, yekPayRequest);
-
-            return builder;
-        }
-
-        internal static void SetYekPayRequest(IInvoiceBuilder builder, YekPayRequest yekPayRequest)
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
-            if (yekPayRequest == null) throw new ArgumentNullException(nameof(yekPayRequest));
-
-            builder.AddOrUpdateProperty(YekPayRequestKey, yekPayRequest);
-        }
-
-        internal static YekPayRequest GetYekPayRequest(this Invoice invoice)
-        {
-            if (invoice == null) throw new ArgumentNullException(nameof(invoice));
-
-            if (invoice.Properties.ContainsKey(YekPayRequestKey))
-            {
-                return (YekPayRequest)invoice.Properties[YekPayRequestKey];
-            }
-
-            return null;
-        }
+        return null;
     }
 }

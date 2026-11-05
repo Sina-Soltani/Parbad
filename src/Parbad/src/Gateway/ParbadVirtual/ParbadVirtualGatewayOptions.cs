@@ -3,13 +3,12 @@
 
 using Microsoft.AspNetCore.Http;
 
-namespace Parbad.Gateway.ParbadVirtual
+namespace Parbad.Gateway.ParbadVirtual;
+
+public class ParbadVirtualGatewayOptions
 {
-    public class ParbadVirtualGatewayOptions
-    {
-        /// <summary>
-        /// Path of Virtual Gateway. It would be like: /MyParbadGateway
-        /// </summary>
-        public PathString GatewayPath { get; set; }
-    }
+    /// <summary>
+    /// Path of Virtual Gateway. It would be like: /MyParbadGateway
+    /// </summary>
+    public PathString GatewayPath { get; set; }
 }

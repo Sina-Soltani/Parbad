@@ -3,13 +3,12 @@
 
 using Newtonsoft.Json;
 
-namespace Parbad.Gateway.FanAva.Internal.Models
+namespace Parbad.Gateway.FanAva.Internal.Models;
+
+internal class FanAvaRefundResultModel
 {
-    internal class FanAvaRefundResultModel
-    {
-        public string Result { get; set; }
+    public string Result { get; set; }
         
-        [JsonProperty("RefNum")]
-        public string InvoiceNumber { get; set; }
-    }
+    [JsonProperty("RefNum")]
+    public string InvoiceNumber { get; set; }
 }

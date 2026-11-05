@@ -3,24 +3,23 @@
 
 using System;
 
-namespace Parbad.Exceptions
+namespace Parbad.Exceptions;
+
+[Serializable]
+public class InvoiceNotFoundException : Exception
 {
-    [Serializable]
-    public class InvoiceNotFoundException : Exception
+    public InvoiceNotFoundException(string paymentToken) : base($"No invoice found with the token {paymentToken}")
     {
-        public InvoiceNotFoundException(string paymentToken) : base($"No invoice found with the token {paymentToken}")
-        {
-            PaymentToken = paymentToken;
-        }
-
-        public InvoiceNotFoundException(long trackingNumber) : base(
-            $"No invoice found with the tracking number {trackingNumber}")
-        {
-            TrackingNumber = trackingNumber;
-        }
-
-        public long TrackingNumber { get; }
-
-        public string PaymentToken { get; }
+        PaymentToken = paymentToken;
     }
+
+    public InvoiceNotFoundException(long trackingNumber) : base(
+                                                                $"No invoice found with the tracking number {trackingNumber}")
+    {
+        TrackingNumber = trackingNumber;
+    }
+
+    public long TrackingNumber { get; }
+
+    public string PaymentToken { get; }
 }

@@ -3,12 +3,11 @@
 
 using Parbad.Abstraction;
 
-namespace Parbad.Gateway.PayIr
-{
-    public class PayIrGatewayAccount : GatewayAccount
-    {
-        public string Api { get; set; }
+namespace Parbad.Gateway.PayIr;
 
-        public bool IsTestAccount { get; set; }
-    }
+public class PayIrGatewayAccount : GatewayAccount
+{
+    public string Api { get; set; }
+
+    public bool IsTestAccount { get; set; }
 }

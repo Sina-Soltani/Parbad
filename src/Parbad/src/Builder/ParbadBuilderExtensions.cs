@@ -4,18 +4,17 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
-namespace Parbad.Builder
-{
-    public static class ParbadBuilderExtensions
-    {
-        /// <summary>
-        /// Adds Parbad pre-configured services to the specified <see cref="IServiceCollection"/>.
-        /// </summary>
-        public static IParbadBuilder AddParbad(this IServiceCollection services)
-        {
-            if (services == null) throw new ArgumentNullException(nameof(services));
+namespace Parbad.Builder;
 
-            return ParbadBuilder.CreateDefaultBuilder(services);
-        }
+public static class ParbadBuilderExtensions
+{
+    /// <summary>
+    /// Adds Parbad pre-configured services to the specified <see cref="IServiceCollection"/>.
+    /// </summary>
+    public static IParbadBuilder AddParbad(this IServiceCollection services)
+    {
+        if (services == null) throw new ArgumentNullException(nameof(services));
+
+        return ParbadBuilder.CreateDefaultBuilder(services);
     }
 }

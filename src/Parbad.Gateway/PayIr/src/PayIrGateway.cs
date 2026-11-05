@@ -17,97 +17,96 @@ using System.Threading;
 using System.Threading.Tasks;
 using PaymentVerifyResult = Parbad.Internal.PaymentVerifyResult;
 
-namespace Parbad.Gateway.PayIr
+namespace Parbad.Gateway.PayIr;
+
+public class PayIrGateway : GatewayBase<PayIrGatewayAccount>
 {
-    public class PayIrGateway : GatewayBase<PayIrGatewayAccount>
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly HttpClient _httpClient;
+    private readonly PayIrGatewayOptions _gatewayOptions;
+    private readonly MessagesOptions _messagesOptions;
+
+    public const string Name = "PayIr";
+
+    private static JsonSerializerSettings DefaultSerializerSettings => new JsonSerializerSettings
+                                                                       {
+                                                                           ContractResolver = new CamelCasePropertyNamesContractResolver()
+                                                                       };
+
+    public PayIrGateway(
+        IGatewayAccountProvider<PayIrGatewayAccount> accountProvider,
+        IHttpContextAccessor httpContextAccessor,
+        IHttpClientFactory httpClientFactory,
+        IOptions<PayIrGatewayOptions> gatewayOptions,
+        IOptions<MessagesOptions> messagesOptions) : base(accountProvider)
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly HttpClient _httpClient;
-        private readonly PayIrGatewayOptions _gatewayOptions;
-        private readonly MessagesOptions _messagesOptions;
+        _httpContextAccessor = httpContextAccessor;
+        _httpClient = httpClientFactory.CreateClient(this);
+        _gatewayOptions = gatewayOptions.Value;
+        _messagesOptions = messagesOptions.Value;
+    }
 
-        public const string Name = "PayIr";
+    /// <inheritdoc />
+    public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
+    {
+        if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
-        private static JsonSerializerSettings DefaultSerializerSettings => new JsonSerializerSettings
+        var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
+
+        var data = PayIrHelper.CreateRequestData(account, invoice);
+
+        var responseMessage = await _httpClient
+                                   .PostJsonAsync(_gatewayOptions.ApiRequestUrl, data, DefaultSerializerSettings, cancellationToken)
+                                   .ConfigureAwaitFalse();
+
+        var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
+
+        return PayIrHelper.CreateRequestResult(responseMessage, response, _httpContextAccessor.HttpContext, account, _gatewayOptions);
+    }
+
+    /// <inheritdoc />
+    public override async Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default)
+    {
+        if (context == null) throw new ArgumentNullException(nameof(context));
+
+        var callbackResult = await PayIrHelper.CreateCallbackResultAsync(_httpContextAccessor.HttpContext.Request, context, _messagesOptions, cancellationToken).ConfigureAwaitFalse();
+
+        if (callbackResult.IsSucceed)
         {
-            ContractResolver = new CamelCasePropertyNamesContractResolver()
-        };
-
-        public PayIrGateway(
-            IGatewayAccountProvider<PayIrGatewayAccount> accountProvider,
-            IHttpContextAccessor httpContextAccessor,
-            IHttpClientFactory httpClientFactory,
-            IOptions<PayIrGatewayOptions> gatewayOptions,
-            IOptions<MessagesOptions> messagesOptions) : base(accountProvider)
-        {
-            _httpContextAccessor = httpContextAccessor;
-            _httpClient = httpClientFactory.CreateClient(this);
-            _gatewayOptions = gatewayOptions.Value;
-            _messagesOptions = messagesOptions.Value;
+            return PaymentFetchResult.ReadyForVerifying();
         }
 
-        /// <inheritdoc />
-        public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
+        return PaymentFetchResult.Failed(callbackResult.Message);
+    }
+
+    /// <inheritdoc />
+    public override async Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default)
+    {
+        if (context == null) throw new ArgumentNullException(nameof(context));
+
+        var callbackResult = await PayIrHelper.CreateCallbackResultAsync(_httpContextAccessor.HttpContext.Request, context, _messagesOptions, cancellationToken).ConfigureAwaitFalse();
+
+        if (!callbackResult.IsSucceed)
         {
-            if (invoice == null) throw new ArgumentNullException(nameof(invoice));
-
-            var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
-
-            var data = PayIrHelper.CreateRequestData(account, invoice);
-
-            var responseMessage = await _httpClient
-                .PostJsonAsync(_gatewayOptions.ApiRequestUrl, data, DefaultSerializerSettings, cancellationToken)
-                .ConfigureAwaitFalse();
-
-            var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
-
-            return PayIrHelper.CreateRequestResult(response, _httpContextAccessor.HttpContext, account, _gatewayOptions);
+            return PaymentVerifyResult.Failed(callbackResult.Message);
         }
 
-        /// <inheritdoc />
-        public override async Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default)
-        {
-            if (context == null) throw new ArgumentNullException(nameof(context));
+        var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 
-            var callbackResult = await PayIrHelper.CreateCallbackResultAsync(_httpContextAccessor.HttpContext.Request, cancellationToken).ConfigureAwaitFalse();
+        var data = PayIrHelper.CreateVerifyData(account, callbackResult);
 
-            if (callbackResult.IsSucceed)
-            {
-                return PaymentFetchResult.ReadyForVerifying();
-            }
+        var responseMessage = await _httpClient
+                                   .PostJsonAsync(_gatewayOptions.ApiVerificationUrl, data, DefaultSerializerSettings, cancellationToken)
+                                   .ConfigureAwaitFalse();
 
-            return PaymentFetchResult.Failed(callbackResult.Message);
-        }
+        var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
-        /// <inheritdoc />
-        public override async Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default)
-        {
-            if (context == null) throw new ArgumentNullException(nameof(context));
+        return PayIrHelper.CreateVerifyResult(responseMessage, response, context, _messagesOptions);
+    }
 
-            var callbackResult = await PayIrHelper.CreateCallbackResultAsync(_httpContextAccessor.HttpContext.Request, cancellationToken).ConfigureAwaitFalse();
-
-            if (!callbackResult.IsSucceed)
-            {
-                return PaymentVerifyResult.Failed(callbackResult.Message);
-            }
-
-            var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
-
-            var data = PayIrHelper.CreateVerifyData(account, callbackResult);
-
-            var responseMessage = await _httpClient
-                .PostJsonAsync(_gatewayOptions.ApiVerificationUrl, data, DefaultSerializerSettings, cancellationToken)
-                .ConfigureAwaitFalse();
-
-            var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
-
-            return PayIrHelper.CreateVerifyResult(response, _messagesOptions);
-        }
-
-        /// <inheritdoc />
-        public override Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default)
-        {
-            return PaymentRefundResult.Failed("The Refund operation is not supported by this gateway.").ToInterfaceAsync();
-        }
+    /// <inheritdoc />
+    public override Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default)
+    {
+        return PaymentRefundResult.Failed("The Refund operation is not supported by this gateway.").ToInterfaceAsync();
     }
 }

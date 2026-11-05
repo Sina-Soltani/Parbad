@@ -1,0 +1,82 @@
+name: CI
+
+# Builds and tests every pull request and every push to master. release.yml reuses this workflow to build the
+# packages it publishes, so a release is built and tested exactly like a pull request.
+
+on:
+  pull_request:
+  push:
+    branches: [ master ]
+  workflow_call:
+    inputs:
+      pack:
+        description: Pack the NuGet packages and upload them as the "packages" artifact.
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  build:
+    name: Build and test
+    # Windows, because Parbad.Mvc and Parbad.Owin target the .NET Framework.
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          # The SDK builds every target framework; the .NET 9 runtime runs the tests.
+          dotnet-version: |
+            9.0.x
+            10.0.x
+
+      - name: Restore
+        run: dotnet restore Parbad.sln
+
+      # Fails when a shipped package depends on a package with a known vulnerability, including the transitive
+      # dependencies of the netstandard and net462 builds.
+      - name: Check for vulnerable packages
+        shell: pwsh
+        run: |
+          $vulnerable = $false
+          Get-ChildItem src -Recurse -Filter *.csproj | Where-Object { $_.FullName -notmatch '[\\/](tests|bin|obj)[\\/]' } | ForEach-Object {
+            $output = dotnet list $_.FullName package --vulnerable --include-transitive 2>&1 | Out-String
+            if ($output -match 'has the following vulnerable packages') { Write-Host $output; $vulnerable = $true }
+          }
+          if ($vulnerable) { Write-Host '::error::Vulnerable packages found.'; exit 1 }
+
+      - name: Build
+        run: dotnet build Parbad.sln -c Release --no-restore
+
+      # A test project that runs no tests fails the build, so tests cannot silently stop running again.
+      - name: Test
+        run: dotnet test Parbad.sln -c Release --no-build -- RunConfiguration.TreatNoTestsAsError=true
+
+      # The versions come from the project files: VersionPrefix, plus VersionSuffix (e.g. beta.1) for a prerelease.
+      - name: Pack
+        if: inputs.pack
+        shell: pwsh
+        run: |
+          Get-ChildItem src -Recurse -Filter *.csproj | Where-Object { $_.FullName -notmatch '[\\/](tests|bin|obj)[\\/]' } | ForEach-Object {
+            dotnet pack $_.FullName -c Release --no-build -o artifacts
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+
+      - name: Upload packages
+        if: inputs.pack
+        uses: actions/upload-artifact@v4
+        with:
+          name: packages
+          path: artifacts/*.nupkg
+          if-no-files-found: error

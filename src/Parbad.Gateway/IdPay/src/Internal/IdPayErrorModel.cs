@@ -3,19 +3,18 @@
 
 using Newtonsoft.Json;
 
-namespace Parbad.Gateway.IdPay.Internal
+namespace Parbad.Gateway.IdPay.Internal;
+
+internal class IdPayErrorModel
 {
-    internal class IdPayErrorModel
+    [JsonProperty("error_code")]
+    public string ErrorCode { get; set; }
+
+    [JsonProperty("error_message")]
+    public string ErrorMessage { get; set; }
+
+    public override string ToString()
     {
-        [JsonProperty("error_code")]
-        public string ErrorCode { get; set; }
-
-        [JsonProperty("error_message")]
-        public string ErrorMessage { get; set; }
-
-        public override string ToString()
-        {
-            return $"Error Code: {ErrorCode}, Error Message: {ErrorMessage}";
-        }
+        return $"Error Code: {ErrorCode}, Error Message: {ErrorMessage}";
     }
 }

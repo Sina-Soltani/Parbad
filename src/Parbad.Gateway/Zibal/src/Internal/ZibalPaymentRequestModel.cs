@@ -4,31 +4,30 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace Parbad.Gateway.Zibal.Internal
+namespace Parbad.Gateway.Zibal.Internal;
+
+internal class ZibalPaymentRequestModel
 {
-    internal class ZibalPaymentRequestModel
-    {
-        public string Merchant { get; set; }
+    public string Merchant { get; set; }
 
-        public long Amount { get; set; }
+    public long Amount { get; set; }
 
-        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public string Mobile { get; set; }
+    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+    public string Mobile { get; set; }
 
-        public string OrderId { get; set; }
+    public string OrderId { get; set; }
 
-        public string CallbackUrl { get; set; }
+    public string CallbackUrl { get; set; }
 
-        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public string Description { get; set; }
+    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+    public string Description { get; set; }
 
-        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public int? FeeMode { get; set; }
+    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+    public int? FeeMode { get; set; }
 
-        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public bool? Sms { get; set; }
+    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+    public bool? Sms { get; set; }
 
-        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public List<string> AllowedCards { get; set; }
-    }
+    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+    public List<string> AllowedCards { get; set; }
 }

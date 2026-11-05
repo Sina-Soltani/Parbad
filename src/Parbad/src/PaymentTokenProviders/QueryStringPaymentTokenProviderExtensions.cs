@@ -6,40 +6,39 @@ using Parbad.Internal;
 using Parbad.PaymentTokenProviders;
 using System;
 
-namespace Parbad.Builder
+namespace Parbad.Builder;
+
+public static class QueryStringPaymentTokenProviderExtensions
 {
-    public static class QueryStringPaymentTokenProviderExtensions
+    /// <summary>
+    /// Uses the <see cref="GuidQueryStringPaymentTokenProvider"/> as <see cref="IPaymentTokenProvider"/>.
+    /// It generates a unique <see cref="Guid"/> as a token for each payments and puts it inside the query string
+    /// of the URL. The generated token will be retrieved from the query string when the client
+    /// comes back from the gateway.
+    /// <para>Note: This is the default <see cref="IPaymentTokenProvider"/>, which means you don't need to call this.</para>
+    /// </summary>
+    /// <param name="builder"></param>
+    public static IPaymentTokenBuilder UseGuidQueryStringPaymentTokenProvider(this IPaymentTokenBuilder builder)
     {
-        /// <summary>
-        /// Uses the <see cref="GuidQueryStringPaymentTokenProvider"/> as <see cref="IPaymentTokenProvider"/>.
-        /// It generates a unique <see cref="Guid"/> as a token for each payments and puts it inside the query string
-        /// of the URL. The generated token will be retrieved from the query string when the client
-        /// comes back from the gateway.
-        /// <para>Note: This is the default <see cref="IPaymentTokenProvider"/>, which means you don't need to call this.</para>
-        /// </summary>
-        /// <param name="builder"></param>
-        public static IPaymentTokenBuilder UseGuidQueryStringPaymentTokenProvider(this IPaymentTokenBuilder builder)
-        {
-            return builder.UseGuidQueryStringPaymentTokenProvider(option => { });
-        }
+        return builder.UseGuidQueryStringPaymentTokenProvider(option => { });
+    }
 
-        /// <summary>
-        /// Uses the <see cref="GuidQueryStringPaymentTokenProvider"/> as <see cref="IPaymentTokenProvider"/>.
-        /// It generates a unique <see cref="Guid"/> as a token for each payments and puts it inside the query string
-        /// of the URL. The generated token will be retrieved from the query string when the client
-        /// comes back from the gateway.
-        /// <para>Note: This is the default <see cref="IPaymentTokenProvider"/>, which means you don't need to call this.</para>
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="configureOptions">A delegate to configure the <see cref="QueryStringPaymentTokenOptions"/>.</param>
-        public static IPaymentTokenBuilder UseGuidQueryStringPaymentTokenProvider(this IPaymentTokenBuilder builder,
-            Action<QueryStringPaymentTokenOptions> configureOptions)
-        {
-            builder.Services.Configure(configureOptions);
+    /// <summary>
+    /// Uses the <see cref="GuidQueryStringPaymentTokenProvider"/> as <see cref="IPaymentTokenProvider"/>.
+    /// It generates a unique <see cref="Guid"/> as a token for each payments and puts it inside the query string
+    /// of the URL. The generated token will be retrieved from the query string when the client
+    /// comes back from the gateway.
+    /// <para>Note: This is the default <see cref="IPaymentTokenProvider"/>, which means you don't need to call this.</para>
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <param name="configureOptions">A delegate to configure the <see cref="QueryStringPaymentTokenOptions"/>.</param>
+    public static IPaymentTokenBuilder UseGuidQueryStringPaymentTokenProvider(this IPaymentTokenBuilder builder,
+                                                                              Action<QueryStringPaymentTokenOptions> configureOptions)
+    {
+        builder.Services.Configure(configureOptions);
 
-            builder.AddPaymentTokenProvider<GuidQueryStringPaymentTokenProvider>(ServiceLifetime.Transient);
+        builder.AddPaymentTokenProvider<GuidQueryStringPaymentTokenProvider>(ServiceLifetime.Transient);
 
-            return builder;
-        }
+        return builder;
     }
 }

@@ -4,28 +4,27 @@
 using System;
 using Parbad.Gateway.Sepehr.Internal;
 
-namespace Parbad.Gateway.Sepehr
+namespace Parbad.Gateway.Sepehr;
+
+public static class SepehrGatewayPaymentResultExtensions
 {
-    public static class SepehrGatewayPaymentResultExtensions
+    /// <summary>
+    /// Gets the verification additional data from Sepehr gateway.
+    /// </summary>
+    public static SepehrGatewayVerificationAdditionalData GetSepehrAdditionalData(this IPaymentVerifyResult result)
     {
-        /// <summary>
-        /// Gets the verification additional data from Sepehr gateway.
-        /// </summary>
-        public static SepehrGatewayVerificationAdditionalData GetSepehrAdditionalData(this IPaymentVerifyResult result)
-        {
-            if (result == null) throw new ArgumentNullException(nameof(result));
+        if (result == null) throw new ArgumentNullException(nameof(result));
 
-            result.AdditionalData.TryGetValue(SepehrHelper.VerificationAdditionalDataKey, out var additionalData);
+        result.AdditionalData.TryGetValue(SepehrHelper.VerificationAdditionalDataKey, out var additionalData);
 
-            return additionalData as SepehrGatewayVerificationAdditionalData;
-        }
+        return additionalData as SepehrGatewayVerificationAdditionalData;
+    }
 
-        internal static void SetSepehrAdditionalData(this IPaymentVerifyResult result, SepehrGatewayVerificationAdditionalData additionalData)
-        {
-            if (result == null) throw new ArgumentNullException(nameof(result));
-            if (additionalData == null) throw new ArgumentNullException(nameof(additionalData));
+    internal static void SetSepehrAdditionalData(this IPaymentVerifyResult result, SepehrGatewayVerificationAdditionalData additionalData)
+    {
+        if (result == null) throw new ArgumentNullException(nameof(result));
+        if (additionalData == null) throw new ArgumentNullException(nameof(additionalData));
 
-            result.AdditionalData.Add(SepehrHelper.VerificationAdditionalDataKey, additionalData);
-        }
+        result.AdditionalData.Add(SepehrHelper.VerificationAdditionalDataKey, additionalData);
     }
 }

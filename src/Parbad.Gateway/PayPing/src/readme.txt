@@ -19,7 +19,7 @@ Configuration
             accounts.AddInMemory(account =>
             {
                 account.Name = "PayPing"; // optional if there is only 1 account for this gateway
-                account.AcessToken = <Your Bearer Token>;
+                account.AccessToken = <Your Bearer Token>;
             });
         });
 })
@@ -31,7 +31,7 @@ Making a request
 var result = _onlinePayment.RequestAsync(invoice => 
 {
 	invoice
-        .SetAmount(viewModel.Amount)
+        .SetAmount(viewModel.Amount) // PayPing expects Toman; Parbad sends the amount as it is
         .SetCallbackUrl(callbackUrl)
         .SetPayPingData(payPing =>
         {

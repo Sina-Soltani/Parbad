@@ -3,19 +3,18 @@
 
 using Parbad.Abstraction;
 
-namespace Parbad.Gateway.IranKish
+namespace Parbad.Gateway.IranKish;
+
+/// <summary>
+/// IranKish gateway account.
+/// </summary>
+public class IranKishGatewayAccount : GatewayAccount
 {
-    /// <summary>
-    /// IranKish gateway account.
-    /// </summary>
-    public class IranKishGatewayAccount : GatewayAccount
-    {
-        public string TerminalId { get; set; }
+    public string TerminalId { get; set; }
 
-        public string AcceptorId { get; set; }
+    public string AcceptorId { get; set; }
 
-        public string PassPhrase { get; set; }
+    public string PassPhrase { get; set; }
 
-        public string PublicKey { get; set; }
-    }
+    public string PublicKey { get; set; }
 }

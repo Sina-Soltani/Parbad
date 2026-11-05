@@ -3,10 +3,9 @@
 
 using Parbad.Abstraction;
 
-namespace Parbad.Gateway.Sepehr
+namespace Parbad.Gateway.Sepehr;
+
+public class SepehrGatewayAccount : GatewayAccount
 {
-    public class SepehrGatewayAccount : GatewayAccount
-    {
-        public long TerminalId { get; set; }
-    }
+    public long TerminalId { get; set; }
 }

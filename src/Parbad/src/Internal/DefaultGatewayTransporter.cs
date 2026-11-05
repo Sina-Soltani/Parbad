@@ -10,54 +10,53 @@ using System.Threading;
 using System.Threading.Tasks;
 using Parbad.Options;
 
-namespace Parbad.Internal
+namespace Parbad.Internal;
+
+/// <inheritdoc />
+public class DefaultGatewayTransporter : IGatewayTransporter
 {
-    /// <inheritdoc />
-    public class DefaultGatewayTransporter : IGatewayTransporter
+    private readonly HttpContext _httpContext;
+
+    /// <summary>
+    /// Initializes an instance of <see cref="DefaultGatewayTransporter"/>.
+    /// </summary>
+    /// <param name="httpContext"></param>
+    /// <param name="descriptor"></param>
+    public DefaultGatewayTransporter(HttpContext httpContext, GatewayTransporterDescriptor descriptor)
     {
-        private readonly HttpContext _httpContext;
+        _httpContext = httpContext ?? throw new ArgumentNullException(nameof(httpContext));
+        Descriptor = descriptor ?? throw new ArgumentNullException(nameof(descriptor));
+    }
 
-        /// <summary>
-        /// Initializes an instance of <see cref="DefaultGatewayTransporter"/>.
-        /// </summary>
-        /// <param name="httpContext"></param>
-        /// <param name="descriptor"></param>
-        public DefaultGatewayTransporter(HttpContext httpContext, GatewayTransporterDescriptor descriptor)
+    /// <inheritdoc />
+    public GatewayTransporterDescriptor Descriptor { get; }
+
+    /// <inheritdoc />
+    public virtual Task TransportAsync(CancellationToken cancellationToken = default)
+    {
+        if (Descriptor.Type == GatewayTransporterDescriptor.TransportType.Post)
         {
-            _httpContext = httpContext ?? throw new ArgumentNullException(nameof(httpContext));
-            Descriptor = descriptor ?? throw new ArgumentNullException(nameof(descriptor));
-        }
+            string nonce = null;
+            var parbadOptions = _httpContext.RequestServices.GetRequiredService<IOptions<ParbadOptions>>();
 
-        /// <inheritdoc />
-        public GatewayTransporterDescriptor Descriptor { get; }
+            HttpResponseUtilities.AddNecessaryContents(_httpContext, "text/html");
 
-        /// <inheritdoc />
-        public virtual Task TransportAsync(CancellationToken cancellationToken = default)
-        {
-            if (Descriptor.Type == GatewayTransporterDescriptor.TransportType.Post)
+            if (parbadOptions.Value.NonceFactory != null)
             {
-                string nonce = null;
-                var parbadOptions = _httpContext.RequestServices.GetRequiredService<IOptions<ParbadOptions>>();
-
-                HttpResponseUtilities.AddNecessaryContents(_httpContext, "text/html");
-
-                if (parbadOptions.Value.NonceFactory != null)
-                {
-                    nonce = parbadOptions.Value.NonceFactory(_httpContext);
-                }
-
-                var form = HtmlFormBuilder.CreateForm(Descriptor.Url, Descriptor.Form, nonce);
-
-                var buffer = Encoding.UTF8.GetBytes(form);
-
-                return _httpContext.Response.Body.WriteAsync(buffer, 0, buffer.Length, cancellationToken);
+                nonce = parbadOptions.Value.NonceFactory(_httpContext);
             }
 
-            HttpResponseUtilities.AddNecessaryContents(_httpContext);
+            var form = HtmlFormBuilder.CreateForm(Descriptor.Url, Descriptor.Form, nonce);
 
-            _httpContext.Response.Redirect(Descriptor.Url);
+            var buffer = Encoding.UTF8.GetBytes(form);
 
-            return Task.CompletedTask;
+            return _httpContext.Response.Body.WriteAsync(buffer, 0, buffer.Length, cancellationToken);
         }
+
+        HttpResponseUtilities.AddNecessaryContents(_httpContext);
+
+        _httpContext.Response.Redirect(Descriptor.Url);
+
+        return Task.CompletedTask;
     }
 }

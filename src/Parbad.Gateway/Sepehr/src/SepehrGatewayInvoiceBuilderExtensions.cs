@@ -4,18 +4,17 @@
 using System;
 using Parbad.InvoiceBuilder;
 
-namespace Parbad.Gateway.Sepehr
-{
-    public static class SepehrGatewayInvoiceBuilderExtensions
-    {
-        /// <summary>
-        /// The invoice will be sent to Sepehr gateway.
-        /// </summary>
-        public static IInvoiceBuilder UseSepehr(this IInvoiceBuilder builder)
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
+namespace Parbad.Gateway.Sepehr;
 
-            return builder.SetGateway(SepehrGateway.Name);
-        }
+public static class SepehrGatewayInvoiceBuilderExtensions
+{
+    /// <summary>
+    /// The invoice will be sent to Sepehr gateway.
+    /// </summary>
+    public static IInvoiceBuilder UseSepehr(this IInvoiceBuilder builder)
+    {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
+
+        return builder.SetGateway(SepehrGateway.Name);
     }
 }

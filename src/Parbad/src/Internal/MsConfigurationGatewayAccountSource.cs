@@ -3,27 +3,26 @@ using Microsoft.Extensions.Configuration;
 using Parbad.Abstraction;
 using Parbad.GatewayBuilders;
 
-namespace Parbad.Internal
+namespace Parbad.Internal;
+
+public class MsConfigurationGatewayAccountSource<TAccount> : IGatewayAccountSource<TAccount>
+    where TAccount : GatewayAccount, new()
 {
-    public class MsConfigurationGatewayAccountSource<TAccount> : IGatewayAccountSource<TAccount>
-        where TAccount : GatewayAccount, new()
+    public MsConfigurationGatewayAccountSource(IConfiguration configuration)
     {
-        public MsConfigurationGatewayAccountSource(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
+        Configuration = configuration;
+    }
 
-        public IConfiguration Configuration { get; }
+    public IConfiguration Configuration { get; }
 
-        public Task AddAccountsAsync(IGatewayAccountCollection<TAccount> accounts)
-        {
-            var newAccount = new TAccount();
+    public Task AddAccountsAsync(IGatewayAccountCollection<TAccount> accounts)
+    {
+        var newAccount = new TAccount();
 
-            Configuration.Bind(newAccount);
+        Configuration.Bind(newAccount);
 
-            accounts.Add(newAccount);
+        accounts.Add(newAccount);
 
-            return Task.CompletedTask;
-        }
+        return Task.CompletedTask;
     }
 }

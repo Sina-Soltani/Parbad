@@ -5,50 +5,49 @@ using Microsoft.Extensions.DependencyInjection;
 using Parbad.GatewayBuilders;
 using System;
 
-namespace Parbad.Gateway.PayPing
+namespace Parbad.Gateway.PayPing;
+
+public static class PayPingGatewayBuilderExtensions
 {
-    public static class PayPingGatewayBuilderExtensions
+    /// <summary>
+    /// Adds the PayPing Gateway to Parbad services.
+    /// </summary>
+    /// <param name="builder"></param>
+    public static IGatewayConfigurationBuilder<PayPingGateway> AddPayPing(this IGatewayBuilder builder)
     {
-        /// <summary>
-        /// Adds the PayPing Gateway to Parbad services.
-        /// </summary>
-        /// <param name="builder"></param>
-        public static IGatewayConfigurationBuilder<PayPingGateway> AddPayPing(this IGatewayBuilder builder)
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            return builder
-                .AddGateway<PayPingGateway>()
-                .WithHttpClient(clientBuilder => { })
-                .WithOptions(options => { });
-        }
+        return builder
+              .AddGateway<PayPingGateway>()
+              .WithHttpClient(clientBuilder => { })
+              .WithOptions(options => { });
+    }
 
-        /// <summary>
-        /// Configures the accounts for PayPing gateway.
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="configureAccounts">Configures the accounts.</param>
-        public static IGatewayConfigurationBuilder<PayPingGateway> WithAccounts(
-            this IGatewayConfigurationBuilder<PayPingGateway> builder,
-            Action<IGatewayAccountBuilder<PayPingGatewayAccount>> configureAccounts)
-        {
-            if (builder == null) throw new ArgumentNullException(nameof(builder));
+    /// <summary>
+    /// Configures the accounts for PayPing gateway.
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <param name="configureAccounts">Configures the accounts.</param>
+    public static IGatewayConfigurationBuilder<PayPingGateway> WithAccounts(
+        this IGatewayConfigurationBuilder<PayPingGateway> builder,
+        Action<IGatewayAccountBuilder<PayPingGatewayAccount>> configureAccounts)
+    {
+        if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-            return builder.WithAccounts(configureAccounts);
-        }
+        return builder.WithAccounts(configureAccounts);
+    }
 
-        /// <summary>
-        /// Configures the options for PayPing Gateway.
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="configureOptions">Configuration</param>
-        public static IGatewayConfigurationBuilder<PayPingGateway> WithOptions(
-            this IGatewayConfigurationBuilder<PayPingGateway> builder,
-            Action<PayPingGatewayOptions> configureOptions)
-        {
-            builder.Services.Configure(configureOptions);
+    /// <summary>
+    /// Configures the options for PayPing Gateway.
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <param name="configureOptions">Configuration</param>
+    public static IGatewayConfigurationBuilder<PayPingGateway> WithOptions(
+        this IGatewayConfigurationBuilder<PayPingGateway> builder,
+        Action<PayPingGatewayOptions> configureOptions)
+    {
+        builder.Services.Configure(configureOptions);
 
-            return builder;
-        }
+        return builder;
     }
 }

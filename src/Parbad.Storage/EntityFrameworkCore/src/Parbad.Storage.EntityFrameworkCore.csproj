@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageId>Parbad.Storage.EntityFrameworkCore</PackageId>
-    <VersionPrefix>1.6.0</VersionPrefix>
+    <VersionPrefix>1.7.0</VersionPrefix>
     <LangVersion>latest</LangVersion>
     <TargetFrameworks>net5;net6;net7;net8.0;net9.0</TargetFrameworks>
     <Nullable>enable</Nullable>  
@@ -20,19 +20,11 @@ More information: https://github.com/Sina-Soltani/Parbad</Description>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Authors>Sina Soltani</Authors>
     <Product>Parbad.Storage.EntityframeworkCore</Product>
-    <PackageReleaseNotes>https://github.com/Sina-Soltani/Parbad/releases/tag/v3.10.0</PackageReleaseNotes>
+    <PackageReleaseNotes>https://github.com/Sina-Soltani/Parbad/releases/tag/v3.12.0</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup>
     <NoWarn>1701;1702;1591</NoWarn>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>Parbad.Storage.EntityFrameworkCore.xml</DocumentationFile>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DocumentationFile>Parbad.Storage.EntityFrameworkCore.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -41,7 +33,6 @@ More information: https://github.com/Sina-Soltani/Parbad</Description>
 
   <ItemGroup>
     <None Include="icon.png" pack="true" Visible="false" PackagePath="" />
-    <None Include="Parbad.Storage.EntityFrameworkCore.xml" pack="true" Visible="false" PackagePath="" />
   </ItemGroup>
 
   <ItemGroup>

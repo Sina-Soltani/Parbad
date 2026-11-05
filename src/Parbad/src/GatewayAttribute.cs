@@ -3,17 +3,16 @@
 
 using System;
 
-namespace Parbad
-{
-    [AttributeUsage(AttributeTargets.Class)]
-    public class GatewayAttribute : Attribute
-    {
-        public GatewayAttribute(string name)
-        {
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
-            Name = name;
-        }
+namespace Parbad;
 
-        public string Name { get; }
+[AttributeUsage(AttributeTargets.Class)]
+public class GatewayAttribute : Attribute
+{
+    public GatewayAttribute(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException(nameof(name));
+        Name = name;
     }
+
+    public string Name { get; }
 }

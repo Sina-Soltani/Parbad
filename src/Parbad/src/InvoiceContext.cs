@@ -4,32 +4,31 @@
 using Parbad.Storage.Abstractions.Models;
 using System.Collections.Generic;
 
-namespace Parbad
+namespace Parbad;
+
+/// <summary>
+/// Describes the payment and transactions of a specific invoice.
+/// </summary>
+public class InvoiceContext
 {
     /// <summary>
-    /// Describes the payment and transactions of a specific invoice.
+    /// Initializes an instance of <see cref="InvoiceContext"/>.
     /// </summary>
-    public class InvoiceContext
+    /// <param name="payment"></param>
+    /// <param name="transactions"></param>
+    public InvoiceContext(Payment payment, IEnumerable<Transaction> transactions)
     {
-        /// <summary>
-        /// Initializes an instance of <see cref="InvoiceContext"/>.
-        /// </summary>
-        /// <param name="payment"></param>
-        /// <param name="transactions"></param>
-        public InvoiceContext(Payment payment, IEnumerable<Transaction> transactions)
-        {
-            Payment = payment;
-            Transactions = transactions;
-        }
-
-        /// <summary>
-        /// Contains the payment information.
-        /// </summary>
-        public Payment Payment { get; }
-
-        /// <summary>
-        /// Contains the transactions of this invoice.
-        /// </summary>
-        public IEnumerable<Transaction> Transactions { get; }
+        Payment = payment;
+        Transactions = transactions;
     }
+
+    /// <summary>
+    /// Contains the payment information.
+    /// </summary>
+    public Payment Payment { get; }
+
+    /// <summary>
+    /// Contains the transactions of this invoice.
+    /// </summary>
+    public IEnumerable<Transaction> Transactions { get; }
 }

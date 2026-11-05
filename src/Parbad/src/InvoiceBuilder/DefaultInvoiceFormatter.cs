@@ -6,49 +6,48 @@ using System.Threading;
 using System.Threading.Tasks;
 using Parbad.Abstraction;
 
-namespace Parbad.InvoiceBuilder
+namespace Parbad.InvoiceBuilder;
+
+/// <summary>
+/// Default implementation of <see cref="IInvoiceFormatter"/>.
+/// </summary>
+public class DefaultInvoiceFormatter : IInvoiceFormatter
 {
+    private readonly Action<Invoice> _formatInvoice;
+    private readonly Func<Invoice, Task> _formatInvoiceAsync;
+
     /// <summary>
-    /// Default implementation of <see cref="IInvoiceFormatter"/>.
+    /// Initializes an instance of <see cref="DefaultInvoiceFormatter"/>.
     /// </summary>
-    public class DefaultInvoiceFormatter : IInvoiceFormatter
+    /// <param name="formatInvoice">Format the given invoice.</param>
+    public DefaultInvoiceFormatter(Action<Invoice> formatInvoice)
     {
-        private readonly Action<Invoice> _formatInvoice;
-        private readonly Func<Invoice, Task> _formatInvoiceAsync;
+        _formatInvoice = formatInvoice ?? throw new ArgumentNullException(nameof(formatInvoice));
+        _formatInvoiceAsync = null;
+    }
 
-        /// <summary>
-        /// Initializes an instance of <see cref="DefaultInvoiceFormatter"/>.
-        /// </summary>
-        /// <param name="formatInvoice">Format the given invoice.</param>
-        public DefaultInvoiceFormatter(Action<Invoice> formatInvoice)
+    /// <summary>
+    /// Initializes an instance of <see cref="DefaultInvoiceFormatter"/>.
+    /// </summary>
+    /// <param name="formatInvoiceAsync">Format the given invoice asynchronously.</param>
+    public DefaultInvoiceFormatter(Func<Invoice, Task> formatInvoiceAsync)
+    {
+        _formatInvoice = null;
+        _formatInvoiceAsync = formatInvoiceAsync ?? throw new ArgumentNullException(nameof(formatInvoiceAsync));
+    }
+
+    /// <inheritdoc />
+    public Task FormatAsync(Invoice invoice, CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        if (_formatInvoice != null)
         {
-            _formatInvoice = formatInvoice ?? throw new ArgumentNullException(nameof(formatInvoice));
-            _formatInvoiceAsync = null;
+            _formatInvoice(invoice);
+
+            return Task.CompletedTask;
         }
 
-        /// <summary>
-        /// Initializes an instance of <see cref="DefaultInvoiceFormatter"/>.
-        /// </summary>
-        /// <param name="formatInvoiceAsync">Format the given invoice asynchronously.</param>
-        public DefaultInvoiceFormatter(Func<Invoice, Task> formatInvoiceAsync)
-        {
-            _formatInvoice = null;
-            _formatInvoiceAsync = formatInvoiceAsync ?? throw new ArgumentNullException(nameof(formatInvoiceAsync));
-        }
-
-        /// <inheritdoc />
-        public Task FormatAsync(Invoice invoice, CancellationToken cancellationToken = default)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            if (_formatInvoice != null)
-            {
-                _formatInvoice(invoice);
-
-                return Task.CompletedTask;
-            }
-
-            return _formatInvoiceAsync(invoice);
-        }
+        return _formatInvoiceAsync(invoice);
     }
 }

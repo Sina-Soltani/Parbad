@@ -1,9 +1,8 @@
-﻿namespace Parbad.Tests.Helpers
-{
-    public static class MediaTypes
-    {
-        public const string Json = "application/json";
+﻿namespace Parbad.Tests.Helpers;
 
-        public const string Xml = "text/xml";
-    }
+public static class MediaTypes
+{
+    public const string Json = "application/json";
+
+    public const string Xml = "text/xml";
 }

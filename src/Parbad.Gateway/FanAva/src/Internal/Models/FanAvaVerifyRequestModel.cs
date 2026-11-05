@@ -3,17 +3,16 @@
 
 using Newtonsoft.Json;
 
-namespace Parbad.Gateway.FanAva.Internal.Models
+namespace Parbad.Gateway.FanAva.Internal.Models;
+
+internal class FanAvaVerifyRequestModel
 {
-    internal class FanAvaVerifyRequestModel
-    {
-        public FanAvaRequestModel.WSContextModel WSContext { get; set; }
+    public FanAvaRequestModel.WSContextModel WSContext { get; set; }
         
-        public string Token { get; set; }
+    public string Token { get; set; }
         
-        [JsonProperty("RefNum")]
-        public string InvoiceNumber { get; set; }
+    [JsonProperty("RefNum")]
+    public string InvoiceNumber { get; set; }
         
-        public Money Amount { get; set; }
-    }
+    public long Amount { get; set; }
 }

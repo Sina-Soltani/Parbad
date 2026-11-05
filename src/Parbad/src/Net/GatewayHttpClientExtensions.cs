@@ -4,39 +4,57 @@
 using System;
 using System.Net.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Parbad.Abstraction;
 using Parbad.Internal;
+using Parbad.Options;
 
-namespace Parbad.Net
+namespace Parbad.Net;
+
+/// <summary>
+/// Manages the <see cref="HttpClient"/> for a specific gateway.
+/// </summary>
+public static class GatewayHttpClientExtensions
 {
     /// <summary>
-    /// Manages the <see cref="HttpClient"/> for a specific gateway.
+    /// Adds a named <see cref="HttpClient"/> for the specified gateway.
     /// </summary>
-    public static class GatewayHttpClientExtensions
+    /// <typeparam name="TGateway"></typeparam>
+    /// <param name="services"></param>
+    public static IHttpClientBuilder AddHttpClientForGateway<TGateway>(this IServiceCollection services) where TGateway : class, IGateway
     {
-        /// <summary>
-        /// Adds a named <see cref="HttpClient"/> for the specified gateway.
-        /// </summary>
-        /// <typeparam name="TGateway"></typeparam>
-        /// <param name="services"></param>
-        public static IHttpClientBuilder AddHttpClientForGateway<TGateway>(this IServiceCollection services) where TGateway : class, IGateway
-        {
-            if (services == null) throw new ArgumentNullException(nameof(services));
+        if (services == null) throw new ArgumentNullException(nameof(services));
 
-            return services.AddHttpClient(GatewayHelper.GetCompleteGatewayName<TGateway>());
-        }
+        return services.AddHttpClient(GatewayHelper.GetCompleteGatewayName<TGateway>()).ConfigureParbadDefaults();
+    }
 
-        /// <summary>
-        /// Creates a <see cref="HttpClient"/> for the specified gateway.
-        /// </summary>
-        /// <param name="factory"></param>
-        /// <param name="gateway"></param>
-        public static HttpClient CreateClient(this IHttpClientFactory factory, IGateway gateway)
-        {
-            if (factory == null) throw new ArgumentNullException(nameof(factory));
-            if (gateway == null) throw new ArgumentNullException(nameof(gateway));
+    /// <summary>
+    /// Applies Parbad's defaults to a gateway's <see cref="HttpClient"/>: the <see cref="ParbadOptions.GatewayTimeout"/>.
+    /// Call it before any other configuration of the client, so that configuration can override the defaults.
+    /// </summary>
+    /// <param name="httpClientBuilder"></param>
+    public static IHttpClientBuilder ConfigureParbadDefaults(this IHttpClientBuilder httpClientBuilder)
+    {
+        if (httpClientBuilder == null) throw new ArgumentNullException(nameof(httpClientBuilder));
 
-            return factory.CreateClient(gateway.GetCompleteGatewayName());
-        }
+        return httpClientBuilder.ConfigureHttpClient((serviceProvider, httpClient) =>
+                                                     {
+                                                         var options = serviceProvider.GetService<IOptions<ParbadOptions>>();
+
+                                                         if (options != null) httpClient.Timeout = options.Value.GatewayTimeout;
+                                                     });
+    }
+
+    /// <summary>
+    /// Creates a <see cref="HttpClient"/> for the specified gateway.
+    /// </summary>
+    /// <param name="factory"></param>
+    /// <param name="gateway"></param>
+    public static HttpClient CreateClient(this IHttpClientFactory factory, IGateway gateway)
+    {
+        if (factory == null) throw new ArgumentNullException(nameof(factory));
+        if (gateway == null) throw new ArgumentNullException(nameof(gateway));
+
+        return factory.CreateClient(gateway.GetCompleteGatewayName());
     }
 }

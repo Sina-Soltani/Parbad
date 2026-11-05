@@ -7,25 +7,24 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Parbad.Http;
 
-namespace Parbad.Internal
+namespace Parbad.Internal;
+
+public class HttpContextBuilder : IHttpContextBuilder
 {
-    public class HttpContextBuilder : IHttpContextBuilder
+    public HttpContextBuilder(IServiceCollection services)
     {
-        public HttpContextBuilder(IServiceCollection services)
-        {
-            Services = services;
-        }
+        Services = services;
+    }
 
-        public IServiceCollection Services { get; }
+    public IServiceCollection Services { get; }
 
-        public void AddHttpContext<THttpContext>(ServiceLifetime serviceLifetime) where THttpContext : class, IHttpContextAccessor
-        {
-            Services.TryAdd(ServiceDescriptor.Describe(typeof(IHttpContextAccessor), typeof(THttpContext), serviceLifetime));
-        }
+    public void AddHttpContext<THttpContext>(ServiceLifetime serviceLifetime) where THttpContext : class, IHttpContextAccessor
+    {
+        Services.TryAdd(ServiceDescriptor.Describe(typeof(IHttpContextAccessor), typeof(THttpContext), serviceLifetime));
+    }
 
-        public void AddHttpContext(Func<IServiceProvider, IHttpContextAccessor> factory, ServiceLifetime serviceLifetime)
-        {
-            Services.TryAdd(ServiceDescriptor.Describe(typeof(IHttpContextAccessor), factory, serviceLifetime));
-        }
+    public void AddHttpContext(Func<IServiceProvider, IHttpContextAccessor> factory, ServiceLifetime serviceLifetime)
+    {
+        Services.TryAdd(ServiceDescriptor.Describe(typeof(IHttpContextAccessor), factory, serviceLifetime));
     }
 }

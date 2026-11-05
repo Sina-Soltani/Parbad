@@ -4,79 +4,78 @@
 using System;
 using Microsoft.Extensions.Primitives;
 
-namespace Parbad.Internal
+namespace Parbad.Internal;
+
+public static class StringExtensions
 {
-    public static class StringExtensions
+    public static bool IsNullOrEmpty(this string value)
     {
-        public static bool IsNullOrEmpty(this string value)
+        return string.IsNullOrEmpty(value);
+    }
+
+    public static bool IsNullOrEmpty(this StringValues value)
+    {
+        return StringValues.IsNullOrEmpty(value);
+    }
+
+    public static bool IsNullOrWhiteSpace(this string value)
+    {
+        return string.IsNullOrWhiteSpace(value);
+    }
+
+    public static bool Equals(this StringValues value, string other, StringComparison comparisonType)
+    {
+        return string.Equals(value, other, comparisonType);
+    }
+
+    public static string ToggleStringAtStart(this string value, string stringValue, bool shouldHave)
+    {
+        if (string.IsNullOrEmpty(value))
         {
-            return string.IsNullOrEmpty(value);
+            return string.Empty;
         }
 
-        public static bool IsNullOrEmpty(this StringValues value)
+        if (shouldHave)
         {
-            return StringValues.IsNullOrEmpty(value);
+            if (!value.StartsWith(stringValue))
+            {
+                value = stringValue + value;
+            }
+        }
+        else
+        {
+            if (value.StartsWith(stringValue))
+            {
+
+                value = value.Substring(stringValue.Length, value.Length - stringValue.Length);
+            }
         }
 
-        public static bool IsNullOrWhiteSpace(this string value)
+        return value;
+    }
+
+    public static string ToggleStringAtEnd(this string value, string stringValue, bool shouldHave)
+    {
+        if (string.IsNullOrEmpty(value))
         {
-            return string.IsNullOrWhiteSpace(value);
+            return string.Empty;
         }
 
-        public static bool Equals(this StringValues value, string other, StringComparison comparisonType)
+        if (shouldHave)
         {
-            return string.Equals(value, other, comparisonType);
+            if (!value.EndsWith(stringValue))
+            {
+                value += stringValue;
+            }
+        }
+        else
+        {
+            if (value.EndsWith(stringValue))
+            {
+                value = value.Substring(0, value.Length - stringValue.Length);
+            }
         }
 
-        public static string ToggleStringAtStart(this string value, string stringValue, bool shouldHave)
-        {
-            if (string.IsNullOrEmpty(value))
-            {
-                return string.Empty;
-            }
-
-            if (shouldHave)
-            {
-                if (!value.StartsWith(stringValue))
-                {
-                    value = stringValue + value;
-                }
-            }
-            else
-            {
-                if (value.StartsWith(stringValue))
-                {
-
-                    value = value.Substring(stringValue.Length, value.Length - stringValue.Length);
-                }
-            }
-
-            return value;
-        }
-
-        public static string ToggleStringAtEnd(this string value, string stringValue, bool shouldHave)
-        {
-            if (string.IsNullOrEmpty(value))
-            {
-                return string.Empty;
-            }
-
-            if (shouldHave)
-            {
-                if (!value.EndsWith(stringValue))
-                {
-                    value += stringValue;
-                }
-            }
-            else
-            {
-                if (value.EndsWith(stringValue))
-                {
-                    value = value.Substring(0, value.Length - stringValue.Length);
-                }
-            }
-
-            return value;
-        }
+        return value;
     }
 }

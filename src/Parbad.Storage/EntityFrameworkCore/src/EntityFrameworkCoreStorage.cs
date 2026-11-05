@@ -2,8 +2,11 @@
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
 using Parbad.Storage.Abstractions;
 using Parbad.Storage.Abstractions.Models;
+using Parbad.Storage.EntityFrameworkCore.Configuration;
 using Parbad.Storage.EntityFrameworkCore.Context;
 using Parbad.Storage.EntityFrameworkCore.Internal;
 using System;
@@ -17,7 +20,7 @@ namespace Parbad.Storage.EntityFrameworkCore;
 /// <summary>
 /// EntityFramework Core implementation of <see cref="IStorage"/>.
 /// </summary>
-public class EntityFrameworkCoreStorage : IStorage
+public class EntityFrameworkCoreStorage : IStorage, IPaidPaymentLookup, IPaymentCompletion
 {
     /// <summary>
     /// Initializes an instance of <see cref="EntityFrameworkCoreStorage"/>.
@@ -163,6 +166,96 @@ public class EntityFrameworkCoreStorage : IStorage
                                          .SingleOrDefaultAsync(payment => payment.Token == paymentToken, cancellationToken);
 
         return paymentEntity?.ToPaymentModel();
+    }
+
+    /// <inheritdoc />
+    public virtual async Task<Payment?> FindPaidPaymentByTransactionCodeAsync(string gatewayName,
+                                                                              string transactionCode,
+                                                                              long exceptTrackingNumber,
+                                                                              CancellationToken cancellationToken = default)
+    {
+        var paymentEntity = await Context.Payments
+                                         .AsNoTracking()
+                                         .FirstOrDefaultAsync(payment => payment.IsPaid &&
+                                                                         payment.TrackingNumber != exceptTrackingNumber &&
+                                                                         payment.TransactionCode == transactionCode &&
+                                                                         payment.GatewayName == gatewayName,
+                                                              cancellationToken);
+
+        return paymentEntity?.ToPaymentModel();
+    }
+
+    /// <inheritdoc />
+    public virtual async Task<bool> TryCompletePaymentAsync(long paymentId,
+                                                            bool isPaid,
+                                                            string? transactionCode,
+                                                            CancellationToken cancellationToken = default)
+    {
+        if (!Context.Database.IsRelational())
+        {
+            return await TryCompletePaymentWithoutSqlAsync(paymentId, isPaid, transactionCode, cancellationToken);
+        }
+
+        // One conditional UPDATE, so two concurrent completions cannot both succeed, without a schema change.
+        var sql = Context.GetService<ISqlGenerationHelper>();
+        var options = Context.EntityFrameworkCoreOptions;
+        var schema = string.IsNullOrWhiteSpace(options.PaymentTableOptions.Schema) ? options.DefaultSchema : options.PaymentTableOptions.Schema;
+
+        string Column(string name) => sql.DelimitIdentifier(name);
+
+        // {5} is false. A paid result may replace an unpaid one; any other result needs an open payment.
+        var condition = isPaid
+            ? $"{Column(PaymentColumnNames.IsPaid)} = {{5}}"
+            : $"{Column(PaymentColumnNames.IsCompleted)} = {{5}} AND {Column(PaymentColumnNames.IsPaid)} = {{5}}";
+
+        var command = $"UPDATE {sql.DelimitIdentifier(options.PaymentTableOptions.Name, schema)} " +
+                      $"SET {Column(PaymentColumnNames.IsCompleted)} = {{0}}, {Column(PaymentColumnNames.IsPaid)} = {{1}}, " +
+                      $"{Column(PaymentColumnNames.TransactionCode)} = {(transactionCode == null ? "NULL" : "{2}")}, {Column(PaymentColumnNames.UpdatedOn)} = {{3}} " +
+                      $"WHERE {Column(PaymentColumnNames.Id)} = {{4}} AND {condition}";
+
+        // A null parameter has no type mapping on every provider, so a missing transaction code is written as NULL.
+        var parameters = new object[] { true, isPaid, transactionCode ?? string.Empty, DateTime.UtcNow, paymentId, false };
+
+        var updatedRows = await Context.Database.ExecuteSqlRawAsync(command, parameters, cancellationToken);
+
+        if (updatedRows == 0 && !await Context.Payments.AnyAsync(payment => payment.Id == paymentId, cancellationToken))
+        {
+            throw new InvalidOperationException($"No payment records found in database with id {paymentId}");
+        }
+
+        return updatedRows > 0;
+    }
+
+    /// <summary>
+    /// The same rule as <see cref="TryCompletePaymentAsync"/> for providers without SQL (e.g. InMemory), where it
+    /// cannot be one atomic step.
+    /// </summary>
+    private async Task<bool> TryCompletePaymentWithoutSqlAsync(long paymentId,
+                                                               bool isPaid,
+                                                               string? transactionCode,
+                                                               CancellationToken cancellationToken)
+    {
+        var record = await Context.Payments.SingleOrDefaultAsync(payment => payment.Id == paymentId, cancellationToken);
+
+        if (record == null) throw new InvalidOperationException($"No payment records found in database with id {paymentId}");
+
+        try
+        {
+            if (record.IsPaid || (record.IsCompleted && !isPaid)) return false;
+
+            record.IsCompleted = true;
+            record.IsPaid = isPaid;
+            record.TransactionCode = transactionCode;
+            record.UpdatedOn = DateTime.UtcNow;
+
+            await Context.SaveChangesAsync(cancellationToken);
+
+            return true;
+        }
+        finally
+        {
+            Context.Entry(record).State = EntityState.Detached;
+        }
     }
 
     /// <inheritdoc />

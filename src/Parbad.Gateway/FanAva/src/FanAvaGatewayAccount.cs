@@ -3,12 +3,11 @@
 
 using Parbad.Abstraction;
 
-namespace Parbad.Gateway.FanAva
-{
-    public class FanAvaGatewayAccount: GatewayAccount
-    {
-        public string UserId { get; set; }
+namespace Parbad.Gateway.FanAva;
 
-        public string Password { get; set; }
-    }
+public class FanAvaGatewayAccount: GatewayAccount
+{
+    public string UserId { get; set; }
+
+    public string Password { get; set; }
 }

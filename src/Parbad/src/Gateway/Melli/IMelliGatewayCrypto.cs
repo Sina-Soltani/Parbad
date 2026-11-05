@@ -1,7 +1,6 @@
-﻿namespace Parbad.Gateway.Melli
+﻿namespace Parbad.Gateway.Melli;
+
+public interface IMelliGatewayCrypto
 {
-    public interface IMelliGatewayCrypto
-    {
-        string Encrypt(string terminalKey, string data);
-    }
+    string Encrypt(string terminalKey, string data);
 }

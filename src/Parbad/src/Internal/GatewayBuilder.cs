@@ -4,6 +4,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Parbad.Abstraction;
 using Parbad.GatewayBuilders;
+using Parbad.Net;
 
 namespace Parbad.Internal;
 
@@ -30,6 +31,9 @@ internal class GatewayBuilder : IGatewayBuilder
         Services.AddSingleton(new GatewayDescriptor(typeof(TGateway)));
 
         Services.TryAdd<TGateway>(serviceLifetime);
+
+        // Registered here, so every gateway's client gets Parbad's defaults (e.g. the timeout), also without WithHttpClient.
+        Services.AddHttpClientForGateway<TGateway>();
 
         return new GatewayConfigurationBuilder<TGateway>(Services);
     }

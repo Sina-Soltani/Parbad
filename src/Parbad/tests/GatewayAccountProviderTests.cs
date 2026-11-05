@@ -2,25 +2,24 @@
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Parbad.Tests
+namespace Parbad.Tests;
+
+[TestClass]
+public class GatewayAccountProviderTests
 {
-    [TestClass]
-    public class GatewayAccountProviderTests
+    [TestMethod]
+    public async Task Must_Have_An_Account()
     {
-        [TestMethod]
-        public async Task Must_Have_An_Account()
-        {
-            var source = new InMemoryGatewayAccountSource<TestableGatewayAccount>(new[]
-            {
-                new TestableGatewayAccount()
-            });
+        var source = new InMemoryGatewayAccountSource<TestableGatewayAccount>(new[]
+                                                                              {
+                                                                                  new TestableGatewayAccount()
+                                                                              });
 
-            var provider = new GatewayAccountProvider<TestableGatewayAccount>(new[] { source });
+        var provider = new GatewayAccountProvider<TestableGatewayAccount>(new[] { source });
 
-            var accounts = await provider.LoadAccountsAsync();
+        var accounts = await provider.LoadAccountsAsync();
 
-            Assert.IsNotNull(accounts);
-            Assert.IsTrue(accounts.Count == 1);
-        }
+        Assert.IsNotNull(accounts);
+        Assert.IsTrue(accounts.Count == 1);
     }
 }

@@ -2,7 +2,9 @@
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
 using System;
+using System.Globalization;
 using System.IO;
+using System.Net;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -53,6 +55,16 @@ internal class ParbadVirtualGatewayMiddlewareInvoker : IParbadVirtualGatewayMidd
             return;
         }
 
+        // The redirect URL becomes a form action, so other schemes (e.g. javascript:) would run script on this site.
+        if (!IsAbsoluteHttpUrl(commandDetails.RedirectUrl))
+        {
+            _httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+
+            await _httpContext.Response.WriteAsync("Parbad Virtual Gateway message: redirectUrl must be an absolute http or https URL.");
+
+            return;
+        }
+
         var cssUrl =
             $"{_httpContext.Request.Scheme}://{_httpContext.Request.Host}{_httpContext.Request.PathBase}?css=true";
 
@@ -94,13 +106,13 @@ internal class ParbadVirtualGatewayMiddlewareInvoker : IParbadVirtualGatewayMidd
         var template = await GetTemplate("VirtualGatewayRequestTemplate.html");
 
         var html = template
-                  .Replace("#CssUrl#", cssUrl)
+                  .Replace("#CssUrl#", Encode(cssUrl))
                   .Replace("#nonce#", nonceProp)
-                  .Replace("#VirtualGatewayPath#", _virtualGatewayOptions.GatewayPath)
-                  .Replace("#TrackingNumber#", commandDetails.TrackingNumber.ToString())
-                  .Replace("#Amount#", commandDetails.Amount.ToString())
-                  .Replace("#DisplayAmount#", ((long)commandDetails.Amount).ToString("N0"))
-                  .Replace("#RedirectUrl#", commandDetails.RedirectUrl)
+                  .Replace("#VirtualGatewayPath#", Encode(_virtualGatewayOptions.GatewayPath))
+                  .Replace("#TrackingNumber#", Encode(commandDetails.TrackingNumber.ToString()))
+                  .Replace("#Amount#", Encode(commandDetails.Amount.ToString()))
+                  .Replace("#DisplayAmount#", Encode(((long)commandDetails.Amount).ToString("N0")))
+                  .Replace("#RedirectUrl#", Encode(commandDetails.RedirectUrl))
                   .Replace("#YearNow#", DateTime.Now.Year.ToString());
 
         await httpContext.Response.WriteAsync(html);
@@ -122,13 +134,13 @@ internal class ParbadVirtualGatewayMiddlewareInvoker : IParbadVirtualGatewayMidd
         var template = await GetTemplate("VirtualGatewayResultTemplate.html");
 
         var html = template
-                  .Replace("#CssUrl#", cssUrl)
+                  .Replace("#CssUrl#", Encode(cssUrl))
                   .Replace("#nonce#", nonceProp)
-                  .Replace("#TrackingNumber#", commandDetails.TrackingNumber.ToString())
-                  .Replace("#DisplayAmount#", ((long)commandDetails.Amount).ToString("N0"))
+                  .Replace("#TrackingNumber#", Encode(commandDetails.TrackingNumber.ToString()))
+                  .Replace("#DisplayAmount#", Encode(((long)commandDetails.Amount).ToString("N0")))
                   .Replace("#TransactionCode#", boolIsPaid ? Guid.NewGuid().ToString("N") : string.Empty)
-                  .Replace("#RedirectUrl#", commandDetails.RedirectUrl)
-                  .Replace("#IsPaid#", isPaid.ToString().ToLower())
+                  .Replace("#RedirectUrl#", Encode(commandDetails.RedirectUrl))
+                  .Replace("#IsPaid#", Encode(isPaid.ToString().ToLowerInvariant()))
                   .Replace("#YearNow#", DateTime.Now.Year.ToString())
                   .Replace("#StatusText#", boolIsPaid ? "Paid" : "Cancelled");
 
@@ -149,7 +161,7 @@ internal class ParbadVirtualGatewayMiddlewareInvoker : IParbadVirtualGatewayMidd
             commandType = VirtualGatewayCommandType.Request;
         }
 
-        if (!long.TryParse(form["trackingNumber"], out var trackingNumber) ||
+        if (!long.TryParse(form["trackingNumber"], NumberStyles.Integer, CultureInfo.InvariantCulture, out var trackingNumber) ||
             !form.TryGetValue("redirectUrl", out var redirectUrl) ||
             !Money.TryParse(form["amount"], out var amount))
         {
@@ -180,6 +192,14 @@ internal class ParbadVirtualGatewayMiddlewareInvoker : IParbadVirtualGatewayMidd
             nonceValue = _options.NonceFactory(_httpContext);
         }
 
-        return string.IsNullOrWhiteSpace(nonceValue) ? null : $" nonce=\"{nonceValue}\"";
+        return string.IsNullOrWhiteSpace(nonceValue) ? null : $" nonce=\"{Encode(nonceValue)}\"";
     }
+
+    private static bool IsAbsoluteHttpUrl(string url)
+    {
+        return Uri.TryCreate(url, UriKind.Absolute, out var uri) &&
+               (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
+    }
+
+    private static string Encode(string value) => WebUtility.HtmlEncode(value);
 }

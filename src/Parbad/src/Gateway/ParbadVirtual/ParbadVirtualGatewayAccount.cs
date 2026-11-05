@@ -3,9 +3,8 @@
 
 using Parbad.Abstraction;
 
-namespace Parbad.Gateway.ParbadVirtual
+namespace Parbad.Gateway.ParbadVirtual;
+
+public class ParbadVirtualGatewayAccount : GatewayAccount
 {
-    public class ParbadVirtualGatewayAccount : GatewayAccount
-    {
-    }
 }

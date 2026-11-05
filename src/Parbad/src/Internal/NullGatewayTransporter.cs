@@ -4,20 +4,19 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Parbad.Internal
+namespace Parbad.Internal;
+
+public class NullGatewayTransporter : IGatewayTransporter
 {
-    public class NullGatewayTransporter : IGatewayTransporter
+    public NullGatewayTransporter()
     {
-        public NullGatewayTransporter()
-        {
-            Descriptor = null;
-        }
+        Descriptor = null;
+    }
 
-        public GatewayTransporterDescriptor Descriptor { get; }
+    public GatewayTransporterDescriptor Descriptor { get; }
 
-        public Task TransportAsync(CancellationToken cancellationToken = default)
-        {
-            return Task.CompletedTask;
-        }
+    public Task TransportAsync(CancellationToken cancellationToken = default)
+    {
+        return Task.CompletedTask;
     }
 }

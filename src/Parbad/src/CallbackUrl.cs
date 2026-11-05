@@ -5,113 +5,112 @@ using Parbad.Exceptions;
 using Parbad.Utilities;
 using System;
 
-namespace Parbad
+namespace Parbad;
+
+/// <summary>
+/// A complete URL of your website. It will be used by the gateway for redirecting
+/// the client again to your website.
+/// <para>Note: A complete URL would be like: "http://www.mywebsite.com/foo/bar/"</para>
+/// </summary>
+/// <exception cref="CallbackUrlFormatException"></exception>
+public readonly struct CallbackUrl : IComparable<CallbackUrl>, IEquatable<CallbackUrl>
 {
     /// <summary>
+    /// Initializes an instance of <see cref="CallbackUrl"/> class.
+    /// </summary>
+    /// <param name="url">
     /// A complete URL of your website. It will be used by the gateway for redirecting
     /// the client again to your website.
-    /// <para>Note: A complete URL would be like: "http://www.mywebsite.com/foo/bar/"</para>
-    /// </summary>
+    /// <para>A complete URL would be like: "http://www.mywebsite.com/foo/bar/"</para>
+    /// </param>
     /// <exception cref="CallbackUrlFormatException"></exception>
-    public readonly struct CallbackUrl : IComparable<CallbackUrl>, IEquatable<CallbackUrl>
+    /// <exception cref="ArgumentNullException"></exception>
+    public CallbackUrl(string url)
     {
-        /// <summary>
-        /// Initializes an instance of <see cref="CallbackUrl"/> class.
-        /// </summary>
-        /// <param name="url">
-        /// A complete URL of your website. It will be used by the gateway for redirecting
-        /// the client again to your website.
-        /// <para>A complete URL would be like: "http://www.mywebsite.com/foo/bar/"</para>
-        /// </param>
-        /// <exception cref="CallbackUrlFormatException"></exception>
-        /// <exception cref="ArgumentNullException"></exception>
-        public CallbackUrl(string url)
+        if (url == null) throw new ArgumentNullException(nameof(url));
+
+        if (!Uri.TryCreate(url, UriKind.Absolute, out _))
         {
-            if (url == null) throw new ArgumentNullException(nameof(url));
-
-            if (!Uri.TryCreate(url, UriKind.Absolute, out _))
-            {
-                throw new CallbackUrlFormatException(url);
-            }
-
-            Url = url;
+            throw new CallbackUrlFormatException(url);
         }
 
-        /// <summary>
-        /// Gets the URL.
-        /// </summary>
-        public string Url { get; }
+        Url = url;
+    }
 
-        /// <summary>
-        /// Adds a query string to the current URL.
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
-        public CallbackUrl AddQueryString(string name, string value)
+    /// <summary>
+    /// Gets the URL.
+    /// </summary>
+    public string Url { get; }
+
+    /// <summary>
+    /// Adds a query string to the current URL.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="value"></param>
+    public CallbackUrl AddQueryString(string name, string value)
+    {
+        var url = QueryHelper.AddQueryString(Url, name, value);
+
+        return new CallbackUrl(url);
+    }
+
+    public int CompareTo(CallbackUrl other)
+    {
+        return string.Compare(Url, other.Url, StringComparison.OrdinalIgnoreCase);
+    }
+
+    public bool Equals(CallbackUrl other)
+    {
+        return string.Equals(Url, other.Url, StringComparison.OrdinalIgnoreCase);
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (ReferenceEquals(null, obj)) return false;
+
+        return obj is CallbackUrl other && Equals(other);
+    }
+
+    public override int GetHashCode()
+    {
+        return Url.GetHashCode();
+    }
+
+    public override string ToString()
+    {
+        return Url;
+    }
+
+    public static CallbackUrl Parse(string url) => new CallbackUrl(url);
+
+    public static bool TryParse(string url, out CallbackUrl callbackUrl)
+    {
+        try
         {
-            var url = QueryHelper.AddQueryString(Url, name, value);
+            callbackUrl = new CallbackUrl(url);
 
-            return new CallbackUrl(url);
+            return true;
         }
-
-        public int CompareTo(CallbackUrl other)
+        catch
         {
-            return string.Compare(Url, other.Url, StringComparison.OrdinalIgnoreCase);
+            callbackUrl = default;
+
+            return false;
         }
+    }
 
-        public bool Equals(CallbackUrl other)
-        {
-            return string.Equals(Url, other.Url, StringComparison.OrdinalIgnoreCase);
-        }
+    public static implicit operator string(CallbackUrl callbackUrl)
+    {
+        return callbackUrl.ToString();
+    }
 
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
+    public static bool operator ==(CallbackUrl left, CallbackUrl right)
+    {
+        return left.Equals(right);
+    }
 
-            return obj is CallbackUrl other && Equals(other);
-        }
-
-        public override int GetHashCode()
-        {
-            return Url.GetHashCode();
-        }
-
-        public override string ToString()
-        {
-            return Url;
-        }
-
-        public static CallbackUrl Parse(string url) => new CallbackUrl(url);
-
-        public static bool TryParse(string url, out CallbackUrl callbackUrl)
-        {
-            try
-            {
-                callbackUrl = new CallbackUrl(url);
-
-                return true;
-            }
-            catch
-            {
-                callbackUrl = default;
-
-                return false;
-            }
-        }
-
-        public static implicit operator string(CallbackUrl callbackUrl)
-        {
-            return callbackUrl.ToString();
-        }
-
-        public static bool operator ==(CallbackUrl left, CallbackUrl right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(CallbackUrl left, CallbackUrl right)
-        {
-            return !(left == right);
-        }
+    public static bool operator !=(CallbackUrl left, CallbackUrl right)
+    {
+        return !(left == right);
     }
 }
