@@ -17,7 +17,7 @@ using Parbad.TrackingNumberProviders;
 namespace Parbad.PaymentFlow.Tests.Core;
 
 /// <summary>
-/// Tests for <see cref="AutoRandomTrackingNumber"/> (ANALYSIS-01, T-1 and T-3).
+/// Tests for <see cref="AutoRandomTrackingNumber"/>.
 /// The storages used here throw from the obsolete <see cref="IStorage.Payments"/>, so every test also proves
 /// that the formatter no longer loads all stored payments.
 /// </summary>

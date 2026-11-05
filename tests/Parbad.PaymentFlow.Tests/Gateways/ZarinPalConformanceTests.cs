@@ -82,7 +82,7 @@ public class ZarinPalConformanceTests : GatewayConformanceTests
             });
         }));
 
-        // Disproved assumption: the real refund.json answers 404 or 401 (ANALYSIS-02 §7.4). The simulator keeps it,
+        // Disproved assumption: the real refund.json answers 404 or 401. The simulator keeps it,
         // so the refund scenarios check Parbad's side only.
         http.When($"{Api}/refund.json").Respond(Bank.Endpoint(BankOperation.Refund, call =>
         {

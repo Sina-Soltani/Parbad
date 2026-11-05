@@ -1,8 +1,6 @@
 # Parbad.PaymentFlow.Tests
 
-Behaviour tests for the payment flow, written before any refactoring (step 1 of the refactoring plan in
-[ANALYSIS-00-SUMMARY.md](../../ANALYSIS-00-SUMMARY.md)). They run the real `IOnlinePayment` pipeline;
-only the bank is simulated.
+Behaviour tests for the payment flow. They run the real `IOnlinePayment` pipeline; only the bank is simulated.
 
 ```
 dotnet test tests/Parbad.PaymentFlow.Tests
@@ -33,9 +31,9 @@ Every test asserts the **correct** behaviour. The outcome tells you where the co
 | Outcome | Meaning |
 |---|---|
 | Passed | The behaviour is correct. |
-| Skipped: `KNOWN ISSUE <id> reproduces: …` | A documented bug still exists. `<id>` refers to the ANALYSIS-0x documents. The build stays green. |
+| Skipped: `KNOWN ISSUE <issue> reproduces: …` | A known bug still exists. `<issue>` describes it. The build stays green. |
 | Skipped: `Not applicable …` | The scenario does not apply to this gateway (e.g. no refund support). |
-| Failed: `Known issue <id> no longer reproduces` | The bug has been fixed. Remove its entry from `KnownIssues` so the test guards the fix from now on. |
+| Failed: `Known issue <issue> no longer reproduces` | The bug has been fixed. Remove its entry from `KnownIssues` so the test guards the fix from now on. |
 | Failed: anything else | A regression, or a problem in a simulator (simulator errors and unexpected HTTP calls are reported by the test cleanup). |
 
 All scenarios run under the invariant culture, so the results do not depend on the machine's settings; the
@@ -51,7 +49,7 @@ Subclass `GatewayConformanceTests` and implement:
 - `SetupBank`: answer the gateway's HTTP calls from `Bank`, through `Bank.Endpoint(...)` so faults are applied;
 - `CreateCallback`: the callback the bank sends for a transaction.
 
-List failing scenarios in `KnownIssues` with the id of a documented issue, never to silence an unexplained failure.
+List failing scenarios in `KnownIssues` with a description of a known bug, never to silence an unexplained failure.
 
 ## Limits of the simulation
 
@@ -60,10 +58,9 @@ List failing scenarios in `KnownIssues` with the id of a documented issue, never
   `Assumption (unverified)`, and assumes the answer most favourable to Parbad. Search for that text before
   relying on a passing result.
 - **Some problems cannot be tested here:**
-  - AsanPardakht's 12-hour timestamp (G-H5) only partly: the gateway reads `DateTime.Now` directly, so the
+  - AsanPardakht's 12-hour timestamp only partly: the gateway reads `DateTime.Now` directly, so the
     simulator (which checks the timestamp against the clock) catches a 12-hour clock only between 12:00 and
     00:59.
-  - PayPing's amount unit (G-H8): this needs confirmation from PayPing.
 - **MockHttp 6 swallows exceptions from asynchronous response handlers,** so the request then hangs. Simulators
   must not throw: `FakeBank.Endpoint` records simulator errors instead, and a lost response is simulated by a
   body that fails while it is read.

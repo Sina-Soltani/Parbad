@@ -10,7 +10,7 @@ using Parbad.Net;
 namespace Parbad.PaymentFlow.Tests.Core;
 
 /// <summary>
-/// The shared reader for gateway responses (ANALYSIS-02, G-H9): a readable answer is returned, anything else throws
+/// The shared reader for gateway responses: a readable answer is returned, anything else throws
 /// <see cref="GatewayResponseException"/>, which is an <see cref="HttpRequestException"/>.
 /// </summary>
 [TestClass]

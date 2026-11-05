@@ -8,17 +8,17 @@ namespace Parbad.PaymentFlow.Tests.Infrastructure;
 /// Runs a test body that asserts the <b>correct</b> behaviour while a documented bug still exists.
 /// <list type="bullet">
 /// <item>If the assertions still fail, the bug reproduces: the test is reported as <i>inconclusive</i>
-/// (shown as "skipped") with the issue id, so it is visible without breaking the build.</item>
+/// (shown as "skipped") with the issue, so it is visible without breaking the build.</item>
 /// <item>If the assertions pass, the bug has been fixed: the test <b>fails</b> and asks you to remove the
 /// known-issue marker, so from then on the test guards the fix.</item>
 /// </list>
-/// Issue ids refer to the ANALYSIS-0x documents in the repository root.
+/// The issue is a short description of the bug.
 /// </summary>
 public static class KnownIssue
 {
     public static async Task ReproducesAsync(string issue, Func<Task> assertCorrectBehaviour)
     {
-        if (string.IsNullOrWhiteSpace(issue)) throw new ArgumentException("An issue id is required.", nameof(issue));
+        if (string.IsNullOrWhiteSpace(issue)) throw new ArgumentException("A description of the issue is required.", nameof(issue));
 
         try
         {

@@ -45,7 +45,7 @@ jobs:
         run: dotnet restore Parbad.sln
 
       # Fails when a shipped package depends on a package with a known vulnerability, including the transitive
-      # dependencies of the netstandard and net462 builds (ANALYSIS-04 §3.1).
+      # dependencies of the netstandard and net462 builds.
       - name: Check for vulnerable packages
         shell: pwsh
         run: |
@@ -59,7 +59,7 @@ jobs:
       - name: Build
         run: dotnet build Parbad.sln -c Release --no-restore
 
-      # A test project that runs no tests fails the build, so tests cannot silently stop running again (T-1).
+      # A test project that runs no tests fails the build, so tests cannot silently stop running again.
       - name: Test
         run: dotnet test Parbad.sln -c Release --no-build -- RunConfiguration.TreatNoTestsAsError=true
 

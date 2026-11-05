@@ -10,7 +10,7 @@ using Parbad.GatewayBuilders;
 namespace Parbad.PaymentFlow.Tests.Core;
 
 /// <summary>
-/// The HTTP clients Parbad uses to call the banks (ANALYSIS-01, H-3). These tests build the services themselves,
+/// The HTTP clients Parbad uses to call the banks. These tests build the services themselves,
 /// because <see cref="Infrastructure.ParbadTestHost"/> replaces every client's handler and timeout.
 /// </summary>
 [TestClass]

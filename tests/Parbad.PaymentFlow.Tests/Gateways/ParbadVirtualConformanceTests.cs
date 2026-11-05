@@ -14,12 +14,12 @@ namespace Parbad.PaymentFlow.Tests.Gateways;
 
 /// <summary>
 /// The Virtual Gateway: a payment page served by the merchant's own application. There is no bank, and it
-/// approves any payment by design (ANALYSIS-02 §3, design note), so the bank-side scenarios do not apply.
+/// approves any payment by design, so the bank-side scenarios do not apply.
 /// </summary>
 [TestClass]
 public class ParbadVirtualConformanceTests : GatewayConformanceTests
 {
-    private const string NoBank = "the Virtual Gateway has no bank and approves payments by design (ANALYSIS-02 §3).";
+    private const string NoBank = "the Virtual Gateway has no bank and approves payments by design.";
 
     protected override string GatewayName => ParbadVirtualGateway.Name;
 

@@ -18,7 +18,7 @@ namespace Parbad.Gateway.AsanPardakht.Internal
     /// AsanPardakht's REST API answers with HTTP status codes, and their meaning depends on the operation (guide v1.6,
     /// p.11). The guide refers to the online Swagger for the tables, which could not be read; the per-operation
     /// meanings below follow mrdaghestani/AsanPardakht.IPG, by a co-author of the guide.
-    /// Assumption (unverified against the Swagger, ANALYSIS-02 §7.3).
+    /// Assumption (unverified against the Swagger).
     /// </summary>
     internal static class AsanPardakhtResultTranslator
     {

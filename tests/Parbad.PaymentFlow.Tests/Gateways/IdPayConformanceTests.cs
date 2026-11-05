@@ -51,14 +51,14 @@ public class IdPayConformanceTests : GatewayConformanceTests
         {
             var transaction = Bank.FindByToken((string?)call.Json["id"]);
 
-            // Assumption (unverified, ANALYSIS-02 §5): IDPay rejects an id that does not belong to the sent order_id.
+            // Assumption (unverified): IDPay rejects an id that does not belong to the sent order_id.
             if (call.Reject || call.Header("X-API-KEY") != ApiKey || transaction is not { Paid: true } ||
                 transaction.OrderId != (long)call.Json["order_id"]!)
             {
                 return Error(53, "The payment cannot be verified.");
             }
 
-            // 101 = "already verified" (official IDPay docs, ANALYSIS-02 §7.3).
+            // 101 = "already verified" (official IDPay docs).
             // Assumption (one library's sample only): the answer carries the same fields as 100.
             var status = transaction.Verified ? "101" : "100";
             transaction.Verified = true;
