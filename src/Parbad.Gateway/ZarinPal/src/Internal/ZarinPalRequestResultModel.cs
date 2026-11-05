@@ -3,8 +3,6 @@
 
 namespace Parbad.Gateway.ZarinPal.Internal;
 
-internal class ZarinPalRequestResultModel : ZarinPalResultModel<ZarinPalRequestResultModelData>;
-
 internal class ZarinPalRequestResultModelData
 {
     public string Authority { set; get; }
