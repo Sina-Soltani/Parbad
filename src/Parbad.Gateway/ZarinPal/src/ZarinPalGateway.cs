@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Parbad.Abstraction;
+using Parbad.Exceptions;
 using Parbad.Gateway.ZarinPal.Internal;
 using Parbad.Gateway.ZarinPal.Models;
 using Parbad.GatewayBuilders;
@@ -60,18 +61,14 @@ public class ZarinPalGateway : GatewayBase<ZarinPalGatewayAccount>
 
         var responseMessage = await PostAsJson(_httpClient, apiUrl, requestModel);
 
-        if (!responseMessage.IsSuccessStatusCode)
+        var response = await ReadAsync<ZarinPalRequestResultModelData>(responseMessage);
+
+        if (response.IsError)
         {
-            await Log(responseMessage);
-
-            var error = await ZarinPalHelper.TryGetError(responseMessage, _messagesOptions);
-
-            return PaymentRequestResult.Failed(error.Message, account.Name, error.Code?.ToString());
+            return PaymentRequestResult.Failed(response.ErrorMessage, account.Name, response.ErrorCode?.ToString());
         }
 
-        var resultModel = await ReadFromJsonAsync<ZarinPalRequestResultModel>(responseMessage);
-
-        var result = ZarinPalHelper.CreateRequestResult(resultModel, _httpContextAccessor.HttpContext, account, _gatewayOptions, _messagesOptions);
+        var result = ZarinPalHelper.CreateRequestResult(response.Data, _httpContextAccessor.HttpContext, account, _gatewayOptions, _messagesOptions);
 
         return result;
     }
@@ -122,24 +119,20 @@ public class ZarinPalGateway : GatewayBase<ZarinPalGatewayAccount>
 
         var responseMessage = await PostAsJson(_httpClient, apiUrl, verificationModel);
 
-        if (!responseMessage.IsSuccessStatusCode)
+        var response = await ReadAsync<ZarinPalOriginalVerificationResult>(responseMessage);
+
+        if (response.IsError)
         {
-            await Log(responseMessage);
-
-            var error = await ZarinPalHelper.TryGetError(responseMessage, _messagesOptions);
-
             return new PaymentVerifyResult
                    {
                        Status = PaymentVerifyResultStatus.Failed,
                        GatewayAccountName = account.Name,
-                       GatewayResponseCode = error.Code?.ToString(),
-                       Message = error.Message
+                       GatewayResponseCode = response.ErrorCode?.ToString(),
+                       Message = response.ErrorMessage
                    };
         }
 
-        var resultModel = await ReadFromJsonAsync<ZarinPalResultModel<ZarinPalOriginalVerificationResult>>(responseMessage);
-
-        var result = ZarinPalHelper.CreateVerifyResult(resultModel, account, _messagesOptions);
+        var result = ZarinPalHelper.CreateVerifyResult(response.Data, account, _messagesOptions);
 
         return result;
     }
@@ -165,24 +158,20 @@ public class ZarinPalGateway : GatewayBase<ZarinPalGatewayAccount>
 
         var responseMessage = await PostAsJson(_httpClient, apiUrl, refundModel);
 
-        if (!responseMessage.IsSuccessStatusCode)
+        var response = await ReadAsync<ZarinPalRefundResultModelData>(responseMessage);
+
+        if (response.IsError)
         {
-            await Log(responseMessage);
-
-            var error = await ZarinPalHelper.TryGetError(responseMessage, _messagesOptions);
-
             return new PaymentRefundResult
                    {
                        Status = PaymentRefundResultStatus.Failed,
                        GatewayAccountName = account.Name,
-                       GatewayResponseCode = error.Code?.ToString(),
-                       Message = error.Message
+                       GatewayResponseCode = response.ErrorCode?.ToString(),
+                       Message = response.ErrorMessage
                    };
         }
 
-        var resultModel = await ReadFromJsonAsync<ZarinPalRefundResultModel>(responseMessage);
-
-        var result = ZarinPalHelper.CreateRefundResult(resultModel, account, _messagesOptions);
+        var result = ZarinPalHelper.CreateRefundResult(response.Data, account, _messagesOptions);
 
         return result;
     }
@@ -198,8 +187,23 @@ public class ZarinPalGateway : GatewayBase<ZarinPalGatewayAccount>
         return httpClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"));
     }
 
-    private static Task<T> ReadFromJsonAsync<T>(HttpResponseMessage httpResponseMessage) where T : class =>
-        httpResponseMessage.ReadJsonAsync<T>();
+    private async Task<ZarinPalResponse<TData>> ReadAsync<TData>(HttpResponseMessage responseMessage) where TData : class
+    {
+        try
+        {
+            var response = await ZarinPalResponse<TData>.ReadAsync(responseMessage, _messagesOptions).ConfigureAwaitFalse();
+
+            if (response.IsError) await Log(responseMessage);
+
+            return response;
+        }
+        catch (GatewayResponseException)
+        {
+            await Log(responseMessage);
+
+            throw;
+        }
+    }
 
     private async Task Log(HttpResponseMessage responseMessage)
     {
