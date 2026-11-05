@@ -3,14 +3,16 @@
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Parbad.Abstraction;
+using Parbad.Exceptions;
 using Parbad.Gateway.PayPing.Internal;
 using Parbad.GatewayBuilders;
 using Parbad.Internal;
 using Parbad.Net;
 using Parbad.Options;
 using System;
+using System.Globalization;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
@@ -19,7 +21,7 @@ using System.Threading.Tasks;
 namespace Parbad.Gateway.PayPing
 {
     /// <summary>
-    /// PayPing Gateway.
+    /// PayPing Gateway (PayPing API v3). PayPing expects the amount in Toman; Parbad sends the invoice amount as it is.
     /// </summary>
     [Gateway(Name)]
     public class PayPingGateway : GatewayBase<PayPingGatewayAccount>
@@ -63,26 +65,33 @@ namespace Parbad.Gateway.PayPing
                 PayerIdentity = invoice.GetPayPingRequest()?.Mobile,
                 PayerName = invoice.GetPayPingRequest()?.PayerName,
                 ReturnUrl = invoice.CallbackUrl,
-                ClientRefId = invoice.TrackingNumber.ToString()
+                ClientRefId = invoice.TrackingNumber.ToString(CultureInfo.InvariantCulture)
             };
 
-            //Send Create pay Request
             var response = await _httpClient.PostJsonAsync(_pingGatewayOptions.ApiRequestUrl, body, cancellationToken);
 
-            //Check if we ran into an Issue
-            response.EnsureSuccessStatusCode();
+            if (!response.IsSuccessStatusCode)
+            {
+                var problem = await PayPingGatewayHelper.ReadProblemAsync(response, _options.Messages).ConfigureAwaitFalse();
 
-            //Get Response data 
-            var responseBody = await response.Content.ReadAsStringAsync();
+                return PaymentRequestResult.Failed(problem.Message, account.Name, problem.Code?.ToString(CultureInfo.InvariantCulture));
+            }
 
-            //Convert Response data to Model and get PayCode
-            var createPayResult = JsonConvert.DeserializeObject<CreatePayResponseModel>(responseBody);
+            var createPayResult = await response.ReadJsonAsync<CreatePayResponseModel>().ConfigureAwaitFalse();
 
-            //Redirect User to gateway with the Code
+            if (string.IsNullOrEmpty(createPayResult.PaymentCode))
+            {
+                return PaymentRequestResult.Failed($"{_options.Messages.InvalidDataReceivedFromGateway}PaymentCode isn't received.", account.Name);
+            }
 
-            var url = _pingGatewayOptions.PaymentPageUrl.ToggleStringAtEnd("/", shouldHave: true) + createPayResult.Code;
+            var url = _pingGatewayOptions.PaymentPageUrl.ToggleStringAtEnd("/", shouldHave: true) + Uri.EscapeDataString(createPayResult.PaymentCode);
 
-            return PaymentRequestResult.SucceedWithRedirect(account.Name, _httpContextAccessor.HttpContext, url);
+            var result = PaymentRequestResult.SucceedWithRedirect(account.Name, _httpContextAccessor.HttpContext, url);
+
+            // The callback and the verification must use the payment code PayPing issued for this invoice.
+            result.DatabaseAdditionalData.Add(PayPingGatewayHelper.PaymentCodeKey, createPayResult.PaymentCode);
+
+            return result;
         }
 
         /// <inheritdoc />
@@ -126,29 +135,48 @@ namespace Parbad.Gateway.PayPing
 
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", account.AccessToken);
 
-            //Send Verify pay Request
             var response = await _httpClient.PostJsonAsync(_pingGatewayOptions.ApiVerificationUrl, verificationModel, cancellationToken);
 
-            //Check if we ran into an Issue
-            if (!response.IsSuccessStatusCode)
+            // 202: PayPing is still verifying; 5xx: it is unknown whether it verified. Either way the payment stays
+            // open, and the verification is retried with the same payment.
+            if (response.StatusCode == HttpStatusCode.Accepted || (int)response.StatusCode >= 500)
             {
-                // A JSON error body is PayPing's answer; anything else (e.g. a proxy's error page) throws, so the
-                // payment stays open for a retry.
-                await response.ReadJsonStringAsync().ConfigureAwaitFalse();
-
-                return PaymentVerifyResult.Failed(_options.Messages.PaymentFailed);
+                throw new GatewayResponseException(response.StatusCode,
+                                                   response.Content?.Headers.ContentType?.MediaType,
+                                                   response.StatusCode == HttpStatusCode.Accepted ? "verification in progress" : "server error");
             }
 
-            var responseModel = await response.ReadJsonAsync<VerifyPayResponseModel>().ConfigureAwaitFalse();
+            PaymentVerifyResult result;
 
-            if (responseModel.Amount != (long)context.Payment.Amount)
+            if (response.IsSuccessStatusCode)
             {
-                var message = $"{_options.Messages.PaymentFailed} Amount is not valid.";
+                var responseModel = await response.ReadJsonAsync<VerifyPayResponseModel>().ConfigureAwaitFalse();
 
-                return PaymentVerifyResult.Failed(message);
+                result = PayPingGatewayHelper.CreateVerifyResult(responseModel, callbackResult, _options.Messages);
+            }
+            else
+            {
+                var problem = await PayPingGatewayHelper.ReadProblemAsync(response, _options.Messages).ConfigureAwaitFalse();
+
+                // 409 with code 110: verified before (e.g. the first answer was lost). The payment code comes from the
+                // database, so it is this invoice's payment.
+                if (response.StatusCode == HttpStatusCode.Conflict && problem.Code == PayPingGatewayHelper.AlreadyVerifiedCode)
+                {
+                    var verifiedTransaction = PayPingGatewayHelper.TryParseVerifyResponse(problem.Details) ?? new VerifyPayResponseModel();
+
+                    result = PayPingGatewayHelper.CreateVerifyResult(verifiedTransaction, callbackResult, _options.Messages);
+                }
+                else
+                {
+                    result = PaymentVerifyResult.Failed(problem.Message);
+                }
+
+                result.GatewayResponseCode = problem.Code?.ToString(CultureInfo.InvariantCulture);
             }
 
-            return PaymentVerifyResult.Succeed(callbackResult.RefId, _options.Messages.PaymentSucceed);
+            result.GatewayAccountName = account.Name;
+
+            return result;
         }
 
         /// <inheritdoc />
