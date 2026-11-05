@@ -58,24 +58,17 @@ namespace Parbad.Gateway.Parsian
         }
 
         /// <inheritdoc />
-        public override Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default)
+        public override async Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
-            var callbackResult = ParsianHelper.CreateCallbackResult(_httpContextAccessor.HttpContext.Request, context, _messageOptions);
+            var callbackResult = await ParsianHelper
+                                       .CreateCallbackResultAsync(_httpContextAccessor.HttpContext.Request, context, _messageOptions, cancellationToken)
+                                       .ConfigureAwaitFalse();
 
-            IPaymentFetchResult result;
-
-            if (callbackResult.IsSucceed)
-            {
-                result = PaymentFetchResult.ReadyForVerifying();
-            }
-            else
-            {
-                result = PaymentFetchResult.Failed(callbackResult.Message);
-            }
-
-            return Task.FromResult(result);
+            return callbackResult.IsSucceed
+                ? PaymentFetchResult.ReadyForVerifying()
+                : PaymentFetchResult.Failed(callbackResult.Message);
         }
 
         /// <inheritdoc />
@@ -83,7 +76,9 @@ namespace Parbad.Gateway.Parsian
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
 
-            var callbackResult = ParsianHelper.CreateCallbackResult(_httpContextAccessor.HttpContext.Request, context, _messageOptions);
+            var callbackResult = await ParsianHelper
+                                       .CreateCallbackResultAsync(_httpContextAccessor.HttpContext.Request, context, _messageOptions, cancellationToken)
+                                       .ConfigureAwaitFalse();
 
             if (!callbackResult.IsSucceed)
             {

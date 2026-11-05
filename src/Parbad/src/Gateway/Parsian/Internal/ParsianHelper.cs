@@ -4,6 +4,7 @@
 using Microsoft.AspNetCore.Http;
 using Parbad.Abstraction;
 using Parbad.Gateway.Parsian.Internal.Models;
+using Parbad.Http;
 using Parbad.Internal;
 using Parbad.Options;
 using Parbad.Storage.Abstractions.Models;
@@ -11,6 +12,8 @@ using Parbad.Utilities;
 using System;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Parbad.Gateway.Parsian.Internal
 {
@@ -38,9 +41,9 @@ namespace Parbad.Gateway.Parsian.Internal
                 "<!--Optional:-->" +
                 $"<sal:CallBackUrl>{XmlHelper.EncodeXmlValue(invoice.CallbackUrl)}</sal:CallBackUrl>" +
                 "<!--Optional:-->" +
-                $"<sal:AdditionalData>{additionalData?.AdditionalData}</sal:AdditionalData>" +
+                $"<sal:AdditionalData>{XmlHelper.EncodeXmlValue(additionalData?.AdditionalData)}</sal:AdditionalData>" +
                 "<!--Optional:-->" +
-                $"<sal:Originator>{additionalData?.Originator}</sal:Originator>" +
+                $"<sal:Originator>{XmlHelper.EncodeXmlValue(additionalData?.Originator)}</sal:Originator>" +
                 "</sal:requestData>" +
                 "</sal:SalePaymentRequest> " +
                 "</soapenv:Body> " +
@@ -81,12 +84,16 @@ namespace Parbad.Gateway.Parsian.Internal
             return result;
         }
 
-        public static ParsianCallbackResult CreateCallbackResult(HttpRequest httpRequest, InvoiceContext context, MessagesOptions messagesOptions)
+        public static async Task<ParsianCallbackResult> CreateCallbackResultAsync(HttpRequest httpRequest,
+                                                                                InvoiceContext context,
+                                                                                MessagesOptions messagesOptions,
+                                                                                CancellationToken cancellationToken)
         {
-            httpRequest.Form.TryGetValue("token", out var token);
-            httpRequest.Form.TryGetValue("status", out var status);
-            httpRequest.Form.TryGetValue("orderId", out var orderId);
-            httpRequest.Form.TryGetValue("amount", out var amount);
+            // Read asynchronously: a synchronous Request.Form blocks a thread, and throws on a GET callback.
+            var (_, token) = await httpRequest.TryGetParamAsync("token", cancellationToken).ConfigureAwaitFalse();
+            var (_, status) = await httpRequest.TryGetParamAsync("status", cancellationToken).ConfigureAwaitFalse();
+            var (_, orderId) = await httpRequest.TryGetParamAsync("orderId", cancellationToken).ConfigureAwaitFalse();
+            var (_, amount) = await httpRequest.TryGetParamAsync("amount", cancellationToken).ConfigureAwaitFalse();
 
             var isSucceed = true;
 

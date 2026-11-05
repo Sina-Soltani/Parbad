@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Net.Http;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Parbad.Builder;
 using Parbad.Gateway.Parsian;
@@ -19,9 +21,14 @@ namespace Parbad.PaymentFlow.Tests.Gateways;
 public class ParsianConformanceTests : GatewayConformanceTests
 {
     private const string LoginAccount = "PEC-LOGIN-ACCOUNT";
+    private const string SpecialAdditionalData = "Order <42> & \"gift\" 'wrap' </sal:AdditionalData>";
+    private const string SpecialSecondValue = "7&8<9>";
     private const string SaleNamespace = "https://pec.Shaparak.ir/NewIPGServices/Sale/SaleService";
     private const string ConfirmNamespace = "https://pec.Shaparak.ir/NewIPGServices/Confirm/ConfirmService";
     private const string ReversalNamespace = "https://pec.Shaparak.ir/NewIPGServices/Reversal/ReversalService";
+
+    private string? _receivedAdditionalData;
+    private string? _receivedSecondValue;
 
     protected override string GatewayName => ParsianGateway.Name;
 
@@ -40,6 +47,47 @@ public class ParsianConformanceTests : GatewayConformanceTests
 
     protected override void UseGateway(IInvoiceBuilder invoice) => invoice.UseParsian();
 
+    /// <summary>
+    /// G-H7: the SOAP envelope is built as a string, so every value must be XML-encoded. An unencoded "&amp;" or "&lt;"
+    /// makes the request invalid XML, or lets the value add elements of its own.
+    /// </summary>
+    [TestMethod]
+    public async Task Request_values_with_xml_special_characters_reach_the_bank_unchanged()
+    {
+        Host.StartCheckoutRequest();
+
+        var result = await Host.OnlinePayment.RequestAsync(invoice =>
+        {
+            invoice.SetTrackingNumber(InvoiceTrackingNumber)
+                   .SetAmount(InvoiceAmount)
+                   .SetCallbackUrl(CallbackUrl);
+
+            UseGateway(invoice);
+            invoice.SetParsianAdditionalData(new ParsianGatewayAdditionalDataRequest { AdditionalData = SpecialAdditionalData, Originator = SpecialSecondValue });
+        });
+
+        Assert.IsTrue(result.IsSucceed, $"Request failed: {result.Message}");
+        Assert.AreEqual(SpecialAdditionalData, _receivedAdditionalData);
+        Assert.AreEqual(SpecialSecondValue, _receivedSecondValue);
+    }
+
+    /// <summary>
+    /// G-H10: the callback is read asynchronously from the form or the query string. A synchronous Request.Form
+    /// threw on a GET request.
+    /// </summary>
+    [TestMethod]
+    public async Task Callback_sent_as_a_get_request_is_verified()
+    {
+        var transaction = await PayAsync(InvoiceTrackingNumber, InvoiceAmount);
+        var post = CreateCallback(transaction, Claims(InvoiceTrackingNumber, InvoiceAmount));
+
+        Host.ReceiveCallback(transaction.CallbackUrl!, new TestCallback { Method = HttpMethods.Get, Query = post.Form });
+        var outcome = await FetchAndVerifyAsync();
+
+        outcome.AssertNoUnexpectedException();
+        Assert.AreEqual(PaymentVerifyResultStatus.Succeed, outcome.Verify?.Status, outcome.Describe());
+    }
+
     protected override void SetupBank(MockHttpMessageHandler http)
     {
         http.When($"{BankUrl}/NewIPGServices/Sale/SaleService.asmx").Respond(Bank.Endpoint(BankOperation.Request, call =>
@@ -48,6 +96,9 @@ public class ParsianConformanceTests : GatewayConformanceTests
             {
                 return Result(SaleNamespace, "SalePaymentRequestResult", ("Token", "0"), ("Status", "-126"), ("Message", "Invalid merchant."));
             }
+
+            _receivedAdditionalData = call.Xml("AdditionalData");
+            _receivedSecondValue = call.Xml("Originator");
 
             var transaction = Bank.Open(
                 long.Parse(call.Xml("OrderId")!, CultureInfo.InvariantCulture),
