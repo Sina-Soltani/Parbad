@@ -23,4 +23,15 @@ public class ParbadOptions
     /// to support CSP (Content-Security-Policy). If your application doesn't include any CSP, you can leave this property null. 
     /// </summary>
     public Func<HttpContext, string> NonceFactory { get; set; }
+
+    /// <summary>
+    /// The timeout of each HTTP call Parbad makes to a gateway. The default value is 30 seconds, instead of the
+    /// 100 seconds of <see cref="System.Net.Http.HttpClient"/>. Use <see cref="System.Threading.Timeout.InfiniteTimeSpan"/>
+    /// for no timeout.
+    /// <para>
+    /// A verification that times out throws and leaves the payment open, so it can be verified again. A timeout
+    /// set for one gateway with <c>WithHttpClient</c> takes precedence.
+    /// </para>
+    /// </summary>
+    public TimeSpan GatewayTimeout { get; set; } = TimeSpan.FromSeconds(30);
 }

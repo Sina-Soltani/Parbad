@@ -17,7 +17,8 @@ namespace Parbad.Gateway.AsanPardakht.Internal
 
         public AsanPardakhtCrypto(IHttpClientFactory httpClientFactory, IOptions<AsanPardakhtGatewayOptions> gatewayOptions)
         {
-            _httpClient = httpClientFactory.CreateClient(AsanPardakhtGateway.Name);
+            // The gateway's own client, so WithHttpClient, WithProxy and the timeout apply to these calls too.
+            _httpClient = httpClientFactory.CreateClient(nameof(AsanPardakhtGateway));
 
             _gatewayOptions = gatewayOptions.Value;
         }
