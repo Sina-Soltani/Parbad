@@ -29,7 +29,7 @@ public class PaymentConfiguration : EntityTypeConfiguration<PaymentEntity>
            .HasKey(entity => entity.Id)
            .HasName("payment_id");
         builder.Property(entity => entity.Id)
-               .HasColumnName("payment_id")
+               .HasColumnName(PaymentColumnNames.Id)
                .ValueGeneratedOnAdd();
 
         builder.Property(entity => entity.TrackingNumber)
@@ -48,7 +48,7 @@ public class PaymentConfiguration : EntityTypeConfiguration<PaymentEntity>
                .IsRequired(required: true);
 
         builder.Property(entity => entity.TransactionCode)
-               .HasColumnName("transaction_code")
+               .HasColumnName(PaymentColumnNames.TransactionCode)
                .IsRequired(required: false);
 
         builder.Property(entity => entity.GatewayName)
@@ -57,11 +57,11 @@ public class PaymentConfiguration : EntityTypeConfiguration<PaymentEntity>
                .IsRequired(required: true);
 
         builder.Property(entity => entity.IsCompleted)
-               .HasColumnName("is_completed")
+               .HasColumnName(PaymentColumnNames.IsCompleted)
                .IsRequired(required: true);
 
         builder.Property(entity => entity.IsPaid)
-               .HasColumnName("is_paid")
+               .HasColumnName(PaymentColumnNames.IsPaid)
                .IsRequired(required: true);
 
         builder.Property(entity => entity.GatewayAccountName)
@@ -73,7 +73,7 @@ public class PaymentConfiguration : EntityTypeConfiguration<PaymentEntity>
                .IsRequired(required: true);
 
         builder.Property(entity => entity.UpdatedOn)
-               .HasColumnName("updated_on")
+               .HasColumnName(PaymentColumnNames.UpdatedOn)
                .IsRequired(required: false);
 
         builder

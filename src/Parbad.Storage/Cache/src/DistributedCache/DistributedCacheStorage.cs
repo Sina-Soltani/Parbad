@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
@@ -40,6 +41,44 @@ public class DistributedCacheStorage : CacheStorage
 
     /// <inheritdoc />
     protected override ICacheStorageCollection Collection { get; }
+
+    /// <inheritdoc />
+    /// <remarks>
+    /// The payment's state is refreshed from the cache first, because another instance may have completed it since
+    /// this instance loaded the records (a verification takes seconds). That narrows the window to the time between
+    /// reading and writing the cache entry, but it is not atomic across instances: a distributed cache has no
+    /// compare-and-set. Use the Entity Framework Core storage where several servers verify payments.
+    /// </remarks>
+    public override async Task<bool> TryCompletePaymentAsync(long paymentId,
+                                                             bool isPaid,
+                                                             string? transactionCode,
+                                                             CancellationToken cancellationToken = default)
+    {
+        var buffer = await _distributedCache.GetAsync(_options.CacheKey, cancellationToken).ConfigureAwait(false);
+
+        var cached = buffer == null
+            ? null
+            : ObjectSerializer.DeserializeObject<CacheStorageCollection>(buffer).Payments.SingleOrDefault(payment => payment.Id == paymentId);
+
+        if (cached != null)
+        {
+            lock (SyncRoot)
+            {
+                var record = Collection.Payments.SingleOrDefault(payment => payment.Id == paymentId);
+
+                // Only take a state that is further along. The cache may not yet have a completion this instance
+                // made a moment ago, and that must not be undone.
+                if (record != null && ((cached.IsPaid && !record.IsPaid) || (cached.IsCompleted && !record.IsCompleted)))
+                {
+                    record.IsCompleted = cached.IsCompleted;
+                    record.IsPaid = cached.IsPaid;
+                    record.TransactionCode = cached.TransactionCode;
+                }
+            }
+        }
+
+        return await base.TryCompletePaymentAsync(paymentId, isPaid, transactionCode, cancellationToken).ConfigureAwait(false);
+    }
 
     /// <inheritdoc />
     protected override async Task SaveChangesAsync(CancellationToken cancellationToken = default)

@@ -273,6 +273,58 @@ public abstract class CacheStorageTests
         Assert.IsNull(await lookup.FindPaidPaymentByTransactionCodeAsync("gateway", "RRN-3", exceptTrackingNumber: 99), "A payment of another gateway was returned.");
     }
 
+    [TestMethod]
+    public async Task Payment_completion_keeps_a_paid_result_and_lets_a_paid_result_replace_an_unpaid_one()
+    {
+        var payment = NewPayment(1);
+        payment.TransactionCode = null;
+        await CreateStorage().CreatePaymentAsync(payment);
+
+        IPaymentCompletion Completion() => (IPaymentCompletion)CreateStorage();
+
+        Assert.IsTrue(await Completion().TryCompletePaymentAsync(payment.Id, isPaid: false, transactionCode: null), "An open payment could not be completed.");
+        Assert.IsFalse(await Completion().TryCompletePaymentAsync(payment.Id, isPaid: false, "RRN-2"), "An unpaid result replaced another result.");
+        Assert.IsTrue(await Completion().TryCompletePaymentAsync(payment.Id, isPaid: true, "RRN-3"), "A paid result could not replace an unpaid one.");
+        Assert.IsFalse(await Completion().TryCompletePaymentAsync(payment.Id, isPaid: true, "RRN-4"), "A paid payment was changed.");
+        Assert.IsFalse(await Completion().TryCompletePaymentAsync(payment.Id, isPaid: false, transactionCode: null), "A paid payment was changed.");
+
+        var stored = await CreateStorage().GetPaymentByTrackingNumberAsync(1);
+        Assert.IsTrue(stored!.IsCompleted && stored.IsPaid);
+        Assert.AreEqual("RRN-3", stored.TransactionCode);
+    }
+
+    [TestMethod]
+    public async Task Parallel_completions_of_one_payment_on_one_storage_let_exactly_one_succeed()
+    {
+        var payment = NewPayment(1);
+        var storage = CreateStorage();
+        await storage.CreatePaymentAsync(payment);
+
+        var completion = (IPaymentCompletion)storage;
+        var results = await Task.WhenAll(Enumerable.Range(0, 20).Select(i => Task.Run(() =>
+            completion.TryCompletePaymentAsync(payment.Id, isPaid: false, $"RRN-{i}"))));
+
+        Assert.AreEqual(1, results.Count(completed => completed));
+    }
+
+    /// <summary>
+    /// A storage instance lives for one request, and a verification takes seconds, so another instance (another
+    /// request or server) may complete the payment in the meantime.
+    /// </summary>
+    [TestMethod]
+    public async Task Completion_sees_a_completion_made_by_another_storage_instance_in_the_meantime()
+    {
+        var payment = NewPayment(1);
+        await CreateStorage().CreatePaymentAsync(payment);
+
+        var thisRequest = (IPaymentCompletion)CreateStorage();
+        Assert.IsTrue(await ((IPaymentCompletion)CreateStorage()).TryCompletePaymentAsync(payment.Id, isPaid: true, "RRN-OTHER"));
+
+        Assert.IsFalse(await thisRequest.TryCompletePaymentAsync(payment.Id, isPaid: false, transactionCode: null),
+                       "The completion was decided on records loaded before the other instance completed the payment.");
+        Assert.IsTrue((await CreateStorage().GetPaymentByTrackingNumberAsync(1))!.IsPaid);
+    }
+
     protected static async Task AssertAllStoredAsync(IStorage storage, IReadOnlyCollection<Payment> payments)
     {
         Assert.AreEqual(payments.Count, payments.Select(payment => payment.Id).Distinct().Count(), "Payment ids are not unique.");

@@ -52,6 +52,9 @@
         <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.FindPaidPaymentByTransactionCodeAsync(System.String,System.String,System.Int64,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
+        <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.TryCompletePaymentAsync(System.Int64,System.Boolean,System.String,System.Threading.CancellationToken)">
+            <inheritdoc />
+        </member>
         <member name="M:Parbad.Storage.Cache.Abstractions.CacheStorage.DoesPaymentExistAsync(System.Int64,System.Threading.CancellationToken)">
             <inheritdoc />
         </member>
@@ -125,6 +128,15 @@
         </member>
         <member name="P:Parbad.Storage.Cache.DistributedCache.DistributedCacheStorage.Collection">
             <inheritdoc />
+        </member>
+        <member name="M:Parbad.Storage.Cache.DistributedCache.DistributedCacheStorage.TryCompletePaymentAsync(System.Int64,System.Boolean,System.String,System.Threading.CancellationToken)">
+            <inheritdoc />
+            <remarks>
+            The payment's state is refreshed from the cache first, because another instance may have completed it since
+            this instance loaded the records (a verification takes seconds). That narrows the window to the time between
+            reading and writing the cache entry, but it is not atomic across instances: a distributed cache has no
+            compare-and-set. Use the Entity Framework Core storage where several servers verify payments.
+            </remarks>
         </member>
         <member name="M:Parbad.Storage.Cache.DistributedCache.DistributedCacheStorage.SaveChangesAsync(System.Threading.CancellationToken)">
             <inheritdoc />

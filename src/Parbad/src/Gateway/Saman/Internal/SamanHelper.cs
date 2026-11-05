@@ -187,7 +187,7 @@ internal static class SamanHelper
 
     public static SamanReverseRequest CreateReverseRequest(InvoiceContext context, SamanGatewayAccount account)
     {
-        var verificationTransaction = context.Transactions.SingleOrDefault(transaction => transaction.Type == TransactionType.Verify);
+        var verificationTransaction = context.Transactions.LastOrDefault(transaction => transaction.Type == TransactionType.Verify && transaction.IsSucceed);
 
         if (string.IsNullOrEmpty(verificationTransaction?.AdditionalData) ||
             !verificationTransaction.ToDictionary().ContainsKey(RefNumKey))

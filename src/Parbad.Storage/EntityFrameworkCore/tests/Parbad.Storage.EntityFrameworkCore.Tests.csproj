@@ -12,6 +12,8 @@
          on .NET 9 does through its database provider. InMemory and Relational must have the same version. -->
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.22" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.22" />
+    <!-- A relational provider, for the code paths that run SQL. -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.22" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
     <PackageReference Include="MSTest.TestAdapter" Version="3.1.1" />
     <PackageReference Include="MSTest.TestFramework" Version="3.1.1" />

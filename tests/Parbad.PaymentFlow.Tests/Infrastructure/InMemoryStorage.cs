@@ -13,7 +13,7 @@ namespace Parbad.PaymentFlow.Tests.Infrastructure;
 /// It enforces unique tracking numbers and tokens, so the tests observe Parbad's own behaviour and are
 /// not affected by the known problems of the cache storages (ANALYSIS-03, S-3 to S-5).
 /// </summary>
-public sealed class InMemoryStorage : IStorage, IPaidPaymentLookup
+public sealed class InMemoryStorage : IStorage, IPaidPaymentLookup, IPaymentCompletion
 {
     private readonly object _sync = new();
     private readonly List<Payment> _payments = new();
@@ -22,7 +22,8 @@ public sealed class InMemoryStorage : IStorage, IPaidPaymentLookup
     private long _lastTransactionId;
 
     /// <summary>
-    /// When set, <see cref="UpdatePaymentAsync"/> throws this exception once, to simulate a database failure.
+    /// When set, <see cref="UpdatePaymentAsync"/> or <see cref="TryCompletePaymentAsync"/> throws this exception once,
+    /// to simulate a database failure.
     /// </summary>
     public Exception? FailNextPaymentUpdate { get; set; }
 
@@ -77,6 +78,28 @@ public sealed class InMemoryStorage : IStorage, IPaidPaymentLookup
         }
 
         return Task.CompletedTask;
+    }
+
+    public Task<bool> TryCompletePaymentAsync(long paymentId, bool isPaid, string? transactionCode, CancellationToken cancellationToken = default)
+    {
+        lock (_sync)
+        {
+            if (FailNextPaymentUpdate is { } failure)
+            {
+                FailNextPaymentUpdate = null;
+                throw failure;
+            }
+
+            var record = _payments.SingleOrDefault(p => p.Id == paymentId) ?? throw new InvalidOperationException($"No payment with id {paymentId}.");
+
+            if (record.IsPaid || (record.IsCompleted && !isPaid)) return Task.FromResult(false);
+
+            record.IsCompleted = true;
+            record.IsPaid = isPaid;
+            record.TransactionCode = transactionCode;
+
+            return Task.FromResult(true);
+        }
     }
 
     public Task DeletePaymentAsync(Payment payment, CancellationToken cancellationToken = default)
