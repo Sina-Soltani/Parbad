@@ -14,21 +14,21 @@ public class Payment
 
     public decimal Amount { get; set; }
 
-    public string Token { get; set; }
+    public string Token { get; set; } = null!;
 
     /// <summary>
     /// The transaction code shown to the customer (e.g. the RRN or the bank's tracking code).
     /// </summary>
-    public string TransactionCode { get; set; }
+    public string? TransactionCode { get; set; }
 
     /// <summary>
     /// The reference the bank verified for this payment. Within a gateway, one bank reference settles only one payment.
     /// </summary>
     public string? BankReference { get; set; }
 
-    public string GatewayName { get; set; }
+    public string GatewayName { get; set; } = null!;
 
-    public string GatewayAccountName { get; set; }
+    public string? GatewayAccountName { get; set; }
 
     /// <summary>
     /// The state of the payment.

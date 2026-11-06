@@ -57,10 +57,10 @@ internal static class AsanPardakhtHelper
         var result = PaymentRequestResult.SucceedWithPost(account.Name,
                                                           httpContext,
                                                           gatewayOptions.PaymentPageUrl,
-                                                          new Dictionary<string, string> { { "RefId", refId } });
+                                                          new Dictionary<string, string> { { "RefId", refId! } });
 
         // Stored to check later that the bank's record of the payment belongs to this request.
-        result.DatabaseAdditionalData.Add(RefIdDatabaseKey, refId);
+        result.DatabaseAdditionalData.Add(RefIdDatabaseKey, refId!);
 
         return result;
     }
@@ -69,7 +69,7 @@ internal static class AsanPardakhtHelper
     /// Checks the bank's record of the payment (TranResult). It is looked up by this invoice's own id, so it
     /// cannot belong to another invoice; the RefId and the amount are compared as well.
     /// </summary>
-    public static (bool IsSucceed, string Message, AsanPardakhtTransactionResult Result) CheckTransactionResult(AsanPardakhtResponse response,
+    public static (bool IsSucceed, string? Message, AsanPardakhtTransactionResult? Result) CheckTransactionResult(AsanPardakhtResponse response,
                                                                                                                 InvoiceContext context,
                                                                                                                 MessagesOptions messagesOptions)
     {
@@ -105,12 +105,12 @@ internal static class AsanPardakhtHelper
     public static PaymentVerifyResult CreateVerifyResult(AsanPardakhtTransactionResult transaction, MessagesOptions messagesOptions)
     {
         // The bank verifies the PayGateTranID; the RRN is shown to the customer.
-        var result = PaymentVerifyResult.Paid(transaction.Rrn, transaction.PayGateTranId, messagesOptions.PaymentSucceed) with
+        var result = PaymentVerifyResult.Paid(transaction.Rrn, transaction.PayGateTranId!, messagesOptions.PaymentSucceed) with
                      {
-                         BankReportedAmount = long.Parse(transaction.Amount, NumberStyles.Integer, CultureInfo.InvariantCulture)
+                         BankReportedAmount = long.Parse(transaction.Amount!, NumberStyles.Integer, CultureInfo.InvariantCulture)
                      };
 
-        result.DatabaseAdditionalData.Add(PayGateTranIdDatabaseKey, transaction.PayGateTranId);
+        result.DatabaseAdditionalData.Add(PayGateTranIdDatabaseKey, transaction.PayGateTranId!);
 
         if (!transaction.CardNumber.IsNullOrEmpty())
         {
@@ -123,12 +123,12 @@ internal static class AsanPardakhtHelper
     /// <summary>
     /// The RefId stored when this invoice was requested. Invoices requested before 3.12 (SOAP) stored none.
     /// </summary>
-    private static string GetIssuedRefId(InvoiceContext context)
+    private static string? GetIssuedRefId(InvoiceContext context)
     {
         var requestTransaction = context.Transactions?.SingleOrDefault(transaction => transaction.Type == TransactionType.Request);
 
         if (string.IsNullOrEmpty(requestTransaction?.AdditionalData)) return null;
 
-        return requestTransaction.ToDictionary().TryGetValue(RefIdDatabaseKey, out var refId) ? refId : null;
+        return requestTransaction!.ToDictionary().TryGetValue(RefIdDatabaseKey, out var refId) ? refId : null;
     }
 }

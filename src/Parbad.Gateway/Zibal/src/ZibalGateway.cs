@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
+using Parbad.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -60,14 +61,14 @@ public class ZibalGateway : GatewayBase<ZibalGatewayAccount>
                                    .PostJsonAsync(_gatewayOptions.ApiRequestUrl, data, DefaultSerializerSettings, cancellationToken)
                                    .ConfigureAwaitFalse();
 
-        return await ZibalHelper.CreateRequestResult(responseMessage, _httpContextAccessor.HttpContext, account, _gatewayOptions, _options.Messages);
+        return await ZibalHelper.CreateRequestResult(responseMessage, _httpContextAccessor.GetRequiredHttpContext(), account, _gatewayOptions, _options.Messages);
     }
 
     public override Task<IPaymentFetchResult> FetchAsync(InvoiceContext context, CancellationToken cancellationToken = default)
     {
         if (context == null) throw new ArgumentNullException(nameof(context));
 
-        return ZibalHelper.CreateFetchResult(_httpContextAccessor.HttpContext.Request,
+        return ZibalHelper.CreateFetchResult(_httpContextAccessor.GetRequiredHttpContext().Request,
                                              context,
                                              _options.Messages,
                                              cancellationToken);

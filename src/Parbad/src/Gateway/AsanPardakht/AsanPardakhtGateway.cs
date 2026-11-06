@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
+using Parbad.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Parbad.Abstraction;
@@ -66,7 +67,7 @@ public class AsanPardakhtGateway : GatewayBase<AsanPardakhtGatewayAccount>
 
         var response = await _api.GetTokenAsync(account, request, cancellationToken).ConfigureAwaitFalse();
 
-        return AsanPardakhtHelper.CreateRequestResult(response, account, _httpContextAccessor.HttpContext, _gatewayOptions, _messageOptions);
+        return AsanPardakhtHelper.CreateRequestResult(response, account, _httpContextAccessor.GetRequiredHttpContext(), _gatewayOptions, _messageOptions);
     }
 
     /// <inheritdoc />
@@ -114,7 +115,7 @@ public class AsanPardakhtGateway : GatewayBase<AsanPardakhtGatewayAccount>
             return PaymentVerifyResult.Failed(transaction.Message, response.Code);
         }
 
-        var payGateTranId = long.Parse(transaction.Result.PayGateTranId, NumberStyles.Integer, CultureInfo.InvariantCulture);
+        var payGateTranId = long.Parse(transaction.Result!.PayGateTranId!, NumberStyles.Integer, CultureInfo.InvariantCulture);
 
         // The transaction comes from TranResult for this invoice, so an "already verified" or "already settled"
         // answer (e.g. after a lost response) is about this invoice's own payment.

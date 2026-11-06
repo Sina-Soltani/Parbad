@@ -34,7 +34,7 @@ public interface IPaymentVerifyResult : IPaymentResult
     /// <summary>
     /// Gets the transaction code from the gateway.
     /// </summary>
-    string TransactionCode { get; }
+    string? TransactionCode { get; }
 
     /// <summary>
     /// Gets the status of the Verify operation.

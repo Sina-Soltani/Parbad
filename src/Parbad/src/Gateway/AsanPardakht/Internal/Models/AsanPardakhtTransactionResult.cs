@@ -11,25 +11,25 @@ namespace Parbad.Gateway.AsanPardakht.Internal.Models;
 internal class AsanPardakhtTransactionResult
 {
     [JsonProperty("cardNumber")]
-    public string CardNumber { get; set; }
+    public string? CardNumber { get; set; }
 
     [JsonProperty("rrn")]
-    public string Rrn { get; set; }
+    public string? Rrn { get; set; }
 
     /// <summary>The RefId (token) that the payment was started with.</summary>
     [JsonProperty("refID")]
-    public string RefId { get; set; }
+    public string? RefId { get; set; }
 
     /// <summary>The amount in rials.</summary>
     [JsonProperty("amount")]
-    public string Amount { get; set; }
+    public string? Amount { get; set; }
 
     [JsonProperty("payGateTranID")]
-    public string PayGateTranId { get; set; }
+    public string? PayGateTranId { get; set; }
 
     [JsonProperty("salesOrderID")]
-    public string SalesOrderId { get; set; }
+    public string? SalesOrderId { get; set; }
 
     [JsonProperty("serviceStatusCode")]
-    public string ServiceStatusCode { get; set; }
+    public string? ServiceStatusCode { get; set; }
 }

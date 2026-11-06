@@ -2,7 +2,7 @@
 
 public class ParsianGatewayAdditionalDataRequest
 {
-    public string AdditionalData { get; set; }
+    public string? AdditionalData { get; set; }
 
-    public string Originator { get; set; }
+    public string? Originator { get; set; }
 }

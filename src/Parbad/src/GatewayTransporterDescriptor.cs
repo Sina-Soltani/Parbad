@@ -12,9 +12,9 @@ public class GatewayTransporterDescriptor
 {
     public TransportType Type { get; set; }
 
-    public string Url { get; set; }
+    public string Url { get; set; } = null!;
 
-    public IEnumerable<KeyValuePair<string, string>> Form { get; set; }
+    public IEnumerable<KeyValuePair<string, string>>? Form { get; set; }
 
     public static GatewayTransporterDescriptor CreateRedirect(string url)
     {

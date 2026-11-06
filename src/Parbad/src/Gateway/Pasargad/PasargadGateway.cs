@@ -1,6 +1,7 @@
 // Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
+using Parbad.Http;
 using System;
 using System.Globalization;
 using System.Linq;
@@ -74,7 +75,7 @@ public class PasargadGateway : GatewayBase<PasargadGatewayAccount>
                                                               PayerMail = additionalData?.PayerMail,
                                                               MobileNumber = additionalData?.MobileNumber
                                                           },
-                                                          tokenResponse.Token,
+                                                          tokenResponse.Token!,
                                                           cancellationToken)
                                          .ConfigureAwaitFalse();
 
@@ -83,8 +84,13 @@ public class PasargadGateway : GatewayBase<PasargadGatewayAccount>
             return PaymentRequestResult.Failed(response.ResultMsg, account.Name, response.ResultCode.ToString());
         }
 
+        if (response.Data?.Url == null || response.Data.UrlId == null)
+        {
+            return PaymentRequestResult.Failed(_messageOptions.InvalidDataReceivedFromGateway, account.Name, response.ResultCode.ToString());
+        }
+
         var result = PaymentRequestResult.SucceedWithRedirect(account.Name,
-                                                              _httpContextAccessor.HttpContext,
+                                                              _httpContextAccessor.GetRequiredHttpContext(),
                                                               response.Data.Url);
 
         result.DatabaseAdditionalData.Add(UrlIdName, response.Data.UrlId);
@@ -97,7 +103,7 @@ public class PasargadGateway : GatewayBase<PasargadGatewayAccount>
     {
         if (context == null) throw new ArgumentNullException(nameof(context));
 
-        var callbackResult = await PasargadHelper.BindCallbackResultModel(_httpContextAccessor.HttpContext.Request,
+        var callbackResult = await PasargadHelper.BindCallbackResultModel(_httpContextAccessor.GetRequiredHttpContext().Request,
                                                                           cancellationToken)
                                                  .ConfigureAwaitFalse();
 
@@ -114,7 +120,7 @@ public class PasargadGateway : GatewayBase<PasargadGatewayAccount>
     {
         if (context == null) throw new ArgumentNullException(nameof(context));
 
-        var callbackResult = await PasargadHelper.BindCallbackResultModel(_httpContextAccessor.HttpContext.Request,
+        var callbackResult = await PasargadHelper.BindCallbackResultModel(_httpContextAccessor.GetRequiredHttpContext().Request,
                                                                           cancellationToken)
                                                  .ConfigureAwaitFalse();
 
@@ -146,7 +152,7 @@ public class PasargadGateway : GatewayBase<PasargadGatewayAccount>
                                                             Invoice = context.Payment.TrackingNumber.ToString(),
                                                             UrlId = urlId
                                                         },
-                                                        tokenResponse.Token,
+                                                        tokenResponse.Token!,
                                                         cancellationToken)
                                          .ConfigureAwaitFalse();
 
@@ -158,7 +164,7 @@ public class PasargadGateway : GatewayBase<PasargadGatewayAccount>
         }
 
         // The bank verifies this invoice with the UrlId stored at request time; the reference number is shown to the customer.
-        return PaymentVerifyResult.Paid(callbackResult.ReferenceNumber, urlId, _messageOptions.PaymentSucceed);
+        return PaymentVerifyResult.Paid(callbackResult.ReferenceNumber, urlId ?? callbackResult.ReferenceNumber ?? string.Empty, _messageOptions.PaymentSucceed);
     }
 
     /// <inheritdoc />
@@ -192,7 +198,7 @@ public class PasargadGateway : GatewayBase<PasargadGatewayAccount>
                                                             Invoice = context.Payment.TrackingNumber.ToString(),
                                                             UrlId = urlId
                                                         },
-                                                        tokenResponse.Token,
+                                                        tokenResponse.Token!,
                                                         cancellationToken)
                                          .ConfigureAwaitFalse();
 
@@ -214,7 +220,7 @@ public class PasargadGateway : GatewayBase<PasargadGatewayAccount>
                                      cancellationToken);
     }
 
-    private static string GetUrlIdFromRequestTransaction(InvoiceContext context)
+    private static string? GetUrlIdFromRequestTransaction(InvoiceContext context)
     {
         var transactionRecord = context.Transactions.SingleOrDefault(transaction => transaction.Type == TransactionType.Request);
 

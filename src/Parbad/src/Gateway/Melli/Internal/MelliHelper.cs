@@ -74,7 +74,7 @@ internal static class MelliHelper
         var requestResult = PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, paymentPageUrl);
 
         // Stored so that the callback can be bound to this invoice (see CreateCallbackResultAsync).
-        requestResult.DatabaseAdditionalData.Add(TokenDatabaseKey, result.Token);
+        requestResult.DatabaseAdditionalData.Add(TokenDatabaseKey, result.Token!);
 
         return requestResult;
     }
@@ -104,7 +104,7 @@ internal static class MelliHelper
         // The order id comes from the browser, so it proves nothing on its own; the token is what the bank
         // verifies, so it must be the one issued for this invoice.
         if (!apiOrderId.Exists || apiOrderId.Value != context.Payment.TrackingNumber ||
-            !IsTokenIssuedForThisInvoice(apiToken.Value, context))
+            !IsTokenIssuedForThisInvoice(apiToken.Value.ToString(), context))
         {
             return new MelliCallbackResult
                    {
@@ -114,9 +114,9 @@ internal static class MelliHelper
                    };
         }
 
-        var signedData = crypto.Encrypt(account.TerminalKey, apiToken.Value);
+        var signedData = crypto.Encrypt(account.TerminalKey, apiToken.Value.ToString());
 
-        var dataToVerify = CreateVerifyObject(apiToken.Value, signedData);
+        var dataToVerify = CreateVerifyObject(apiToken.Value.ToString(), signedData);
 
         return new MelliCallbackResult
                {
@@ -198,7 +198,7 @@ internal static class MelliHelper
         var requestTransaction = context.Transactions?.SingleOrDefault(transaction => transaction.Type == TransactionType.Request);
 
         if (string.IsNullOrEmpty(requestTransaction?.AdditionalData) ||
-            !requestTransaction.ToDictionary().TryGetValue(TokenDatabaseKey, out var issuedToken))
+            !requestTransaction!.ToDictionary().TryGetValue(TokenDatabaseKey, out var issuedToken))
         {
             return true;
         }

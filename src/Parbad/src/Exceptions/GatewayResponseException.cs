@@ -20,7 +20,7 @@ public class GatewayResponseException : HttpRequestException
     /// <summary>
     /// Initializes an instance of <see cref="GatewayResponseException"/>.
     /// </summary>
-    public GatewayResponseException(HttpStatusCode statusCode, string contentType, string reason)
+    public GatewayResponseException(HttpStatusCode statusCode, string? contentType, string reason)
         : base($"The gateway returned a response that cannot be read ({reason}). HTTP status: {(int)statusCode} {statusCode}. Content type: {contentType ?? "none"}.")
     {
         ResponseStatusCode = statusCode;
@@ -35,5 +35,5 @@ public class GatewayResponseException : HttpRequestException
     /// <summary>
     /// The content type of the response, if any.
     /// </summary>
-    public string ContentType { get; }
+    public string? ContentType { get; }
 }

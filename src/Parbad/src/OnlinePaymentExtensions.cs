@@ -182,7 +182,7 @@ public static class OnlinePaymentExtensions
     public static IPaymentCancelResult Cancel(
         this IOnlinePayment onlinePayment,
         long trackingNumber,
-        string cancellationReason = null)
+        string? cancellationReason = null)
         => onlinePayment.CancelAsync(trackingNumber, cancellationReason).GetAwaiter().GetResult();
 
     /// <summary>
@@ -196,7 +196,7 @@ public static class OnlinePaymentExtensions
     public static Task<IPaymentCancelResult> CancelAsync(
         this IOnlinePayment onlinePayment,
         IPaymentFetchResult invoice,
-        string cancellationReason = null,
+        string? cancellationReason = null,
         CancellationToken cancellationToken = default)
     {
         if (invoice == null) throw new ArgumentNullException(nameof(invoice));
@@ -214,7 +214,7 @@ public static class OnlinePaymentExtensions
     public static IPaymentCancelResult Cancel(
         this IOnlinePayment onlinePayment,
         IPaymentFetchResult invoice,
-        string cancellationReason = null)
+        string? cancellationReason = null)
     {
         if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 

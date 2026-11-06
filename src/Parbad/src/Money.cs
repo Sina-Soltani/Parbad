@@ -53,7 +53,7 @@ public readonly struct Money : IComparable<Money>, IEquatable<Money>, IEquatable
     public bool Equals(decimal? other) => other.HasValue && Equals(other.Value);
     public bool Equals(decimal other) => Value == other;
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         var equals =
             (obj is Money other && Equals(other)) ||

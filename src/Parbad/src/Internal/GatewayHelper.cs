@@ -59,7 +59,7 @@ internal static class GatewayHelper
 
         if (gatewayType.HasAttribute<GatewayAttribute>())
         {
-            return gatewayType.GetCustomAttribute<GatewayAttribute>().Name;
+            return gatewayType.GetCustomAttribute<GatewayAttribute>()!.Name;
         }
 
         var gatewayName = GetCompleteGatewayName(gatewayType).ToggleStringAtEnd("Gateway", false);

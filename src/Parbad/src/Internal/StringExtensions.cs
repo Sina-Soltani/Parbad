@@ -2,13 +2,14 @@
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Primitives;
 
 namespace Parbad.Internal;
 
 public static class StringExtensions
 {
-    public static bool IsNullOrEmpty(this string value)
+    public static bool IsNullOrEmpty([NotNullWhen(false)] this string? value)
     {
         return string.IsNullOrEmpty(value);
     }
@@ -18,12 +19,12 @@ public static class StringExtensions
         return StringValues.IsNullOrEmpty(value);
     }
 
-    public static bool IsNullOrWhiteSpace(this string value)
+    public static bool IsNullOrWhiteSpace([NotNullWhen(false)] this string? value)
     {
         return string.IsNullOrWhiteSpace(value);
     }
 
-    public static bool Equals(this StringValues value, string other, StringComparison comparisonType)
+    public static bool Equals(this StringValues value, string? other, StringComparison comparisonType)
     {
         return string.Equals(value, other, comparisonType);
     }

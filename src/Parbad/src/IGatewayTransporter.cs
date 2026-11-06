@@ -14,7 +14,7 @@ public interface IGatewayTransporter
     /// <summary>
     /// Describes a gateway transporter.
     /// </summary>
-    GatewayTransporterDescriptor Descriptor { get; }
+    GatewayTransporterDescriptor? Descriptor { get; }
 
     /// <summary>
     /// Transports the client to the specified gateway.

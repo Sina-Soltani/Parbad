@@ -7,7 +7,7 @@ namespace Parbad.Gateway.Saman;
 
 public class SamanGatewayAccount : GatewayAccount
 {
-    public string TerminalId { get; set; }
+    public string TerminalId { get; set; } = null!;
 
-    public string Password { get; set; }
+    public string Password { get; set; } = null!;
 }

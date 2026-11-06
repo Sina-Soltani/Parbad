@@ -16,7 +16,7 @@ internal static class RsaHelper
         var xmlDoc = new XmlDocument();
         xmlDoc.LoadXml(xmlString);
 
-        if (!xmlDoc.DocumentElement.Name.Equals("RSAKeyValue"))
+        if (xmlDoc.DocumentElement?.Name != "RSAKeyValue")
         {
             throw new Exception("Invalid XML RSA key.");
         }

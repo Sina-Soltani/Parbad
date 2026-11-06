@@ -59,7 +59,7 @@ internal static class SamanHelper
         {
             var form = new Dictionary<string, string>
                        {
-                           { "Token", tokenResponse.Token },
+                           { "Token", tokenResponse.Token ?? string.Empty },
                            { "GetMethod", "false" }
                        };
 
@@ -180,7 +180,7 @@ internal static class SamanHelper
                          IsAlreadyVerifiedAtBank = isThisTransaction && verificationResponse.ResultCode == VerificationAlreadyVerifiedCode
                      };
 
-        result.DatabaseAdditionalData.Add(RefNumKey, callbackResponse.RefNum);
+        result.DatabaseAdditionalData.Add(RefNumKey, callbackResponse.RefNum ?? string.Empty);
 
         result.AddSamanAdditionalData(MapToAdditionalData(callbackResponse));
 
@@ -192,7 +192,7 @@ internal static class SamanHelper
         var verificationTransaction = context.Transactions.LastOrDefault(transaction => transaction.Type == TransactionType.Verify && transaction.IsSucceed);
 
         if (string.IsNullOrEmpty(verificationTransaction?.AdditionalData) ||
-            !verificationTransaction.ToDictionary().ContainsKey(RefNumKey))
+            !verificationTransaction!.ToDictionary().ContainsKey(RefNumKey))
         {
             throw new
                 InvalidOperationException($"No Transaction of type Verification or additional data found for reversing the invoice {context.Payment.TrackingNumber}.");
@@ -201,7 +201,7 @@ internal static class SamanHelper
         return new()
                {
                    TerminalNumber = account.TerminalId,
-                   RefNum = verificationTransaction.ToDictionary()[RefNumKey]
+                   RefNum = verificationTransaction!.ToDictionary()[RefNumKey]
                };
     }
 

@@ -45,7 +45,7 @@ public class Invoice
     /// <summary>
     /// Gets or sets the name of the gateway which the invoice must be paid in.
     /// </summary>
-    public string GatewayName { get; set; }
+    public string GatewayName { get; set; } = null!;
 
     /// <summary>
     /// Gets or sets the properties of the invoice.

@@ -7,7 +7,7 @@ namespace Parbad.Gateway.Saman.Internal.ResultTranslators;
 
 internal static class SamanResultTranslator
 {
-    public static string Translate(string result, MessagesOptions options)
+    public static string Translate(string? result, MessagesOptions options)
     {
         return result switch
         {

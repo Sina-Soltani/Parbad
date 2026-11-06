@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
+using Parbad.Http;
 using System;
 using System.Net.Http;
 using System.Text;
@@ -68,7 +69,7 @@ public class ZarinPalGateway : GatewayBase<ZarinPalGatewayAccount>
             return PaymentRequestResult.Failed(response.ErrorMessage, account.Name, response.ErrorCode?.ToString());
         }
 
-        var result = ZarinPalHelper.CreateRequestResult(response.Data, _httpContextAccessor.HttpContext, account, _gatewayOptions, _messagesOptions);
+        var result = ZarinPalHelper.CreateRequestResult(response.Data, _httpContextAccessor.GetRequiredHttpContext(), account, _gatewayOptions, _messagesOptions);
 
         return result;
     }
@@ -77,7 +78,7 @@ public class ZarinPalGateway : GatewayBase<ZarinPalGatewayAccount>
     {
         if (context == null) throw new ArgumentNullException(nameof(context));
 
-        var callbackResult = await ZarinPalHelper.CreateCallbackResultAsync(_httpContextAccessor.HttpContext.Request,
+        var callbackResult = await ZarinPalHelper.CreateCallbackResultAsync(_httpContextAccessor.GetRequiredHttpContext().Request,
                                                                             _messagesOptions,
                                                                             cancellationToken);
 
@@ -100,7 +101,7 @@ public class ZarinPalGateway : GatewayBase<ZarinPalGatewayAccount>
     {
         if (context == null) throw new ArgumentNullException(nameof(context));
 
-        var callbackResult = await ZarinPalHelper.CreateCallbackResultAsync(_httpContextAccessor.HttpContext.Request,
+        var callbackResult = await ZarinPalHelper.CreateCallbackResultAsync(_httpContextAccessor.GetRequiredHttpContext().Request,
                                                                             _messagesOptions,
                                                                             cancellationToken);
 

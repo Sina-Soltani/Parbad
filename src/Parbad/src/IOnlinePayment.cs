@@ -64,7 +64,7 @@ public interface IOnlinePayment
     /// <param name="cancellationReason">The reason for canceling the operation. It will be saved in Message field in database.</param>
     /// <param name="cancellationToken"></param>
     /// <exception cref="InvoiceNotFoundException"></exception>
-    Task<IPaymentCancelResult> CancelAsync(long trackingNumber, string cancellationReason = null, CancellationToken cancellationToken = default);
+    Task<IPaymentCancelResult> CancelAsync(long trackingNumber, string? cancellationReason = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Performs a refund request for the given invoice.

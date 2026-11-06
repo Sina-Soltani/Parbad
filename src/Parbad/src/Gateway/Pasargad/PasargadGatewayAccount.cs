@@ -7,9 +7,9 @@ namespace Parbad.Gateway.Pasargad;
 
 public class PasargadGatewayAccount : GatewayAccount
 {
-    public string TerminalNumber { get; set; }
+    public string TerminalNumber { get; set; } = null!;
 
-    public string Username { get; set; }
+    public string Username { get; set; } = null!;
 
-    public string Password { get; set; }
+    public string Password { get; set; } = null!;
 }

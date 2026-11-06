@@ -25,7 +25,7 @@ internal class ParbadVirtualGatewayMiddlewareInvoker : IParbadVirtualGatewayMidd
                                                  IOptions<ParbadVirtualGatewayOptions> virtualGatewayOptions,
                                                  IOptions<ParbadOptions> options)
     {
-        _httpContext = httpContextAccessor.HttpContext;
+        _httpContext = httpContextAccessor.HttpContext ?? throw new InvalidOperationException("The virtual gateway runs inside an HTTP request.");
         _virtualGatewayOptions = virtualGatewayOptions.Value;
         _options = options.Value;
     }
@@ -147,7 +147,7 @@ internal class ParbadVirtualGatewayMiddlewareInvoker : IParbadVirtualGatewayMidd
         await httpContext.Response.WriteAsync(html);
     }
 
-    private static async Task<VirtualGatewayCommandDetails> GetCommandDetails(HttpContext httpContext)
+    private static async Task<VirtualGatewayCommandDetails?> GetCommandDetails(HttpContext httpContext)
     {
         if (!httpContext.Request.HasFormContentType)
         {
@@ -163,12 +163,12 @@ internal class ParbadVirtualGatewayMiddlewareInvoker : IParbadVirtualGatewayMidd
 
         if (!long.TryParse(form["trackingNumber"], NumberStyles.Integer, CultureInfo.InvariantCulture, out var trackingNumber) ||
             !form.TryGetValue("redirectUrl", out var redirectUrl) ||
-            !Money.TryParse(form["amount"], out var amount))
+            !Money.TryParse(form["amount"].ToString(), out var amount))
         {
             return null;
         }
 
-        return new VirtualGatewayCommandDetails(commandType, trackingNumber, amount, redirectUrl);
+        return new VirtualGatewayCommandDetails(commandType, trackingNumber, amount, redirectUrl.ToString());
     }
 
     private static Task<string> GetTemplate(string templateName)
@@ -176,7 +176,8 @@ internal class ParbadVirtualGatewayMiddlewareInvoker : IParbadVirtualGatewayMidd
         using var stream = typeof(ParbadVirtualGatewayOptions)
                           .GetTypeInfo()
                           .Assembly
-                          .GetManifestResourceStream($"Parbad.Gateway.ParbadVirtual.{templateName}");
+                          .GetManifestResourceStream($"Parbad.Gateway.ParbadVirtual.{templateName}") ??
+                           throw new InvalidOperationException($"The virtual gateway template {templateName} is missing.");
 
         var streamReader = new StreamReader(stream, Encoding.UTF8);
 
@@ -185,14 +186,14 @@ internal class ParbadVirtualGatewayMiddlewareInvoker : IParbadVirtualGatewayMidd
 
     private string GetNonceProp()
     {
-        string nonceValue = null;
+        string? nonceValue = null;
 
         if (_options.NonceFactory != null)
         {
             nonceValue = _options.NonceFactory(_httpContext);
         }
 
-        return string.IsNullOrWhiteSpace(nonceValue) ? null : $" nonce=\"{Encode(nonceValue)}\"";
+        return string.IsNullOrWhiteSpace(nonceValue) ? string.Empty : $" nonce=\"{Encode(nonceValue!)}\"";
     }
 
     private static bool IsAbsoluteHttpUrl(string url)

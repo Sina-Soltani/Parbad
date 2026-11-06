@@ -17,7 +17,7 @@ namespace Parbad;
 /// </summary>
 public static class StaticOnlinePayment
 {
-    private static IOnlinePaymentAccessor _parbadAccessor;
+    private static IOnlinePaymentAccessor? _parbadAccessor;
 
     /// <summary>
     /// Creates an <see cref="OnlinePaymentScope"/> for one operation, e.g. one web request. It owns the services of

@@ -7,5 +7,5 @@ namespace Parbad.Gateway.Parsian;
 
 public class ParsianGatewayAccount : GatewayAccount
 {
-    public string LoginAccount { get; set; }
+    public string LoginAccount { get; set; } = null!;
 }

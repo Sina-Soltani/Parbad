@@ -16,9 +16,9 @@ public class Transaction
 
     public bool IsSucceed { get; set; }
 
-    public string Message { get; set; }
+    public string? Message { get; set; }
 
-    public string AdditionalData { get; set; }
+    public string? AdditionalData { get; set; }
 
     public long PaymentId { get; set; }
 }

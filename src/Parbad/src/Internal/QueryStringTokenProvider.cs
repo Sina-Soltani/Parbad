@@ -1,6 +1,7 @@
 // Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
+using Microsoft.Extensions.Primitives;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -39,13 +40,13 @@ public abstract class QueryStringTokenProvider : IPaymentTokenProvider
         return token;
     }
 
-    public virtual Task<string> RetrieveTokenAsync(CancellationToken cancellationToken = default)
+    public virtual Task<string?> RetrieveTokenAsync(CancellationToken cancellationToken = default)
     {
-        _httpContextAccessor.HttpContext.Request.Query.TryGetValue(
-                                                                   GetQueryName(),
-                                                                   out var paymentToken);
+        StringValues paymentToken = default;
 
-        return Task.FromResult<string>(paymentToken);
+        _httpContextAccessor.HttpContext?.Request.Query.TryGetValue(GetQueryName(), out paymentToken);
+
+        return Task.FromResult<string?>(paymentToken.IsNullOrEmpty() ? null : paymentToken.ToString());
     }
 
     protected abstract Task<string> GenerateTokenAsync(Invoice invoice, CancellationToken cancellationToken = default);

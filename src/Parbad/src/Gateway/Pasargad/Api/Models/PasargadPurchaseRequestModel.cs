@@ -8,23 +8,23 @@ public class PasargadPurchaseRequestModel
     /// <summary>
     /// شماره ترمینال پرداختی
     /// </summary>
-    public string TerminalNumber { get; set; }
+    public string? TerminalNumber { get; set; }
 
     /// <summary>
     /// شماره فاکتور یکتا
     /// </summary>
-    public string Invoice { get; set; }
+    public string? Invoice { get; set; }
 
     /// <summary>
     /// آدرسی که پس از عملیات پرداخت، کاربر به آن صفحه منتقل می شود
     /// باید دامنه کالبک هنگام ثبت نام در دیتابیس تعریف شده باشد.
     /// </summary>
-    public string CallbackApi { get; set; }
+    public string? CallbackApi { get; set; }
 
     /// <summary>
     /// تاریخ فاکتور به فرمت دلخواه
     /// </summary>
-    public string InvoiceDate { get; set; }
+    public string? InvoiceDate { get; set; }
 
     /// <summary>
     /// مبلغ به ریال
@@ -44,30 +44,30 @@ public class PasargadPurchaseRequestModel
     /// <summary>
     /// تلفن همراه پرداخت کننده
     /// </summary>
-    public string MobileNumber { get; set; }
+    public string? MobileNumber { get; set; }
 
     /// <summary>
     /// توضیحات
     /// </summary>
-    public string Description { get; set; }
+    public string? Description { get; set; }
 
     /// <summary>
     /// ایمیل پرداخت کننده
     /// </summary>
-    public string PayerMail { get; set; }
+    public string? PayerMail { get; set; }
 
     /// <summary>
     /// نام پرداخت کننده
     /// </summary>
-    public string PayerName { get; set; }
+    public string? PayerName { get; set; }
 
     /// <summary>
     /// کدملی
     /// </summary>
-    public string NationalCode { get; set; }
+    public string? NationalCode { get; set; }
 
     /// <summary>
     /// شماره کارت ها
     /// </summary>
-    public string Pans { get; set; }
+    public string? Pans { get; set; }
 }

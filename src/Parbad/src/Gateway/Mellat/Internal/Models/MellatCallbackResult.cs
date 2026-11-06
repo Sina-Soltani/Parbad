@@ -7,9 +7,9 @@ internal class MellatCallbackResult
 {
     public bool IsSucceed { get; set; }
 
-    public string RefId { get; set; }
+    public string? RefId { get; set; }
 
-    public string SaleReferenceId { get; set; }
+    public string? SaleReferenceId { get; set; }
 
-    public string Message { get; set; }
+    public string? Message { get; set; }
 }
