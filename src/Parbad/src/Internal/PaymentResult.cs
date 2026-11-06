@@ -6,7 +6,11 @@ using System.Collections.Generic;
 namespace Parbad.Internal;
 
 /// <inheritdoc />
-public class PaymentResult : IPaymentResult
+/// <remarks>
+/// Results cannot be changed after they are created. Gateways create them with the factory methods or an object
+/// initializer; a copy with other values is made with <c>result with { ... }</c>.
+/// </remarks>
+public record PaymentResult : IPaymentResult
 {
     /// <summary>
     /// Initializes an instance of <see cref="PaymentResult"/>.
@@ -18,28 +22,28 @@ public class PaymentResult : IPaymentResult
     }
 
     /// <inheritdoc />
-    public long TrackingNumber { get; set; }
+    public long TrackingNumber { get; init; }
 
     /// <inheritdoc />
-    public Money Amount { get; set; }
+    public Money Amount { get; init; }
 
     /// <inheritdoc />
-    public virtual bool IsSucceed { get; set; }
+    public virtual bool IsSucceed { get; init; }
 
     /// <inheritdoc />
-    public string GatewayName { get; set; }
+    public string GatewayName { get; init; }
 
     /// <inheritdoc />
-    public string GatewayAccountName { get; set; }
+    public string GatewayAccountName { get; init; }
 
     /// <inheritdoc />
-    public string GatewayResponseCode { get; set; }
+    public string GatewayResponseCode { get; init; }
 
     /// <inheritdoc />
-    public string Message { get; set; }
+    public string Message { get; init; }
 
     /// <inheritdoc />
-    public IDictionary<string, object> AdditionalData { get; protected set; }
+    public IDictionary<string, object> AdditionalData { get; init; }
 
-    public IDictionary<string, string> DatabaseAdditionalData { get; protected set; }
+    public IDictionary<string, string> DatabaseAdditionalData { get; init; }
 }

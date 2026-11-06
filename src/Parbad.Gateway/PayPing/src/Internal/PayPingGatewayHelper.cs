@@ -126,13 +126,13 @@ internal static class PayPingGatewayHelper
 
         var paymentRefId = responseModel.PaymentRefId ?? callbackResult.PaymentRefId;
 
-        var result = PaymentVerifyResult.Succeed(paymentRefId.ToString(CultureInfo.InvariantCulture), messagesOptions.PaymentSucceed);
+        var reference = paymentRefId.ToString(CultureInfo.InvariantCulture);
 
-        if (responseModel.Amount != null) result.BankReportedAmount = responseModel.Amount.Value;
-
-        if (!string.IsNullOrEmpty(responseModel.ClientRefId)) result.BankReportedOrderId = responseModel.ClientRefId;
-
-        return result;
+        return PaymentVerifyResult.Paid(reference, reference, messagesOptions.PaymentSucceed) with
+               {
+                   BankReportedAmount = responseModel.Amount,
+                   BankReportedOrderId = string.IsNullOrEmpty(responseModel.ClientRefId) ? null : responseModel.ClientRefId
+               };
     }
 
     /// <summary>

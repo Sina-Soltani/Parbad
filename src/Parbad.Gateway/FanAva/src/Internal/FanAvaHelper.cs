@@ -189,7 +189,7 @@ internal static class FanAvaHelper
             return PaymentVerifyResult.Failed(messagesOptions.PaymentFailed, verifyResult?.Result);
         }
 
-        var result = PaymentVerifyResult.Succeed(callbackResult.InvoiceNumber, messagesOptions.PaymentSucceed, verifyResult.Result);
+        var result = PaymentVerifyResult.Paid(callbackResult.InvoiceNumber, callbackResult.InvoiceNumber, messagesOptions.PaymentSucceed, verifyResult.Result);
 
         // A refund may run long after the callback (e.g. from an admin action), so it reads them from here.
         result.DatabaseAdditionalData.Add(TokenDatabaseKey, callbackResult.CallbackCheckData.Token);

@@ -201,6 +201,7 @@ internal static class MellatHelper
                {
                    Status = isSuccess ? PaymentVerifyResultStatus.Succeed : PaymentVerifyResultStatus.Failed,
                    TransactionCode = callbackResult.SaleReferenceId,
+                   BankReference = callbackResult.SaleReferenceId,
                    Message = message
                };
     }

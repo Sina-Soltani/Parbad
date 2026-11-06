@@ -114,6 +114,6 @@ internal static class YekPayHelper
             return PaymentVerifyResult.Failed(failureMessage);
         }
 
-        return PaymentVerifyResult.Succeed(response.Reference, optionsMessages.PaymentSucceed);
+        return PaymentVerifyResult.Paid(response.Reference, response.Reference, optionsMessages.PaymentSucceed);
     }
 }

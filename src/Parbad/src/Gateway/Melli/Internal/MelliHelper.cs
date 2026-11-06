@@ -160,6 +160,8 @@ internal static class MelliHelper
                {
                    Status = status,
                    TransactionCode = result.RetrivalRefNo,
+                   // The verification is bound to the token stored for this invoice; the RRN identifies the payment.
+                   BankReference = result.RetrivalRefNo,
                    Message = message
                };
     }

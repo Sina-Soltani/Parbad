@@ -15,7 +15,7 @@ public static class AdditionalDataConverter
         return JsonConvert.DeserializeObject<IDictionary<string, string>>(transaction.AdditionalData);
     }
 
-    internal static string ToJson(PaymentResult paymentResult)
+    internal static string ToJson(IPaymentResult paymentResult)
     {
         if (paymentResult == null) throw new ArgumentNullException(nameof(paymentResult));
 

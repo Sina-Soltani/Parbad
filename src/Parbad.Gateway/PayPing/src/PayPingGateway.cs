@@ -171,12 +171,10 @@ public class PayPingGateway : GatewayBase<PayPingGatewayAccount>
                 result = PaymentVerifyResult.Failed(problem.Message);
             }
 
-            result.GatewayResponseCode = problem.Code?.ToString(CultureInfo.InvariantCulture);
+            result = result with { GatewayResponseCode = problem.Code?.ToString(CultureInfo.InvariantCulture) };
         }
 
-        result.GatewayAccountName = account.Name;
-
-        return result;
+        return result with { GatewayAccountName = account.Name };
     }
 
     /// <inheritdoc />

@@ -34,8 +34,8 @@ public sealed class FakeGatewayBehaviour
     public Func<Task> BeforeVerify { get; set; } = () => Task.CompletedTask;
 
     /// <summary>Builds the verify result from the invoice. By default the payment succeeds with <see cref="FakeGateway.TransactionCode"/>.</summary>
-    public Func<InvoiceContext, PaymentVerifyResult> VerifyResult { get; set; } =
-        _ => PaymentVerifyResult.Succeed(FakeGateway.TransactionCode, "Paid.");
+    public Func<InvoiceContext, IPaymentVerifyResult> VerifyResult { get; set; } =
+        _ => PaymentVerifyResult.Paid(FakeGateway.TransactionCode, FakeGateway.TransactionCode, "Paid.");
 
     public int VerifyCalls => _verifyCalls;
 

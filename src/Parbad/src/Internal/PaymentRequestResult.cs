@@ -6,13 +6,13 @@ using System.Collections.Generic;
 
 namespace Parbad.Internal;
 
-public class PaymentRequestResult : PaymentResult, IPaymentRequestResult
+public record PaymentRequestResult : PaymentResult, IPaymentRequestResult
 {
     /// <inheritdoc />
-    public PaymentRequestResultStatus Status { get; set; }
+    public PaymentRequestResultStatus Status { get; init; }
 
     /// <inheritdoc />
-    public IGatewayTransporter GatewayTransporter { get; set; }
+    public IGatewayTransporter GatewayTransporter { get; init; }
 
     public override bool IsSucceed => Status == PaymentRequestResultStatus.Succeed;
 

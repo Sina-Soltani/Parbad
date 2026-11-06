@@ -11,6 +11,7 @@ using Parbad.PaymentTokenProviders;
 using Parbad.Storage.Abstractions;
 using Parbad.Storage.Abstractions.Models;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -109,29 +110,40 @@ public class DefaultOnlinePayment : IOnlinePayment
 
         await _storage.CreatePaymentAsync(newPayment, cancellationToken).ConfigureAwaitFalse();
 
-        PaymentRequestResult requestResult;
+        IPaymentRequestResult gatewayResult;
 
         try
         {
-            requestResult = await gateway
+            gatewayResult = await gateway
                                  .RequestAsync(invoice, cancellationToken)
-                                 .ConfigureAwaitFalse() as PaymentRequestResult;
+                                 .ConfigureAwaitFalse();
 
-            if (requestResult == null) throw new Exception($"Requesting the invoice {invoice.TrackingNumber} is finished. The gateway {gateway.GetCompleteGatewayName()} returns null instead of a result.");
+            if (gatewayResult == null) throw new Exception($"Requesting the invoice {invoice.TrackingNumber} is finished. The gateway {gateway.GetCompleteGatewayName()} returns null instead of a result.");
         }
         catch (Exception exception)
         {
             _logger.LogError(exception, exception.Message);
 
-            requestResult = PaymentRequestResult.Failed(exception.Message);
+            gatewayResult = PaymentRequestResult.Failed(exception.Message);
         }
+
+        // Parbad's own result, so a gateway may return any implementation of the interface.
+        var requestResult = new PaymentRequestResult
+                            {
+                                TrackingNumber = invoice.TrackingNumber,
+                                Amount = invoice.Amount,
+                                GatewayName = gateway.GetRoutingGatewayName(),
+                                GatewayAccountName = gatewayResult.GatewayAccountName,
+                                Status = gatewayResult.Status,
+                                GatewayTransporter = gatewayResult.GatewayTransporter ?? new NullGatewayTransporter(),
+                                GatewayResponseCode = gatewayResult.GatewayResponseCode,
+                                Message = gatewayResult.Message,
+                                AdditionalData = gatewayResult.AdditionalData ?? new Dictionary<string, object>(),
+                                DatabaseAdditionalData = gatewayResult.DatabaseAdditionalData ?? new Dictionary<string, string>()
+                            };
 
         // A rejected request is final: the user never reaches the bank, so there is nothing to verify.
         if (!requestResult.IsSucceed) newPayment.Status = PaymentStatus.Failed;
-
-        requestResult.TrackingNumber = invoice.TrackingNumber;
-        requestResult.Amount = invoice.Amount;
-        requestResult.GatewayName = gateway.GetRoutingGatewayName();
 
         newPayment.GatewayAccountName = requestResult.GatewayAccountName;
 
@@ -246,13 +258,13 @@ public class DefaultOnlinePayment : IOnlinePayment
         var transactions = await _storage.GetTransactionsAsync(payment, cancellationToken).ConfigureAwaitFalse();
         var invoiceContext = new InvoiceContext(payment, transactions);
 
-        PaymentVerifyResult verifyResult;
+        IPaymentVerifyResult gatewayResult;
 
         try
         {
-            verifyResult = await gateway
-                                .VerifyAsync(invoiceContext, cancellationToken)
-                                .ConfigureAwaitFalse() as PaymentVerifyResult;
+            gatewayResult = await gateway
+                                 .VerifyAsync(invoiceContext, cancellationToken)
+                                 .ConfigureAwaitFalse();
         }
         catch (Exception exception)
         {
@@ -260,19 +272,37 @@ public class DefaultOnlinePayment : IOnlinePayment
             throw;
         }
 
-        if (verifyResult == null) throw new Exception($"The {gateway.GetCompleteGatewayName()} returns null instead of a result.");
+        if (gatewayResult == null) throw new Exception($"The {gateway.GetCompleteGatewayName()} returns null instead of a result.");
 
-        verifyResult.TrackingNumber = payment.TrackingNumber;
-        verifyResult.Amount = payment.Amount;
-        verifyResult.GatewayName = payment.GatewayName;
-        verifyResult.GatewayAccountName = payment.GatewayAccountName;
+        // The gateway reports what the bank verified; a gateway that does not name the bank reference is taken to
+        // have verified its transaction code.
+        var reportedBankReference = gatewayResult.BankReference.IsNullOrEmpty() ? gatewayResult.TransactionCode : gatewayResult.BankReference;
 
-        await EnforceVerificationRulesAsync(payment, verifyResult, cancellationToken).ConfigureAwaitFalse();
+        var (resultStatus, resultMessage) = await DecideAsync(payment, gatewayResult, reportedBankReference, cancellationToken).ConfigureAwaitFalse();
+
+        // Parbad's own result, so a gateway may return any implementation of the interface.
+        var verifyResult = new PaymentVerifyResult
+                           {
+                               TrackingNumber = payment.TrackingNumber,
+                               Amount = payment.Amount,
+                               GatewayName = payment.GatewayName,
+                               GatewayAccountName = payment.GatewayAccountName,
+                               Status = resultStatus,
+                               Message = resultMessage,
+                               TransactionCode = gatewayResult.TransactionCode,
+                               BankReference = reportedBankReference,
+                               BankReportedAmount = gatewayResult.BankReportedAmount,
+                               BankReportedOrderId = gatewayResult.BankReportedOrderId,
+                               IsAlreadyVerifiedAtBank = gatewayResult.IsAlreadyVerifiedAtBank,
+                               GatewayResponseCode = gatewayResult.GatewayResponseCode,
+                               AdditionalData = gatewayResult.AdditionalData ?? new Dictionary<string, object>(),
+                               DatabaseAdditionalData = gatewayResult.DatabaseAdditionalData ?? new Dictionary<string, string>()
+                           };
 
         var status = verifyResult.IsSucceed ? PaymentStatus.Paid : PaymentStatus.Failed;
 
         // Only a paid payment claims its bank reference: one bank reference settles only one payment.
-        var bankReference = verifyResult.IsSucceed && !verifyResult.TransactionCode.IsNullOrEmpty() ? verifyResult.TransactionCode : null;
+        var bankReference = verifyResult.IsSucceed && !reportedBankReference.IsNullOrEmpty() ? reportedBankReference : null;
 
         if (!await _storage
                   .TryCompletePaymentAsync(payment.Id, status, verifyResult.TransactionCode, bankReference, cancellationToken)
@@ -472,13 +502,13 @@ public class DefaultOnlinePayment : IOnlinePayment
 
         var verifyContext = new InvoiceContext(payment, transactions);
 
-        PaymentRefundResult refundResult;
+        IPaymentRefundResult gatewayResult;
 
         try
         {
-            refundResult = await gateway
-                                .RefundAsync(verifyContext, amountToRefund, cancellationToken)
-                                .ConfigureAwaitFalse() as PaymentRefundResult;
+            gatewayResult = await gateway
+                                 .RefundAsync(verifyContext, amountToRefund, cancellationToken)
+                                 .ConfigureAwaitFalse();
         }
         catch (Exception exception)
         {
@@ -486,12 +516,21 @@ public class DefaultOnlinePayment : IOnlinePayment
             throw;
         }
 
-        if (refundResult == null) throw new Exception($"Gateway {gateway.GetCompleteGatewayName()} returns null instead of a result.");
+        if (gatewayResult == null) throw new Exception($"Gateway {gateway.GetCompleteGatewayName()} returns null instead of a result.");
 
-        refundResult.TrackingNumber = payment.TrackingNumber;
-        refundResult.Amount = amountToRefund;
-        refundResult.GatewayName = payment.GatewayName;
-        refundResult.GatewayAccountName = payment.GatewayAccountName;
+        // Parbad's own result, so a gateway may return any implementation of the interface.
+        var refundResult = new PaymentRefundResult
+                           {
+                               TrackingNumber = payment.TrackingNumber,
+                               Amount = amountToRefund,
+                               GatewayName = payment.GatewayName,
+                               GatewayAccountName = payment.GatewayAccountName,
+                               Status = gatewayResult.Status,
+                               Message = gatewayResult.Message,
+                               GatewayResponseCode = gatewayResult.GatewayResponseCode,
+                               AdditionalData = gatewayResult.AdditionalData ?? new Dictionary<string, object>(),
+                               DatabaseAdditionalData = gatewayResult.DatabaseAdditionalData ?? new Dictionary<string, string>()
+                           };
 
         var newtTransaction = new Transaction
                               {
@@ -519,30 +558,34 @@ public class DefaultOnlinePayment : IOnlinePayment
     }
 
     /// <summary>
-    /// Checks that every gateway gets for free, so a gateway cannot forget them: the bank-reported amount and
-    /// order id must match the invoice, and one bank transaction can settle only one payment. An "already
-    /// verified" answer that the gateway could not tie to this invoice is accepted only after the last check.
+    /// Decides the result of a verification from what the gateway reported, with checks that every gateway gets for
+    /// free, so a gateway cannot forget them: the bank-reported amount and order id must match the invoice, and one
+    /// bank reference can settle only one payment. An "already verified" answer that the gateway could not tie to this
+    /// invoice is accepted only after the last check.
     /// </summary>
-    private async Task EnforceVerificationRulesAsync(Payment payment, PaymentVerifyResult verifyResult, CancellationToken cancellationToken)
+    private async Task<(PaymentVerifyResultStatus Status, string Message)> DecideAsync(Payment payment,
+                                                                                      IPaymentVerifyResult gatewayResult,
+                                                                                      string bankReference,
+                                                                                      CancellationToken cancellationToken)
     {
-        if (!verifyResult.IsSucceed && !verifyResult.IsAlreadyVerifiedAtBank) return;
+        if (!gatewayResult.IsSucceed && !gatewayResult.IsAlreadyVerifiedAtBank) return (gatewayResult.Status, gatewayResult.Message);
 
         string failure = null;
 
-        if (verifyResult.BankReportedAmount.HasValue && verifyResult.BankReportedAmount.Value.Value != payment.Amount)
+        if (gatewayResult.BankReportedAmount.HasValue && gatewayResult.BankReportedAmount.Value.Value != payment.Amount)
         {
             failure = _options.Messages.BankReportedDifferentAmount;
         }
-        else if (verifyResult.BankReportedOrderId != null &&
-                 verifyResult.BankReportedOrderId != payment.TrackingNumber.ToString(CultureInfo.InvariantCulture))
+        else if (gatewayResult.BankReportedOrderId != null &&
+                 gatewayResult.BankReportedOrderId != payment.TrackingNumber.ToString(CultureInfo.InvariantCulture))
         {
             failure = _options.Messages.BankReportedDifferentInvoice;
         }
-        else if (!verifyResult.TransactionCode.IsNullOrEmpty())
+        else if (!bankReference.IsNullOrEmpty())
         {
             var otherPayment = await _storage
                                     .FindPaidPaymentByBankReferenceAsync(payment.GatewayName,
-                                                                         verifyResult.TransactionCode,
+                                                                         bankReference,
                                                                          payment.TrackingNumber,
                                                                          cancellationToken)
                                     .ConfigureAwaitFalse();
@@ -552,13 +595,13 @@ public class DefaultOnlinePayment : IOnlinePayment
                 _logger.LogWarning(LoggingEvents.VerifyPayment,
                                    "Verifying the invoice {TrackingNumber}: the bank reference {BankReference} already settled the invoice {OtherTrackingNumber}",
                                    payment.TrackingNumber,
-                                   verifyResult.TransactionCode,
+                                   bankReference,
                                    otherPayment.TrackingNumber);
 
                 failure = _options.Messages.TransactionCodeAlreadyUsed;
             }
         }
-        else if (verifyResult.IsAlreadyVerifiedAtBank)
+        else if (gatewayResult.IsAlreadyVerifiedAtBank)
         {
             failure = _options.Messages.AlreadyVerifiedPaymentCannotBeConfirmed;
         }
@@ -570,37 +613,29 @@ public class DefaultOnlinePayment : IOnlinePayment
                                payment.TrackingNumber,
                                failure);
 
-            verifyResult.Status = PaymentVerifyResultStatus.Failed;
-            verifyResult.Message = failure;
-
-            return;
+            return (PaymentVerifyResultStatus.Failed, failure);
         }
 
-        if (verifyResult.IsAlreadyVerifiedAtBank)
-        {
-            verifyResult.Status = PaymentVerifyResultStatus.Succeed;
-            verifyResult.Message = _options.Messages.PaymentSucceed;
-        }
+        return gatewayResult.IsAlreadyVerifiedAtBank
+            ? (PaymentVerifyResultStatus.Succeed, _options.Messages.PaymentSucceed)
+            : (gatewayResult.Status, gatewayResult.Message);
     }
 
     private async Task<IPaymentFetchResult> FetchAsync(Payment payment, CancellationToken cancellationToken)
     {
-        var fetchResult = new PaymentFetchResult
-                          {
-                              TrackingNumber = payment.TrackingNumber,
-                              Amount = payment.Amount,
-                              GatewayName = payment.GatewayName,
-                              GatewayAccountName = payment.GatewayAccountName,
-                              IsAlreadyVerified = payment.IsPaid
-                          };
-
         if (payment.IsCompleted)
         {
-            fetchResult.Status = PaymentFetchResultStatus.AlreadyProcessed;
-            fetchResult.Message = _options.Messages.PaymentIsAlreadyProcessedBefore;
-            fetchResult.TransactionCode = payment.TransactionCode;
-
-            return fetchResult;
+            return new PaymentFetchResult
+                   {
+                       TrackingNumber = payment.TrackingNumber,
+                       Amount = payment.Amount,
+                       GatewayName = payment.GatewayName,
+                       GatewayAccountName = payment.GatewayAccountName,
+                       IsAlreadyVerified = payment.IsPaid,
+                       Status = PaymentFetchResultStatus.AlreadyProcessed,
+                       Message = _options.Messages.PaymentIsAlreadyProcessedBefore,
+                       TransactionCode = payment.TransactionCode
+                   };
         }
 
         var gateway = _gatewayProvider.Provide(payment.GatewayName);
@@ -608,13 +643,13 @@ public class DefaultOnlinePayment : IOnlinePayment
         var transactions = await _storage.GetTransactionsAsync(payment, cancellationToken).ConfigureAwaitFalse();
         var invoiceContext = new InvoiceContext(payment, transactions);
 
-        PaymentFetchResult gatewayFetchResult;
+        IPaymentFetchResult gatewayFetchResult;
 
         try
         {
             gatewayFetchResult = await gateway
                                       .FetchAsync(invoiceContext, cancellationToken)
-                                      .ConfigureAwaitFalse() as PaymentFetchResult;
+                                      .ConfigureAwaitFalse();
         }
         catch (Exception exception)
         {
@@ -629,17 +664,18 @@ public class DefaultOnlinePayment : IOnlinePayment
 
         _logger.LogInformation(LoggingEvents.FetchPayment, "Fetching is finished");
 
-        fetchResult.Status = gatewayFetchResult.Status;
-
-        string message = null;
-        if (gatewayFetchResult.Status != PaymentFetchResultStatus.ReadyForVerifying)
-        {
-            message = gatewayFetchResult.Message ?? _options.Messages.PaymentFailed;
-        }
-        fetchResult.Message = message;
-
-        fetchResult.GatewayResponseCode = gatewayFetchResult.GatewayResponseCode;
-
-        return fetchResult;
+        return new PaymentFetchResult
+               {
+                   TrackingNumber = payment.TrackingNumber,
+                   Amount = payment.Amount,
+                   GatewayName = payment.GatewayName,
+                   GatewayAccountName = payment.GatewayAccountName,
+                   IsAlreadyVerified = payment.IsPaid,
+                   Status = gatewayFetchResult.Status,
+                   Message = gatewayFetchResult.Status == PaymentFetchResultStatus.ReadyForVerifying
+                       ? null
+                       : gatewayFetchResult.Message ?? _options.Messages.PaymentFailed,
+                   GatewayResponseCode = gatewayFetchResult.GatewayResponseCode
+               };
     }
 }

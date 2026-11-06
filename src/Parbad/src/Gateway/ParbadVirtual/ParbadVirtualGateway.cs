@@ -87,7 +87,8 @@ public class ParbadVirtualGateway : GatewayBase<ParbadVirtualGatewayAccount>
 
         var transactionCode = await request.TryGetParamAsync("TransactionCode", cancellationToken).ConfigureAwaitFalse();
 
-        return PaymentVerifyResult.Succeed(transactionCode.Value, _messageOptions.Value.PaymentSucceed);
+        // The virtual gateway has no bank; its transaction code is its reference.
+        return PaymentVerifyResult.Paid(transactionCode.Value, transactionCode.Value, _messageOptions.Value.PaymentSucceed);
     }
 
     /// <inheritdoc />

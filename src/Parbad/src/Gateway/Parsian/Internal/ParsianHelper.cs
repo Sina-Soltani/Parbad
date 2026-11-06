@@ -197,7 +197,8 @@ internal static class ParsianHelper
 
         if (isSucceed)
         {
-            result = PaymentVerifyResult.Succeed(rrn, messagesOptions.PaymentSucceed, status);
+            // The bank confirms the token; the RRN is shown to the customer.
+            result = PaymentVerifyResult.Paid(rrn, callbackResult.Token, messagesOptions.PaymentSucceed, status);
         }
         else if (status == AlreadyConfirmedStatus)
         {
@@ -209,20 +210,17 @@ internal static class ParsianHelper
                 string.Equals(issuedToken, callbackResult.Token, StringComparison.Ordinal))
             {
                 // The confirmed token is the one issued for this invoice, so it is this invoice's payment.
-                result = PaymentVerifyResult.Succeed(transactionCode, messagesOptions.PaymentSucceed, status);
+                result = PaymentVerifyResult.Paid(transactionCode, callbackResult.Token, messagesOptions.PaymentSucceed, status);
             }
             else
             {
                 // Invoices requested before the token was stored cannot be tied to the token; Parbad decides.
-                result = PaymentVerifyResult.Failed($"Error in Verifying section: {status}", status);
-                result.TransactionCode = transactionCode;
-                result.IsAlreadyVerifiedAtBank = true;
+                result = PaymentVerifyResult.AlreadyVerifiedAtBank(transactionCode, callbackResult.Token, $"Error in Verifying section: {status}", status);
             }
         }
         else
         {
-            result = PaymentVerifyResult.Failed($"Error in Verifying section: {status}", status);
-            result.TransactionCode = rrn;
+            result = PaymentVerifyResult.Failed($"Error in Verifying section: {status}", status) with { TransactionCode = rrn };
         }
 
         result.DatabaseAdditionalData.Add("token", token);
