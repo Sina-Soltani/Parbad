@@ -45,7 +45,7 @@ jobs:
         run: dotnet restore Parbad.sln
 
       # Fails when a shipped package depends on a package with a known vulnerability, including the transitive
-      # dependencies of the netstandard and net462 builds.
+      # dependencies of the netstandard and net472 builds.
       - name: Check for vulnerable packages
         shell: pwsh
         run: |

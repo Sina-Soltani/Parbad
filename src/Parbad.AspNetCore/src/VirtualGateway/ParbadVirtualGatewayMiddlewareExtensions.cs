@@ -21,7 +21,7 @@ public static class ParbadVirtualGatewayMiddlewareExtensions
     {
         if (builder == null) throw new ArgumentNullException(nameof(builder));
 
-        // Net_5 etc. were not real symbols, so every target used the obsolete IHostingEnvironment.
+        // The netstandard targets only have the obsolete IHostingEnvironment.
 #if NETCOREAPP3_0_OR_GREATER
         var hostEnvironment = builder.ApplicationServices.GetRequiredService<Hosting.IWebHostEnvironment>();
         var isDevelopment = Microsoft.Extensions.Hosting.HostEnvironmentEnvExtensions.IsDevelopment(hostEnvironment);

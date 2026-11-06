@@ -3,7 +3,7 @@
   <PropertyGroup>
     <PackageId>Parbad.Storage.EntityFrameworkCore</PackageId>
     <PackageValidationBaselineVersion>1.7.0</PackageValidationBaselineVersion>
-    <TargetFrameworks>net5;net6;net7;net8.0;net9.0</TargetFrameworks>
+    <TargetFrameworks>net8.0</TargetFrameworks>
     <Nullable>enable</Nullable>  
     <Description>Entity Framework Core implementation of Parbad storage.
 More information: https://github.com/Sina-Soltani/Parbad</Description>
@@ -20,7 +20,9 @@ More information: https://github.com/Sina-Soltani/Parbad</Description>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="5.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="8.0.0" />
+    <!-- The lowest EF Core 8 keeps apps free to choose their EF Core version; this patched transitive package replaces a vulnerable one. -->
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
   </ItemGroup>
 
 </Project>

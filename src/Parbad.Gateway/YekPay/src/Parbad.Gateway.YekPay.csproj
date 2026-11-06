@@ -4,7 +4,7 @@
     <PackageId>Parbad.Gateway.YekPay</PackageId>
     <PackageValidationBaselineVersion>1.7.0</PackageValidationBaselineVersion>
     <Product>Parbad.Gateway.YekPay</Product>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.0;net5.0;net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net8.0;net9.0;net10.0</TargetFrameworks>
     <PackageTags>parbad Payment gateway bank Iran shetab yekpay  پرداخت درگاه بانک ایران شتاب یک پی</PackageTags>
     <Description>YekPay Gateway for Parbad project.
 

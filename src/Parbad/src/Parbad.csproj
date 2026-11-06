@@ -4,7 +4,7 @@
     <PackageId>Parbad</PackageId>
     <PackageValidationBaselineVersion>3.12.0</PackageValidationBaselineVersion>
     <Product>Parbad</Product>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.0;netcoreapp3.1;net5.0;net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net8.0;net9.0;net10.0</TargetFrameworks>
     <Authors>Parbad Sina Soltani</Authors>
     <Description>Parbad is a free, open-source, integrated and extensible library which connects your web applications to online payment gateways. Gateways can be added or developed by you.
 The Virtual Gateway also simulates the online payment process, which helps the application development.
@@ -20,13 +20,13 @@ More information: https://github.com/Sina-Soltani/Parbad
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netstandard2.1' ">
+  <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETStandard' ">
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.13" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="2.2.0" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.0' or '$(TargetFramework)' == 'netcoreapp3.1' or '$(TargetFramework)' == 'net5.0' or '$(TargetFramework)' == 'net6.0' or '$(TargetFramework)' == 'net7.0' or '$(TargetFramework)' == 'net8.0' or '$(TargetFramework)' == 'net9.0' ">
+  <ItemGroup Condition=" '$(TargetFrameworkIdentifier)' == '.NETCoreApp' ">
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
