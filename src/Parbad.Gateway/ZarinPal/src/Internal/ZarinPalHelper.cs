@@ -40,7 +40,7 @@ internal static class ZarinPalHelper
         return new()
                {
                    MerchantId = account.MerchantId,
-                   Amount = invoice.Amount,
+                   Amount = (long)invoice.Amount,
                    CallbackUrl = invoice.CallbackUrl,
                    Description = zarinPalInvoice.Description,
                    Email = zarinPalInvoice.Email,
@@ -103,7 +103,7 @@ internal static class ZarinPalHelper
         return new()
                {
                    MerchantId = account.MerchantId,
-                   Amount = amount,
+                   Amount = (long)amount,
                    Authority = authority
                };
     }

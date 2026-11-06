@@ -28,7 +28,7 @@ internal static class SepehrHelper
         return new TokenRequestModel
                {
                    InvoiceId = invoice.TrackingNumber.ToString(),
-                   Amount = invoice.Amount,
+                   Amount = (long)invoice.Amount,
                    CallbackUrl = invoice.CallbackUrl,
                    TerminalId = account.TerminalId
                };

@@ -29,7 +29,7 @@ internal static class IranKishHelper
         var requestInfo = new IranKishTokenRequestInfo
                           {
                               AcceptorId = account.AcceptorId,
-                              Amount = invoice.Amount,
+                              Amount = (long)invoice.Amount,
                               CmsPreservationId = invoice.GetCmsPreservationId(),
                               PaymentId = invoice.TrackingNumber.ToString(),
                               RequestId = Guid.NewGuid().ToString("N").Substring(0, 20),

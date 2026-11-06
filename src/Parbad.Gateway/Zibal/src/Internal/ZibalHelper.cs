@@ -34,7 +34,7 @@ internal static class ZibalHelper
         return new ZibalPaymentRequestModel
                {
                    Merchant = GetMerchant(account),
-                   Amount = invoice.Amount,
+                   Amount = (long)invoice.Amount,
                    Mobile = requestAdditionalData?.MobileNumber,
                    OrderId = invoice.TrackingNumber.ToString(),
                    CallbackUrl = invoice.CallbackUrl,

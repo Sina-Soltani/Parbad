@@ -35,7 +35,7 @@ internal static class SamanHelper
                     {
                         Action = "token",
                         TerminalId = account.TerminalId,
-                        Amount = invoice.Amount,
+                        Amount = (long)invoice.Amount,
                         ResNum = invoice.TrackingNumber.ToString(),
                         RedirectUrl = invoice.CallbackUrl,
                         CellNumber = invoice.GetSamanCellNumber()

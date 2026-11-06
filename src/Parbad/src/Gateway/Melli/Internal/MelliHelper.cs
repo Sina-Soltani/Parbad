@@ -31,7 +31,7 @@ internal static class MelliHelper
         return CreateRequestObject(
                                    account.TerminalId,
                                    account.MerchantId,
-                                   invoice.Amount,
+                                   (long)invoice.Amount,
                                    signedData,
                                    invoice.CallbackUrl,
                                    invoice.TrackingNumber);
