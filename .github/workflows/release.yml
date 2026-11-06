@@ -2,16 +2,15 @@ name: Release
 
 # Publishes the NuGet packages of a release branch (release/...) to nuget.org.
 #
-# The project files decide what is published. A package is published when its version (VersionPrefix, plus
-# VersionSuffix for a prerelease) is not on nuget.org yet; every other package is left alone.
+# All packages share one version, set in Directory.Build.props (VersionPrefix, plus VersionSuffix for a
+# prerelease). A package is published when that version is not on nuget.org yet.
 #
 # Releasing, alpha/beta/rc included:
-#   1. Create release/vX-Y-Z from master and bump the VersionPrefix of every package that changes.
-#   2. For a prerelease, also set <VersionSuffix>alpha.1</VersionSuffix> (beta.1, rc.1, ...) in those projects.
-#      Every bumped package needs the suffix until the final release, or it is published as stable.
+#   1. Create release/vX-Y-Z from master and set the VersionPrefix in Directory.Build.props.
+#   2. For a prerelease, also set <VersionSuffix>alpha.1</VersionSuffix> (beta.1, rc.1, ...) next to it.
 #   3. Push the branch. ci.yml builds, tests and packs; the "plan" job finds the new versions; publishing waits for
 #      an approval. The next prerelease raises the suffix (alpha.2, beta.1, ...).
-#   4. For the stable release, remove the VersionSuffix lines and push. Then open the pull request to master.
+#   4. For the stable release, remove the VersionSuffix and push. Then open the pull request to master.
 #
 
 on:
