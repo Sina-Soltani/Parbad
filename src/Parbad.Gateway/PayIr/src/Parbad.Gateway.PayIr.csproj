@@ -4,7 +4,7 @@
     <PackageId>Parbad.Gateway.PayIr</PackageId>
     <PackageValidationBaselineVersion>1.9.0</PackageValidationBaselineVersion>
     <Product>Parbad.Gateway.PayIr</Product>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.0;net5.0;net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net8.0;net9.0;net10.0</TargetFrameworks>
     <PackageTags>parbad Payment Gateway Bank Iran Shetab pay.ir پرداخت درگاه بانک ایران شتاب پی</PackageTags>
     <Description>Pay.ir Gateway for Parbad project.
 

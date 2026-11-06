@@ -5,7 +5,7 @@
     <PackageValidationBaselineVersion>1.5.0</PackageValidationBaselineVersion>
     <Product>Parbad.Gateway.Zibal</Product>
 	<Nullable>enable</Nullable>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.0;net5.0;net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net8.0;net9.0;net10.0</TargetFrameworks>
     <Authors>Mohammad Ashrafi</Authors>
     <PackageTags>parbad Payment Gateway Bank Iran Shetab zibal پرداخت درگاه بانک ایران شتاب زیبال</PackageTags>
     <Description>Zibal Gateway for Parbad project.
