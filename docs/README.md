@@ -26,6 +26,7 @@ npm start -- --locale fa  # Persian: http://localhost:3000/Parbad/fa/
 | Folder | Content |
 |---|---|
 | `docs/` | The pages of the current version (4.0) |
+| `docs/gateways/` | The gateways built into the `Parbad` package. The pages of the gateway packages are generated from their `README.md` (`src/Parbad.Gateway/*/src/README.md`) by `scripts/gateway-pages.mjs` before every start and build; edit the README, not the generated page |
 | `versioned_docs/version-3.x/` | The pages of 3.x, frozen |
 | `i18n/fa/` | The Persian translations; a page without a translation is shown in English |
 | `src/pages/` | The home page |

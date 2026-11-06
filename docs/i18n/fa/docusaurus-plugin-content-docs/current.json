@@ -6,5 +6,9 @@
   "sidebar.docs.category.Gateways": {
     "message": "درگاه‌ها",
     "description": "The label for category 'Gateways' in sidebar 'docs'"
+  },
+  "sidebar.docs.category.Gateways.link.generated-index.description": {
+    "message": "درگاه‌هایی که پرباد پشتیبانی می‌کند: نحوه پیکربندی هر کدام و ارسال پرداخت به آن.",
+    "description": "The generated-index page description for category 'Gateways' in sidebar 'docs'"
   }
 }

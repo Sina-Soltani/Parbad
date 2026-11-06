@@ -1,5 +1,6 @@
 ---
 title: زرین‌پال
+slug: /gateways/zarinpal
 ---
 
 # زرین‌پال

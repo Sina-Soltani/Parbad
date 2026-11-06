@@ -5,6 +5,7 @@
 /build
 
 # Generated files
+/docs/gateways/*.generated.md
 .docusaurus
 .cache-loader
 
