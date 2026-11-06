@@ -28,6 +28,8 @@ public class ZarinPalConformanceTests : GatewayConformanceTests
     /// <summary>The answer to a rejected call, when a test needs another response shape than <see cref="Error"/>.</summary>
     private Func<HttpResponseMessage>? _rejection;
 
+    private BankCall? _lastRequest;
+
     protected override string GatewayName => ZarinPalGateway.Name;
 
     protected override bool SupportsRefund => true;
@@ -53,8 +55,10 @@ public class ZarinPalConformanceTests : GatewayConformanceTests
 
             if (call.Reject || (string?)call.Json["merchant_id"] != MerchantId) return Error(-9, "The merchant id is not valid.");
 
-            // The v4 request has no order id.
-            var transaction = Bank.Open(0, (decimal)call.Json["amount"]!, (string?)call.Json["callback_url"]);
+            _lastRequest = call;
+
+            var orderId = (string?)call.Json["metadata"]?["order_id"];
+            var transaction = Bank.Open(orderId == null ? 0 : long.Parse(orderId), (decimal)call.Json["amount"]!, (string?)call.Json["callback_url"]);
 
             return FakeBank.Json(new { data = new { code = 100, message = "Success", authority = transaction.Token, fee_type = "Merchant", fee = 0 }, errors = new object[0] });
         }));
@@ -101,6 +105,23 @@ public class ZarinPalConformanceTests : GatewayConformanceTests
 
     protected override TestCallback CreateCallback(BankTransaction transaction, CallbackClaims claims) =>
         TestCallback.Get(("Authority", claims.Token ?? transaction.Token), ("Status", claims.Paid ? "OK" : "NOK"));
+
+    /// <summary>
+    /// ZarinPal's documented request: mobile, email and the order id inside "metadata", no null values, and an
+    /// Accept header for JSON.
+    /// </summary>
+    [TestMethod]
+    public async Task Request_sends_the_details_in_metadata_and_accepts_JSON()
+    {
+        await RequestAsync(InvoiceTrackingNumber, InvoiceAmount);
+
+        Assert.IsNotNull(_lastRequest);
+        StringAssert.Contains(_lastRequest.Header("Accept"), "application/json");
+        Assert.IsNull(_lastRequest.Json["mobile"], "mobile is sent at the top level.");
+        Assert.IsNull(_lastRequest.Json["email"], "email is sent at the top level.");
+        Assert.AreEqual(InvoiceTrackingNumber.ToString(), (string?)_lastRequest.Json["metadata"]?["order_id"]);
+        Assert.IsFalse(_lastRequest.Body.Contains("null"), $"A null value is sent: {_lastRequest.Body}");
+    }
 
     /// <summary>
     /// ZarinPal answers an error with "data" as an empty array or object and "errors" as an object or an array,
