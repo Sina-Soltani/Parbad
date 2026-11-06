@@ -17,7 +17,20 @@ internal class ZarinPalRequestModel
 
     public long Amount { get; set; }
 
+    public ZarinPalRequestMetadata Metadata { get; set; } = new();
+}
+
+/// <summary>
+/// The optional details of a request; ZarinPal shows them in its panel. Empty values are not sent.
+/// </summary>
+internal class ZarinPalRequestMetadata
+{
+    [JsonProperty("mobile", NullValueHandling = NullValueHandling.Ignore)]
     public string? Mobile { get; set; }
 
+    [JsonProperty("email", NullValueHandling = NullValueHandling.Ignore)]
     public string? Email { get; set; }
+
+    [JsonProperty("order_id", NullValueHandling = NullValueHandling.Ignore)]
+    public string? OrderId { get; set; }
 }

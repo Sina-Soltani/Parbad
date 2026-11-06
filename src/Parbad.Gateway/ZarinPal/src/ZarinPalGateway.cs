@@ -4,6 +4,7 @@
 using Parbad.Http;
 using System;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -183,7 +184,15 @@ public class ZarinPalGateway : GatewayBase<ZarinPalGatewayAccount>
                                                    ContractResolver = new CamelCasePropertyNamesContractResolver()
                                                });
 
-        return httpClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"));
+        var request = new HttpRequestMessage(HttpMethod.Post, url)
+                      {
+                          Content = new StringContent(json, Encoding.UTF8, "application/json")
+                      };
+
+        // Required by ZarinPal's documentation.
+        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+        return httpClient.SendAsync(request);
     }
 
     private async Task<ZarinPalResponse<TData>> ReadAsync<TData>(HttpResponseMessage responseMessage) where TData : class

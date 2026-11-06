@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -43,8 +44,12 @@ internal static class ZarinPalHelper
                    Amount = (long)invoice.Amount,
                    CallbackUrl = invoice.CallbackUrl,
                    Description = zarinPalInvoice.Description,
-                   Email = zarinPalInvoice.Email,
-                   Mobile = zarinPalInvoice.Mobile
+                   Metadata = new ZarinPalRequestMetadata
+                              {
+                                  Mobile = string.IsNullOrWhiteSpace(zarinPalInvoice.Mobile) ? null : zarinPalInvoice.Mobile,
+                                  Email = string.IsNullOrWhiteSpace(zarinPalInvoice.Email) ? null : zarinPalInvoice.Email,
+                                  OrderId = invoice.TrackingNumber.ToString(CultureInfo.InvariantCulture)
+                              }
                };
     }
 

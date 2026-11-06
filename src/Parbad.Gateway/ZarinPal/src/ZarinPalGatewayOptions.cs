@@ -5,13 +5,13 @@ namespace Parbad.Gateway.ZarinPal;
 
 public class ZarinPalGatewayOptions
 {
-    public string ApiRequestUrl { get; set; } = "https://api.zarinpal.com/pg/v4/payment/request.json";
+    public string ApiRequestUrl { get; set; } = "https://payment.zarinpal.com/pg/v4/payment/request.json";
 
-    public string ApiVerificationUrl { get; set; } = "https://api.zarinpal.com/pg/v4/payment/verify.json";
+    public string ApiVerificationUrl { get; set; } = "https://payment.zarinpal.com/pg/v4/payment/verify.json";
 
     public string ApiRefundUrl { get; set; } = "https://api.zarinpal.com/pg/v4/payment/refund.json";
 
-    public string PaymentPageUrl { get; set; } = "https://www.zarinpal.com/pg/StartPay/";
+    public string PaymentPageUrl { get; set; } = "https://payment.zarinpal.com/pg/StartPay/";
 
 
     public string SandboxApiRequestUrl { get; set; } = "https://sandbox.zarinpal.com/pg/v4/payment/request.json";
