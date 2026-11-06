@@ -69,7 +69,7 @@ public class ApplicationDbContextTests
         var storage = scope.ServiceProvider.GetRequiredService<IStorage>();
         var payment = NewPayment(1001);
         await storage.CreatePaymentAsync(payment);
-        await ((IPaymentCompletion)storage).TryCompletePaymentAsync(payment.Id, isPaid: true, "RRN");
+        await storage.TryCompletePaymentAsync(payment.Id, PaymentStatus.Paid, "RRN", "RRN");
 
         await using var check = new ShopDbContext(Options());
         Assert.AreEqual(0, await check.Orders.CountAsync(), "Parbad saved the application's pending order.");

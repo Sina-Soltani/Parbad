@@ -102,8 +102,7 @@ public class DefaultOnlinePayment : IOnlinePayment
                          {
                              TrackingNumber = invoice.TrackingNumber,
                              Amount = invoice.Amount,
-                             IsCompleted = false,
-                             IsPaid = false,
+                             Status = PaymentStatus.Requested,
                              Token = paymentToken,
                              GatewayName = gateway.GetRoutingGatewayName()
                          };
@@ -124,11 +123,11 @@ public class DefaultOnlinePayment : IOnlinePayment
         {
             _logger.LogError(exception, exception.Message);
 
-            newPayment.IsCompleted = true;
-            newPayment.IsPaid = false;
-
             requestResult = PaymentRequestResult.Failed(exception.Message);
         }
+
+        // A rejected request is final: the user never reaches the bank, so there is nothing to verify.
+        if (!requestResult.IsSucceed) newPayment.Status = PaymentStatus.Failed;
 
         requestResult.TrackingNumber = invoice.TrackingNumber;
         requestResult.Amount = invoice.Amount;
@@ -270,11 +269,14 @@ public class DefaultOnlinePayment : IOnlinePayment
 
         await EnforceVerificationRulesAsync(payment, verifyResult, cancellationToken).ConfigureAwaitFalse();
 
-        payment.IsCompleted = true;
-        payment.IsPaid = verifyResult.IsSucceed;
-        payment.TransactionCode = verifyResult.TransactionCode;
+        var status = verifyResult.IsSucceed ? PaymentStatus.Paid : PaymentStatus.Failed;
 
-        if (!await CompletePaymentAsync(payment, cancellationToken).ConfigureAwaitFalse())
+        // Only a paid payment claims its bank reference: one bank reference settles only one payment.
+        var bankReference = verifyResult.IsSucceed && !verifyResult.TransactionCode.IsNullOrEmpty() ? verifyResult.TransactionCode : null;
+
+        if (!await _storage
+                  .TryCompletePaymentAsync(payment.Id, status, verifyResult.TransactionCode, bankReference, cancellationToken)
+                  .ConfigureAwaitFalse())
         {
             // Another verification or a cancellation completed the payment first, e.g. on another server.
             var storedPayment = await _storage
@@ -353,10 +355,9 @@ public class DefaultOnlinePayment : IOnlinePayment
 
         _logger.LogInformation(LoggingEvents.CancelPayment, message);
 
-        payment.IsCompleted = true;
-        payment.IsPaid = false;
-
-        if (!await CompletePaymentAsync(payment, cancellationToken).ConfigureAwaitFalse())
+        if (!await _storage
+                  .TryCompletePaymentAsync(payment.Id, PaymentStatus.Cancelled, payment.TransactionCode, bankReference: null, cancellationToken)
+                  .ConfigureAwaitFalse())
         {
             // A verification completed the payment first, e.g. on another server.
             return new PaymentCancelResult
@@ -401,6 +402,10 @@ public class DefaultOnlinePayment : IOnlinePayment
 
         _logger.LogInformation(LoggingEvents.RefundPayment, "Refunding the invoice {TrackingNumber} is started", invoice.TrackingNumber);
 
+        // Refunds of one payment run one at a time within this process, so two of them cannot both pass the check of
+        // the remaining amount.
+        using var paymentLock = await PaymentLocks.AcquireAsync(invoice.TrackingNumber, cancellationToken).ConfigureAwaitFalse();
+
         var payment = await _storage.GetPaymentByTrackingNumberAsync(invoice.TrackingNumber, cancellationToken).ConfigureAwaitFalse();
 
         if (payment == null)
@@ -435,9 +440,11 @@ public class DefaultOnlinePayment : IOnlinePayment
 
         var transactions = await _storage.GetTransactionsAsync(payment, cancellationToken).ConfigureAwaitFalse();
 
-        var alreadyRefunded = transactions
-                             .Where(transaction => transaction.Type == TransactionType.Refund && transaction.IsSucceed)
-                             .Sum(transaction => transaction.Amount);
+        // The refund transactions also count, for payments refunded before Parbad 4.0 kept RefundedAmount.
+        var alreadyRefunded = Math.Max(payment.RefundedAmount,
+                                       transactions
+                                          .Where(transaction => transaction.Type == TransactionType.Refund && transaction.IsSucceed)
+                                          .Sum(transaction => transaction.Amount));
 
         var remainingAmount = payment.Amount - alreadyRefunded;
 
@@ -498,6 +505,14 @@ public class DefaultOnlinePayment : IOnlinePayment
 
         await _storage.CreateTransactionAsync(newtTransaction, cancellationToken).ConfigureAwaitFalse();
 
+        if (refundResult.IsSucceed)
+        {
+            payment.RefundedAmount = alreadyRefunded + amountToRefund;
+            payment.Status = payment.RefundedAmount >= payment.Amount ? PaymentStatus.Refunded : PaymentStatus.PartiallyRefunded;
+
+            await _storage.UpdatePaymentAsync(payment, cancellationToken).ConfigureAwaitFalse();
+        }
+
         _logger.LogInformation(LoggingEvents.RefundPayment, "Refunding the invoice {TrackingNumber} is finished", invoice.TrackingNumber);
 
         return refundResult;
@@ -525,37 +540,22 @@ public class DefaultOnlinePayment : IOnlinePayment
         }
         else if (!verifyResult.TransactionCode.IsNullOrEmpty())
         {
-            var lookup = _storage as IPaidPaymentLookup;
+            var otherPayment = await _storage
+                                    .FindPaidPaymentByBankReferenceAsync(payment.GatewayName,
+                                                                         verifyResult.TransactionCode,
+                                                                         payment.TrackingNumber,
+                                                                         cancellationToken)
+                                    .ConfigureAwaitFalse();
 
-            if (lookup == null)
+            if (otherPayment != null)
             {
                 _logger.LogWarning(LoggingEvents.VerifyPayment,
-                                   "Verifying the invoice {TrackingNumber}: the storage does not implement {Lookup}, so it is not checked whether the transaction code {TransactionCode} already settled another payment",
+                                   "Verifying the invoice {TrackingNumber}: the bank reference {BankReference} already settled the invoice {OtherTrackingNumber}",
                                    payment.TrackingNumber,
-                                   nameof(IPaidPaymentLookup),
-                                   verifyResult.TransactionCode);
+                                   verifyResult.TransactionCode,
+                                   otherPayment.TrackingNumber);
 
-                if (verifyResult.IsAlreadyVerifiedAtBank) failure = _options.Messages.AlreadyVerifiedPaymentCannotBeConfirmed;
-            }
-            else
-            {
-                var otherPayment = await lookup
-                                        .FindPaidPaymentByTransactionCodeAsync(payment.GatewayName,
-                                                                               verifyResult.TransactionCode,
-                                                                               payment.TrackingNumber,
-                                                                               cancellationToken)
-                                        .ConfigureAwaitFalse();
-
-                if (otherPayment != null)
-                {
-                    _logger.LogWarning(LoggingEvents.VerifyPayment,
-                                       "Verifying the invoice {TrackingNumber}: the transaction code {TransactionCode} already settled the invoice {OtherTrackingNumber}",
-                                       payment.TrackingNumber,
-                                       verifyResult.TransactionCode,
-                                       otherPayment.TrackingNumber);
-
-                    failure = _options.Messages.TransactionCodeAlreadyUsed;
-                }
+                failure = _options.Messages.TransactionCodeAlreadyUsed;
             }
         }
         else if (verifyResult.IsAlreadyVerifiedAtBank)
@@ -581,33 +581,6 @@ public class DefaultOnlinePayment : IOnlinePayment
             verifyResult.Status = PaymentVerifyResultStatus.Succeed;
             verifyResult.Message = _options.Messages.PaymentSucceed;
         }
-    }
-
-    /// <summary>
-    /// Stores the completion of <paramref name="payment"/> (<see cref="Payment.IsCompleted"/>, <see cref="Payment.IsPaid"/>
-    /// and <see cref="Payment.TransactionCode"/>) unless another operation completed it first in a way that must be
-    /// kept: a paid payment is never changed, and an unpaid result never replaces another result.
-    /// </summary>
-    /// <returns>False if the payment was completed by another operation and nothing was stored.</returns>
-    private async Task<bool> CompletePaymentAsync(Payment payment, CancellationToken cancellationToken)
-    {
-        var completion = _storage as IPaymentCompletion;
-
-        if (completion == null)
-        {
-            _logger.LogWarning(LoggingEvents.VerifyPayment,
-                               "Completing the invoice {TrackingNumber}: the storage does not implement {Completion}, so a concurrent operation on another server could overwrite this result",
-                               payment.TrackingNumber,
-                               nameof(IPaymentCompletion));
-
-            await _storage.UpdatePaymentAsync(payment, cancellationToken).ConfigureAwaitFalse();
-
-            return true;
-        }
-
-        return await completion
-                    .TryCompletePaymentAsync(payment.Id, payment.IsPaid, payment.TransactionCode, cancellationToken)
-                    .ConfigureAwaitFalse();
     }
 
     private async Task<IPaymentFetchResult> FetchAsync(Payment payment, CancellationToken cancellationToken)

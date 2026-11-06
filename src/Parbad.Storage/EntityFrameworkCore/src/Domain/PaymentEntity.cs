@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using Parbad.Storage.Abstractions.Models;
 
 namespace Parbad.Storage.EntityFrameworkCore.Domain;
 
@@ -22,8 +23,23 @@ public class PaymentEntity
 
     public string GatewayAccountName { get; set; }
 
+    /// <summary>
+    /// The reference the bank verified. Unique per gateway among the payments that have one.
+    /// </summary>
+    public string? BankReference { get; set; }
+
+    public PaymentStatus Status { get; set; }
+
+    public decimal RefundedAmount { get; set; }
+
+    /// <summary>
+    /// Kept in step with <see cref="Status"/>, for queries and reports written before Parbad 4.0.
+    /// </summary>
     public bool IsCompleted { get; set; }
 
+    /// <summary>
+    /// Kept in step with <see cref="Status"/>, for queries and reports written before Parbad 4.0.
+    /// </summary>
     public bool IsPaid { get; set; }
 
     public DateTime CreatedOn { get; set; }

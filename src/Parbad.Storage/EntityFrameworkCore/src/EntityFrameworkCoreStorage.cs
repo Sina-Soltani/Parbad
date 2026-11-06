@@ -26,7 +26,7 @@ namespace Parbad.Storage.EntityFrameworkCore;
 /// </para>
 /// </summary>
 /// <typeparam name="TContext">The context that contains Parbad's entities.</typeparam>
-public class EntityFrameworkCoreStorage<TContext> : IStorage, IPaidPaymentLookup, IPaymentCompletion where TContext : DbContext
+public class EntityFrameworkCoreStorage<TContext> : IStorage where TContext : DbContext
 {
     private readonly IDbContextFactory<TContext> _contextFactory;
     private volatile bool _modelChecked;
@@ -164,19 +164,21 @@ public class EntityFrameworkCoreStorage<TContext> : IStorage, IPaidPaymentLookup
     }
 
     /// <inheritdoc />
-    public virtual async Task<Payment?> FindPaidPaymentByTransactionCodeAsync(string gatewayName,
-                                                                              string transactionCode,
-                                                                              long exceptTrackingNumber,
-                                                                              CancellationToken cancellationToken = default)
+    public virtual async Task<Payment?> FindPaidPaymentByBankReferenceAsync(string gatewayName,
+                                                                            string bankReference,
+                                                                            long exceptTrackingNumber,
+                                                                            CancellationToken cancellationToken = default)
     {
         await using var context = await CreateContextAsync(cancellationToken);
 
+        // Payments stored before Parbad 4.0 have no bank reference; their transaction code is compared instead.
         var paymentEntity = await context.Set<PaymentEntity>()
                                          .AsNoTracking()
                                          .FirstOrDefaultAsync(payment => payment.IsPaid &&
                                                                          payment.TrackingNumber != exceptTrackingNumber &&
-                                                                         payment.TransactionCode == transactionCode &&
-                                                                         payment.GatewayName == gatewayName,
+                                                                         payment.GatewayName == gatewayName &&
+                                                                         (payment.BankReference == bankReference ||
+                                                                          (payment.BankReference == null && payment.TransactionCode == bankReference)),
                                                               cancellationToken);
 
         return paymentEntity?.ToPaymentModel();
@@ -184,10 +186,18 @@ public class EntityFrameworkCoreStorage<TContext> : IStorage, IPaidPaymentLookup
 
     /// <inheritdoc />
     public virtual async Task<bool> TryCompletePaymentAsync(long paymentId,
-                                                            bool isPaid,
+                                                            PaymentStatus status,
                                                             string? transactionCode,
+                                                            string? bankReference,
                                                             CancellationToken cancellationToken = default)
     {
+        if (status is not (PaymentStatus.Paid or PaymentStatus.Failed or PaymentStatus.Cancelled))
+        {
+            throw new ArgumentOutOfRangeException(nameof(status), status, "A payment is completed as paid, failed or cancelled.");
+        }
+
+        var isPaid = status == PaymentStatus.Paid;
+
         await using var context = await CreateContextAsync(cancellationToken);
 
         var payments = context.Set<PaymentEntity>();
@@ -201,7 +211,7 @@ public class EntityFrameworkCoreStorage<TContext> : IStorage, IPaidPaymentLookup
 
         if (context.Database.IsRelational())
         {
-            updated = await TryCompleteWithSqlAsync(context, paymentId, isPaid, transactionCode, cancellationToken) > 0;
+            updated = await TryCompleteWithSqlAsync(context, paymentId, status, transactionCode, bankReference, cancellationToken) > 0;
         }
         else
         {
@@ -210,9 +220,11 @@ public class EntityFrameworkCoreStorage<TContext> : IStorage, IPaidPaymentLookup
 
             if (record != null)
             {
+                record.Status = status;
                 record.IsCompleted = true;
                 record.IsPaid = isPaid;
                 record.TransactionCode = transactionCode;
+                record.BankReference = bankReference;
                 record.UpdatedOn = DateTime.UtcNow;
 
                 await context.SaveChangesAsync(cancellationToken);
@@ -239,8 +251,9 @@ public class EntityFrameworkCoreStorage<TContext> : IStorage, IPaidPaymentLookup
     /// </summary>
     private static Task<int> TryCompleteWithSqlAsync(TContext context,
                                                      long paymentId,
-                                                     bool isPaid,
+                                                     PaymentStatus status,
                                                      string? transactionCode,
+                                                     string? bankReference,
                                                      CancellationToken cancellationToken)
     {
         var sql = context.GetService<ISqlGenerationHelper>();
@@ -253,20 +266,28 @@ public class EntityFrameworkCoreStorage<TContext> : IStorage, IPaidPaymentLookup
         var isCompletedColumn = Column(nameof(PaymentEntity.IsCompleted));
         var isPaidColumn = Column(nameof(PaymentEntity.IsPaid));
         var transactionCodeColumn = Column(nameof(PaymentEntity.TransactionCode));
+        var bankReferenceColumn = Column(nameof(PaymentEntity.BankReference));
+        var statusColumn = Column(nameof(PaymentEntity.Status));
+        var isPaid = status == PaymentStatus.Paid;
         var updatedOn = Column(nameof(PaymentEntity.UpdatedOn));
 
-        // {5} is false. A paid result may replace an unpaid one; any other result needs an open payment.
+        // {5} is false. A paid result may replace an unpaid one; any other result needs an open payment. The condition
+        // uses is_completed/is_paid, which payments stored before Parbad 4.0 have too.
         var condition = isPaid
             ? $"{isPaidColumn} = {{5}}"
             : $"{isCompletedColumn} = {{5}} AND {isPaidColumn} = {{5}}";
 
         var command = $"UPDATE {table} " +
-                      $"SET {isCompletedColumn} = {{0}}, {isPaidColumn} = {{1}}, " +
-                      $"{transactionCodeColumn} = {(transactionCode == null ? "NULL" : "{2}")}, {updatedOn} = {{3}} " +
+                      $"SET {statusColumn} = {{6}}, {isCompletedColumn} = {{0}}, {isPaidColumn} = {{1}}, " +
+                      $"{transactionCodeColumn} = {(transactionCode == null ? "NULL" : "{2}")}, " +
+                      $"{bankReferenceColumn} = {(bankReference == null ? "NULL" : "{7}")}, {updatedOn} = {{3}} " +
                       $"WHERE {id} = {{4}} AND {condition}";
 
-        // A null parameter has no type mapping on every provider, so a missing transaction code is written as NULL.
-        var parameters = new object[] { true, isPaid, transactionCode ?? string.Empty, DateTime.UtcNow, paymentId, false };
+        // A null parameter has no type mapping on every provider, so missing values are written as NULL.
+        var parameters = new object[]
+                         {
+                             true, isPaid, transactionCode ?? string.Empty, DateTime.UtcNow, paymentId, false, (byte)status, bankReference ?? string.Empty
+                         };
 
         return context.Database.ExecuteSqlRawAsync(command, parameters, cancellationToken);
     }
