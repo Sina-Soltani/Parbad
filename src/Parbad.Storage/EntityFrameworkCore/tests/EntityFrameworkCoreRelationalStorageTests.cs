@@ -1,10 +1,8 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Parbad.Storage.Abstractions.Models;
 using Parbad.Storage.EntityFrameworkCore.Context;
-using Parbad.Storage.EntityFrameworkCore.Options;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -41,10 +39,7 @@ public class EntityFrameworkCoreRelationalStorageTests
     {
         var payment = new Payment { TrackingNumber = 1, Amount = 1000, Token = "token", GatewayName = "gateway" };
 
-        await using (var context = CreateContext())
-        {
-            await new EntityFrameworkCoreStorage(context).CreatePaymentAsync(payment);
-        }
+        await Storage().CreatePaymentAsync(payment);
 
         Assert.IsTrue(await TryCompleteAsync(payment.Id, isPaid: false, transactionCode: null), "An open payment could not be completed.");
         Assert.IsFalse(await TryCompleteAsync(payment.Id, isPaid: false, "RRN-2"), "An unpaid result replaced another result.");
@@ -53,7 +48,7 @@ public class EntityFrameworkCoreRelationalStorageTests
         Assert.IsFalse(await TryCompleteAsync(payment.Id, isPaid: false, transactionCode: null), "A paid payment was changed.");
 
         await using var verifyContext = CreateContext();
-        var stored = await new EntityFrameworkCoreStorage(verifyContext).GetPaymentByTrackingNumberAsync(1);
+        var stored = await Storage().GetPaymentByTrackingNumberAsync(1);
 
         Assert.IsTrue(stored.IsCompleted && stored.IsPaid);
         Assert.AreEqual("RRN-3", stored.TransactionCode);
@@ -68,12 +63,10 @@ public class EntityFrameworkCoreRelationalStorageTests
 
     private async Task<bool> TryCompleteAsync(long paymentId, bool isPaid, string transactionCode)
     {
-        // A new context each time, as each request would have.
-        await using var context = CreateContext();
-
-        return await new EntityFrameworkCoreStorage(context).TryCompletePaymentAsync(paymentId, isPaid, transactionCode);
+        return await Storage().TryCompletePaymentAsync(paymentId, isPaid, transactionCode);
     }
 
-    private ParbadDataContext CreateContext() =>
-        new(_contextOptions, new OptionsWrapper<EntityFrameworkCoreOptions>(new EntityFrameworkCoreOptions()));
+    private ParbadDataContext CreateContext() => new(_contextOptions);
+
+    private EntityFrameworkCoreStorage<ParbadDataContext> Storage() => new(new TestDbContextFactory<ParbadDataContext>(CreateContext));
 }

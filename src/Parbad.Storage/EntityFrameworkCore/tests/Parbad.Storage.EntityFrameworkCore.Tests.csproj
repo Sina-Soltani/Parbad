@@ -1,19 +1,22 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <!-- The storage is built against EF Core 8 but runs with the EF Core of the application, so it is tested with
+         EF Core 8 (the lowest supported), 9 and 10. A binary break between EF Core versions fails here. -->
+    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+    <EfCoreTestVersion Condition=" '$(TargetFramework)' == 'net8.0' ">8.0.0</EfCoreTestVersion>
+    <EfCoreTestVersion Condition=" '$(TargetFramework)' == 'net9.0' ">9.0.22</EfCoreTestVersion>
+    <EfCoreTestVersion Condition=" '$(TargetFramework)' == 'net10.0' ">10.0.0</EfCoreTestVersion>
     <LangVersion>latest</LangVersion>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="CompareNETObjects" Version="4.73.0" />
-    <!-- EF Core 5 (the storage's own dependency) cannot run on .NET 9, so the tests use EF Core 9, as an app
-         on .NET 9 does through its database provider. InMemory and Relational must have the same version. -->
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.22" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.22" />
-    <!-- A relational provider, for the code paths that run SQL. -->
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.22" />
+    <!-- InMemory, Relational and the SQLite provider (for the code that runs SQL) must have the same version. -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="$(EfCoreTestVersion)" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="$(EfCoreTestVersion)" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="$(EfCoreTestVersion)" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
     <PackageReference Include="MSTest.TestAdapter" Version="3.1.1" />
     <PackageReference Include="MSTest.TestFramework" Version="3.1.1" />

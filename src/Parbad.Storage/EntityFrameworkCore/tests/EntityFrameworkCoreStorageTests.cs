@@ -1,9 +1,7 @@
 using KellermanSoftware.CompareNetObjects;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Parbad.Storage.Abstractions.Models;
 using Parbad.Storage.EntityFrameworkCore.Context;
-using Parbad.Storage.EntityFrameworkCore.Options;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,8 +12,7 @@ namespace Parbad.Storage.EntityFrameworkCore.Tests;
 [TestClass]
 public class EntityFrameworkCoreStorageTests
 {
-    private ParbadDataContext _context;
-    private EntityFrameworkCoreStorage _storage;
+    private EntityFrameworkCoreStorage<ParbadDataContext> _storage;
 
     private static readonly Payment PaymentTestData = new()
                                                       {
@@ -46,17 +43,7 @@ public class EntityFrameworkCoreStorageTests
                             .UseInMemoryDatabase(Guid.NewGuid().ToString())
                             .Options;
 
-        var efCoreOptions = new OptionsWrapper<EntityFrameworkCoreOptions>(new EntityFrameworkCoreOptions());
-
-        _context = new ParbadDataContext(contextOptions, efCoreOptions);
-
-        _storage = new EntityFrameworkCoreStorage(_context);
-    }
-
-    [TestCleanup]
-    public async Task Cleanup()
-    {
-        await _context.DisposeAsync();
+        _storage = new EntityFrameworkCoreStorage<ParbadDataContext>(new TestDbContextFactory<ParbadDataContext>(() => new ParbadDataContext(contextOptions)));
     }
 
     [TestMethod]
