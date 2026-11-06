@@ -190,6 +190,8 @@ internal static class IranKishHelper
                {
                    Status = status,
                    TransactionCode = result.Result.RetrievalReferenceNumber,
+                   // The verification is bound to the token stored for this invoice; the RRN identifies the payment.
+                   BankReference = result.Result.RetrievalReferenceNumber,
                    Message = message
                };
     }

@@ -92,9 +92,7 @@ public class ZarinPalGateway : GatewayBase<ZarinPalGatewayAccount>
             result = PaymentFetchResult.Failed(callbackResult.Message);
         }
 
-        result.GatewayResponseCode = callbackResult.Status;
-
-        return result;
+        return result with { GatewayResponseCode = callbackResult.Status };
     }
 
     /// <inheritdoc />

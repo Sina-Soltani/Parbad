@@ -89,10 +89,7 @@ public class AsanPardakhtGateway : GatewayBase<AsanPardakhtGatewayAccount>
 
         if (transaction.IsSucceed) return PaymentFetchResult.ReadyForVerifying();
 
-        var failed = PaymentFetchResult.Failed(transaction.Message);
-        failed.GatewayResponseCode = response.Code;
-
-        return failed;
+        return PaymentFetchResult.Failed(transaction.Message) with { GatewayResponseCode = response.Code };
     }
 
     /// <inheritdoc />
@@ -136,7 +133,7 @@ public class AsanPardakhtGateway : GatewayBase<AsanPardakhtGatewayAccount>
         {
             // The payment is verified, so the money is captured. When settlement fails, AsanPardakht has Shaparak
             // settle it 12 hours after the transaction (guide v1.6, p.12), so the payment is still paid.
-            result.GatewayResponseCode = settlement.Code;
+            result = result with { GatewayResponseCode = settlement.Code };
             result.DatabaseAdditionalData.Add(AsanPardakhtHelper.SettlementResultDatabaseKey,
                                               AsanPardakhtResultTranslator.Translate(AsanPardakhtOperation.Settlement, settlement, _messageOptions));
         }

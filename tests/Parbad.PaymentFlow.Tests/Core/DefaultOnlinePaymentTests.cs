@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -383,6 +384,41 @@ public class DefaultOnlinePaymentTests
     }
 
     [TestMethod]
+    public async Task Bank_reference_not_transaction_code_decides_whether_a_bank_transaction_settled_another_payment()
+    {
+        // Two different customer-facing codes, but the bank verified the same reference twice.
+        _gateway.VerifyResult = context => PaymentVerifyResult.Paid($"RRN-{context.Payment.TrackingNumber}", "REF-A", "Paid.");
+
+        await RequestAsync(OtherTrackingNumber);
+        await _host.OnlinePayment.VerifyAsync(OtherTrackingNumber);
+        await RequestAsync();
+
+        var result = await _host.OnlinePayment.VerifyAsync(TrackingNumber);
+
+        Assert.AreEqual(PaymentVerifyResultStatus.Failed, result.Status);
+        Assert.AreEqual(new MessagesOptions().TransactionCodeAlreadyUsed, result.Message);
+        Assert.AreEqual("REF-A", (await _host.GetPaymentAsync(OtherTrackingNumber)).BankReference);
+        await AssertRecordedAsUnpaidAsync(TrackingNumber);
+    }
+
+    [TestMethod]
+    public async Task A_gateway_may_return_its_own_implementation_of_the_result_interface()
+    {
+        _gateway.VerifyResult = _ => new OwnVerifyResult();
+        await RequestAsync();
+
+        var result = await _host.OnlinePayment.VerifyAsync(TrackingNumber);
+
+        Assert.AreEqual(PaymentVerifyResultStatus.Succeed, result.Status, result.Message);
+        Assert.AreEqual(TrackingNumber, result.TrackingNumber, "Parbad did not complete the result with the invoice's data.");
+        Assert.AreEqual("OWN-REF", result.BankReference);
+
+        var payment = await _host.GetPaymentAsync(TrackingNumber);
+        Assert.IsTrue(payment.IsPaid);
+        Assert.AreEqual("OWN-REF", payment.BankReference);
+    }
+
+    [TestMethod]
     public async Task Already_verified_at_the_bank_is_recorded_as_paid_when_the_transaction_code_is_unused()
     {
         _gateway.VerifyResult = _ => AlreadyVerifiedAtBank(FakeGateway.TransactionCode);
@@ -564,21 +600,44 @@ public class DefaultOnlinePaymentTests
 
     private static PaymentVerifyResult Succeed(string transactionCode, decimal? bankAmount = null, string? bankOrderId = null)
     {
-        var result = PaymentVerifyResult.Succeed(transactionCode, "Paid.");
-        result.BankReportedAmount = bankAmount;
-        result.BankReportedOrderId = bankOrderId;
-
-        return result;
+        return PaymentVerifyResult.Paid(transactionCode, transactionCode, "Paid.") with
+               {
+                   BankReportedAmount = bankAmount,
+                   BankReportedOrderId = bankOrderId
+               };
     }
 
     /// <summary>What a gateway returns when the bank answers "already verified" without tying it to the invoice.</summary>
     private static PaymentVerifyResult AlreadyVerifiedAtBank(string? transactionCode)
     {
-        var result = PaymentVerifyResult.Failed("Already verified.");
-        result.TransactionCode = transactionCode;
-        result.IsAlreadyVerifiedAtBank = true;
+        return new PaymentVerifyResult
+               {
+                   Status = PaymentVerifyResultStatus.Failed,
+                   Message = "Already verified.",
+                   TransactionCode = transactionCode,
+                   BankReference = transactionCode,
+                   IsAlreadyVerifiedAtBank = true
+               };
+    }
 
-        return result;
+    /// <summary>A third-party gateway's own result type, not derived from Parbad's.</summary>
+    private sealed class OwnVerifyResult : IPaymentVerifyResult
+    {
+        public long TrackingNumber => 0;
+        public Money Amount => 0;
+        public bool IsSucceed => true;
+        public string GatewayName => "Fake";
+        public string GatewayAccountName => "Fake";
+        public string GatewayResponseCode => "00";
+        public string Message => "Paid by a third-party gateway.";
+        public IDictionary<string, object> AdditionalData { get; } = new Dictionary<string, object>();
+        public IDictionary<string, string> DatabaseAdditionalData { get; } = new Dictionary<string, string>();
+        public string TransactionCode => "OWN-RRN";
+        public PaymentVerifyResultStatus Status => PaymentVerifyResultStatus.Succeed;
+        public string? BankReference => "OWN-REF";
+        public Money? BankReportedAmount => null;
+        public string? BankReportedOrderId => null;
+        public bool IsAlreadyVerifiedAtBank => false;
     }
 
     private async Task AssertRecordedAsUnpaidAsync(long trackingNumber)

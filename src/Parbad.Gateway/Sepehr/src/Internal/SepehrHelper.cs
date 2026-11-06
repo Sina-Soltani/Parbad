@@ -212,6 +212,7 @@ internal static class SepehrHelper
 
         PaymentVerifyResultStatus status;
         string message;
+        var isAlreadyVerifiedAtBank = false;
 
         switch (result.Status.ToLowerInvariant())
         {
@@ -244,7 +245,10 @@ internal static class SepehrHelper
                 break;
 
             case "duplicate":
-                status = PaymentVerifyResultStatus.AlreadyVerified;
+                // Verified before (e.g. the first response was lost). The digital receipt comes from the browser, so
+                // Parbad records the payment as paid only if the receipt has not settled another payment.
+                status = PaymentVerifyResultStatus.Failed;
+                isAlreadyVerifiedAtBank = true;
                 message = !result.Message.IsNullOrWhiteSpace() ? result.Message : messagesOptions.PaymentIsAlreadyProcessedBefore;
                 break;
 
@@ -258,7 +262,10 @@ internal static class SepehrHelper
                                  {
                                      Status = status,
                                      Message = message,
-                                     TransactionCode = callbackResult.Rrn.ToString()
+                                     // The RRN is shown to the customer; the bank verifies the digital receipt.
+                                     TransactionCode = callbackResult.Rrn.ToString(),
+                                     BankReference = callbackResult.DigitalReceipt,
+                                     IsAlreadyVerifiedAtBank = isAlreadyVerifiedAtBank
                                  };
 
         var verificationAdditionalData = new SepehrGatewayVerificationAdditionalData

@@ -17,11 +17,6 @@ public interface IPaymentResult
 
     /// <summary>
     /// The amount of the payment.
-    /// <para>Examples:</para>
-    /// <para>decimal a = new Money(1000)</para>
-    /// <para>long a = new Money(1000)</para>
-    /// <para>Money m = 1000.55m</para>
-    /// <para>Money m = 1000</para>
     /// </summary>
     Money Amount { get; }
 
@@ -43,7 +38,7 @@ public interface IPaymentResult
     /// <summary>
     /// Gets the original response code (also known as Status Code) that recevied from the gateway.
     /// </summary>
-    string GatewayResponseCode { get; set; }
+    string GatewayResponseCode { get; }
 
     /// <summary>
     /// A short message about the operation.
@@ -54,4 +49,10 @@ public interface IPaymentResult
     /// Includes some additional data.
     /// </summary>
     IDictionary<string, object> AdditionalData { get; }
+
+    /// <summary>
+    /// Data the gateway needs later for this payment (e.g. a token or reference from the request). Parbad stores it
+    /// with the payment's transaction and gives it back to the gateway in <c>InvoiceContext</c>.
+    /// </summary>
+    IDictionary<string, string> DatabaseAdditionalData { get; }
 }

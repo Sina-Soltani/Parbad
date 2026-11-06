@@ -136,21 +136,19 @@ internal static class ZibalHelper
         // the database, so it is this invoice's own payment and it counts as paid.
         if (response.Result == PaymentAlreadyVerifiedCode)
         {
-            var alreadyVerified = PaymentVerifyResult.Succeed(response.RefNumber?.ToString() ?? trackId, messagesOptions.PaymentSucceed);
-            alreadyVerified.GatewayResponseCode = response.Result.ToString();
-
-            return alreadyVerified;
+            return PaymentVerifyResult.Paid(response.RefNumber?.ToString() ?? trackId,
+                                            trackId ?? response.RefNumber?.ToString() ?? string.Empty,
+                                            messagesOptions.PaymentSucceed,
+                                            response.Result.ToString());
         }
 
         if (response.Result != SuccessCode)
         {
-            var verifyResult = PaymentVerifyResult.Failed(response.Message);
-            verifyResult.GatewayResponseCode = response.Result.ToString();
-
-            return verifyResult;
+            return PaymentVerifyResult.Failed(response.Message, response.Result.ToString());
         }
 
-        return PaymentVerifyResult.Succeed(response.RefNumber.ToString(), messagesOptions.PaymentSucceed);
+        // The bank verifies the trackId stored for this invoice; the reference number is shown to the customer.
+        return PaymentVerifyResult.Paid(response.RefNumber.ToString(), trackId ?? response.RefNumber.ToString(), messagesOptions.PaymentSucceed);
     }
 
     private static string GetPaymentPageUrl(string paymentUrl, long trackId)

@@ -122,11 +122,11 @@ internal static class IdPayHelper
             return PaymentVerifyResult.Failed($"Verification failed. Status: {result.Status}");
         }
 
-        var verifyResult = PaymentVerifyResult.Succeed(result.TrackId, messagesOptions.PaymentSucceed, result.Status);
-        verifyResult.BankReportedOrderId = result.OrderId;
-        verifyResult.BankReportedAmount = result.Amount;
-
-        return verifyResult;
+        return PaymentVerifyResult.Paid(result.TrackId, result.TrackId, messagesOptions.PaymentSucceed, result.Status) with
+               {
+                   BankReportedOrderId = result.OrderId,
+                   BankReportedAmount = result.Amount
+               };
     }
 
     public static void AssignHeaders(HttpRequestHeaders headers, IdPayGatewayAccount account)

@@ -63,9 +63,11 @@ internal static class ZarinPalHelper
 
         var paymentPageUrl = GetPaymentPageUrl(account.IsSandbox, gatewayOptions) + data.Authority;
 
-        var result = PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, paymentPageUrl);
+        var result = PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, paymentPageUrl) with
+                     {
+                         GatewayResponseCode = data.Code.ToString()
+                     };
 
-        result.GatewayResponseCode = data.Code.ToString();
         result.DatabaseAdditionalData.Add(AuthorityDatabaseKey, data.Authority);
 
         return result;
@@ -118,7 +120,7 @@ internal static class ZarinPalHelper
         // the database, so it is this invoice's own payment and it counts as paid.
         if (IsSucceedCode(verificationResult.Code) || verificationResult.Code == NumericAlreadyOkResult)
         {
-            result = PaymentVerifyResult.Succeed(verificationResult.RefId, messagesOptions.PaymentSucceed);
+            result = PaymentVerifyResult.Paid(verificationResult.RefId, verificationResult.RefId, messagesOptions.PaymentSucceed);
         }
         else
         {
@@ -131,8 +133,12 @@ internal static class ZarinPalHelper
                      };
         }
 
-        result.GatewayAccountName = account.Name;
-        result.GatewayResponseCode = verificationResult.Code.ToString();
+        result = result with
+                 {
+                     GatewayAccountName = account.Name,
+                     GatewayResponseCode = verificationResult.Code.ToString()
+                 };
+
         result.SetZarinPalOriginalVerificationResult(verificationResult);
 
         return result;
@@ -149,26 +155,17 @@ internal static class ZarinPalHelper
 
     public static PaymentRefundResult CreateRefundResult(ZarinPalRefundResultModelData data, ZarinPalGatewayAccount account, MessagesOptions messagesOptions)
     {
-        var result = new PaymentRefundResult
-                     {
-                         GatewayResponseCode = data.Code.ToString(),
-                         GatewayAccountName = account.Name
-                     };
+        var isSucceed = IsSucceedCode(data.Code);
 
-        if (IsSucceedCode(data.Code))
-        {
-            result.Status = PaymentRefundResultStatus.Succeed;
-
-            result.Message = messagesOptions.PaymentSucceed;
-        }
-        else
-        {
-            result.Status = data.Code == NumericAlreadyOkResult ? PaymentRefundResultStatus.AlreadyRefunded : PaymentRefundResultStatus.Failed;
-
-            result.Message = ZarinPalCodeTranslator.Translate(data.Code, messagesOptions);
-        }
-
-        return result;
+        return new PaymentRefundResult
+               {
+                   GatewayResponseCode = data.Code.ToString(),
+                   GatewayAccountName = account.Name,
+                   Status = isSucceed
+                       ? PaymentRefundResultStatus.Succeed
+                       : data.Code == NumericAlreadyOkResult ? PaymentRefundResultStatus.AlreadyRefunded : PaymentRefundResultStatus.Failed,
+                   Message = isSucceed ? messagesOptions.PaymentSucceed : ZarinPalCodeTranslator.Translate(data.Code, messagesOptions)
+               };
     }
 
     public static string GetAuthorityFromAdditionalData(InvoiceContext context)

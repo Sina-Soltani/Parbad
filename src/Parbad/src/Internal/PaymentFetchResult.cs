@@ -3,13 +3,13 @@
 
 namespace Parbad.Internal;
 
-public class PaymentFetchResult : PaymentResult, IPaymentFetchResult
+public record PaymentFetchResult : PaymentResult, IPaymentFetchResult
 {
-    public string TransactionCode { get; set; }
+    public string TransactionCode { get; init; }
         
-    public PaymentFetchResultStatus Status { get; set; }
+    public PaymentFetchResultStatus Status { get; init; }
 
-    public bool IsAlreadyVerified { get; set; }
+    public bool IsAlreadyVerified { get; init; }
 
     public override bool IsSucceed => Status == PaymentFetchResultStatus.ReadyForVerifying;
 

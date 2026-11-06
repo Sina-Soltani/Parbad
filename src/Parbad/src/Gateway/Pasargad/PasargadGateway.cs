@@ -106,10 +106,7 @@ public class PasargadGateway : GatewayBase<PasargadGatewayAccount>
             return PaymentFetchResult.Failed(_messageOptions.PaymentFailed);
         }
 
-        var result = PaymentFetchResult.ReadyForVerifying();
-        result.TransactionCode = callbackResult.ReferenceNumber;
-
-        return result;
+        return PaymentFetchResult.ReadyForVerifying() with { TransactionCode = callbackResult.ReferenceNumber };
     }
 
     /// <inheritdoc />
@@ -160,8 +157,8 @@ public class PasargadGateway : GatewayBase<PasargadGatewayAccount>
             return PaymentVerifyResult.Failed(message, response.ResultCode.ToString());
         }
 
-        return PaymentVerifyResult.Succeed(callbackResult.ReferenceNumber,
-                                           _messageOptions.PaymentSucceed);
+        // The bank verifies this invoice with the UrlId stored at request time; the reference number is shown to the customer.
+        return PaymentVerifyResult.Paid(callbackResult.ReferenceNumber, urlId, _messageOptions.PaymentSucceed);
     }
 
     /// <inheritdoc />

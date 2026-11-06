@@ -115,7 +115,7 @@ internal static class PayIrHelper
         }
         else if (result.IsSucceed)
         {
-            verifyResult = PaymentVerifyResult.Succeed(result.TransId, messagesOptions.PaymentSucceed);
+            verifyResult = PaymentVerifyResult.Paid(result.TransId, result.TransId, messagesOptions.PaymentSucceed);
         }
         else
         {

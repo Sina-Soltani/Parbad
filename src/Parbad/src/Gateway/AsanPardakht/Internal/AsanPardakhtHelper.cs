@@ -104,9 +104,12 @@ internal static class AsanPardakhtHelper
 
     public static PaymentVerifyResult CreateVerifyResult(AsanPardakhtTransactionResult transaction, MessagesOptions messagesOptions)
     {
-        var result = PaymentVerifyResult.Succeed(transaction.Rrn, messagesOptions.PaymentSucceed);
+        // The bank verifies the PayGateTranID; the RRN is shown to the customer.
+        var result = PaymentVerifyResult.Paid(transaction.Rrn, transaction.PayGateTranId, messagesOptions.PaymentSucceed) with
+                     {
+                         BankReportedAmount = long.Parse(transaction.Amount, NumberStyles.Integer, CultureInfo.InvariantCulture)
+                     };
 
-        result.BankReportedAmount = long.Parse(transaction.Amount, NumberStyles.Integer, CultureInfo.InvariantCulture);
         result.DatabaseAdditionalData.Add(PayGateTranIdDatabaseKey, transaction.PayGateTranId);
 
         if (!transaction.CardNumber.IsNullOrEmpty())

@@ -3,6 +3,6 @@
 
 namespace Parbad.Internal;
 
-public class PaymentCancelResult : PaymentResult, IPaymentCancelResult
+public record PaymentCancelResult : PaymentResult, IPaymentCancelResult
 {
 }

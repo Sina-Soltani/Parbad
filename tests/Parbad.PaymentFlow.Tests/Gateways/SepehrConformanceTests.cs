@@ -25,8 +25,6 @@ public class SepehrConformanceTests : GatewayConformanceTests
 
     protected override IReadOnlyDictionary<string, string> KnownIssues => new Dictionary<string, string>
     {
-        // "Duplicate" (already verified) becomes AlreadyVerified, which the core stores as failed.
-        [nameof(Lost_verification_response_is_recovered_when_the_callback_is_retried)] = "an already verified payment is recorded as unpaid",
         // The digital receipt comes from the browser and is not tied to this invoice; only the amount protects it.
         [nameof(Payment_of_another_invoice_with_the_same_amount_cannot_settle_this_invoice)] = "same-amount payment swap",
         [nameof(Payment_of_another_invoice_cannot_settle_this_invoice_even_with_this_invoices_token)] = "same-amount payment swap"
