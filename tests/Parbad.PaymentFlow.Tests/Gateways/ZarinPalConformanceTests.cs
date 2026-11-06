@@ -1,3 +1,6 @@
+using Parbad.Storage.Abstractions.Models;
+using Newtonsoft.Json.Linq;
+using System.Linq;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -17,13 +20,18 @@ namespace Parbad.PaymentFlow.Tests.Gateways;
 
 /// <summary>
 /// ZarinPal API v4: payment/request.json → redirect to StartPay → GET callback (Authority, Status) →
-/// payment/verify.json; refunds use payment/refund.json.
+/// payment/verify.json. Refunds use the GraphQL API: Terminals → Session (by ref_id) → AddRefund.
 /// </summary>
 [TestClass]
 public class ZarinPalConformanceTests : GatewayConformanceTests
 {
     private const string MerchantId = "1344b5d4-0048-11e8-94db-005056a205be";
     private const string Api = BankUrl + "/pg/v4/payment";
+    private const string GraphQl = BankUrl + "/api/v4/graphql/";
+    private const string AccessToken = "panel-access-token";
+    private const string TerminalId = "1915487";
+
+    private string? _accountAccessToken = AccessToken;
 
     /// <summary>The answer to a rejected call, when a test needs another response shape than <see cref="Error"/>.</summary>
     private Func<HttpResponseMessage>? _rejection;
@@ -36,12 +44,16 @@ public class ZarinPalConformanceTests : GatewayConformanceTests
 
     protected override void AddGateway(IGatewayBuilder gateways) =>
         gateways.AddZarinPal()
-                .WithAccounts(accounts => accounts.AddInMemory(account => account.MerchantId = MerchantId))
+                .WithAccounts(accounts => accounts.AddInMemory(account =>
+                {
+                    account.MerchantId = MerchantId;
+                    account.AuthorizationToken = _accountAccessToken;
+                }))
                 .WithOptions(options =>
                 {
                     options.ApiRequestUrl = $"{Api}/request.json";
                     options.ApiVerificationUrl = $"{Api}/verify.json";
-                    options.ApiRefundUrl = $"{Api}/refund.json";
+                    options.ApiGraphQlUrl = GraphQl;
                     options.PaymentPageUrl = $"{BankUrl}/pg/StartPay/";
                 });
 
@@ -86,25 +98,101 @@ public class ZarinPalConformanceTests : GatewayConformanceTests
             });
         }));
 
-        // Disproved assumption: the real refund.json answers 404 or 401. The simulator keeps it,
-        // so the refund scenarios check Parbad's side only.
-        http.When($"{Api}/refund.json").Respond(Bank.Endpoint(BankOperation.Refund, call =>
+        http.When(GraphQl).Respond(Bank.Endpoint(BankOperation.Refund, call =>
         {
-            var transaction = Bank.FindByToken((string?)call.Json["authority"]);
-
-            if ((string?)call.Json["merchant_id"] != MerchantId || transaction is not { Verified: true } || transaction.RefundedAmount > 0)
+            if (call.Header("Authorization") != $"Bearer {AccessToken}")
             {
-                return Error(-80, "The transaction cannot be refunded.");
+                return FakeBank.Json(new { data = (object?)null, errors = new[] { new { readable_code = "UNAUTHORIZED", message = "invalid access token or data" } } },
+                                     HttpStatusCode.Unauthorized);
             }
 
-            transaction.RefundedAmount = transaction.Amount;
+            var query = (string)call.Json["query"]!;
+            var variables = call.Json["variables"] as JObject;
 
-            return FakeBank.Json(new { data = new { code = 100, message = "Refunded", ref_id = transaction.Rrn }, errors = new object[0] });
+            if (query.Contains("Terminals"))
+            {
+                return FakeBank.Json(new { data = new { Terminals = new[] { new { id = "1", key = "another-merchant" }, new { id = TerminalId, key = MerchantId } } } });
+            }
+
+            if (query.Contains("Session("))
+            {
+                // Assumption (unverified): Session can be filtered by reference_id (the verify response's ref_id).
+                var sessions = (string?)variables?["terminal_id"] != TerminalId
+                    ? new object[0]
+                    : Bank.Transactions
+                          .Where(transaction => transaction.Verified && transaction.Rrn == (string?)variables?["reference_id"])
+                          .Select(transaction => (object)new { id = transaction.Reference, authority = transaction.Token, reference_id = transaction.Rrn, status = "VERIFIED", amount = (long)transaction.Amount })
+                          .ToArray();
+
+                return FakeBank.Json(new { data = new { Session = sessions } });
+            }
+
+            if (query.Contains("AddRefund"))
+            {
+                var transaction = Bank.FindByReference((string?)variables?["session_id"]);
+                var amount = (decimal)variables!["amount"]!;
+
+                if (call.Reject || transaction is not { Verified: true } || amount + transaction.RefundedAmount > transaction.Amount)
+                {
+                    return FakeBank.Json(new { data = (object?)null, errors = new[] { new { readable_code = "VALIDATION", message = "The refund is not valid." } } });
+                }
+
+                transaction.RefundedAmount += amount;
+
+                return FakeBank.Json(new
+                {
+                    data = new
+                    {
+                        resource = new
+                        {
+                            terminal_id = TerminalId,
+                            id = transaction.Reference,
+                            amount = (long)transaction.Amount,
+                            timeline = new { refund_amount = (long)amount, refund_time = "2026-11-06T10:00:00+03:30", refund_status = "PENDING" }
+                        }
+                    }
+                });
+            }
+
+            return FakeBank.Json(new { data = (object?)null, errors = new[] { new { message = "Unknown operation." } } });
         }));
     }
 
     protected override TestCallback CreateCallback(BankTransaction transaction, CallbackClaims claims) =>
         TestCallback.Get(("Authority", claims.Token ?? transaction.Token), ("Status", claims.Paid ? "OK" : "NOK"));
+
+    /// <summary>
+    /// A refund needs the access token of the ZarinPal panel; without it, Parbad says so and calls nothing.
+    /// </summary>
+    [TestMethod]
+    public async Task Refund_without_the_access_token_fails_clearly()
+    {
+        _accountAccessToken = null;
+        await UseHostAsync(AddGateway);
+        var transaction = await PayAndVerifyAsync(InvoiceTrackingNumber, InvoiceAmount);
+
+        var result = await Host.OnlinePayment.RefundCompletelyAsync(InvoiceTrackingNumber);
+
+        Assert.IsFalse(result.IsSucceed);
+        StringAssert.Contains(result.Message, "AuthorizationToken");
+        Assert.AreEqual(0m, transaction.RefundedAmount);
+    }
+
+    /// <summary>
+    /// A refund is ZarinPal's AddRefund for the payment's session, found by the verify response's ref_id.
+    /// </summary>
+    [TestMethod]
+    public async Task Refund_reaches_ZarinPal_with_the_session_of_this_payment_and_the_amount()
+    {
+        var transaction = await PayAndVerifyAsync(InvoiceTrackingNumber, InvoiceAmount);
+
+        var result = await Host.OnlinePayment.RefundAsync(new RefundInvoice(InvoiceTrackingNumber, 400_000));
+
+        Assert.IsTrue(result.IsSucceed, result.Message);
+        Assert.AreEqual("PENDING", result.GatewayResponseCode);
+        Assert.AreEqual(400_000m, transaction.RefundedAmount);
+        Assert.AreEqual(PaymentStatus.PartiallyRefunded, (await Host.GetPaymentAsync(InvoiceTrackingNumber)).Status);
+    }
 
     /// <summary>
     /// ZarinPal's documented request: mobile, email and the order id inside "metadata", no null values, and an
