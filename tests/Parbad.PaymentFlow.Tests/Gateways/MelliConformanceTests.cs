@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Parbad.Builder;
 using Parbad.Gateway.Melli;
 using Parbad.GatewayBuilders;
@@ -17,7 +17,7 @@ namespace Parbad.PaymentFlow.Tests.Gateways;
 /// <summary>
 /// Melli (Sadad VPG api/v0): PaymentRequest (3DES-signed) → redirect → POST callback → Advice/Verify (signed token).
 /// </summary>
-[TestClass]
+[TestFixture]
 public class MelliConformanceTests : GatewayConformanceTests
 {
     private const string TerminalId = "24000615";

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Globalization;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Parbad.Builder;
 using Parbad.Gateway.Sepehr;
 using Parbad.GatewayBuilders;
@@ -13,7 +13,7 @@ namespace Parbad.PaymentFlow.Tests.Gateways;
 /// <summary>
 /// Sepehr (PeymentApi V1): GetToken → POST to the payment page → POST callback → Advice; refunds use Rollback.
 /// </summary>
-[TestClass]
+[TestFixture]
 public class SepehrConformanceTests : GatewayConformanceTests
 {
     private const long TerminalId = 99015001;

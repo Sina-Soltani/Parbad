@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Globalization;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Parbad.Builder;
 using Parbad.Gateway.YekPay;
 using Parbad.GatewayBuilders;
@@ -14,7 +14,7 @@ namespace Parbad.PaymentFlow.Tests.Gateways;
 /// YekPay: payment/request → redirect → callback → payment/verify (with the Authority stored at request time).
 /// Fetch never inspects the callback, so cancellations are only detected by the bank.
 /// </summary>
-[TestClass]
+[TestFixture]
 public class YekPayConformanceTests : GatewayConformanceTests
 {
     private const string MerchantId = "yekpay-merchant-id";

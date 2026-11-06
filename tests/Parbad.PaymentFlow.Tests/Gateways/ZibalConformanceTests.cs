@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Parbad.Builder;
 using Parbad.Gateway.Zibal;
 using Parbad.GatewayBuilders;
@@ -15,7 +15,7 @@ namespace Parbad.PaymentFlow.Tests.Gateways;
 /// <summary>
 /// Zibal v1: request → redirect → GET callback (trackId, status) → verify.
 /// </summary>
-[TestClass]
+[TestFixture]
 public class ZibalConformanceTests : GatewayConformanceTests
 {
     private const string Merchant = "zibal-merchant-id";
@@ -88,7 +88,7 @@ public class ZibalConformanceTests : GatewayConformanceTests
             ("orderId", claims.OrderId.ToString(CultureInfo.InvariantCulture)),
             ("status", claims.Paid ? "2" : "3")); // 3 = cancelled by the user
 
-    [TestMethod]
+    [Test]
     public Task Sandbox_payment_can_be_verified() =>
         UnderCultureAsync(CultureInfo.InvariantCulture.Name, async () =>
         {
@@ -97,7 +97,7 @@ public class ZibalConformanceTests : GatewayConformanceTests
             await PaidInvoiceIsVerifiedAsync();
         });
 
-    [TestMethod]
+    [Test]
     public Task Http_client_configuration_is_applied_to_the_gateway() =>
         UnderCultureAsync(CultureInfo.InvariantCulture.Name, async () =>
         {
@@ -106,12 +106,12 @@ public class ZibalConformanceTests : GatewayConformanceTests
 
             await RequestSucceededAsync(InvoiceTrackingNumber, InvoiceAmount);
 
-            Assert.AreEqual("yes", _lastConfiguredHeader,
-                            "The configuration passed to WithHttpClient (also used by WithProxy) did not reach Zibal's HttpClient.");
+            Assert.That(_lastConfiguredHeader, Is.EqualTo("yes"),
+                        "The configuration passed to WithHttpClient (also used by WithProxy) did not reach Zibal's HttpClient.");
         });
 
     /// <summary>3,000,000,000 Rial does not fit an Int32 amount in the verify response model.</summary>
-    [TestMethod]
+    [Test]
     public Task Large_amount_can_be_verified() =>
         UnderCultureAsync(CultureInfo.InvariantCulture.Name, () => PaidInvoiceIsVerifiedAsync(3_000_000_000));
 

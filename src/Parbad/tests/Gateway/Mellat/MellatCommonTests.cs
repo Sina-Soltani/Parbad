@@ -6,16 +6,16 @@ using Parbad.InvoiceBuilder;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Parbad.Tests.Gateway.Mellat;
 
-[TestClass]
+[TestFixture]
 public class MellatCommonTests
 {
     private IInvoiceBuilder _invoiceBuilder;
 
-    [TestInitialize]
+    [SetUp]
     public void Initialize()
     {
         var mockServiceProvider = new Mock<IServiceProvider>();
@@ -23,19 +23,19 @@ public class MellatCommonTests
         _invoiceBuilder = new DefaultInvoiceBuilder(mockServiceProvider.Object);
     }
 
-    [TestMethod]
+    [Test]
     public async Task Invoice_Must_Have_Correct_GatewayName()
     {
         _invoiceBuilder.UseMellat();
 
         var invoice = await _invoiceBuilder.BuildAsync();
 
-        Assert.IsNotNull(invoice);
-        Assert.IsNotNull(invoice.GatewayName);
-        Assert.IsTrue(invoice.GatewayName.Equals("Mellat", StringComparison.OrdinalIgnoreCase));
+        Assert.That(invoice, Is.Not.Null);
+        Assert.That(invoice.GatewayName, Is.Not.Null);
+        Assert.That(invoice.GatewayName.Equals("Mellat", StringComparison.OrdinalIgnoreCase), Is.True);
     }
 
-    [TestMethod]
+    [Test]
     public async Task InvoiceProperties_Must_Contain_The_CumulativeAccounts()
     {
         _invoiceBuilder
@@ -46,24 +46,24 @@ public class MellatCommonTests
 
         var invoice = await _invoiceBuilder.BuildAsync();
 
-        Assert.IsNotNull(invoice);
-        Assert.IsNotNull(invoice.Properties);
-        Assert.AreEqual(1, invoice.Properties.Count);
-        Assert.IsTrue(invoice.Properties.ContainsKey(MellatHelper.CumulativeAccountsKey));
+        Assert.That(invoice, Is.Not.Null);
+        Assert.That(invoice.Properties, Is.Not.Null);
+        Assert.That(invoice.Properties.Count, Is.EqualTo(1));
+        Assert.That(invoice.Properties.ContainsKey(MellatHelper.CumulativeAccountsKey), Is.True);
         var cumulativeAccounts = invoice.Properties[MellatHelper.CumulativeAccountsKey] as List<MellatCumulativeDynamicAccount>;
-        Assert.IsNotNull(cumulativeAccounts);
-        Assert.AreEqual(2, cumulativeAccounts.Count);
+        Assert.That(cumulativeAccounts, Is.Not.Null);
+        Assert.That(cumulativeAccounts.Count, Is.EqualTo(2));
 
-        Assert.AreEqual(1, cumulativeAccounts[0].SubServiceId);
-        Assert.AreEqual(4, cumulativeAccounts[0].Amount.Value);
-        Assert.AreEqual(10, cumulativeAccounts[0].PayerId);
+        Assert.That(cumulativeAccounts[0].SubServiceId, Is.EqualTo(1));
+        Assert.That(cumulativeAccounts[0].Amount.Value, Is.EqualTo(4));
+        Assert.That(cumulativeAccounts[0].PayerId, Is.EqualTo(10));
 
-        Assert.AreEqual(2, cumulativeAccounts[1].SubServiceId);
-        Assert.AreEqual(6, cumulativeAccounts[1].Amount.Value);
-        Assert.AreEqual(0, cumulativeAccounts[1].PayerId);
+        Assert.That(cumulativeAccounts[1].SubServiceId, Is.EqualTo(2));
+        Assert.That(cumulativeAccounts[1].Amount.Value, Is.EqualTo(6));
+        Assert.That(cumulativeAccounts[1].PayerId, Is.EqualTo(0));
     }
 
-    [TestMethod]
+    [Test]
     public async Task InvoiceProperties_Must_Contain_AdditionalData()
     {
         var expectedAdditionalData = new MellatGatewayAdditionalDataRequest
@@ -79,16 +79,16 @@ public class MellatCommonTests
 
         var invoice = await _invoiceBuilder.BuildAsync();
 
-        Assert.IsNotNull(invoice);
+        Assert.That(invoice, Is.Not.Null);
 
-        Assert.IsNotNull(invoice.Properties);
-        Assert.AreEqual(1, invoice.Properties.Count);
-        Assert.IsTrue(invoice.Properties.ContainsKey(MellatHelper.AdditionalDataKey));
+        Assert.That(invoice.Properties, Is.Not.Null);
+        Assert.That(invoice.Properties.Count, Is.EqualTo(1));
+        Assert.That(invoice.Properties.ContainsKey(MellatHelper.AdditionalDataKey), Is.True);
 
         var additionalData = invoice.Properties[MellatHelper.AdditionalDataKey] as MellatGatewayAdditionalDataRequest;
-        Assert.IsNotNull(additionalData);
-        Assert.AreEqual(expectedAdditionalData.MobileNumber, additionalData.MobileNumber);
-        Assert.AreEqual(expectedAdditionalData.AdditionalData, additionalData.AdditionalData);
-        Assert.AreEqual(expectedAdditionalData.PayerId, additionalData.PayerId);
+        Assert.That(additionalData, Is.Not.Null);
+        Assert.That(additionalData.MobileNumber, Is.EqualTo(expectedAdditionalData.MobileNumber));
+        Assert.That(additionalData.AdditionalData, Is.EqualTo(expectedAdditionalData.AdditionalData));
+        Assert.That(additionalData.PayerId, Is.EqualTo(expectedAdditionalData.PayerId));
     }
 }

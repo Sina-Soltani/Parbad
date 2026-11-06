@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Parbad.Storage.Abstractions;
 using Parbad.Storage.Abstractions.Models;
 using Parbad.Storage.EntityFrameworkCore.Builder;
@@ -18,12 +18,12 @@ namespace Parbad.Storage.EntityFrameworkCore.Tests;
 /// Parbad's entities in the application's own DbContext (<c>modelBuilder.UseParbad()</c> and
 /// <c>UseEfCore&lt;TContext&gt;()</c>), on SQLite.
 /// </summary>
-[TestClass]
+[TestFixture]
 public class ApplicationDbContextTests
 {
     private SqliteConnection _connection = null!;
 
-    [TestInitialize]
+    [SetUp]
     public void Setup()
     {
         // The database lives as long as this connection is open.
@@ -31,10 +31,10 @@ public class ApplicationDbContextTests
         _connection.Open();
     }
 
-    [TestCleanup]
+    [TearDown]
     public void Cleanup() => _connection.Dispose();
 
-    [TestMethod]
+    [Test]
     public async Task Payments_are_stored_in_the_applications_database()
     {
         await using var services = BuildServices(storage => storage.UseEfCore<ShopDbContext>());
@@ -46,15 +46,15 @@ public class ApplicationDbContextTests
         await storage.CreatePaymentAsync(payment);
         await storage.CreateTransactionAsync(new Transaction { PaymentId = payment.Id, Amount = 1000, Type = TransactionType.Request });
 
-        Assert.IsNotNull(await storage.GetPaymentByTrackingNumberAsync(1001));
-        Assert.AreEqual(1, (await storage.GetTransactionsAsync(payment)).Count);
+        Assert.That(await storage.GetPaymentByTrackingNumberAsync(1001), Is.Not.Null);
+        Assert.That((await storage.GetTransactionsAsync(payment)).Count, Is.EqualTo(1));
 
         await using var scope = services.CreateAsyncScope();
         var shop = scope.ServiceProvider.GetRequiredService<ShopDbContext>();
-        Assert.AreEqual(1001, shop.Set<PaymentEntity>().Single().TrackingNumber, "The payment is not in the application's context.");
+        Assert.That(shop.Set<PaymentEntity>().Single().TrackingNumber, Is.EqualTo(1001), "The payment is not in the application's context.");
     }
 
-    [TestMethod]
+    [Test]
     public async Task Parbad_does_not_save_changes_the_application_has_pending_on_its_own_context()
     {
         await using var services = BuildServices(storage => storage.UseEfCore<ShopDbContext>());
@@ -72,11 +72,11 @@ public class ApplicationDbContextTests
         await storage.TryCompletePaymentAsync(payment.Id, PaymentStatus.Paid, "RRN", "RRN");
 
         await using var check = new ShopDbContext(Options());
-        Assert.AreEqual(0, await check.Orders.CountAsync(), "Parbad saved the application's pending order.");
-        Assert.IsTrue((await storage.GetPaymentByTrackingNumberAsync(1001))!.IsPaid);
+        Assert.That(await check.Orders.CountAsync(), Is.EqualTo(0), "Parbad saved the application's pending order.");
+        Assert.That((await storage.GetPaymentByTrackingNumberAsync(1001))!.IsPaid, Is.True);
     }
 
-    [TestMethod]
+    [Test]
     public async Task Table_names_and_schema_come_from_UseParbad()
     {
         await using var context = new RenamedTablesDbContext(new DbContextOptionsBuilder<RenamedTablesDbContext>().UseSqlite(_connection).Options);
@@ -84,12 +84,12 @@ public class ApplicationDbContextTests
         var payment = context.Model.FindEntityType(typeof(PaymentEntity))!;
         var transaction = context.Model.FindEntityType(typeof(TransactionEntity))!;
 
-        Assert.AreEqual("shop_payment", payment.GetTableName());
-        Assert.AreEqual("shop_transaction", transaction.GetTableName());
-        Assert.AreEqual("billing", payment.GetSchema());
+        Assert.That(payment.GetTableName(), Is.EqualTo("shop_payment"));
+        Assert.That(transaction.GetTableName(), Is.EqualTo("shop_transaction"));
+        Assert.That(payment.GetSchema(), Is.EqualTo("billing"));
     }
 
-    [TestMethod]
+    [Test]
     public async Task A_context_without_Parbads_entities_is_reported_clearly()
     {
         var services = new ServiceCollection();
@@ -99,11 +99,11 @@ public class ApplicationDbContextTests
         await using var provider = services.BuildServiceProvider();
         var storage = provider.GetRequiredService<IStorage>();
 
-        var exception = await Assert.ThrowsExceptionAsync<InvalidOperationException>(() => storage.DoesPaymentExistAsync(1));
-        StringAssert.Contains(exception.Message, "modelBuilder.UseParbad()");
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => storage.DoesPaymentExistAsync(1));
+        Assert.That(exception.Message, Does.Contain("modelBuilder.UseParbad()"));
     }
 
-    [TestMethod]
+    [Test]
     public async Task A_context_registered_without_a_factory_is_reported_clearly()
     {
         var services = new ServiceCollection();
@@ -112,11 +112,11 @@ public class ApplicationDbContextTests
 
         await using var provider = services.BuildServiceProvider();
 
-        var exception = Assert.ThrowsException<InvalidOperationException>(() => provider.GetRequiredService<IStorage>());
-        StringAssert.Contains(exception.Message, "AddDbContextFactory<ShopDbContext>");
+        var exception = Assert.Throws<InvalidOperationException>(() => provider.GetRequiredService<IStorage>());
+        Assert.That(exception.Message, Does.Contain("AddDbContextFactory<ShopDbContext>"));
     }
 
-    [TestMethod]
+    [Test]
     public async Task Parbads_own_context_takes_its_table_options_from_UseEfCore()
     {
         var services = new ServiceCollection();
@@ -131,14 +131,14 @@ public class ApplicationDbContextTests
 
         await using (var context = await factory.CreateDbContextAsync())
         {
-            Assert.AreEqual("parbad_payment", context.Model.FindEntityType(typeof(PaymentEntity))!.GetTableName());
+            Assert.That(context.Model.FindEntityType(typeof(PaymentEntity))!.GetTableName(), Is.EqualTo("parbad_payment"));
             await context.Database.EnsureCreatedAsync();
         }
 
         var storage = provider.GetRequiredService<IStorage>();
         await storage.CreatePaymentAsync(NewPayment(7));
 
-        Assert.IsTrue(await storage.DoesPaymentExistAsync(7));
+        Assert.That(await storage.DoesPaymentExistAsync(7), Is.True);
     }
 
     private ServiceProvider BuildServices(Action<IStorageBuilder> configureStorage)

@@ -5,16 +5,16 @@ using Parbad.Internal;
 using Parbad.InvoiceBuilder;
 using System;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Parbad.Tests.Gateway.Melli;
 
-[TestClass]
+[TestFixture]
 public class MelliCommonTests
 {
     private IInvoiceBuilder _invoiceBuilder;
 
-    [TestInitialize]
+    [SetUp]
     public void Initialize()
     {
         var mockServiceProvider = new Mock<IServiceProvider>();
@@ -22,28 +22,28 @@ public class MelliCommonTests
         _invoiceBuilder = new DefaultInvoiceBuilder(mockServiceProvider.Object);
     }
 
-    [TestMethod]
+    [Test]
     public async Task Invoice_Must_Have_Correct_GatewayName()
     {
         _invoiceBuilder.UseMelli();
 
         var invoice = await _invoiceBuilder.BuildAsync();
 
-        Assert.IsNotNull(invoice);
-        Assert.IsNotNull(invoice.GatewayName);
-        Assert.IsTrue(invoice.GatewayName.Equals("melli", StringComparison.OrdinalIgnoreCase));
+        Assert.That(invoice, Is.Not.Null);
+        Assert.That(invoice.GatewayName, Is.Not.Null);
+        Assert.That(invoice.GatewayName.Equals("melli", StringComparison.OrdinalIgnoreCase), Is.True);
     }
 
-    [TestMethod]
+    [Test]
     public void Signing_Invalid_RequestData_Must_Throw_Exception()
     {
         var crypto = new MelliGatewayCrypto();
 
         const string data = "test";
 
-        Assert.ThrowsException<MelliGatewayDataSigningException>(() =>
-                                                                 {
-                                                                     crypto.Encrypt("test", data);
-                                                                 });
+        Assert.Throws<MelliGatewayDataSigningException>(() =>
+                                                        {
+                                                            crypto.Encrypt("test", data);
+                                                        });
     }
 }

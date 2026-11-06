@@ -6,23 +6,27 @@
     <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
     <EfCoreTestVersion Condition=" '$(TargetFramework)' == 'net8.0' ">8.0.0</EfCoreTestVersion>
     <EfCoreTestVersion Condition=" '$(TargetFramework)' == 'net9.0' ">9.0.22</EfCoreTestVersion>
-    <EfCoreTestVersion Condition=" '$(TargetFramework)' == 'net10.0' ">10.0.0</EfCoreTestVersion>
+    <EfCoreTestVersion Condition=" '$(TargetFramework)' == 'net10.0' ">10.0.14</EfCoreTestVersion>
     <LangVersion>latest</LangVersion>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CompareNETObjects" Version="4.73.0" />
+    <PackageReference Include="CompareNETObjects" Version="4.84.0" />
     <!-- InMemory, Relational and the SQLite provider (for the code that runs SQL) must have the same version. -->
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="$(EfCoreTestVersion)" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="$(EfCoreTestVersion)" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="$(EfCoreTestVersion)" />
     <!-- The SQLite library of EF Core's SQLite provider (2.1.11 and older) has a known vulnerability. -->
     <PackageReference Include="SQLitePCLRaw.lib.e_sqlite3" Version="2.1.14" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
-    <PackageReference Include="MSTest.TestAdapter" Version="3.1.1" />
-    <PackageReference Include="MSTest.TestFramework" Version="3.1.1" />
-    <PackageReference Include="coverlet.collector" Version="6.0.4">
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+    <PackageReference Include="NUnit" Version="5.0.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="6.3.1" />
+    <PackageReference Include="NUnit.Analyzers" Version="4.15.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.collector" Version="10.1.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

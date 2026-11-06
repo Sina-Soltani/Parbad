@@ -3,14 +3,14 @@ using Microsoft.Extensions.Options;
 using Parbad.Internal;
 using Parbad.Options;
 using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Parbad.Tests;
 
-[TestClass]
+[TestFixture]
 public class LoggerTests
 {
-    [TestMethod]
+    [Test]
     public void No_Logs_Must_Be_Written_When_Logger_Is_Disabled()
     {
         var options = new OptionsWrapper<ParbadOptions>(new ParbadOptions
@@ -24,10 +24,10 @@ public class LoggerTests
 
         parbadLogger.LogInformation("Test");
 
-        Assert.IsFalse(fakeLogger.LogReceived);
+        Assert.That(fakeLogger.LogReceived, Is.False);
     }
 
-    [TestMethod]
+    [Test]
     public void Logs_Must_Be_Written_When_Logger_Is_Enabled()
     {
         var options = new OptionsWrapper<ParbadOptions>(new ParbadOptions
@@ -41,7 +41,7 @@ public class LoggerTests
 
         parbadLogger.LogInformation("Test");
 
-        Assert.IsTrue(fakeLogger.LogReceived);
+        Assert.That(fakeLogger.LogReceived, Is.True);
     }
 }
 

@@ -7,14 +7,14 @@ using Parbad.Tests.Helpers;
 using RichardSzalay.MockHttp;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Parbad.Gateway.IdPay.Tests;
 
-[TestClass]
+[TestFixture]
 public class IdPayGatewayTests
 {
-    [TestMethod]
+    [Test]
     public async Task Requesting_And_Verifying_Work()
     {
         const long expectedTrackingNumber = 1;
