@@ -7,9 +7,9 @@ internal class TokenRequestModel
 {
     public long Amount { get; set; }
 
-    public string CallbackUrl { get; set; }
+    public string? CallbackUrl { get; set; }
 
-    public string InvoiceId { get; set; }
+    public string? InvoiceId { get; set; }
 
     public long TerminalId { get; set; }
 }

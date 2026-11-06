@@ -15,13 +15,13 @@ public class PaymentEntity
 
     public decimal Amount { get; set; }
 
-    public string Token { get; set; }
+    public string Token { get; set; } = null!;
 
-    public string TransactionCode { get; set; }
+    public string? TransactionCode { get; set; }
 
-    public string GatewayName { get; set; }
+    public string GatewayName { get; set; } = null!;
 
-    public string GatewayAccountName { get; set; }
+    public string? GatewayAccountName { get; set; }
 
     /// <summary>
     /// The reference the bank verified. Unique per gateway among the payments that have one.

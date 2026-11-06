@@ -7,5 +7,5 @@ internal class TokenResponseModel
 {
     public int Status { get; set; }
 
-    public string AccessToken { get; set; }
+    public string? AccessToken { get; set; }
 }

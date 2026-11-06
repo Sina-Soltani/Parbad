@@ -9,5 +9,5 @@ public class IranKishGatewayAdditionalData
     /// To enable the card-recall feature of the gateway, set this additional data with user's
     /// mobile-phone number (like "989123456789") or email.
     /// </summary>
-    public string MobileNumberOrEmail { get; set; }
+    public string? MobileNumberOrEmail { get; set; }
 }

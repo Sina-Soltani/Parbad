@@ -13,16 +13,16 @@ public class ZarinPalOriginalVerificationResult
     public int Code { get; set; }
 
     [JsonProperty("ref_id")]
-    public string RefId { get; set; }
+    public string? RefId { get; set; }
 
     [JsonProperty("card_hash")]
-    public string CardHash { get; set; }
+    public string? CardHash { get; set; }
 
     [JsonProperty("card_pan")]
-    public string CardPan { get; set; }
+    public string? CardPan { get; set; }
 
     [JsonProperty("fee_type")]
-    public string FeeType { get; set; }
+    public string? FeeType { get; set; }
 
-    public string Fee { get; set; }
+    public string? Fee { get; set; }
 }

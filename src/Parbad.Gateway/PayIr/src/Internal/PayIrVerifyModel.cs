@@ -5,7 +5,7 @@ namespace Parbad.Gateway.PayIr.Internal;
 
 internal class PayIrVerifyModel
 {
-    public string Api { get; set; }
+    public string? Api { get; set; }
 
-    public string Token { get; set; }
+    public string? Token { get; set; }
 }

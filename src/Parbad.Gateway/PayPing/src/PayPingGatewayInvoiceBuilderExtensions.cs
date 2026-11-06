@@ -48,7 +48,7 @@ public static class PayPingGatewayInvoiceBuilderExtensions
         return builder;
     }
 
-    internal static PayPingRequest GetPayPingRequest(this Invoice invoice)
+    internal static PayPingRequest? GetPayPingRequest(this Invoice invoice)
     {
         if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 

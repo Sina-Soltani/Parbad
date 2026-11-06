@@ -12,15 +12,15 @@ public class FanAvaGatewayAdditionalDataRequest
 
     public FanAvaGatewayAdditionalDataRequestType Type { get; set; } = FanAvaGatewayAdditionalDataRequestType.Goods;
 
-    public string MobileNumber { get; set; }
+    public string? MobileNumber { get; set; }
 
-    public string Email { get; set; }
+    public string? Email { get; set; }
 
-    public string GoodsReferenceId { get; set; }
+    public string? GoodsReferenceId { get; set; }
 
-    public string MerchantGoodReferenceId { get; set; }
+    public string? MerchantGoodReferenceId { get; set; }
 
-    public IEnumerable<FanAvaGatewayApportionmentAccount> ApportionmentAccountList { get; set; }
+    public IEnumerable<FanAvaGatewayApportionmentAccount>? ApportionmentAccountList { get; set; }
 }
 
 public enum FanAvaGatewayAdditionalDataRequestType

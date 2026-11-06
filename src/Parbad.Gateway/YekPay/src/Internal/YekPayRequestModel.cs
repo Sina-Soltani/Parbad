@@ -5,11 +5,11 @@ namespace Parbad.Gateway.YekPay.Internal;
 
 internal class YekPayRequestModel : YekPayRequest
 {
-    public string MerchantId { get; set; }
+    public string? MerchantId { get; set; }
 
     public decimal Amount { get; set; }
 
     public long OrderNumber { get; set; }
 
-    public string Callback { get; set; }
+    public string? Callback { get; set; }
 }

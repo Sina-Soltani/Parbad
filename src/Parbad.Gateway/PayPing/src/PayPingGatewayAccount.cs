@@ -7,5 +7,5 @@ namespace Parbad.Gateway.PayPing;
 
 public class PayPingGatewayAccount : GatewayAccount
 {
-    public string AccessToken { get; set; }
+    public string AccessToken { get; set; } = null!;
 }

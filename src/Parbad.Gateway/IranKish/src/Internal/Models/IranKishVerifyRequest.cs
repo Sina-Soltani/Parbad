@@ -5,11 +5,11 @@ namespace Parbad.Gateway.IranKish.Internal.Models;
 
 internal class IranKishVerifyRequest
 {
-    public string TerminalId { get; set; }
+    public string? TerminalId { get; set; }
 
-    public string RetrievalReferenceNumber { get; set; }
+    public string? RetrievalReferenceNumber { get; set; }
 
-    public string SystemTraceAuditNumber { get; set; }
+    public string? SystemTraceAuditNumber { get; set; }
 
-    public string TokenIdentity { get; set; }
+    public string? TokenIdentity { get; set; }
 }

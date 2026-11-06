@@ -9,10 +9,10 @@ internal class ZarinPalRefundResultModelData
 {
     public int Code { get; set; }
 
-    public string Iban { get; set; }
+    public string? Iban { get; set; }
 
     [JsonProperty("ref_id")]
-    public string RefId { get; set; }
+    public string? RefId { get; set; }
 
-    public string Message { get; set; }
+    public string? Message { get; set; }
 }

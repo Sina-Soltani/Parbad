@@ -90,7 +90,7 @@ public class PayPingGateway : GatewayBase<PayPingGatewayAccount>
         var result = PaymentRequestResult.SucceedWithRedirect(account.Name, _httpContextAccessor.GetRequiredHttpContext(), url);
 
         // The callback and the verification must use the payment code PayPing issued for this invoice.
-        result.DatabaseAdditionalData.Add(PayPingGatewayHelper.PaymentCodeKey, createPayResult.PaymentCode);
+        result.DatabaseAdditionalData.Add(PayPingGatewayHelper.PaymentCodeKey, createPayResult.PaymentCode!);
 
         return result;
     }

@@ -5,7 +5,7 @@ namespace Parbad.Gateway.Sepehr.Internal;
 
 internal class VerificationRollbackRequestModel
 {
-    public string DigitalReceipt { get; set; }
+    public string? DigitalReceipt { get; set; }
 
     public long Tid { get; set; }
 }

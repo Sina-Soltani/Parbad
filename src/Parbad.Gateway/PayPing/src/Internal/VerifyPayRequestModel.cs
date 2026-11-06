@@ -12,7 +12,7 @@ internal class PayPingVerifyRequestModel
     public long PaymentRefId { get; set; }
 
     [JsonProperty("paymentCode")]
-    public string PaymentCode { get; set; }
+    public string? PaymentCode { get; set; }
 
     [JsonProperty("amount")]
     public long Amount { get; set; }
