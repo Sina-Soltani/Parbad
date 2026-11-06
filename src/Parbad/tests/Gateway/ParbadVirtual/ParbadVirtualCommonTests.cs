@@ -3,17 +3,17 @@ using Parbad.Internal;
 using Parbad.InvoiceBuilder;
 using System;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Parbad.Gateway.ParbadVirtual;
 
 namespace Parbad.Tests.Gateway.ParbadVirtual;
 
-[TestClass]
+[TestFixture]
 public class ParbadVirtualCommonTests
 {
     private IInvoiceBuilder _invoiceBuilder;
 
-    [TestInitialize]
+    [SetUp]
     public void Initialize()
     {
         var mockServiceProvider = new Mock<IServiceProvider>();
@@ -21,15 +21,15 @@ public class ParbadVirtualCommonTests
         _invoiceBuilder = new DefaultInvoiceBuilder(mockServiceProvider.Object);
     }
 
-    [TestMethod]
+    [Test]
     public async Task Invoice_Must_Have_Correct_GatewayName()
     {
         _invoiceBuilder.UseParbadVirtual();
 
         var invoice = await _invoiceBuilder.BuildAsync();
 
-        Assert.IsNotNull(invoice);
-        Assert.IsNotNull(invoice.GatewayName);
-        Assert.IsTrue(invoice.GatewayName.Equals("ParbadVirtual", StringComparison.OrdinalIgnoreCase));
+        Assert.That(invoice, Is.Not.Null);
+        Assert.That(invoice.GatewayName, Is.Not.Null);
+        Assert.That(invoice.GatewayName.Equals("ParbadVirtual", StringComparison.OrdinalIgnoreCase), Is.True);
     }
 }

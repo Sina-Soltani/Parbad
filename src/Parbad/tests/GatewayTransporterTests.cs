@@ -8,16 +8,16 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Parbad.Tests;
 
-[TestClass]
+[TestFixture]
 public class GatewayTransporterTests
 {
     private HttpContext _httpContext;
 
-    [TestInitialize]
+    [SetUp]
     public void Setup()
     {
         var httpContextAccessor = MockHelpers.MockHttpContextAccessor();
@@ -29,7 +29,7 @@ public class GatewayTransporterTests
         _httpContext.Response.Body = new MemoryStream();
     }
 
-    [TestMethod]
+    [Test]
     public async Task Transporter_Redirects_Correctly()
     {
         const string expectedUrl = "http://test.com";
@@ -40,12 +40,11 @@ public class GatewayTransporterTests
 
         await transporter.TransportAsync();
 
-        Assert.AreEqual((int)HttpStatusCode.Redirect, _httpContext.Response.StatusCode);
-        Assert.IsNotNull(_httpContext.Response.Headers[HeaderNames.Location]);
-        Assert.AreEqual(expectedUrl, _httpContext.Response.Headers[HeaderNames.Location].ToString());
+        Assert.That(_httpContext.Response.StatusCode, Is.EqualTo((int)HttpStatusCode.Redirect));
+        Assert.That(_httpContext.Response.Headers[HeaderNames.Location].ToString(), Is.EqualTo(expectedUrl));
     }
 
-    [TestMethod]
+    [Test]
     public async Task Transporter_Posts_Correctly()
     {
         const string expectedUrl = "http://test.com";
@@ -56,9 +55,9 @@ public class GatewayTransporterTests
 
         await transporter.TransportAsync();
 
-        Assert.AreEqual((int)HttpStatusCode.OK, _httpContext.Response.StatusCode);
+        Assert.That(_httpContext.Response.StatusCode, Is.EqualTo((int)HttpStatusCode.OK));
 
         var html = Encoding.UTF8.GetString(((MemoryStream)_httpContext.Response.Body).ToArray());
-        StringAssert.Contains(html, $"action=\"{expectedUrl}\"");
+        Assert.That(html, Does.Contain($"action=\"{expectedUrl}\""));
     }
 }

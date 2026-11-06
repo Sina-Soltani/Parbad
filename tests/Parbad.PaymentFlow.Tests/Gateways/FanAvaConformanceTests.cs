@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Globalization;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Newtonsoft.Json.Linq;
 using Parbad.Builder;
 using Parbad.Gateway.FanAva;
@@ -19,7 +19,7 @@ namespace Parbad.PaymentFlow.Tests.Gateways;
 /// The inquiry and the verification both count as <see cref="BankOperation.Verify"/>, so the lost-response
 /// scenario loses the inquiry's response, not verifyMerchantTrans's.
 /// </remarks>
-[TestClass]
+[TestFixture]
 public class FanAvaConformanceTests : GatewayConformanceTests
 {
     private const string UserId = "merchant";

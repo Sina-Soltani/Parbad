@@ -5,7 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Parbad.Builder;
@@ -25,7 +25,7 @@ namespace Parbad.PaymentFlow.Tests.Gateways;
 /// <remarks>
 /// The simulated bank records the amount exactly as sent. PayPing expects Toman; Parbad never converts the amount.
 /// </remarks>
-[TestClass]
+[TestFixture]
 public class PayPingConformanceTests : GatewayConformanceTests
 {
     private const string AccessToken = "payping-access-token";
@@ -128,19 +128,19 @@ public class PayPingConformanceTests : GatewayConformanceTests
     /// Issue #446: the verification must send the payment code PayPing issued at request time, and the paymentRefId
     /// of the callback.
     /// </summary>
-    [TestMethod]
+    [Test]
     public async Task Verification_sends_the_payment_code_of_the_request_and_the_payment_reference()
     {
         var transaction = await PayAndVerifyAsync(InvoiceTrackingNumber, InvoiceAmount);
 
-        Assert.IsNotNull(_lastVerifyBody);
-        Assert.AreEqual(transaction.Token, (string?)_lastVerifyBody["paymentCode"]);
-        Assert.AreEqual(long.Parse(transaction.Reference, CultureInfo.InvariantCulture), (long)_lastVerifyBody["paymentRefId"]!);
-        Assert.AreEqual(transaction.Reference, (await Host.GetPaymentAsync(InvoiceTrackingNumber)).TransactionCode);
+        Assert.That(_lastVerifyBody, Is.Not.Null);
+        Assert.That((string?)_lastVerifyBody["paymentCode"], Is.EqualTo(transaction.Token));
+        Assert.That((long)_lastVerifyBody["paymentRefId"]!, Is.EqualTo(long.Parse(transaction.Reference, CultureInfo.InvariantCulture)));
+        Assert.That((await Host.GetPaymentAsync(InvoiceTrackingNumber)).TransactionCode, Is.EqualTo(transaction.Reference));
     }
 
     /// <summary>The official WooCommerce plugin notes that some callbacks arrive as a JSON body instead of a form.</summary>
-    [TestMethod]
+    [Test]
     public async Task Callback_with_a_JSON_body_is_verified()
     {
         var transaction = await PayAsync(InvoiceTrackingNumber, InvoiceAmount);
@@ -154,12 +154,12 @@ public class PayPingConformanceTests : GatewayConformanceTests
 
         var outcome = await FetchAndVerifyAsync();
 
-        Assert.IsTrue(outcome.Verify?.IsSucceed ?? false, outcome.Describe());
-        Assert.IsTrue((await Host.GetPaymentAsync(InvoiceTrackingNumber)).IsPaid, outcome.Describe());
+        Assert.That(outcome.Verify?.IsSucceed ?? false, Is.True, outcome.Describe());
+        Assert.That((await Host.GetPaymentAsync(InvoiceTrackingNumber)).IsPaid, Is.True, outcome.Describe());
     }
 
     /// <summary>HTTP 202: PayPing is still verifying. The payment stays open and the retried callback verifies it.</summary>
-    [TestMethod]
+    [Test]
     public async Task Verification_in_progress_leaves_the_payment_open_for_a_retry()
     {
         var transaction = await PayAsync(InvoiceTrackingNumber, InvoiceAmount);
@@ -169,18 +169,18 @@ public class PayPingConformanceTests : GatewayConformanceTests
         DeliverCallback(transaction, transaction, Claims(InvoiceTrackingNumber, InvoiceAmount));
         var first = await FetchAndVerifyAsync();
 
-        Assert.IsInstanceOfType<GatewayResponseException>(first.Exception, first.Describe());
-        Assert.IsFalse((await Host.GetPaymentAsync(InvoiceTrackingNumber)).IsCompleted, first.Describe());
+        Assert.That(first.Exception, Is.InstanceOf<GatewayResponseException>(), first.Describe());
+        Assert.That((await Host.GetPaymentAsync(InvoiceTrackingNumber)).IsCompleted, Is.False, first.Describe());
 
         Bank.VerifyFault = BankFault.None;
         DeliverCallback(transaction, transaction, Claims(InvoiceTrackingNumber, InvoiceAmount));
         var retry = await FetchAndVerifyAsync();
 
-        Assert.IsTrue((await Host.GetPaymentAsync(InvoiceTrackingNumber)).IsPaid, retry.Describe());
+        Assert.That((await Host.GetPaymentAsync(InvoiceTrackingNumber)).IsPaid, Is.True, retry.Describe());
     }
 
     /// <summary>A rejection is reported with PayPing's code and message.</summary>
-    [TestMethod]
+    [Test]
     public async Task Rejected_verification_reports_the_PayPing_code_and_message()
     {
         var transaction = await PayAsync(InvoiceTrackingNumber, InvoiceAmount);
@@ -189,10 +189,10 @@ public class PayPingConformanceTests : GatewayConformanceTests
         DeliverCallback(transaction, transaction, Claims(InvoiceTrackingNumber, InvoiceAmount));
         var outcome = await FetchAndVerifyAsync();
 
-        Assert.IsNull(outcome.Exception, outcome.Describe());
-        Assert.AreEqual(PaymentVerifyResultStatus.Failed, outcome.Verify?.Status, outcome.Describe());
-        Assert.AreEqual("133", outcome.Verify?.GatewayResponseCode, outcome.Describe());
-        StringAssert.Contains(outcome.Verify?.Message, "اطلاعات پرداخت نامعتبر است");
+        Assert.That(outcome.Exception, Is.Null, outcome.Describe());
+        Assert.That(outcome.Verify?.Status, Is.EqualTo(PaymentVerifyResultStatus.Failed), outcome.Describe());
+        Assert.That(outcome.Verify?.GatewayResponseCode, Is.EqualTo("133"), outcome.Describe());
+        Assert.That(outcome.Verify?.Message, Does.Contain("اطلاعات پرداخت نامعتبر است"));
     }
 
     private static JObject CallbackData(BankTransaction transaction, CallbackClaims claims)

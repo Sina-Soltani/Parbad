@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Parbad.Tests.Helpers;
 
@@ -16,21 +16,21 @@ public static class GatewayOnResultHelper
         string expectedPaymentPageUrl = null,
         IDictionary<string, string> expectedForm = null)
     {
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
 
         AssertFailWhenResultIsNotSucceed(result);
-        Assert.IsTrue(result.IsSucceed);
+        Assert.That(result.IsSucceed, Is.True);
 
-        Assert.AreEqual(expectedGatewayName, result.GatewayName);
+        Assert.That(result.GatewayName, Is.EqualTo(expectedGatewayName));
 
-        Assert.IsNotNull(result.GatewayTransporter);
-        Assert.IsNotNull(result.GatewayTransporter.Descriptor);
-        Assert.AreEqual(transportType, result.GatewayTransporter.Descriptor.Type);
-        Assert.IsNotNull(result.GatewayTransporter.Descriptor.Url);
+        Assert.That(result.GatewayTransporter, Is.Not.Null);
+        Assert.That(result.GatewayTransporter.Descriptor, Is.Not.Null);
+        Assert.That(result.GatewayTransporter.Descriptor.Type, Is.EqualTo(transportType));
+        Assert.That(result.GatewayTransporter.Descriptor.Url, Is.Not.Null);
 
         if (transportType == GatewayTransporterDescriptor.TransportType.Post)
         {
-            Assert.IsNotNull(result.GatewayTransporter.Descriptor.Form);
+            Assert.That(result.GatewayTransporter.Descriptor.Form, Is.Not.Null);
 
             if (expectedForm != null)
             {
@@ -42,19 +42,19 @@ public static class GatewayOnResultHelper
                               .Form
                               .SingleOrDefault(_ => _.Key == item.Key);
 
-                    Assert.IsNotNull(form.Key);
-                    Assert.IsNotNull(form.Value);
+                    Assert.That(form.Key, Is.Not.Null);
+                    Assert.That(form.Value, Is.Not.Null);
                 }
             }
         }
         else
         {
-            Assert.IsNull(result.GatewayTransporter.Descriptor.Form);
+            Assert.That(result.GatewayTransporter.Descriptor.Form, Is.Null);
         }
 
         if (!string.IsNullOrEmpty(expectedPaymentPageUrl))
         {
-            Assert.AreEqual(expectedPaymentPageUrl, result.GatewayTransporter.Descriptor.Url);
+            Assert.That(result.GatewayTransporter.Descriptor.Url, Is.EqualTo(expectedPaymentPageUrl));
         }
 
         additionalChecks?.Invoke();
@@ -66,21 +66,21 @@ public static class GatewayOnResultHelper
         decimal expectedAmount,
         string expectedGatewayName)
     {
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
 
         AssertFailWhenResultIsNotSucceed(result);
-        Assert.IsTrue(result.IsSucceed);
-        Assert.AreEqual(PaymentFetchResultStatus.ReadyForVerifying, result.Status);
+        Assert.That(result.IsSucceed, Is.True);
+        Assert.That(result.Status, Is.EqualTo(PaymentFetchResultStatus.ReadyForVerifying));
 
-        Assert.AreEqual(expectedTrackingNumber, result.TrackingNumber);
+        Assert.That(result.TrackingNumber, Is.EqualTo(expectedTrackingNumber));
 
-        Assert.AreEqual(expectedGatewayName, result.GatewayName);
+        Assert.That(result.GatewayName, Is.EqualTo(expectedGatewayName));
 
-        Assert.AreEqual(GatewayAccount.DefaultName, result.GatewayAccountName);
+        Assert.That(result.GatewayAccountName, Is.EqualTo(GatewayAccount.DefaultName));
 
-        Assert.AreEqual(expectedAmount, result.Amount.Value);
+        Assert.That(result.Amount.Value, Is.EqualTo(expectedAmount));
 
-        Assert.IsFalse(result.IsAlreadyVerified);
+        Assert.That(result.IsAlreadyVerified, Is.False);
     }
 
     public static void OnVerifyResult(
@@ -90,25 +90,25 @@ public static class GatewayOnResultHelper
         string expectedGatewayName,
         string expectedTransactionCode = null)
     {
-        Assert.IsNotNull(result);
+        Assert.That(result, Is.Not.Null);
 
         AssertFailWhenResultIsNotSucceed(result);
-        Assert.IsTrue(result.IsSucceed);
-        Assert.AreEqual(PaymentVerifyResultStatus.Succeed, result.Status);
+        Assert.That(result.IsSucceed, Is.True);
+        Assert.That(result.Status, Is.EqualTo(PaymentVerifyResultStatus.Succeed));
 
-        Assert.AreEqual(expectedTrackingNumber, result.TrackingNumber);
+        Assert.That(result.TrackingNumber, Is.EqualTo(expectedTrackingNumber));
 
-        Assert.AreEqual(expectedGatewayName, result.GatewayName);
+        Assert.That(result.GatewayName, Is.EqualTo(expectedGatewayName));
 
-        Assert.AreEqual(GatewayAccount.DefaultName, result.GatewayAccountName);
+        Assert.That(result.GatewayAccountName, Is.EqualTo(GatewayAccount.DefaultName));
 
-        Assert.AreEqual(expectedAmount, result.Amount.Value);
+        Assert.That(result.Amount.Value, Is.EqualTo(expectedAmount));
 
-        Assert.IsNotNull(result.TransactionCode);
+        Assert.That(result.TransactionCode, Is.Not.Null);
 
         if (!string.IsNullOrEmpty(expectedTransactionCode))
         {
-            Assert.AreEqual(expectedTransactionCode, result.TransactionCode);
+            Assert.That(result.TransactionCode, Is.EqualTo(expectedTransactionCode));
         }
     }
 

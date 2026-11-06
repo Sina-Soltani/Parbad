@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Parbad.Builder;
 using Parbad.Storage.Abstractions;
 using Parbad.Storage.Cache.MemoryCache;
@@ -15,7 +15,7 @@ namespace Parbad.PaymentFlow.Tests.Storage;
 /// <see cref="MemoryCacheStorage"/>, registered with <c>UseMemoryCache</c>. Every instance that uses the same
 /// <see cref="IMemoryCache"/> works on the same data, so each instance stands for a concurrent request.
 /// </summary>
-[TestClass]
+[TestFixture]
 public class MemoryCacheStorageTests : CacheStorageTests
 {
     protected override int ParallelCreateCount => 2000;
@@ -25,7 +25,7 @@ public class MemoryCacheStorageTests : CacheStorageTests
         services.AddParbad().ConfigureStorage(builder => builder.UseMemoryCache());
     }
 
-    [TestMethod]
+    [Test]
     public async Task Storages_that_use_the_same_memory_cache_see_each_others_data()
     {
         var first = CreateStorage();
@@ -34,7 +34,7 @@ public class MemoryCacheStorageTests : CacheStorageTests
             Services.GetRequiredService<IMemoryCache>(),
             Services.GetRequiredService<IOptions<MemoryCacheStorageOptions>>());
 
-        Assert.AreNotSame(first, second);
+        Assert.That(second, Is.Not.SameAs(first));
 
         var payment = NewPayment(1001);
         await first.CreatePaymentAsync(payment);
@@ -54,11 +54,11 @@ public class MemoryCacheStorageTests : CacheStorageTests
 
         await second.DeletePaymentAsync(payment);
 
-        Assert.IsFalse(await first.DoesPaymentExistAsync(1001));
-        Assert.AreEqual(0, (await constructedDirectly.GetTransactionsAsync(payment)).Count);
+        Assert.That(await first.DoesPaymentExistAsync(1001), Is.False);
+        Assert.That((await constructedDirectly.GetTransactionsAsync(payment)).Count, Is.EqualTo(0));
     }
 
-    [TestMethod]
+    [Test]
     public async Task Parallel_creates_from_separate_storages_are_all_stored_with_unique_ids()
     {
         var payments = Enumerable.Range(1, ParallelCreateCount).Select(i => NewPayment(1000 + i)).ToList();
@@ -71,7 +71,7 @@ public class MemoryCacheStorageTests : CacheStorageTests
 
             await storage.CreatePaymentAsync(payment);
             await storage.CreateTransactionAsync(NewTransaction(payment.Id));
-            Assert.IsNotNull(await CreateStorage().GetPaymentByTrackingNumberAsync(payment.TrackingNumber));
+            Assert.That(await CreateStorage().GetPaymentByTrackingNumberAsync(payment.TrackingNumber), Is.Not.Null);
         })));
 
         await AssertAllStoredAsync(CreateStorage(), payments);

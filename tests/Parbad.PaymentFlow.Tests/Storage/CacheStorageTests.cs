@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Parbad.Storage.Abstractions;
 using Parbad.Storage.Abstractions.Models;
 
@@ -31,7 +31,7 @@ public abstract class CacheStorageTests
 
     protected IStorage CreateStorage() => Services.GetRequiredService<IStorage>();
 
-    [TestInitialize]
+    [SetUp]
     public void Setup()
     {
         var services = new ServiceCollection();
@@ -41,10 +41,10 @@ public abstract class CacheStorageTests
         Services = services.BuildServiceProvider();
     }
 
-    [TestCleanup]
-    public Task Cleanup() => Services.DisposeAsync().AsTask();
+    [TearDown]
+    public async Task Cleanup() => await Services.DisposeAsync();
 
-    [TestMethod]
+    [Test]
     public async Task Updating_a_payment_from_a_detached_copy_persists_every_field()
     {
         var storage = CreateStorage();
@@ -71,7 +71,7 @@ public abstract class CacheStorageTests
         AssertSamePayment(detached, stored);
     }
 
-    [TestMethod]
+    [Test]
     public async Task Updating_a_transaction_from_a_detached_copy_persists_every_field()
     {
         var storage = CreateStorage();
@@ -99,7 +99,7 @@ public abstract class CacheStorageTests
         AssertSameTransaction(detached, stored);
     }
 
-    [TestMethod]
+    [Test]
     public async Task Created_records_get_an_id_and_are_not_changed_by_mutating_the_original_objects()
     {
         var storage = CreateStorage();
@@ -108,8 +108,8 @@ public abstract class CacheStorageTests
         var transaction = NewTransaction(payment.Id);
         await storage.CreateTransactionAsync(transaction);
 
-        Assert.AreNotEqual(0, payment.Id, "The created payment did not get an id.");
-        Assert.AreNotEqual(0, transaction.Id, "The created transaction did not get an id.");
+        Assert.That(payment.Id, Is.Not.EqualTo(0), "The created payment did not get an id.");
+        Assert.That(transaction.Id, Is.Not.EqualTo(0), "The created transaction did not get an id.");
 
         var expectedPayment = Copy(payment);
         var expectedTransaction = Copy(transaction);
@@ -123,7 +123,7 @@ public abstract class CacheStorageTests
         AssertSameTransaction(expectedTransaction, (await storage.GetTransactionsAsync(expectedPayment)).Single());
     }
 
-    [TestMethod]
+    [Test]
     public async Task Mutating_records_returned_by_reads_does_not_change_stored_data()
     {
         var storage = CreateStorage();
@@ -161,7 +161,7 @@ public abstract class CacheStorageTests
         }
     }
 
-    [TestMethod]
+    [Test]
     public async Task Creating_a_payment_with_an_existing_tracking_number_is_rejected()
     {
         var storage = CreateStorage();
@@ -170,14 +170,14 @@ public abstract class CacheStorageTests
         var duplicate = NewPayment(1001);
         duplicate.Token = "other-token";
 
-        var exception = await AssertThrowsInvalidOperationAsync(() => storage.CreatePaymentAsync(duplicate));
+        var exception = await Assert.CatchAsync<InvalidOperationException>(() => storage.CreatePaymentAsync(duplicate));
 
-        StringAssert.Contains(exception.Message, "tracking number 1001");
-        Assert.IsFalse(await CreateStorage().DoesPaymentExistAsync(duplicate.Token));
-        Assert.IsNotNull(await CreateStorage().GetPaymentByTrackingNumberAsync(1001));
+        Assert.That(exception.Message, Does.Contain("tracking number 1001"));
+        Assert.That(await CreateStorage().DoesPaymentExistAsync(duplicate.Token), Is.False);
+        Assert.That(await CreateStorage().GetPaymentByTrackingNumberAsync(1001), Is.Not.Null);
     }
 
-    [TestMethod]
+    [Test]
     public async Task Creating_a_payment_with_an_existing_token_is_rejected()
     {
         var storage = CreateStorage();
@@ -187,14 +187,14 @@ public abstract class CacheStorageTests
         var duplicate = NewPayment(1002);
         duplicate.Token = original.Token;
 
-        var exception = await AssertThrowsInvalidOperationAsync(() => storage.CreatePaymentAsync(duplicate));
+        var exception = await Assert.CatchAsync<InvalidOperationException>(() => storage.CreatePaymentAsync(duplicate));
 
-        StringAssert.Contains(exception.Message, "token");
-        Assert.IsFalse(await CreateStorage().DoesPaymentExistAsync(duplicate.TrackingNumber));
-        Assert.IsNotNull(await CreateStorage().GetPaymentByTokenAsync(original.Token));
+        Assert.That(exception.Message, Does.Contain("token"));
+        Assert.That(await CreateStorage().DoesPaymentExistAsync(duplicate.TrackingNumber), Is.False);
+        Assert.That(await CreateStorage().GetPaymentByTokenAsync(original.Token), Is.Not.Null);
     }
 
-    [TestMethod]
+    [Test]
     public async Task Updating_a_payment_to_the_tracking_number_or_token_of_another_payment_is_rejected()
     {
         var storage = CreateStorage();
@@ -209,8 +209,8 @@ public abstract class CacheStorageTests
         var sameToken = Copy(second);
         sameToken.Token = first.Token;
 
-        await AssertThrowsInvalidOperationAsync(() => storage.UpdatePaymentAsync(sameTrackingNumber));
-        await AssertThrowsInvalidOperationAsync(() => storage.UpdatePaymentAsync(sameToken));
+        await Assert.CatchAsync<InvalidOperationException>(() => storage.UpdatePaymentAsync(sameTrackingNumber));
+        await Assert.CatchAsync<InvalidOperationException>(() => storage.UpdatePaymentAsync(sameToken));
 
         // A payment may keep its own tracking number and token.
         var unchangedKeys = Copy(second);
@@ -221,7 +221,7 @@ public abstract class CacheStorageTests
         AssertSamePayment(unchangedKeys, await CreateStorage().GetPaymentByTrackingNumberAsync(second.TrackingNumber));
     }
 
-    [TestMethod]
+    [Test]
     public async Task Parallel_creates_on_one_storage_are_all_stored_with_unique_ids()
     {
         var storage = CreateStorage();
@@ -232,13 +232,13 @@ public abstract class CacheStorageTests
         {
             await storage.CreatePaymentAsync(payment);
             await storage.CreateTransactionAsync(NewTransaction(payment.Id));
-            Assert.IsNotNull(await storage.GetPaymentByTrackingNumberAsync(payment.TrackingNumber));
+            Assert.That(await storage.GetPaymentByTrackingNumberAsync(payment.TrackingNumber), Is.Not.Null);
         })));
 
         await AssertAllStoredAsync(CreateStorage(), payments);
     }
 
-    [TestMethod]
+    [Test]
     public async Task Paid_payment_lookup_finds_only_paid_payments_of_the_same_gateway_except_the_given_one()
     {
         var storage = CreateStorage();
@@ -262,12 +262,12 @@ public abstract class CacheStorageTests
         lookup = CreateStorage();
 
         AssertSamePayment(paid, await lookup.FindPaidPaymentByBankReferenceAsync("GATEWAY", "RRN-1", exceptTrackingNumber: 99));
-        Assert.IsNull(await lookup.FindPaidPaymentByBankReferenceAsync("gateway", "RRN-1", exceptTrackingNumber: 1), "The excluded payment was returned.");
-        Assert.IsNull(await lookup.FindPaidPaymentByBankReferenceAsync("gateway", "RRN-2", exceptTrackingNumber: 99), "An unpaid payment was returned.");
-        Assert.IsNull(await lookup.FindPaidPaymentByBankReferenceAsync("gateway", "RRN-3", exceptTrackingNumber: 99), "A payment of another gateway was returned.");
+        Assert.That(await lookup.FindPaidPaymentByBankReferenceAsync("gateway", "RRN-1", exceptTrackingNumber: 1), Is.Null, "The excluded payment was returned.");
+        Assert.That(await lookup.FindPaidPaymentByBankReferenceAsync("gateway", "RRN-2", exceptTrackingNumber: 99), Is.Null, "An unpaid payment was returned.");
+        Assert.That(await lookup.FindPaidPaymentByBankReferenceAsync("gateway", "RRN-3", exceptTrackingNumber: 99), Is.Null, "A payment of another gateway was returned.");
     }
 
-    [TestMethod]
+    [Test]
     public async Task Payment_completion_keeps_a_paid_result_and_lets_a_paid_result_replace_an_unpaid_one()
     {
         var payment = NewPayment(1);
@@ -276,18 +276,18 @@ public abstract class CacheStorageTests
 
         IStorage Completion() => CreateStorage();
 
-        Assert.IsTrue(await Completion().TryCompletePaymentAsync(payment.Id, isPaid: false, transactionCode: null), "An open payment could not be completed.");
-        Assert.IsFalse(await Completion().TryCompletePaymentAsync(payment.Id, isPaid: false, "RRN-2"), "An unpaid result replaced another result.");
-        Assert.IsTrue(await Completion().TryCompletePaymentAsync(payment.Id, isPaid: true, "RRN-3"), "A paid result could not replace an unpaid one.");
-        Assert.IsFalse(await Completion().TryCompletePaymentAsync(payment.Id, isPaid: true, "RRN-4"), "A paid payment was changed.");
-        Assert.IsFalse(await Completion().TryCompletePaymentAsync(payment.Id, isPaid: false, transactionCode: null), "A paid payment was changed.");
+        Assert.That(await Completion().TryCompletePaymentAsync(payment.Id, isPaid: false, transactionCode: null), Is.True, "An open payment could not be completed.");
+        Assert.That(await Completion().TryCompletePaymentAsync(payment.Id, isPaid: false, "RRN-2"), Is.False, "An unpaid result replaced another result.");
+        Assert.That(await Completion().TryCompletePaymentAsync(payment.Id, isPaid: true, "RRN-3"), Is.True, "A paid result could not replace an unpaid one.");
+        Assert.That(await Completion().TryCompletePaymentAsync(payment.Id, isPaid: true, "RRN-4"), Is.False, "A paid payment was changed.");
+        Assert.That(await Completion().TryCompletePaymentAsync(payment.Id, isPaid: false, transactionCode: null), Is.False, "A paid payment was changed.");
 
         var stored = await CreateStorage().GetPaymentByTrackingNumberAsync(1);
-        Assert.IsTrue(stored!.IsCompleted && stored.IsPaid);
-        Assert.AreEqual("RRN-3", stored.TransactionCode);
+        Assert.That(stored!.IsCompleted && stored.IsPaid, Is.True);
+        Assert.That(stored.TransactionCode, Is.EqualTo("RRN-3"));
     }
 
-    [TestMethod]
+    [Test]
     public async Task Parallel_completions_of_one_payment_on_one_storage_let_exactly_one_succeed()
     {
         var payment = NewPayment(1);
@@ -298,31 +298,31 @@ public abstract class CacheStorageTests
         var results = await Task.WhenAll(Enumerable.Range(0, 20).Select(i => Task.Run(() =>
             completion.TryCompletePaymentAsync(payment.Id, isPaid: false, $"RRN-{i}"))));
 
-        Assert.AreEqual(1, results.Count(completed => completed));
+        Assert.That(results.Count(completed => completed), Is.EqualTo(1));
     }
 
     /// <summary>
     /// A storage instance lives for one request, and a verification takes seconds, so another instance (another
     /// request or server) may complete the payment in the meantime.
     /// </summary>
-    [TestMethod]
+    [Test]
     public async Task Completion_sees_a_completion_made_by_another_storage_instance_in_the_meantime()
     {
         var payment = NewPayment(1);
         await CreateStorage().CreatePaymentAsync(payment);
 
         var thisRequest = CreateStorage();
-        Assert.IsTrue(await CreateStorage().TryCompletePaymentAsync(payment.Id, isPaid: true, "RRN-OTHER"));
+        Assert.That(await CreateStorage().TryCompletePaymentAsync(payment.Id, isPaid: true, "RRN-OTHER"), Is.True);
 
-        Assert.IsFalse(await thisRequest.TryCompletePaymentAsync(payment.Id, isPaid: false, transactionCode: null),
-                       "The completion was decided on records loaded before the other instance completed the payment.");
-        Assert.IsTrue((await CreateStorage().GetPaymentByTrackingNumberAsync(1))!.IsPaid);
+        Assert.That(await thisRequest.TryCompletePaymentAsync(payment.Id, isPaid: false, transactionCode: null), Is.False,
+                    "The completion was decided on records loaded before the other instance completed the payment.");
+        Assert.That((await CreateStorage().GetPaymentByTrackingNumberAsync(1))!.IsPaid, Is.True);
     }
 
     protected static async Task AssertAllStoredAsync(IStorage storage, IReadOnlyCollection<Payment> payments)
     {
-        Assert.AreEqual(payments.Count, payments.Select(payment => payment.Id).Distinct().Count(), "Payment ids are not unique.");
-        Assert.AreEqual(payments.Max(payment => payment.TrackingNumber), await storage.GetLargestTrackingNumberAsync());
+        Assert.That(payments.Select(payment => payment.Id).Distinct().Count(), Is.EqualTo(payments.Count), "Payment ids are not unique.");
+        Assert.That(await storage.GetLargestTrackingNumberAsync(), Is.EqualTo(payments.Max(payment => payment.TrackingNumber)));
 
         var transactionIds = new List<long>();
 
@@ -331,11 +331,11 @@ public abstract class CacheStorageTests
             AssertSamePayment(payment, await storage.GetPaymentByTrackingNumberAsync(payment.TrackingNumber));
 
             var transactions = await storage.GetTransactionsAsync(payment);
-            Assert.AreEqual(1, transactions.Count, $"Payment {payment.TrackingNumber} has no transaction.");
+            Assert.That(transactions.Count, Is.EqualTo(1), $"Payment {payment.TrackingNumber} has no transaction.");
             transactionIds.AddRange(transactions.Select(transaction => transaction.Id));
         }
 
-        Assert.AreEqual(payments.Count, transactionIds.Distinct().Count(), "Transaction ids are not unique.");
+        Assert.That(transactionIds.Distinct().Count(), Is.EqualTo(payments.Count), "Transaction ids are not unique.");
     }
 
     protected static Payment NewPayment(long trackingNumber) => new()
@@ -360,45 +360,28 @@ public abstract class CacheStorageTests
 
     protected static void AssertSamePayment(Payment expected, Payment? actual)
     {
-        Assert.IsNotNull(actual, $"Payment {expected.TrackingNumber} was not found.");
-        Assert.AreEqual(expected.Id, actual.Id, nameof(Payment.Id));
-        Assert.AreEqual(expected.TrackingNumber, actual.TrackingNumber, nameof(Payment.TrackingNumber));
-        Assert.AreEqual(expected.Amount, actual.Amount, nameof(Payment.Amount));
-        Assert.AreEqual(expected.Token, actual.Token, nameof(Payment.Token));
-        Assert.AreEqual(expected.TransactionCode, actual.TransactionCode, nameof(Payment.TransactionCode));
-        Assert.AreEqual(expected.GatewayName, actual.GatewayName, nameof(Payment.GatewayName));
-        Assert.AreEqual(expected.GatewayAccountName, actual.GatewayAccountName, nameof(Payment.GatewayAccountName));
-        Assert.AreEqual(expected.IsCompleted, actual.IsCompleted, nameof(Payment.IsCompleted));
-        Assert.AreEqual(expected.IsPaid, actual.IsPaid, nameof(Payment.IsPaid));
+        Assert.That(actual, Is.Not.Null, $"Payment {expected.TrackingNumber} was not found.");
+        Assert.That(actual.Id, Is.EqualTo(expected.Id), nameof(Payment.Id));
+        Assert.That(actual.TrackingNumber, Is.EqualTo(expected.TrackingNumber), nameof(Payment.TrackingNumber));
+        Assert.That(actual.Amount, Is.EqualTo(expected.Amount), nameof(Payment.Amount));
+        Assert.That(actual.Token, Is.EqualTo(expected.Token), nameof(Payment.Token));
+        Assert.That(actual.TransactionCode, Is.EqualTo(expected.TransactionCode), nameof(Payment.TransactionCode));
+        Assert.That(actual.GatewayName, Is.EqualTo(expected.GatewayName), nameof(Payment.GatewayName));
+        Assert.That(actual.GatewayAccountName, Is.EqualTo(expected.GatewayAccountName), nameof(Payment.GatewayAccountName));
+        Assert.That(actual.IsCompleted, Is.EqualTo(expected.IsCompleted), nameof(Payment.IsCompleted));
+        Assert.That(actual.IsPaid, Is.EqualTo(expected.IsPaid), nameof(Payment.IsPaid));
     }
 
     protected static void AssertSameTransaction(Transaction expected, Transaction? actual)
     {
-        Assert.IsNotNull(actual, $"Transaction {expected.Id} was not found.");
-        Assert.AreEqual(expected.Id, actual.Id, nameof(Transaction.Id));
-        Assert.AreEqual(expected.PaymentId, actual.PaymentId, nameof(Transaction.PaymentId));
-        Assert.AreEqual(expected.Amount, actual.Amount, nameof(Transaction.Amount));
-        Assert.AreEqual(expected.Type, actual.Type, nameof(Transaction.Type));
-        Assert.AreEqual(expected.IsSucceed, actual.IsSucceed, nameof(Transaction.IsSucceed));
-        Assert.AreEqual(expected.Message, actual.Message, nameof(Transaction.Message));
-        Assert.AreEqual(expected.AdditionalData, actual.AdditionalData, nameof(Transaction.AdditionalData));
-    }
-
-    // Assert.ThrowsExceptionAsync is removed in MSTest 4.
-    protected static async Task<InvalidOperationException> AssertThrowsInvalidOperationAsync(Func<Task> action)
-    {
-        try
-        {
-            await action();
-        }
-        catch (InvalidOperationException exception)
-        {
-            return exception;
-        }
-
-        Assert.Fail("Expected an InvalidOperationException.");
-
-        return null!;
+        Assert.That(actual, Is.Not.Null, $"Transaction {expected.Id} was not found.");
+        Assert.That(actual.Id, Is.EqualTo(expected.Id), nameof(Transaction.Id));
+        Assert.That(actual.PaymentId, Is.EqualTo(expected.PaymentId), nameof(Transaction.PaymentId));
+        Assert.That(actual.Amount, Is.EqualTo(expected.Amount), nameof(Transaction.Amount));
+        Assert.That(actual.Type, Is.EqualTo(expected.Type), nameof(Transaction.Type));
+        Assert.That(actual.IsSucceed, Is.EqualTo(expected.IsSucceed), nameof(Transaction.IsSucceed));
+        Assert.That(actual.Message, Is.EqualTo(expected.Message), nameof(Transaction.Message));
+        Assert.That(actual.AdditionalData, Is.EqualTo(expected.AdditionalData), nameof(Transaction.AdditionalData));
     }
 
     private static Payment Copy(Payment payment) => new()

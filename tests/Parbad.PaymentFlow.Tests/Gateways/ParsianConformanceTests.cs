@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Parbad.Builder;
 using Parbad.Gateway.Parsian;
 using Parbad.GatewayBuilders;
@@ -17,7 +17,7 @@ namespace Parbad.PaymentFlow.Tests.Gateways;
 /// Parsian (PEC NewIPGServices, SOAP): SalePaymentRequest → redirect → POST callback → ConfirmPayment;
 /// refunds use ReversalRequest.
 /// </summary>
-[TestClass]
+[TestFixture]
 public class ParsianConformanceTests : GatewayConformanceTests
 {
     private const string LoginAccount = "PEC-LOGIN-ACCOUNT";
@@ -51,7 +51,7 @@ public class ParsianConformanceTests : GatewayConformanceTests
     /// The SOAP envelope is built as a string, so every value must be XML-encoded. An unencoded "&amp;" or "&lt;"
     /// makes the request invalid XML, or lets the value add elements of its own.
     /// </summary>
-    [TestMethod]
+    [Test]
     public async Task Request_values_with_xml_special_characters_reach_the_bank_unchanged()
     {
         Host.StartCheckoutRequest();
@@ -66,16 +66,16 @@ public class ParsianConformanceTests : GatewayConformanceTests
             invoice.SetParsianAdditionalData(new ParsianGatewayAdditionalDataRequest { AdditionalData = SpecialAdditionalData, Originator = SpecialSecondValue });
         });
 
-        Assert.IsTrue(result.IsSucceed, $"Request failed: {result.Message}");
-        Assert.AreEqual(SpecialAdditionalData, _receivedAdditionalData);
-        Assert.AreEqual(SpecialSecondValue, _receivedSecondValue);
+        Assert.That(result.IsSucceed, Is.True, $"Request failed: {result.Message}");
+        Assert.That(_receivedAdditionalData, Is.EqualTo(SpecialAdditionalData));
+        Assert.That(_receivedSecondValue, Is.EqualTo(SpecialSecondValue));
     }
 
     /// <summary>
     /// The callback is read asynchronously from the form or the query string. A synchronous Request.Form
     /// threw on a GET request.
     /// </summary>
-    [TestMethod]
+    [Test]
     public async Task Callback_sent_as_a_get_request_is_verified()
     {
         var transaction = await PayAsync(InvoiceTrackingNumber, InvoiceAmount);
@@ -85,7 +85,7 @@ public class ParsianConformanceTests : GatewayConformanceTests
         var outcome = await FetchAndVerifyAsync();
 
         outcome.AssertNoUnexpectedException();
-        Assert.AreEqual(PaymentVerifyResultStatus.Succeed, outcome.Verify?.Status, outcome.Describe());
+        Assert.That(outcome.Verify?.Status, Is.EqualTo(PaymentVerifyResultStatus.Succeed), outcome.Describe());
     }
 
     protected override void SetupBank(MockHttpMessageHandler http)

@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Parbad.Gateway.ParbadVirtual;
 using Parbad.Gateway.ParbadVirtual.MiddlewareInvoker;
 using Parbad.Internal;
@@ -19,7 +19,7 @@ namespace Parbad.PaymentFlow.Tests.Core;
 /// The HTML that Parbad writes to the browser: the auto-post form of <see cref="DefaultGatewayTransporter"/> and the
 /// Virtual Gateway pages.
 /// </summary>
-[TestClass]
+[TestFixture]
 public class HtmlRenderingTests
 {
     private const string Payload = "\"><script>alert(1)</script>";
@@ -29,7 +29,7 @@ public class HtmlRenderingTests
 
     private ParbadTestHost _host = null!;
 
-    [TestInitialize]
+    [SetUp]
     public void Initialize()
     {
         _host = ParbadTestHost.Create(
@@ -37,12 +37,12 @@ public class HtmlRenderingTests
             services => services.Configure<ParbadOptions>(options => options.NonceFactory = _ => Nonce));
     }
 
-    [TestCleanup]
-    public Task Cleanup() => _host.DisposeAsync().AsTask();
+    [TearDown]
+    public async Task Cleanup() => await _host.DisposeAsync();
 
     // ---------- Auto-post form ----------
 
-    [TestMethod]
+    [Test]
     public async Task Post_form_encodes_the_url_and_the_fields()
     {
         var descriptor = GatewayTransporterDescriptor.CreatePost(
@@ -51,13 +51,13 @@ public class HtmlRenderingTests
 
         var body = await TransportAsync(descriptor);
 
-        StringAssert.Contains(body, $"action=\"https://bank.test/pay?x={EncodedPayload}\"");
-        StringAssert.Contains(body, $"name=\"field{EncodedPayload}\"");
-        StringAssert.Contains(body, $"value=\"value{EncodedPayload}\"");
-        Assert.IsFalse(body.Contains("<script>alert(1)"), body);
+        Assert.That(body, Does.Contain($"action=\"https://bank.test/pay?x={EncodedPayload}\""));
+        Assert.That(body, Does.Contain($"name=\"field{EncodedPayload}\""));
+        Assert.That(body, Does.Contain($"value=\"value{EncodedPayload}\""));
+        Assert.That(body.Contains("<script>alert(1)"), Is.False, body);
     }
 
-    [TestMethod]
+    [Test]
     public async Task Post_form_is_valid_markup_with_a_noscript_fallback_and_the_nonce()
     {
         var descriptor = GatewayTransporterDescriptor.CreatePost(
@@ -66,16 +66,16 @@ public class HtmlRenderingTests
 
         var body = await TransportAsync(descriptor);
 
-        Assert.IsTrue(body.StartsWith("<!DOCTYPE html>"), body);
-        StringAssert.Contains(body, "<meta charset=\"utf-8\">");
-        StringAssert.Contains(body, "<form id=\"paymentForm\" action=\"https://bank.test/pay\" method=\"post\"><input");
-        StringAssert.Matches(body, new Regex("<noscript><button type=\"submit\">[^<]+</button></noscript></form>"));
-        StringAssert.Contains(body, $"<script type=\"text/javascript\" nonce=\"{Nonce}\">document.getElementById('paymentForm').submit();</script>");
+        Assert.That(body.StartsWith("<!DOCTYPE html>"), Is.True, body);
+        Assert.That(body, Does.Contain("<meta charset=\"utf-8\">"));
+        Assert.That(body, Does.Contain("<form id=\"paymentForm\" action=\"https://bank.test/pay\" method=\"post\"><input"));
+        Assert.That(body, Does.Match("<noscript><button type=\"submit\">[^<]+</button></noscript></form>"));
+        Assert.That(body, Does.Contain($"<script type=\"text/javascript\" nonce=\"{Nonce}\">document.getElementById('paymentForm').submit();</script>"));
     }
 
     // ---------- CORS headers ----------
 
-    [TestMethod]
+    [Test]
     public async Task Post_transport_adds_no_cors_headers()
     {
         await TransportAsync(GatewayTransporterDescriptor.CreatePost("https://bank.test/pay", new List<KeyValuePair<string, string>>()));
@@ -83,44 +83,42 @@ public class HtmlRenderingTests
         AssertNoCorsHeaders(_host.HttpContextAccessor.HttpContext!.Response);
     }
 
-    [TestMethod]
+    [Test]
     public async Task Redirect_transport_adds_no_cors_headers()
     {
         await TransportAsync(GatewayTransporterDescriptor.CreateRedirect("https://bank.test/pay"));
 
         var response = _host.HttpContextAccessor.HttpContext!.Response;
-        Assert.AreEqual(StatusCodes.Status302Found, response.StatusCode);
+        Assert.That(response.StatusCode, Is.EqualTo(StatusCodes.Status302Found));
         AssertNoCorsHeaders(response);
     }
 
     // ---------- Virtual Gateway ----------
 
-    [TestMethod]
-    [DataRow("Request", "javascript:alert(1)")]
-    [DataRow("Pay", "javascript:alert(1)")]
-    [DataRow("Request", "JavaScript:alert(1)")]
-    [DataRow("Request", "data:text/html,<script>alert(1)</script>")]
-    [DataRow("Request", "/payment/callback")]
+    [TestCase("Request", "javascript:alert(1)")]
+    [TestCase("Pay", "javascript:alert(1)")]
+    [TestCase("Request", "JavaScript:alert(1)")]
+    [TestCase("Request", "data:text/html,<script>alert(1)</script>")]
+    [TestCase("Request", "/payment/callback")]
     public async Task Virtual_gateway_rejects_a_redirect_url_that_is_not_absolute_http(string commandType, string redirectUrl)
     {
         var (response, body) = await InvokeVirtualGatewayAsync(commandType, redirectUrl);
 
-        Assert.AreEqual(StatusCodes.Status400BadRequest, response.StatusCode);
-        Assert.IsFalse(body.Contains(redirectUrl), body);
-        Assert.IsFalse(body.Contains("<form"), body);
+        Assert.That(response.StatusCode, Is.EqualTo(StatusCodes.Status400BadRequest));
+        Assert.That(body.Contains(redirectUrl), Is.False, body);
+        Assert.That(body.Contains("<form"), Is.False, body);
     }
 
-    [TestMethod]
-    [DataRow("Request")]
-    [DataRow("Pay")]
+    [TestCase("Request")]
+    [TestCase("Pay")]
     public async Task Virtual_gateway_encodes_the_redirect_url(string commandType)
     {
         var (response, body) = await InvokeVirtualGatewayAsync(commandType, "https://shop.test/callback?x=" + Payload);
 
-        Assert.AreEqual(StatusCodes.Status200OK, response.StatusCode);
-        StringAssert.Contains(body, $"\"https://shop.test/callback?x={EncodedPayload}\"");
-        Assert.IsFalse(body.Contains("<script>alert(1)"), body);
-        StringAssert.Contains(body, $"<script type=\"text/javascript\"  nonce=\"{Nonce}\">");
+        Assert.That(response.StatusCode, Is.EqualTo(StatusCodes.Status200OK));
+        Assert.That(body, Does.Contain($"\"https://shop.test/callback?x={EncodedPayload}\""));
+        Assert.That(body.Contains("<script>alert(1)"), Is.False, body);
+        Assert.That(body, Does.Contain($"<script type=\"text/javascript\"  nonce=\"{Nonce}\">"));
         AssertNoCorsHeaders(response);
     }
 
@@ -169,7 +167,7 @@ public class HtmlRenderingTests
     {
         var corsHeaders = response.Headers.Keys.Where(key => key.StartsWith("Access-Control-")).ToList();
 
-        Assert.AreEqual(0, corsHeaders.Count, "Unexpected headers: " + string.Join(", ", corsHeaders));
-        Assert.AreEqual("no-store, no-cache", response.Headers["Cache-Control"].ToString());
+        Assert.That(corsHeaders.Count, Is.EqualTo(0), "Unexpected headers: " + string.Join(", ", corsHeaders));
+        Assert.That(response.Headers["Cache-Control"].ToString(), Is.EqualTo("no-store, no-cache"));
     }
 }

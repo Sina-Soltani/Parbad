@@ -3,16 +3,16 @@ using Parbad.Internal;
 using Parbad.InvoiceBuilder;
 using System;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Parbad.Gateway.FanAva.Tests;
 
-[TestClass]
+[TestFixture]
 public class FanAvaCommonTests
 {
     private IInvoiceBuilder _invoiceBuilder;
 
-    [TestInitialize]
+    [SetUp]
     public void Initialize()
     {
         var mockServiceProvider = new Mock<IServiceProvider>();
@@ -20,15 +20,15 @@ public class FanAvaCommonTests
         _invoiceBuilder = new DefaultInvoiceBuilder(mockServiceProvider.Object);
     }
 
-    [TestMethod]
+    [Test]
     public async Task Invoice_Must_Have_Correct_GatewayName()
     {
         _invoiceBuilder.UseFanAva();
 
         var invoice = await _invoiceBuilder.BuildAsync();
 
-        Assert.IsNotNull(invoice);
-        Assert.IsNotNull(invoice.GatewayName);
-        Assert.AreEqual(FanAvaGateway.Name, invoice.GatewayName);
+        Assert.That(invoice, Is.Not.Null);
+        Assert.That(invoice.GatewayName, Is.Not.Null);
+        Assert.That(invoice.GatewayName, Is.EqualTo(FanAvaGateway.Name));
     }
 }

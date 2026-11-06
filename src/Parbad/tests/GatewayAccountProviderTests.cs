@@ -1,13 +1,13 @@
 ﻿using Parbad.Internal;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Parbad.Tests;
 
-[TestClass]
+[TestFixture]
 public class GatewayAccountProviderTests
 {
-    [TestMethod]
+    [Test]
     public async Task Must_Have_An_Account()
     {
         var source = new InMemoryGatewayAccountSource<TestableGatewayAccount>(new[]
@@ -19,7 +19,7 @@ public class GatewayAccountProviderTests
 
         var accounts = await provider.LoadAccountsAsync();
 
-        Assert.IsNotNull(accounts);
-        Assert.IsTrue(accounts.Count == 1);
+        Assert.That(accounts, Is.Not.Null);
+        Assert.That(accounts.Count == 1, Is.True);
     }
 }

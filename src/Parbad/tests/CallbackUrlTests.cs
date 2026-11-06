@@ -1,35 +1,35 @@
 ﻿using Parbad.Exceptions;
 using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Parbad.Tests;
 
-[TestClass]
+[TestFixture]
 public class CallbackUrlTests
 {
     private const string ExpectedUrl = "http://www.mysite.com";
 
-    [TestMethod]
+    [Test]
     public void Url_Must_Be_Equal_With_ExpectedUrl()
     {
         var instance1 = new CallbackUrl(ExpectedUrl);
         var instance2 = CallbackUrl.Parse(ExpectedUrl);
         CallbackUrl.TryParse(ExpectedUrl, out var instance3);
 
-        Assert.AreEqual(ExpectedUrl, instance1.Url);
-        Assert.AreEqual(ExpectedUrl, instance2.Url);
-        Assert.AreEqual(ExpectedUrl, instance3.Url);
+        Assert.That(instance1.Url, Is.EqualTo(ExpectedUrl));
+        Assert.That(instance2.Url, Is.EqualTo(ExpectedUrl));
+        Assert.That(instance3.Url, Is.EqualTo(ExpectedUrl));
     }
 
-    [TestMethod]
+    [Test]
     public void ToString_Value_Must_Be_Equal_With_Url()
     {
         var instance = new CallbackUrl(ExpectedUrl);
 
-        Assert.AreEqual(ExpectedUrl, instance.ToString());
+        Assert.That(instance.ToString(), Is.EqualTo(ExpectedUrl));
     }
 
-    [TestMethod]
+    [Test]
     public void QueryString_Works()
     {
         const string expectedQueryName = "test";
@@ -42,21 +42,21 @@ public class CallbackUrlTests
         var uri = new Uri(instance2.Url);
         var query = uri.Query;
 
-        Assert.IsNotNull(query);
-        Assert.IsTrue(query.Contains($"{expectedQueryName}={expectedQueryValue}"));
+        Assert.That(query, Is.Not.Null);
+        Assert.That(query.Contains($"{expectedQueryName}={expectedQueryValue}"), Is.True);
     }
 
-    [TestMethod]
+    [Test]
     public void Casted_Value_Must_Be_Equal_With_Url()
     {
         var url = (string)new CallbackUrl(ExpectedUrl);
 
-        Assert.AreEqual(ExpectedUrl, url);
+        Assert.That(url, Is.EqualTo(ExpectedUrl));
     }
 
-    [TestMethod]
+    [Test]
     public void NonValidUrl_Must_Throw_Exception()
     {
-        Assert.ThrowsException<CallbackUrlFormatException>(() => new CallbackUrl("abcd"));
+        Assert.Throws<CallbackUrlFormatException>(() => new CallbackUrl("abcd"));
     }
 }

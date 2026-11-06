@@ -5,11 +5,11 @@ using Parbad.Storage.Abstractions.Models;
 using Parbad.Storage.Cache.MemoryCache;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Parbad.Storage.Cache.Tests;
 
-[TestClass]
+[TestFixture]
 public class MemoryCacheTests
 {
     private ServiceProvider _services;
@@ -36,7 +36,7 @@ public class MemoryCacheTests
                                                           AdditionalData = "test"
                                                       };
 
-    [TestInitialize]
+    [SetUp]
     public void Setup()
     {
         _services = new ServiceCollection()
@@ -50,34 +50,34 @@ public class MemoryCacheTests
         _storage = new MemoryCacheStorage(memoryCache, options);
     }
 
-    [TestCleanup]
+    [TearDown]
     public async Task Cleanup()
     {
         await _services.DisposeAsync();
     }
 
-    [TestMethod]
+    [Test]
     public async Task Create_Payment_Works()
     {
         await _storage.CreatePaymentAsync(PaymentTestData);
 
         var payment = await _storage.GetPaymentByTrackingNumberAsync(PaymentTestData.TrackingNumber);
 
-        Assert.IsNotNull(payment);
-        Assert.IsTrue(await _storage.DoesPaymentExistAsync(PaymentTestData.TrackingNumber));
+        Assert.That(payment, Is.Not.Null);
+        Assert.That(await _storage.DoesPaymentExistAsync(PaymentTestData.TrackingNumber), Is.True);
 
-        Assert.AreEqual(1, payment.Id);
-        Assert.AreEqual(PaymentTestData.TrackingNumber, payment.TrackingNumber);
-        Assert.AreEqual(PaymentTestData.Amount, payment.Amount);
-        Assert.AreEqual(PaymentTestData.TransactionCode, payment.TransactionCode);
-        Assert.AreEqual(PaymentTestData.GatewayName, payment.GatewayName);
-        Assert.AreEqual(PaymentTestData.GatewayAccountName, payment.GatewayAccountName);
-        Assert.AreEqual(PaymentTestData.Token, payment.Token);
-        Assert.AreEqual(PaymentTestData.IsPaid, payment.IsPaid);
-        Assert.AreEqual(PaymentTestData.IsCompleted, payment.IsCompleted);
+        Assert.That(payment.Id, Is.EqualTo(1));
+        Assert.That(payment.TrackingNumber, Is.EqualTo(PaymentTestData.TrackingNumber));
+        Assert.That(payment.Amount, Is.EqualTo(PaymentTestData.Amount));
+        Assert.That(payment.TransactionCode, Is.EqualTo(PaymentTestData.TransactionCode));
+        Assert.That(payment.GatewayName, Is.EqualTo(PaymentTestData.GatewayName));
+        Assert.That(payment.GatewayAccountName, Is.EqualTo(PaymentTestData.GatewayAccountName));
+        Assert.That(payment.Token, Is.EqualTo(PaymentTestData.Token));
+        Assert.That(payment.IsPaid, Is.EqualTo(PaymentTestData.IsPaid));
+        Assert.That(payment.IsCompleted, Is.EqualTo(PaymentTestData.IsCompleted));
     }
 
-    [TestMethod]
+    [Test]
     public async Task Update_Payment_Works()
     {
         await _storage.CreatePaymentAsync(PaymentTestData);
@@ -95,19 +95,19 @@ public class MemoryCacheTests
 
         var newPayment = await _storage.GetPaymentByTrackingNumberAsync(payment.TrackingNumber);
 
-        Assert.IsNotNull(newPayment);
-        Assert.AreEqual(1, newPayment.Id);
-        Assert.AreEqual(payment.TrackingNumber, newPayment.TrackingNumber);
-        Assert.AreEqual(payment.Amount, newPayment.Amount);
-        Assert.AreEqual(payment.TransactionCode, newPayment.TransactionCode);
-        Assert.AreEqual(payment.GatewayName, newPayment.GatewayName);
-        Assert.AreEqual(payment.GatewayAccountName, newPayment.GatewayAccountName);
-        Assert.AreEqual(payment.Token, newPayment.Token);
-        Assert.AreEqual(payment.IsPaid, newPayment.IsPaid);
-        Assert.AreEqual(payment.IsCompleted, newPayment.IsCompleted);
+        Assert.That(newPayment, Is.Not.Null);
+        Assert.That(newPayment.Id, Is.EqualTo(1));
+        Assert.That(newPayment.TrackingNumber, Is.EqualTo(payment.TrackingNumber));
+        Assert.That(newPayment.Amount, Is.EqualTo(payment.Amount));
+        Assert.That(newPayment.TransactionCode, Is.EqualTo(payment.TransactionCode));
+        Assert.That(newPayment.GatewayName, Is.EqualTo(payment.GatewayName));
+        Assert.That(newPayment.GatewayAccountName, Is.EqualTo(payment.GatewayAccountName));
+        Assert.That(newPayment.Token, Is.EqualTo(payment.Token));
+        Assert.That(newPayment.IsPaid, Is.EqualTo(payment.IsPaid));
+        Assert.That(newPayment.IsCompleted, Is.EqualTo(payment.IsCompleted));
     }
 
-    [TestMethod]
+    [Test]
     public async Task Delete_Payment_Works()
     {
         await _storage.CreatePaymentAsync(PaymentTestData);
@@ -116,10 +116,10 @@ public class MemoryCacheTests
 
         await _storage.DeletePaymentAsync(payment);
 
-        Assert.IsFalse(await _storage.DoesPaymentExistAsync(PaymentTestData.TrackingNumber));
+        Assert.That(await _storage.DoesPaymentExistAsync(PaymentTestData.TrackingNumber), Is.False);
     }
 
-    [TestMethod]
+    [Test]
     public async Task Create_Transaction_Works()
     {
         await _storage.CreatePaymentAsync(PaymentTestData);
@@ -132,19 +132,19 @@ public class MemoryCacheTests
 
         var transaction = (await _storage.GetTransactionsAsync(payment)).SingleOrDefault();
 
-        Assert.IsNotNull(transaction);
-        Assert.AreEqual(1, (await _storage.GetTransactionsAsync(payment)).Count);
+        Assert.That(transaction, Is.Not.Null);
+        Assert.That((await _storage.GetTransactionsAsync(payment)).Count, Is.EqualTo(1));
 
-        Assert.AreEqual(1, transaction.Id);
-        Assert.AreEqual(payment.Id, transaction.PaymentId);
-        Assert.AreEqual(TransactionTestData.Amount, transaction.Amount);
-        Assert.AreEqual(TransactionTestData.AdditionalData, transaction.AdditionalData);
-        Assert.AreEqual(TransactionTestData.IsSucceed, transaction.IsSucceed);
-        Assert.AreEqual(TransactionTestData.Type, transaction.Type);
-        Assert.AreEqual(TransactionTestData.Message, transaction.Message);
+        Assert.That(transaction.Id, Is.EqualTo(1));
+        Assert.That(transaction.PaymentId, Is.EqualTo(payment.Id));
+        Assert.That(transaction.Amount, Is.EqualTo(TransactionTestData.Amount));
+        Assert.That(transaction.AdditionalData, Is.EqualTo(TransactionTestData.AdditionalData));
+        Assert.That(transaction.IsSucceed, Is.EqualTo(TransactionTestData.IsSucceed));
+        Assert.That(transaction.Type, Is.EqualTo(TransactionTestData.Type));
+        Assert.That(transaction.Message, Is.EqualTo(TransactionTestData.Message));
     }
 
-    [TestMethod]
+    [Test]
     public async Task Update_Transaction_Works()
     {
         await _storage.CreatePaymentAsync(PaymentTestData);
@@ -166,19 +166,19 @@ public class MemoryCacheTests
 
         var newTransaction = (await _storage.GetTransactionsAsync(payment)).SingleOrDefault();
 
-        Assert.IsNotNull(newTransaction);
-        Assert.AreEqual(1, (await _storage.GetTransactionsAsync(payment)).Count);
+        Assert.That(newTransaction, Is.Not.Null);
+        Assert.That((await _storage.GetTransactionsAsync(payment)).Count, Is.EqualTo(1));
 
-        Assert.AreEqual(1, transaction.Id);
-        Assert.AreEqual(transaction.Id, newTransaction.PaymentId);
-        Assert.AreEqual(transaction.Amount, newTransaction.Amount);
-        Assert.AreEqual(transaction.AdditionalData, newTransaction.AdditionalData);
-        Assert.AreEqual(transaction.IsSucceed, newTransaction.IsSucceed);
-        Assert.AreEqual(transaction.Type, newTransaction.Type);
-        Assert.AreEqual(transaction.Message, newTransaction.Message);
+        Assert.That(transaction.Id, Is.EqualTo(1));
+        Assert.That(newTransaction.PaymentId, Is.EqualTo(transaction.Id));
+        Assert.That(newTransaction.Amount, Is.EqualTo(transaction.Amount));
+        Assert.That(newTransaction.AdditionalData, Is.EqualTo(transaction.AdditionalData));
+        Assert.That(newTransaction.IsSucceed, Is.EqualTo(transaction.IsSucceed));
+        Assert.That(newTransaction.Type, Is.EqualTo(transaction.Type));
+        Assert.That(newTransaction.Message, Is.EqualTo(transaction.Message));
     }
 
-    [TestMethod]
+    [Test]
     public async Task Delete_Transaction_Works()
     {
         await _storage.CreatePaymentAsync(PaymentTestData);
@@ -193,6 +193,6 @@ public class MemoryCacheTests
 
         await _storage.DeleteTransactionAsync(transaction);
 
-        Assert.AreEqual(0, (await _storage.GetTransactionsAsync(payment)).Count);
+        Assert.That((await _storage.GetTransactionsAsync(payment)).Count, Is.EqualTo(0));
     }
 }

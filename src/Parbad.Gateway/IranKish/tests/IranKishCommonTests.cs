@@ -1,16 +1,16 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using NUnit.Framework;
 using Moq;
 using Parbad.Internal;
 using Parbad.InvoiceBuilder;
 
 namespace Parbad.Gateway.IranKish.Tests;
 
-[TestClass]
+[TestFixture]
 public class IranKishCommonTests
 {
     private IInvoiceBuilder _invoiceBuilder = null!;
 
-    [TestInitialize]
+    [SetUp]
     public void Initialize()
     {
         var mockServiceProvider = new Mock<IServiceProvider>();
@@ -18,15 +18,15 @@ public class IranKishCommonTests
         _invoiceBuilder = new DefaultInvoiceBuilder(mockServiceProvider.Object);
     }
 
-    [TestMethod]
+    [Test]
     public async Task Invoice_Must_Have_Correct_GatewayName()
     {
         _invoiceBuilder.UseIranKish();
 
         var invoice = await _invoiceBuilder.BuildAsync();
 
-        Assert.IsNotNull(invoice);
-        Assert.IsNotNull(invoice.GatewayName);
-        Assert.IsTrue(invoice.GatewayName.Equals("IranKish", StringComparison.OrdinalIgnoreCase));
+        Assert.That(invoice, Is.Not.Null);
+        Assert.That(invoice.GatewayName, Is.Not.Null);
+        Assert.That(invoice.GatewayName.Equals("IranKish", StringComparison.OrdinalIgnoreCase), Is.True);
     }
 }
