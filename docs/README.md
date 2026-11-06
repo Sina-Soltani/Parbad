@@ -10,15 +10,15 @@ Requires Node.js 20 or later.
 ```bash
 cd docs
 npm install
-npm start                 # English, with live reload: http://localhost:3000/Parbad/
-npm start -- --locale fa  # Persian
+npm run preview           # The whole site, both languages: http://localhost:3000/Parbad/
 ```
 
-`npm start` serves one language at a time. To see both languages and the language switcher together:
+While writing, `npm start` reloads a page as soon as it is saved. It serves one language at a time, so the language
+switcher leads to a "page not found" there:
 
 ```bash
-npm run build
-npm run serve             # http://localhost:3000/Parbad/
+npm start                 # English: http://localhost:3000/Parbad/
+npm start -- --locale fa  # Persian: http://localhost:3000/Parbad/fa/
 ```
 
 ## Structure
