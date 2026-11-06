@@ -70,7 +70,7 @@ internal static class ZibalHelper
             ? GetPaymentPageUrl(gatewayOptions.PaymentPageUrl, response.TrackId)
             : response.PayLink;
 
-        var result = PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, paymentPageUrl);
+        var result = PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, paymentPageUrl!);
 
         result.DatabaseAdditionalData.Add(TrackIdAdditionalDataKey, response.TrackId.ToString());
 
@@ -148,7 +148,7 @@ internal static class ZibalHelper
         }
 
         // The bank verifies the trackId stored for this invoice; the reference number is shown to the customer.
-        return PaymentVerifyResult.Paid(response.RefNumber.ToString(), trackId ?? response.RefNumber.ToString(), messagesOptions.PaymentSucceed);
+        return PaymentVerifyResult.Paid(response.RefNumber.ToString(), trackId ?? response.RefNumber.ToString() ?? string.Empty, messagesOptions.PaymentSucceed);
     }
 
     private static string GetPaymentPageUrl(string paymentUrl, long trackId)
@@ -166,7 +166,7 @@ internal static class ZibalHelper
 
         if (transactionRecord == null) throw new Exception("Cannot find any transaction with the type \"Request\"");
 
-        var additionalData = JsonConvert.DeserializeObject<IDictionary<string, string>>(transactionRecord.AdditionalData);
+        var additionalData = JsonConvert.DeserializeObject<IDictionary<string, string>>(transactionRecord.AdditionalData ?? "{}") ?? new Dictionary<string, string>();
 
         if (!additionalData.TryGetValue(TrackIdAdditionalDataKey, out var id))
         {

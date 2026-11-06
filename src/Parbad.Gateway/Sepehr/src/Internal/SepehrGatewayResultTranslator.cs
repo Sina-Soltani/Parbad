@@ -7,7 +7,7 @@ namespace Parbad.Gateway.Sepehr.Internal;
 
 internal static class SepehrGatewayResultTranslator
 {
-    public static string Translate(string result, MessagesOptions options)
+    public static string Translate(string? result, MessagesOptions options)
     {
         return result switch
         {

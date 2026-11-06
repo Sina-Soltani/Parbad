@@ -115,7 +115,7 @@ internal static class SepehrHelper
             }
             else if (responseCode != 0)
             {
-                message = respMsgParam.Exists ? (string)respMsgParam.Value : messages.PaymentFailed;
+                message = respMsgParam.Exists ? respMsgParam.Value.ToString() : messages.PaymentFailed;
 
                 isSucceed = false;
             }
@@ -149,7 +149,7 @@ internal static class SepehrHelper
                 }
                 else
                 {
-                    traceNumber = long.Parse(traceNumberParam.Value, CultureInfo.InvariantCulture);
+                    traceNumber = long.Parse(traceNumberParam.Value.ToString(), CultureInfo.InvariantCulture);
                 }
 
                 if (!rrnParam.Exists)
@@ -159,7 +159,7 @@ internal static class SepehrHelper
                 }
                 else
                 {
-                    rrn = long.Parse(rrnParam.Value, CultureInfo.InvariantCulture);
+                    rrn = long.Parse(rrnParam.Value.ToString(), CultureInfo.InvariantCulture);
                 }
 
                 if (!digitalReceiptParam.Exists)
@@ -291,7 +291,7 @@ internal static class SepehrHelper
             throw new Exception("No verification record found in transactions.");
         }
 
-        var additionalData = JsonConvert.DeserializeObject<IDictionary<string, string>>(verificationRecord.AdditionalData);
+        var additionalData = JsonConvert.DeserializeObject<IDictionary<string, string>>(verificationRecord.AdditionalData ?? "{}");
 
         if (additionalData == null || !additionalData.ContainsKey(VerificationAdditionalDataKey))
         {

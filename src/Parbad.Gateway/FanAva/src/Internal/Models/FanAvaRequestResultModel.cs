@@ -8,7 +8,7 @@ namespace Parbad.Gateway.FanAva.Internal.Models;
 internal class FanAvaRequestResultModel
 {
     public bool IsSucceed => !string.IsNullOrEmpty(Result) &&
-                             Result.Equals("erSucceed", StringComparison.OrdinalIgnoreCase);
+                             string.Equals(Result, "erSucceed", StringComparison.OrdinalIgnoreCase);
 
     public string? Result { get; set; }
 

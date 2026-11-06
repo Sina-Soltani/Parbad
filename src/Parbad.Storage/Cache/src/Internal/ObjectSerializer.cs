@@ -15,7 +15,7 @@ internal static class ObjectSerializer
         return Encoding.UTF8.GetBytes(json);
     }
 
-    public static T DeserializeObject<T>(byte[] buffer)
+    public static T? DeserializeObject<T>(byte[] buffer)
     {
         var json = Encoding.UTF8.GetString(buffer);
 

@@ -70,7 +70,7 @@ public class ZarinPalGateway : GatewayBase<ZarinPalGatewayAccount>
             return PaymentRequestResult.Failed(response.ErrorMessage, account.Name, response.ErrorCode?.ToString());
         }
 
-        var result = ZarinPalHelper.CreateRequestResult(response.Data, _httpContextAccessor.GetRequiredHttpContext(), account, _gatewayOptions, _messagesOptions);
+        var result = ZarinPalHelper.CreateRequestResult(response.Data!, _httpContextAccessor.GetRequiredHttpContext(), account, _gatewayOptions, _messagesOptions);
 
         return result;
     }
@@ -132,7 +132,7 @@ public class ZarinPalGateway : GatewayBase<ZarinPalGatewayAccount>
                    };
         }
 
-        var result = ZarinPalHelper.CreateVerifyResult(response.Data, account, _messagesOptions);
+        var result = ZarinPalHelper.CreateVerifyResult(response.Data!, account, _messagesOptions);
 
         return result;
     }
@@ -171,7 +171,7 @@ public class ZarinPalGateway : GatewayBase<ZarinPalGatewayAccount>
                    };
         }
 
-        var result = ZarinPalHelper.CreateRefundResult(response.Data, account, _messagesOptions);
+        var result = ZarinPalHelper.CreateRefundResult(response.Data!, account, _messagesOptions);
 
         return result;
     }

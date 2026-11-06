@@ -106,7 +106,7 @@ public class FanAvaGateway : GatewayBase<FanAvaGatewayAccount>
 
         var responseMessage = await _httpClient.PostJsonAsync(
                                                               _gatewayOptions.ApiCheckPaymentUrl,
-                                                              callbackResult.CallbackCheckData,
+                                                              callbackResult.CallbackCheckData!,
                                                               cancellationToken)
                                                .ConfigureAwaitFalse();
 
@@ -118,7 +118,7 @@ public class FanAvaGateway : GatewayBase<FanAvaGatewayAccount>
 
         if (!checkResult.IsSucceed)
         {
-            return checkResult.VerifyResult;
+            return checkResult.VerifyResult!;
         }
 
         var data = FanAvaHelper.CreateVerifyRequest(context, callbackResult);

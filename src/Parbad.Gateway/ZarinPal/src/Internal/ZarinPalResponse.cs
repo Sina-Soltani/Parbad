@@ -25,7 +25,7 @@ namespace Parbad.Gateway.ZarinPal.Internal;
 /// </summary>
 internal class ZarinPalResponse<TData> where TData : class
 {
-    private ZarinPalResponse(TData data, int? errorCode, string errorMessage)
+    private ZarinPalResponse(TData? data, int? errorCode, string? errorMessage)
     {
         Data = data;
         ErrorCode = errorCode;
@@ -33,13 +33,13 @@ internal class ZarinPalResponse<TData> where TData : class
     }
 
     /// <summary>The "data" object, or <see langword="null"/> when ZarinPal answered with an error.</summary>
-    public TData Data { get; }
+    public TData? Data { get; }
 
     public bool IsError => Data == null;
 
     public int? ErrorCode { get; }
 
-    public string ErrorMessage { get; }
+    public string? ErrorMessage { get; }
 
     /// <exception cref="GatewayResponseException">
     /// It is not known whether ZarinPal processed the call: a server error, a body that is not JSON (e.g. an HTML
@@ -82,9 +82,9 @@ internal class ZarinPalResponse<TData> where TData : class
         {
             message = ZarinPalCodeTranslator.Translate(errorCode.Value, messagesOptions);
         }
-        else if (error?["message"] is JValue { Type: JTokenType.String } errorMessage && !string.IsNullOrWhiteSpace((string)errorMessage))
+        else if (error?["message"] is JValue { Type: JTokenType.String } errorMessage && !string.IsNullOrWhiteSpace((string?)errorMessage))
         {
-            message = (string)errorMessage;
+            message = (string)errorMessage!;
         }
         else
         {

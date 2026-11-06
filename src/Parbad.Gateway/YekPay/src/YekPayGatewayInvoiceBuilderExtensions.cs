@@ -56,7 +56,7 @@ public static class YekPayGatewayInvoiceBuilderExtensions
         builder.AddOrUpdateProperty(YekPayRequestKey, yekPayRequest);
     }
 
-    internal static YekPayRequest GetYekPayRequest(this Invoice invoice)
+    internal static YekPayRequest? GetYekPayRequest(this Invoice invoice)
     {
         if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 

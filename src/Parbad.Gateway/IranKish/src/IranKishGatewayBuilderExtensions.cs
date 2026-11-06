@@ -53,7 +53,7 @@ public static class IranKishGatewayBuilderExtensions
         return builder;
     }
 
-    internal static string GetCmsPreservationId(this Invoice invoice)
+    internal static string? GetCmsPreservationId(this Invoice invoice)
     {
         if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 

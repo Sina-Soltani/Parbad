@@ -16,7 +16,7 @@ internal class IranKishVerifyResult
 
 internal class IranKishVerifyResultInfo
 {
-    public string ResponseCode { get; set; }
+    public string? ResponseCode { get; set; }
 
     public string? SystemTraceAuditNumber { get; set; }
 

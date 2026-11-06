@@ -7,7 +7,7 @@ namespace Parbad.Gateway.IranKish.Internal;
 
 internal static class IranKishGatewayResultTranslator
 {
-    public static string Translate(string result, MessagesOptions options)
+    public static string Translate(string? result, MessagesOptions options)
     {
         return result switch
         {
