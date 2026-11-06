@@ -52,9 +52,9 @@ public static class GatewayTestHelpers
 
         onRequestResult(requestResult);
 
-        var storageManager = serviceProvider.GetRequiredService<IStorageManager>();
+        var storage = serviceProvider.GetRequiredService<IStorage>();
 
-        var payment = await storageManager.GetPaymentByTrackingNumberAsync(requestResult.TrackingNumber);
+        var payment = await storage.GetPaymentByTrackingNumberAsync(requestResult.TrackingNumber);
 
         var queries = httpContext.Request
                                  .Query

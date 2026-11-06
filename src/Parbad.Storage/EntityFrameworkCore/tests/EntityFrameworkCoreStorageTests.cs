@@ -60,14 +60,34 @@ public class EntityFrameworkCoreStorageTests
     }
 
     [TestMethod]
+    public async Task Largest_tracking_number_is_null_without_payments_and_the_maximum_otherwise()
+    {
+        Assert.IsNull(await _storage.GetLargestTrackingNumberAsync());
+
+        foreach (var trackingNumber in new long[] { 5, 42, 7 })
+        {
+            await _storage.CreatePaymentAsync(new Payment
+                                              {
+                                                  TrackingNumber = trackingNumber,
+                                                  Amount = 1000,
+                                                  Token = $"token-{trackingNumber}",
+                                                  GatewayName = "gateway",
+                                                  GatewayAccountName = "test"
+                                              });
+        }
+
+        Assert.AreEqual(42, await _storage.GetLargestTrackingNumberAsync());
+    }
+
+    [TestMethod]
     public async Task Create_Payment_Works()
     {
         await _storage.CreatePaymentAsync(PaymentTestData);
 
-        var payment = _storage.Payments.SingleOrDefault();
+        var payment = await _storage.GetPaymentByTrackingNumberAsync(PaymentTestData.TrackingNumber);
 
         Assert.IsNotNull(payment);
-        Assert.AreEqual(1, _storage.Payments.Count());
+        Assert.IsTrue(await _storage.DoesPaymentExistAsync(PaymentTestData.TrackingNumber));
 
         payment.ShouldCompare(PaymentTestData);
     }
@@ -77,7 +97,7 @@ public class EntityFrameworkCoreStorageTests
     {
         await _storage.CreatePaymentAsync(PaymentTestData);
 
-        var payment = _storage.Payments.SingleOrDefault();
+        var payment = await _storage.GetPaymentByTrackingNumberAsync(PaymentTestData.TrackingNumber);
 
         Assert.IsNotNull(payment);
 
@@ -92,7 +112,7 @@ public class EntityFrameworkCoreStorageTests
 
         await _storage.UpdatePaymentAsync(payment);
 
-        var newPayment = _storage.Payments.SingleOrDefault();
+        var newPayment = await _storage.GetPaymentByTrackingNumberAsync(payment.TrackingNumber);
 
         Assert.IsNotNull(newPayment);
         newPayment.ShouldCompare(payment);
@@ -103,11 +123,11 @@ public class EntityFrameworkCoreStorageTests
     {
         await _storage.CreatePaymentAsync(PaymentTestData);
 
-        var payment = _storage.Payments.SingleOrDefault();
+        var payment = await _storage.GetPaymentByTrackingNumberAsync(PaymentTestData.TrackingNumber);
 
         await _storage.DeletePaymentAsync(payment);
 
-        Assert.AreEqual(0, _storage.Payments.Count());
+        Assert.IsFalse(await _storage.DoesPaymentExistAsync(PaymentTestData.TrackingNumber));
     }
 
     [TestMethod]
@@ -115,7 +135,7 @@ public class EntityFrameworkCoreStorageTests
     {
         await _storage.CreatePaymentAsync(PaymentTestData);
 
-        var payment = _storage.Payments.SingleOrDefault();
+        var payment = await _storage.GetPaymentByTrackingNumberAsync(PaymentTestData.TrackingNumber);
 
         Assert.IsNotNull(payment);
 
@@ -123,10 +143,10 @@ public class EntityFrameworkCoreStorageTests
 
         await _storage.CreateTransactionAsync(TransactionTestData);
 
-        var transaction = _storage.Transactions.SingleOrDefault();
+        var transaction = (await _storage.GetTransactionsAsync(payment)).SingleOrDefault();
 
         Assert.IsNotNull(transaction);
-        Assert.AreEqual(1, _storage.Transactions.Count());
+        Assert.AreEqual(1, (await _storage.GetTransactionsAsync(payment)).Count);
 
         transaction.ShouldCompare(TransactionTestData);
     }
@@ -136,7 +156,7 @@ public class EntityFrameworkCoreStorageTests
     {
         await _storage.CreatePaymentAsync(PaymentTestData);
 
-        var payment = _storage.Payments.SingleOrDefault();
+        var payment = await _storage.GetPaymentByTrackingNumberAsync(PaymentTestData.TrackingNumber);
 
         Assert.IsNotNull(payment);
 
@@ -144,7 +164,7 @@ public class EntityFrameworkCoreStorageTests
 
         await _storage.CreateTransactionAsync(TransactionTestData);
 
-        var transaction = _storage.Transactions.SingleOrDefault();
+        var transaction = (await _storage.GetTransactionsAsync(payment)).SingleOrDefault();
 
         Assert.IsNotNull(transaction);
 
@@ -156,10 +176,10 @@ public class EntityFrameworkCoreStorageTests
 
         await _storage.UpdateTransactionAsync(transaction);
 
-        var newTransaction = _storage.Transactions.SingleOrDefault();
+        var newTransaction = (await _storage.GetTransactionsAsync(payment)).SingleOrDefault();
 
         Assert.IsNotNull(newTransaction);
-        Assert.AreEqual(1, _storage.Transactions.Count());
+        Assert.AreEqual(1, (await _storage.GetTransactionsAsync(payment)).Count);
 
         newTransaction.ShouldCompare(transaction);
     }
@@ -169,7 +189,7 @@ public class EntityFrameworkCoreStorageTests
     {
         await _storage.CreatePaymentAsync(PaymentTestData);
 
-        var payment = _storage.Payments.SingleOrDefault();
+        var payment = await _storage.GetPaymentByTrackingNumberAsync(PaymentTestData.TrackingNumber);
 
         Assert.IsNotNull(payment);
 
@@ -177,11 +197,11 @@ public class EntityFrameworkCoreStorageTests
 
         await _storage.CreateTransactionAsync(TransactionTestData);
 
-        var transaction = _storage.Transactions.SingleOrDefault();
+        var transaction = (await _storage.GetTransactionsAsync(payment)).SingleOrDefault();
 
         await _storage.DeleteTransactionAsync(transaction);
 
-        Assert.AreEqual(0, _storage.Transactions.Count());
+        Assert.AreEqual(0, (await _storage.GetTransactionsAsync(payment)).Count);
     }
 
     [TestMethod]

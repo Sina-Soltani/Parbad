@@ -20,23 +20,6 @@ public static class StaticOnlinePayment
     private static IOnlinePaymentAccessor _parbadAccessor;
 
     /// <summary>
-    /// Gets a new instance of <see cref="IOnlinePayment"/> from the <see cref="IServiceProvider"/>.
-    /// </summary>
-    /// <exception cref="InvalidOperationException"></exception>
-    [Obsolete("Resolves IOnlinePayment from the application's root service provider, so services meant to live for one request (e.g. the EF Core DbContext) are shared by all requests and never released. Use CreateScope() instead. This member will be removed in Parbad 4.0.")]
-    public static IOnlinePayment Instance
-    {
-        get
-        {
-            if (_parbadAccessor == null) throw new InvalidOperationException($"{nameof(StaticOnlinePayment)} is not initialized.");
-
-#pragma warning disable CS0618 // The accessor's OnlinePayment has the same problem and is obsolete for the same reason.
-            return _parbadAccessor.OnlinePayment;
-#pragma warning restore CS0618
-        }
-    }
-
-    /// <summary>
     /// Creates an <see cref="OnlinePaymentScope"/> for one operation, e.g. one web request. It owns the services of
     /// that operation, such as the storage's database context. Dispose it when the operation is finished:
     /// <code>

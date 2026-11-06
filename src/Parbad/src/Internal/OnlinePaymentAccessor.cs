@@ -21,20 +21,4 @@ public class OnlinePaymentAccessor : IOnlinePaymentAccessor
 
     /// <inheritdoc />
     public IServiceProvider Services { get; }
-
-    /// <inheritdoc />
-    public IOnlinePayment OnlinePayment
-    {
-        get
-        {
-            var instance = Services.GetService<IOnlinePayment>();
-
-            if (instance == null)
-            {
-                throw new ParbadServiceNotInitializedException();
-            }
-
-            return instance;
-        }
-    }
 }

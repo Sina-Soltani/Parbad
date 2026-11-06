@@ -32,6 +32,6 @@ public class DistributedCacheStorageTests : CacheStorageTests
         var payment = NewPayment(1001);
         await CreateStorage().CreatePaymentAsync(payment);
 
-        AssertSamePayment(payment, CreateStorage().Payments.Single());
+        AssertSamePayment(payment, await CreateStorage().GetPaymentByTrackingNumberAsync(1001));
     }
 }

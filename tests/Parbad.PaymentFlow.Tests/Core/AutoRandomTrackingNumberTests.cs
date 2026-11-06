@@ -205,8 +205,8 @@ public class AutoRandomTrackingNumberTests
     }
 
     /// <summary>
-    /// Delegates to another storage, records the tracking numbers checked with
-    /// <see cref="DoesPaymentExistAsync(long, CancellationToken)"/> and throws from the obsolete queryables.
+    /// Delegates to another storage and records the tracking numbers checked with
+    /// <see cref="DoesPaymentExistAsync(long, CancellationToken)"/>.
     /// </summary>
     private sealed class CheckingStorage : IStorage
     {
@@ -233,10 +233,6 @@ public class AutoRandomTrackingNumberTests
             }
         }
 
-        public IQueryable<Payment> Payments => throw new AssertFailedException("IStorage.Payments must not be used.");
-
-        public IQueryable<Transaction> Transactions => throw new AssertFailedException("IStorage.Transactions must not be used.");
-
         public async Task<bool> DoesPaymentExistAsync(long trackingNumber, CancellationToken cancellationToken = default)
         {
             int call;
@@ -252,6 +248,9 @@ public class AutoRandomTrackingNumberTests
 
         public Task<bool> DoesPaymentExistAsync(string paymentToken, CancellationToken cancellationToken = default) =>
             _inner.DoesPaymentExistAsync(paymentToken, cancellationToken);
+
+        public Task<long?> GetLargestTrackingNumberAsync(CancellationToken cancellationToken = default) =>
+            _inner.GetLargestTrackingNumberAsync(cancellationToken);
 
         public Task CreatePaymentAsync(Payment payment, CancellationToken cancellationToken = default) =>
             _inner.CreatePaymentAsync(payment, cancellationToken);

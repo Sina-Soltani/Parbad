@@ -21,30 +21,6 @@ public abstract class CacheStorage : IStorage, IPaidPaymentLookup, IPaymentCompl
     // so the lock must belong to the collection, not to the storage instance.
     private static readonly ConditionalWeakTable<ICacheStorageCollection, object> CollectionLocks = new();
 
-    /// <inheritdoc />
-    public virtual IQueryable<Payment> Payments
-    {
-        get
-        {
-            lock (SyncRoot)
-            {
-                return Collection.Payments.Select(ClonePayment).ToList().AsQueryable();
-            }
-        }
-    }
-
-    /// <inheritdoc />
-    public virtual IQueryable<Transaction> Transactions
-    {
-        get
-        {
-            lock (SyncRoot)
-            {
-                return Collection.Transactions.Select(CloneTransaction).ToList().AsQueryable();
-            }
-        }
-    }
-
     /// <summary>
     /// A collection for holding the data.
     /// </summary>
@@ -267,6 +243,17 @@ public abstract class CacheStorage : IStorage, IPaidPaymentLookup, IPaymentCompl
             var exists = Collection.Payments.Any(payment => payment.Token == paymentToken);
 
             return Task.FromResult(exists);
+        }
+    }
+
+    /// <inheritdoc />
+    public virtual Task<long?> GetLargestTrackingNumberAsync(CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        lock (SyncRoot)
+        {
+            return Task.FromResult(Collection.Payments.Count == 0 ? (long?)null : Collection.Payments.Max(payment => payment.TrackingNumber));
         }
     }
 

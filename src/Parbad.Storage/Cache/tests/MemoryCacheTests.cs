@@ -62,10 +62,10 @@ public class MemoryCacheTests
     {
         await _storage.CreatePaymentAsync(PaymentTestData);
 
-        var payment = _storage.Payments.SingleOrDefault();
+        var payment = await _storage.GetPaymentByTrackingNumberAsync(PaymentTestData.TrackingNumber);
 
         Assert.IsNotNull(payment);
-        Assert.AreEqual(1, _storage.Payments.Count());
+        Assert.IsTrue(await _storage.DoesPaymentExistAsync(PaymentTestData.TrackingNumber));
 
         Assert.AreEqual(1, payment.Id);
         Assert.AreEqual(PaymentTestData.TrackingNumber, payment.TrackingNumber);
@@ -83,7 +83,7 @@ public class MemoryCacheTests
     {
         await _storage.CreatePaymentAsync(PaymentTestData);
 
-        var payment = _storage.Payments.SingleOrDefault();
+        var payment = await _storage.GetPaymentByTrackingNumberAsync(PaymentTestData.TrackingNumber);
         payment.TrackingNumber = 2;
         payment.Amount = 2000;
         payment.Token = "NewToken";
@@ -95,7 +95,7 @@ public class MemoryCacheTests
 
         await _storage.UpdatePaymentAsync(payment);
 
-        var newPayment = _storage.Payments.SingleOrDefault();
+        var newPayment = await _storage.GetPaymentByTrackingNumberAsync(payment.TrackingNumber);
 
         Assert.IsNotNull(newPayment);
         Assert.AreEqual(1, newPayment.Id);
@@ -114,11 +114,11 @@ public class MemoryCacheTests
     {
         await _storage.CreatePaymentAsync(PaymentTestData);
 
-        var payment = _storage.Payments.SingleOrDefault();
+        var payment = await _storage.GetPaymentByTrackingNumberAsync(PaymentTestData.TrackingNumber);
 
         await _storage.DeletePaymentAsync(payment);
 
-        Assert.AreEqual(0, _storage.Payments.Count());
+        Assert.IsFalse(await _storage.DoesPaymentExistAsync(PaymentTestData.TrackingNumber));
     }
 
     [TestMethod]
@@ -126,16 +126,16 @@ public class MemoryCacheTests
     {
         await _storage.CreatePaymentAsync(PaymentTestData);
 
-        var payment = _storage.Payments.SingleOrDefault();
+        var payment = await _storage.GetPaymentByTrackingNumberAsync(PaymentTestData.TrackingNumber);
 
         TransactionTestData.PaymentId = payment.Id;
 
         await _storage.CreateTransactionAsync(TransactionTestData);
 
-        var transaction = _storage.Transactions.SingleOrDefault();
+        var transaction = (await _storage.GetTransactionsAsync(payment)).SingleOrDefault();
 
         Assert.IsNotNull(transaction);
-        Assert.AreEqual(1, _storage.Transactions.Count());
+        Assert.AreEqual(1, (await _storage.GetTransactionsAsync(payment)).Count);
 
         Assert.AreEqual(1, transaction.Id);
         Assert.AreEqual(payment.Id, transaction.PaymentId);
@@ -151,13 +151,13 @@ public class MemoryCacheTests
     {
         await _storage.CreatePaymentAsync(PaymentTestData);
 
-        var payment = _storage.Payments.SingleOrDefault();
+        var payment = await _storage.GetPaymentByTrackingNumberAsync(PaymentTestData.TrackingNumber);
 
         TransactionTestData.PaymentId = payment.Id;
 
         await _storage.CreateTransactionAsync(TransactionTestData);
 
-        var transaction = _storage.Transactions.SingleOrDefault();
+        var transaction = (await _storage.GetTransactionsAsync(payment)).SingleOrDefault();
         transaction.Amount = 2000;
         transaction.IsSucceed = true;
         transaction.Message = "NewMessage";
@@ -166,10 +166,10 @@ public class MemoryCacheTests
 
         await _storage.UpdateTransactionAsync(transaction);
 
-        var newTransaction = _storage.Transactions.SingleOrDefault();
+        var newTransaction = (await _storage.GetTransactionsAsync(payment)).SingleOrDefault();
 
         Assert.IsNotNull(newTransaction);
-        Assert.AreEqual(1, _storage.Transactions.Count());
+        Assert.AreEqual(1, (await _storage.GetTransactionsAsync(payment)).Count);
 
         Assert.AreEqual(1, transaction.Id);
         Assert.AreEqual(transaction.Id, newTransaction.PaymentId);
@@ -185,16 +185,16 @@ public class MemoryCacheTests
     {
         await _storage.CreatePaymentAsync(PaymentTestData);
 
-        var payment = _storage.Payments.SingleOrDefault();
+        var payment = await _storage.GetPaymentByTrackingNumberAsync(PaymentTestData.TrackingNumber);
 
         TransactionTestData.PaymentId = payment.Id;
 
         await _storage.CreateTransactionAsync(TransactionTestData);
 
-        var transaction = _storage.Transactions.SingleOrDefault();
+        var transaction = (await _storage.GetTransactionsAsync(payment)).SingleOrDefault();
 
         await _storage.DeleteTransactionAsync(transaction);
 
-        Assert.AreEqual(0, _storage.Transactions.Count());
+        Assert.AreEqual(0, (await _storage.GetTransactionsAsync(payment)).Count);
     }
 }

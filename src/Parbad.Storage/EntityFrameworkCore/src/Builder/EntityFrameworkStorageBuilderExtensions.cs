@@ -39,8 +39,6 @@ public static class EntityFrameworkStorageBuilderExtensions
 
         builder.AddStorage<EntityFrameworkCoreStorage>(ServiceLifetime.Transient);
 
-        builder.AddStorageManager<EntityFrameworkCoreStorageManager>(ServiceLifetime.Transient);
-
         return builder;
     }
 }

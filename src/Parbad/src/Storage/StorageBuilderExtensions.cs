@@ -22,22 +22,9 @@ public static class StorageBuilderExtensions
         if (configureStorage == null) throw new ArgumentNullException(nameof(configureStorage));
 
         var storageBuilder = new StorageBuilder(builder.Services);
-        storageBuilder.UseDefaultStorageManager();
 
         configureStorage(storageBuilder);
 
         return builder;
-    }
-
-    /// <summary>
-    /// Uses the default implementation of <see cref="IStorageManager"/>.
-    /// </summary>
-    /// <param name="builder"></param>
-    [Obsolete("StorageManager will be removed in a future release. The implementations are moved to the IStorage interface.")]
-    public static IStorageBuilder UseDefaultStorageManager(this IStorageBuilder builder)
-    {
-        if (builder == null) throw new ArgumentNullException(nameof(builder));
-
-        return builder.AddStorageManager<StorageManager>(ServiceLifetime.Transient);
     }
 }

@@ -31,14 +31,6 @@ public class EntityFrameworkCoreStorage : IStorage, IPaidPaymentLookup, IPayment
         Context = context;
     }
 
-    /// <inheritdoc />
-    [Obsolete("This property will be removed in a future release. The usages are implemented as methods now.")]
-    public virtual IQueryable<Payment> Payments => Context.Payments.Select(Mapper.ToPaymentModel());
-
-    /// <inheritdoc />
-    [Obsolete("This property will be removed in a future release. The usages are implemented as methods now.")]
-    public virtual IQueryable<Transaction> Transactions => Context.Transactions.Select(Mapper.ToTransactionModel());
-
     /// <summary>
     /// Gets Parbad DbContext.
     /// </summary>
@@ -268,6 +260,12 @@ public class EntityFrameworkCoreStorage : IStorage, IPaidPaymentLookup, IPayment
     public virtual Task<bool> DoesPaymentExistAsync(string paymentToken, CancellationToken cancellationToken = default)
     {
         return Context.Payments.AnyAsync(payment => payment.Token == paymentToken, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public virtual Task<long?> GetLargestTrackingNumberAsync(CancellationToken cancellationToken = default)
+    {
+        return Context.Payments.MaxAsync(payment => (long?)payment.TrackingNumber, cancellationToken);
     }
 
     /// <inheritdoc />
