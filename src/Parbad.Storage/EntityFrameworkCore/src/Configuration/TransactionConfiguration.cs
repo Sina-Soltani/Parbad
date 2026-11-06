@@ -16,14 +16,14 @@ public class TransactionConfiguration : EntityTypeConfiguration<TransactionEntit
     /// <summary>
     /// Initializes an instance of <see cref="TransactionConfiguration"/>.
     /// </summary>
-    public TransactionConfiguration(EntityFrameworkCoreOptions efCoreOptions) : base(efCoreOptions)
+    public TransactionConfiguration(ParbadModelOptions modelOptions) : base(modelOptions)
     {
     }
 
     /// <inheritdoc />
-    public override void Configure(EntityTypeBuilder<TransactionEntity> builder, EntityFrameworkCoreOptions efCoreOptions)
+    public override void Configure(EntityTypeBuilder<TransactionEntity> builder, ParbadModelOptions modelOptions)
     {
-        builder.ToTable(efCoreOptions.TransactionTableOptions, efCoreOptions.DefaultSchema);
+        builder.ToTable(modelOptions.TransactionTableOptions, modelOptions.DefaultSchema);
 
         builder
            .HasKey(entity => entity.Id)

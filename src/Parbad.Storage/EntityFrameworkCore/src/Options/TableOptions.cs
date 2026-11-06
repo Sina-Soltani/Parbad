@@ -11,10 +11,10 @@ public class TableOptions
     /// <summary>
     /// Gets or sets the name.
     /// </summary>
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the schema.
+    /// Gets or sets the schema. When empty, <see cref="ParbadModelOptions.DefaultSchema"/> is used.
     /// </summary>
-    public string Schema { get; set; }
+    public string? Schema { get; set; }
 }

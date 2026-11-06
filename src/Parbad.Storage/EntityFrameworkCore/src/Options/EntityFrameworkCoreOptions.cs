@@ -8,39 +8,15 @@ using Parbad.Storage.EntityFrameworkCore.Context;
 namespace Parbad.Storage.EntityFrameworkCore.Options;
 
 /// <summary>
-/// Contains the options for configuring the EntityFrameworkCore for Parbad storage.
+/// The options of Parbad's own <see cref="ParbadDataContext"/>, for applications that keep Parbad's tables in a
+/// database of their own.
 /// </summary>
-public class EntityFrameworkCoreOptions
+public class EntityFrameworkCoreOptions : ParbadModelOptions
 {
     /// <summary>
-    /// Initializes an instance of <see cref="EntityFrameworkCoreOptions"/>.
+    /// Configures the <see cref="ParbadDataContext"/>: its database provider and connection, and, if needed, the
+    /// migrations assembly and history table, e.g.
+    /// <c>db => db.UseSqlServer(connectionString, sql => sql.MigrationsAssembly("MyApp.Migrations"))</c>.
     /// </summary>
-    public EntityFrameworkCoreOptions()
-    {
-        DefaultSchema = "parbad";
-
-        PaymentTableOptions = new TableOptions { Name = "payment" };
-
-        TransactionTableOptions = new TableOptions { Name = "transaction" };
-    }
-
-    /// <summary>
-    /// Configures the <see cref="ParbadDataContext"/>.
-    /// </summary>
-    public Action<DbContextOptionsBuilder> ConfigureDbContext { get; set; }
-
-    /// <summary>
-    /// Gets or sets the default schema for all tables. The default value is "parbad".
-    /// </summary>
-    public string DefaultSchema { get; set; }
-
-    /// <summary>
-    /// Contains the options for configuring the Payment table.
-    /// </summary>
-    public TableOptions PaymentTableOptions { get; set; }
-
-    /// <summary>
-    /// Contains the options for configuring the Transaction table.
-    /// </summary>
-    public TableOptions TransactionTableOptions { get; set; }
+    public Action<DbContextOptionsBuilder>? ConfigureDbContext { get; set; }
 }
