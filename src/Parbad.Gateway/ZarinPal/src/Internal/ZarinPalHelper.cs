@@ -149,29 +149,7 @@ internal static class ZarinPalHelper
         return result;
     }
 
-    public static ZarinPalRefundModel CreateRefundModel(string authority, ZarinPalGatewayAccount account)
-    {
-        return new()
-               {
-                   MerchantId = account.MerchantId,
-                   Authority = authority
-               };
-    }
 
-    public static PaymentRefundResult CreateRefundResult(ZarinPalRefundResultModelData data, ZarinPalGatewayAccount account, MessagesOptions messagesOptions)
-    {
-        var isSucceed = IsSucceedCode(data.Code);
-
-        return new PaymentRefundResult
-               {
-                   GatewayResponseCode = data.Code.ToString(),
-                   GatewayAccountName = account.Name,
-                   Status = isSucceed
-                       ? PaymentRefundResultStatus.Succeed
-                       : data.Code == NumericAlreadyOkResult ? PaymentRefundResultStatus.AlreadyRefunded : PaymentRefundResultStatus.Failed,
-                   Message = isSucceed ? messagesOptions.PaymentSucceed : ZarinPalCodeTranslator.Translate(data.Code, messagesOptions)
-               };
-    }
 
     public static string GetAuthorityFromAdditionalData(InvoiceContext context)
     {
@@ -218,12 +196,6 @@ internal static class ZarinPalHelper
             : gatewayOptions.ApiVerificationUrl;
     }
 
-    public static string GetApiRefundUrl(bool isSandbox, ZarinPalGatewayOptions gatewayOptions)
-    {
-        return isSandbox
-            ? gatewayOptions.SandboxApiRefundUrl
-            : gatewayOptions.ApiRefundUrl;
-    }
 
     private static string GetPaymentPageUrl(bool isSandbox, ZarinPalGatewayOptions gatewayOptions)
     {

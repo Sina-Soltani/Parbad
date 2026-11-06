@@ -13,9 +13,9 @@ public class ZarinPalGatewayAccount : GatewayAccount
     public string MerchantId { get; set; } = null!;
 
     /// <summary>
-    /// It's needed for refunding a payment.
+    /// The access token of the ZarinPal panel, needed only for refunds.
     /// </summary>
-    public string AuthorizationToken { get; set; } = null!;
+    public string? AuthorizationToken { get; set; }
 
     public bool IsSandbox { get; set; }
 }
