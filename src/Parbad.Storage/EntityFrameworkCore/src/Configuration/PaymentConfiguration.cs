@@ -56,6 +56,23 @@ public class PaymentConfiguration : EntityTypeConfiguration<PaymentEntity>
                .HasMaxLength(20)
                .IsRequired(required: true);
 
+        builder.Property(entity => entity.BankReference)
+               .HasColumnName("bank_reference")
+               .HasMaxLength(200)
+               .IsRequired(required: false);
+
+        // One bank reference settles only one payment of a gateway.
+        builder.HasIndex(entity => new { entity.GatewayName, entity.BankReference }).IsUnique(unique: true);
+
+        builder.Property(entity => entity.Status)
+               .HasColumnName("status")
+               .IsRequired(required: true);
+
+        builder.Property(entity => entity.RefundedAmount)
+               .HasColumnName("refunded_amount")
+               .HasColumnType("decimal(18,2)")
+               .IsRequired(required: true);
+
         builder.Property(entity => entity.IsCompleted)
                .HasColumnName("is_completed")
                .IsRequired(required: true);

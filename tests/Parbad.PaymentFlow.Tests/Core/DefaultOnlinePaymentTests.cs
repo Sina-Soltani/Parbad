@@ -87,8 +87,29 @@ public class DefaultOnlinePaymentTests
         Assert.AreEqual(PaymentRequestResultStatus.Failed, result.Status);
 
         var payment = await _host.GetPaymentAsync(TrackingNumber);
+        Assert.AreEqual(PaymentStatus.Failed, payment.Status);
         Assert.IsTrue(payment.IsCompleted);
         Assert.IsFalse(payment.IsPaid);
+    }
+
+    [TestMethod]
+    public async Task Rejected_request_is_recorded_as_failed()
+    {
+        _gateway.RequestResult = account => PaymentRequestResult.Failed("Invalid terminal.", account);
+
+        var result = await RequestAsync();
+
+        Assert.AreEqual(PaymentRequestResultStatus.Failed, result.Status);
+        Assert.AreEqual(PaymentStatus.Failed, (await _host.GetPaymentAsync(TrackingNumber)).Status,
+                        "A rejected request left the payment open, although the user never reached the bank.");
+    }
+
+    [TestMethod]
+    public async Task Requested_payment_is_open()
+    {
+        await RequestAsync();
+
+        Assert.AreEqual(PaymentStatus.Requested, (await _host.GetPaymentAsync(TrackingNumber)).Status);
     }
 
     [TestMethod]
@@ -163,9 +184,11 @@ public class DefaultOnlinePaymentTests
         Assert.AreEqual(FakeGateway.TransactionCode, result.TransactionCode);
 
         var payment = await _host.GetPaymentAsync(TrackingNumber);
+        Assert.AreEqual(PaymentStatus.Paid, payment.Status);
         Assert.IsTrue(payment.IsCompleted);
         Assert.IsTrue(payment.IsPaid);
         Assert.AreEqual(FakeGateway.TransactionCode, payment.TransactionCode);
+        Assert.AreEqual(FakeGateway.TransactionCode, payment.BankReference, "A paid payment does not claim its bank reference.");
 
         var transactions = await _host.Storage.GetTransactionsAsync(payment);
         Assert.AreEqual(1, transactions.Count(t => t.Type == TransactionType.Verify && t.IsSucceed));
@@ -288,17 +311,6 @@ public class DefaultOnlinePaymentTests
         Assert.IsTrue((await _host.GetPaymentAsync(TrackingNumber)).IsPaid);
     }
 
-    [TestMethod]
-    public async Task Storage_without_payment_completion_still_records_the_result()
-    {
-        await UseStorageWithoutOptionalCapabilitiesAsync();
-        await RequestAsync();
-
-        var result = await _host.OnlinePayment.VerifyAsync(TrackingNumber);
-
-        Assert.AreEqual(PaymentVerifyResultStatus.Succeed, result.Status, result.Message);
-        Assert.IsTrue((await _host.GetPaymentAsync(TrackingNumber)).IsPaid);
-    }
 
     [TestMethod]
     public async Task Database_failure_after_bank_confirmation_leaves_the_payment_retryable()
@@ -414,31 +426,7 @@ public class DefaultOnlinePaymentTests
         await AssertRecordedAsUnpaidAsync(TrackingNumber);
     }
 
-    [TestMethod]
-    public async Task Already_verified_at_the_bank_is_not_recorded_as_paid_when_the_storage_cannot_look_up_paid_payments()
-    {
-        await UseStorageWithoutOptionalCapabilitiesAsync();
-        _gateway.VerifyResult = _ => AlreadyVerifiedAtBank(FakeGateway.TransactionCode);
-        await RequestAsync();
 
-        var result = await _host.OnlinePayment.VerifyAsync(TrackingNumber);
-
-        Assert.AreEqual(PaymentVerifyResultStatus.Failed, result.Status);
-        Assert.AreEqual(new MessagesOptions().AlreadyVerifiedPaymentCannotBeConfirmed, result.Message);
-        await AssertRecordedAsUnpaidAsync(TrackingNumber);
-    }
-
-    [TestMethod]
-    public async Task Storage_without_paid_payment_lookup_still_verifies_normal_payments()
-    {
-        await UseStorageWithoutOptionalCapabilitiesAsync();
-        await RequestAsync();
-
-        var result = await _host.OnlinePayment.VerifyAsync(TrackingNumber);
-
-        Assert.AreEqual(PaymentVerifyResultStatus.Succeed, result.Status, result.Message);
-        Assert.IsTrue((await _host.GetPaymentAsync(TrackingNumber)).IsPaid);
-    }
 
     // ---------- Cancel ----------
 
@@ -452,6 +440,7 @@ public class DefaultOnlinePaymentTests
         Assert.IsTrue(result.IsSucceed);
 
         var payment = await _host.GetPaymentAsync(TrackingNumber);
+        Assert.AreEqual(PaymentStatus.Cancelled, payment.Status);
         Assert.IsTrue(payment.IsCompleted);
         Assert.IsFalse(payment.IsPaid);
         Assert.AreEqual(0, _gateway.VerifyCalls);
@@ -483,6 +472,39 @@ public class DefaultOnlinePaymentTests
 
         Assert.IsTrue(result.IsSucceed, result.Message);
         CollectionAssert.AreEqual(new[] { Amount }, _gateway.RefundedAmounts.ToArray());
+
+        var payment = await _host.GetPaymentAsync(TrackingNumber);
+        Assert.AreEqual(PaymentStatus.Refunded, payment.Status);
+        Assert.AreEqual(Amount, payment.RefundedAmount);
+        Assert.IsTrue(payment.IsPaid, "A refunded payment was paid.");
+    }
+
+    [TestMethod]
+    public async Task Partial_refund_is_recorded_on_the_payment()
+    {
+        await RequestAsync();
+        await _host.OnlinePayment.VerifyAsync(TrackingNumber);
+
+        await _host.OnlinePayment.RefundAsync(new RefundInvoice(TrackingNumber, 800_000));
+
+        var payment = await _host.GetPaymentAsync(TrackingNumber);
+        Assert.AreEqual(PaymentStatus.PartiallyRefunded, payment.Status);
+        Assert.AreEqual(800_000m, payment.RefundedAmount);
+    }
+
+    [TestMethod]
+    public async Task Failed_refund_does_not_change_the_payment()
+    {
+        await RequestAsync();
+        await _host.OnlinePayment.VerifyAsync(TrackingNumber);
+        _gateway.RefundResult = () => PaymentRefundResult.Failed("The bank rejected the refund.");
+
+        var result = await _host.OnlinePayment.RefundCompletelyAsync(TrackingNumber);
+
+        Assert.IsFalse(result.IsSucceed);
+        var payment = await _host.GetPaymentAsync(TrackingNumber);
+        Assert.AreEqual(PaymentStatus.Paid, payment.Status);
+        Assert.AreEqual(0m, payment.RefundedAmount);
     }
 
     [TestMethod]
@@ -567,17 +589,6 @@ public class DefaultOnlinePaymentTests
         Assert.IsFalse(payment.IsPaid, "The rejected payment was recorded as paid.");
     }
 
-    private async Task UseStorageWithoutOptionalCapabilitiesAsync()
-    {
-        await _host.DisposeAsync();
-
-        _host = ParbadTestHost.Create(
-            gateways => gateways
-                        .AddGateway<FakeGateway>()
-                        .WithAccounts<FakeGatewayAccount>(accounts => accounts.AddInMemory(_ => { })),
-            services => services.AddSingleton(_gateway),
-            storageHasOptionalCapabilities: false);
-    }
 
     private async Task ReceiveCallbackAsync() =>
         _host.ReceiveCallback(await _host.GetCallbackUrlAsync(TrackingNumber, CallbackUrl), TestCallback.Get());

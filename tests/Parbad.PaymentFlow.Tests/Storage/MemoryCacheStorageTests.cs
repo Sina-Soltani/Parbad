@@ -1,3 +1,4 @@
+using Parbad.Storage.Abstractions.Models;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
@@ -41,8 +42,7 @@ public class MemoryCacheStorageTests : CacheStorageTests
         AssertSamePayment(payment, await second.GetPaymentByTrackingNumberAsync(1001));
         AssertSamePayment(payment, await constructedDirectly.GetPaymentByTokenAsync(payment.Token));
 
-        payment.IsPaid = true;
-        payment.IsCompleted = true;
+        payment.Status = PaymentStatus.Paid;
         await second.UpdatePaymentAsync(payment);
 
         AssertSamePayment(payment, await first.GetPaymentByTrackingNumberAsync(1001));

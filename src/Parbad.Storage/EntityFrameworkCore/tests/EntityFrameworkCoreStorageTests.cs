@@ -22,8 +22,7 @@ public class EntityFrameworkCoreStorageTests
                                                           TransactionCode = "test",
                                                           GatewayName = "gateway",
                                                           GatewayAccountName = "test",
-                                                          IsPaid = false,
-                                                          IsCompleted = false
+                                                          Status = PaymentStatus.Requested
                                                       };
 
     private static readonly Transaction TransactionTestData = new()
@@ -94,8 +93,7 @@ public class EntityFrameworkCoreStorageTests
         payment.TransactionCode = "NewCode";
         payment.GatewayName = "NewGateway";
         payment.GatewayAccountName = "NewAccount";
-        payment.IsPaid = true;
-        payment.IsCompleted = true;
+        payment.Status = PaymentStatus.Paid;
 
         await _storage.UpdatePaymentAsync(payment);
 
@@ -198,12 +196,39 @@ public class EntityFrameworkCoreStorageTests
         await _storage.CreatePaymentAsync(NewPayment(2, "RRN-2", "gateway", isPaid: false));
         await _storage.CreatePaymentAsync(NewPayment(3, "RRN-3", "other", isPaid: true));
 
-        var found = await _storage.FindPaidPaymentByTransactionCodeAsync("gateway", "RRN-1", exceptTrackingNumber: 99);
+        var found = await _storage.FindPaidPaymentByBankReferenceAsync("gateway", "RRN-1", exceptTrackingNumber: 99);
 
         Assert.AreEqual(1, found?.TrackingNumber);
-        Assert.IsNull(await _storage.FindPaidPaymentByTransactionCodeAsync("gateway", "RRN-1", exceptTrackingNumber: 1), "The excluded payment was returned.");
-        Assert.IsNull(await _storage.FindPaidPaymentByTransactionCodeAsync("gateway", "RRN-2", exceptTrackingNumber: 99), "An unpaid payment was returned.");
-        Assert.IsNull(await _storage.FindPaidPaymentByTransactionCodeAsync("gateway", "RRN-3", exceptTrackingNumber: 99), "A payment of another gateway was returned.");
+        Assert.IsNull(await _storage.FindPaidPaymentByBankReferenceAsync("gateway", "RRN-1", exceptTrackingNumber: 1), "The excluded payment was returned.");
+        Assert.IsNull(await _storage.FindPaidPaymentByBankReferenceAsync("gateway", "RRN-2", exceptTrackingNumber: 99), "An unpaid payment was returned.");
+        Assert.IsNull(await _storage.FindPaidPaymentByBankReferenceAsync("gateway", "RRN-3", exceptTrackingNumber: 99), "A payment of another gateway was returned.");
+    }
+
+    [TestMethod]
+    public async Task Paid_Payment_Lookup_Compares_The_Transaction_Code_Of_Payments_Without_A_Bank_Reference()
+    {
+        // A payment stored before Parbad 4.0 has no bank reference.
+        var legacy = NewPayment(1, "RRN-1", "gateway", isPaid: true);
+        legacy.BankReference = null;
+        await _storage.CreatePaymentAsync(legacy);
+
+        Assert.AreEqual(1, (await _storage.FindPaidPaymentByBankReferenceAsync("gateway", "RRN-1", exceptTrackingNumber: 99))?.TrackingNumber);
+    }
+
+    [TestMethod]
+    public async Task Status_RefundedAmount_And_BankReference_Are_Stored()
+    {
+        var payment = NewPayment(1, "RRN-1", "gateway", isPaid: true);
+        payment.Status = PaymentStatus.PartiallyRefunded;
+        payment.RefundedAmount = 400;
+        await _storage.CreatePaymentAsync(payment);
+
+        var stored = await _storage.GetPaymentByTrackingNumberAsync(1);
+
+        Assert.AreEqual(PaymentStatus.PartiallyRefunded, stored!.Status);
+        Assert.AreEqual(400, stored.RefundedAmount);
+        Assert.AreEqual("RRN-1", stored.BankReference);
+        Assert.IsTrue(stored.IsPaid && stored.IsCompleted);
     }
 
     private static Payment NewPayment(long trackingNumber, string transactionCode, string gatewayName, bool isPaid) => new()
@@ -214,7 +239,7 @@ public class EntityFrameworkCoreStorageTests
             TransactionCode = transactionCode,
             GatewayName = gatewayName,
             GatewayAccountName = "test",
-            IsCompleted = true,
-            IsPaid = isPaid
+            BankReference = isPaid ? transactionCode : null,
+            Status = isPaid ? PaymentStatus.Paid : PaymentStatus.Failed
         };
 }

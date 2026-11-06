@@ -252,6 +252,12 @@ public class AutoRandomTrackingNumberTests
         public Task<long?> GetLargestTrackingNumberAsync(CancellationToken cancellationToken = default) =>
             _inner.GetLargestTrackingNumberAsync(cancellationToken);
 
+        public Task<Payment?> FindPaidPaymentByBankReferenceAsync(string gatewayName, string bankReference, long exceptTrackingNumber, CancellationToken cancellationToken = default) =>
+            _inner.FindPaidPaymentByBankReferenceAsync(gatewayName, bankReference, exceptTrackingNumber, cancellationToken);
+
+        public Task<bool> TryCompletePaymentAsync(long paymentId, PaymentStatus status, string? transactionCode, string? bankReference, CancellationToken cancellationToken = default) =>
+            _inner.TryCompletePaymentAsync(paymentId, status, transactionCode, bankReference, cancellationToken);
+
         public Task CreatePaymentAsync(Payment payment, CancellationToken cancellationToken = default) =>
             _inner.CreatePaymentAsync(payment, cancellationToken);
 

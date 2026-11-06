@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Parbad.Storage.Abstractions.Models;
 using Parbad.Storage.EntityFrameworkCore.Context;
+using Parbad.Storage.EntityFrameworkCore.Domain;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -50,8 +51,10 @@ public class EntityFrameworkCoreRelationalStorageTests
         await using var verifyContext = CreateContext();
         var stored = await Storage().GetPaymentByTrackingNumberAsync(1);
 
-        Assert.IsTrue(stored.IsCompleted && stored.IsPaid);
+        Assert.AreEqual(PaymentStatus.Paid, stored.Status);
         Assert.AreEqual("RRN-3", stored.TransactionCode);
+        Assert.AreEqual("RRN-3", stored.BankReference);
+        Assert.IsTrue(verifyContext.Payments.Single().IsPaid, "is_paid is not kept in step with the status.");
         Assert.IsNotNull(verifyContext.Payments.Single().UpdatedOn);
     }
 
@@ -61,9 +64,60 @@ public class EntityFrameworkCoreRelationalStorageTests
         await Assert.ThrowsExceptionAsync<System.InvalidOperationException>(() => TryCompleteAsync(42, isPaid: true, "RRN"));
     }
 
+    [TestMethod]
+    public async Task A_Payment_Stored_Before_4_0_Keeps_Its_State()
+    {
+        // Rows written by Parbad 3.x have the new status column at its default (Requested) after the migration.
+        await using (var context = CreateContext())
+        {
+            context.Payments.Add(new PaymentEntity
+                                 {
+                                     TrackingNumber = 1, Amount = 1000, Token = "token", GatewayName = "gateway", TransactionCode = "RRN",
+                                     IsCompleted = true, IsPaid = true, CreatedOn = System.DateTime.UtcNow
+                                 });
+            await context.SaveChangesAsync();
+        }
+
+        var stored = await Storage().GetPaymentByTrackingNumberAsync(1);
+
+        Assert.AreEqual(PaymentStatus.Paid, stored!.Status);
+        Assert.IsFalse(await TryCompleteAsync(stored.Id, isPaid: false, transactionCode: null), "A payment paid before 4.0 was changed.");
+        Assert.AreEqual(1, (await Storage().FindPaidPaymentByBankReferenceAsync("gateway", "RRN", exceptTrackingNumber: 99))?.TrackingNumber);
+    }
+
+    [TestMethod]
+    public async Task Cancelled_Payment_Is_Stored_As_Cancelled()
+    {
+        var payment = new Payment { TrackingNumber = 1, Amount = 1000, Token = "token", GatewayName = "gateway" };
+        await Storage().CreatePaymentAsync(payment);
+
+        Assert.IsTrue(await Storage().TryCompletePaymentAsync(payment.Id, PaymentStatus.Cancelled, transactionCode: null, bankReference: null));
+
+        var stored = await Storage().GetPaymentByTrackingNumberAsync(1);
+        Assert.AreEqual(PaymentStatus.Cancelled, stored!.Status);
+        Assert.IsTrue(stored.IsCompleted && !stored.IsPaid);
+    }
+
+    [TestMethod]
+    public void A_Bank_Reference_Is_Unique_Per_Gateway()
+    {
+        using var context = CreateContext();
+
+        var index = context.Model.FindEntityType(typeof(PaymentEntity))!
+                           .GetIndexes()
+                           .SingleOrDefault(index => index.Properties.Select(property => property.Name)
+                                                          .SequenceEqual(new[] { nameof(PaymentEntity.GatewayName), nameof(PaymentEntity.BankReference) }));
+
+        Assert.IsNotNull(index);
+        Assert.IsTrue(index.IsUnique);
+    }
+
     private async Task<bool> TryCompleteAsync(long paymentId, bool isPaid, string transactionCode)
     {
-        return await Storage().TryCompletePaymentAsync(paymentId, isPaid, transactionCode);
+        return await Storage().TryCompletePaymentAsync(paymentId,
+                                                       isPaid ? PaymentStatus.Paid : PaymentStatus.Failed,
+                                                       transactionCode,
+                                                       isPaid ? transactionCode : null);
     }
 
     private ParbadDataContext CreateContext() => new(_contextOptions);

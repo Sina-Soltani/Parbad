@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
+using Parbad.Storage.Abstractions.Models;
 using Parbad.Storage.Cache.Abstractions;
 using Parbad.Storage.Cache.Internal;
 
@@ -50,8 +51,9 @@ public class DistributedCacheStorage : CacheStorage
     /// compare-and-set. Use the Entity Framework Core storage where several servers verify payments.
     /// </remarks>
     public override async Task<bool> TryCompletePaymentAsync(long paymentId,
-                                                             bool isPaid,
+                                                             PaymentStatus status,
                                                              string? transactionCode,
+                                                             string? bankReference,
                                                              CancellationToken cancellationToken = default)
     {
         var buffer = await _distributedCache.GetAsync(_options.CacheKey, cancellationToken).ConfigureAwait(false);
@@ -70,14 +72,14 @@ public class DistributedCacheStorage : CacheStorage
                 // made a moment ago, and that must not be undone.
                 if (record != null && ((cached.IsPaid && !record.IsPaid) || (cached.IsCompleted && !record.IsCompleted)))
                 {
-                    record.IsCompleted = cached.IsCompleted;
-                    record.IsPaid = cached.IsPaid;
+                    record.Status = cached.Status;
                     record.TransactionCode = cached.TransactionCode;
+                    record.BankReference = cached.BankReference;
                 }
             }
         }
 
-        return await base.TryCompletePaymentAsync(paymentId, isPaid, transactionCode, cancellationToken).ConfigureAwait(false);
+        return await base.TryCompletePaymentAsync(paymentId, status, transactionCode, bankReference, cancellationToken).ConfigureAwait(false);
     }
 
     /// <inheritdoc />

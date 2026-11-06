@@ -1,3 +1,4 @@
+using Parbad.PaymentFlow.Tests.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -60,8 +61,7 @@ public abstract class CacheStorageTests
             TransactionCode = "new-code",
             GatewayName = "new-gateway",
             GatewayAccountName = "new-account",
-            IsCompleted = true,
-            IsPaid = true
+            Status = PaymentStatus.Paid
         };
 
         await storage.UpdatePaymentAsync(detached);
@@ -114,7 +114,7 @@ public abstract class CacheStorageTests
         var expectedPayment = Copy(payment);
         var expectedTransaction = Copy(transaction);
 
-        payment.IsPaid = true;
+        payment.Status = PaymentStatus.Paid;
         payment.Amount = 1;
         transaction.IsSucceed = true;
         transaction.Message = "changed";
@@ -147,8 +147,7 @@ public abstract class CacheStorageTests
             switch (record)
             {
                 case Payment p:
-                    p.IsPaid = true;
-                    p.IsCompleted = true;
+                    p.Status = PaymentStatus.Paid;
                     p.Amount = 1;
                     p.TrackingNumber = 9999;
                     p.Token = "mutated";
@@ -215,7 +214,7 @@ public abstract class CacheStorageTests
 
         // A payment may keep its own tracking number and token.
         var unchangedKeys = Copy(second);
-        unchangedKeys.IsPaid = true;
+        unchangedKeys.Status = PaymentStatus.Paid;
         await storage.UpdatePaymentAsync(unchangedKeys);
 
         AssertSamePayment(first, await CreateStorage().GetPaymentByTrackingNumberAsync(first.TrackingNumber));
@@ -243,30 +242,29 @@ public abstract class CacheStorageTests
     public async Task Paid_payment_lookup_finds_only_paid_payments_of_the_same_gateway_except_the_given_one()
     {
         var storage = CreateStorage();
-        var lookup = storage as IPaidPaymentLookup;
-        Assert.IsNotNull(lookup, $"{storage.GetType().Name} does not implement {nameof(IPaidPaymentLookup)}.");
+        var lookup = storage;
 
         var paid = NewPayment(1);
         paid.TransactionCode = "RRN-1";
-        paid.IsCompleted = paid.IsPaid = true;
+        paid.Status = PaymentStatus.Paid;
 
         var unpaid = NewPayment(2);
         unpaid.TransactionCode = "RRN-2";
-        unpaid.IsCompleted = true;
+        unpaid.Status = PaymentStatus.Failed;
 
         var otherGateway = NewPayment(3);
         otherGateway.TransactionCode = "RRN-3";
         otherGateway.GatewayName = "other";
-        otherGateway.IsCompleted = otherGateway.IsPaid = true;
+        otherGateway.Status = PaymentStatus.Paid;
 
         foreach (var payment in new[] { paid, unpaid, otherGateway }) await storage.CreatePaymentAsync(payment);
 
-        lookup = (IPaidPaymentLookup)CreateStorage();
+        lookup = CreateStorage();
 
-        AssertSamePayment(paid, await lookup.FindPaidPaymentByTransactionCodeAsync("GATEWAY", "RRN-1", exceptTrackingNumber: 99));
-        Assert.IsNull(await lookup.FindPaidPaymentByTransactionCodeAsync("gateway", "RRN-1", exceptTrackingNumber: 1), "The excluded payment was returned.");
-        Assert.IsNull(await lookup.FindPaidPaymentByTransactionCodeAsync("gateway", "RRN-2", exceptTrackingNumber: 99), "An unpaid payment was returned.");
-        Assert.IsNull(await lookup.FindPaidPaymentByTransactionCodeAsync("gateway", "RRN-3", exceptTrackingNumber: 99), "A payment of another gateway was returned.");
+        AssertSamePayment(paid, await lookup.FindPaidPaymentByBankReferenceAsync("GATEWAY", "RRN-1", exceptTrackingNumber: 99));
+        Assert.IsNull(await lookup.FindPaidPaymentByBankReferenceAsync("gateway", "RRN-1", exceptTrackingNumber: 1), "The excluded payment was returned.");
+        Assert.IsNull(await lookup.FindPaidPaymentByBankReferenceAsync("gateway", "RRN-2", exceptTrackingNumber: 99), "An unpaid payment was returned.");
+        Assert.IsNull(await lookup.FindPaidPaymentByBankReferenceAsync("gateway", "RRN-3", exceptTrackingNumber: 99), "A payment of another gateway was returned.");
     }
 
     [TestMethod]
@@ -276,7 +274,7 @@ public abstract class CacheStorageTests
         payment.TransactionCode = null;
         await CreateStorage().CreatePaymentAsync(payment);
 
-        IPaymentCompletion Completion() => (IPaymentCompletion)CreateStorage();
+        IStorage Completion() => CreateStorage();
 
         Assert.IsTrue(await Completion().TryCompletePaymentAsync(payment.Id, isPaid: false, transactionCode: null), "An open payment could not be completed.");
         Assert.IsFalse(await Completion().TryCompletePaymentAsync(payment.Id, isPaid: false, "RRN-2"), "An unpaid result replaced another result.");
@@ -296,7 +294,7 @@ public abstract class CacheStorageTests
         var storage = CreateStorage();
         await storage.CreatePaymentAsync(payment);
 
-        var completion = (IPaymentCompletion)storage;
+        var completion = storage;
         var results = await Task.WhenAll(Enumerable.Range(0, 20).Select(i => Task.Run(() =>
             completion.TryCompletePaymentAsync(payment.Id, isPaid: false, $"RRN-{i}"))));
 
@@ -313,8 +311,8 @@ public abstract class CacheStorageTests
         var payment = NewPayment(1);
         await CreateStorage().CreatePaymentAsync(payment);
 
-        var thisRequest = (IPaymentCompletion)CreateStorage();
-        Assert.IsTrue(await ((IPaymentCompletion)CreateStorage()).TryCompletePaymentAsync(payment.Id, isPaid: true, "RRN-OTHER"));
+        var thisRequest = CreateStorage();
+        Assert.IsTrue(await CreateStorage().TryCompletePaymentAsync(payment.Id, isPaid: true, "RRN-OTHER"));
 
         Assert.IsFalse(await thisRequest.TryCompletePaymentAsync(payment.Id, isPaid: false, transactionCode: null),
                        "The completion was decided on records loaded before the other instance completed the payment.");
@@ -412,8 +410,9 @@ public abstract class CacheStorageTests
         TransactionCode = payment.TransactionCode,
         GatewayName = payment.GatewayName,
         GatewayAccountName = payment.GatewayAccountName,
-        IsCompleted = payment.IsCompleted,
-        IsPaid = payment.IsPaid
+        BankReference = payment.BankReference,
+        Status = payment.Status,
+        RefundedAmount = payment.RefundedAmount
     };
 
     private static Transaction Copy(Transaction transaction) => new()

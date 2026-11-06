@@ -23,8 +23,7 @@ public class MemoryCacheTests
                                                   TransactionCode = "test",
                                                   GatewayName = "gateway",
                                                   GatewayAccountName = "test",
-                                                  IsPaid = false,
-                                                  IsCompleted = false
+                                                  Status = PaymentStatus.Requested
                                               };
 
     private static Transaction TransactionTestData => new Transaction
@@ -90,8 +89,7 @@ public class MemoryCacheTests
         payment.TransactionCode = "NewCode";
         payment.GatewayName = "NewGateway";
         payment.GatewayAccountName = "NewAccount";
-        payment.IsPaid = true;
-        payment.IsCompleted = true;
+        payment.Status = PaymentStatus.Paid;
 
         await _storage.UpdatePaymentAsync(payment);
 
