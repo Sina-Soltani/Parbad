@@ -52,6 +52,9 @@ public sealed class StorageWithoutOptionalCapabilities : IStorage
     public Task<bool> DoesPaymentExistAsync(string paymentToken, CancellationToken cancellationToken = default) =>
         _inner.DoesPaymentExistAsync(paymentToken, cancellationToken);
 
+    public Task<long?> GetLargestTrackingNumberAsync(CancellationToken cancellationToken = default) =>
+        _inner.GetLargestTrackingNumberAsync(cancellationToken);
+
     public Task<List<Transaction>> GetTransactionsAsync(Payment payment, CancellationToken cancellationToken = default) =>
         _inner.GetTransactionsAsync(payment, cancellationToken);
 }

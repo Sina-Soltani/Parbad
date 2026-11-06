@@ -1,9 +1,7 @@
 ﻿// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using Parbad.Storage.Abstractions.Models;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,18 +13,6 @@ namespace Parbad.Storage.Abstractions;
 /// </summary>
 public interface IStorage
 {
-    /// <summary>
-    /// Gets a list of <see cref="Payment"/>.
-    /// </summary>
-    [Obsolete("This property will be removed in a future release. The usages are implemented as methods now.")]
-    IQueryable<Payment> Payments { get; }
-
-    /// <summary>
-    /// Gets a list of <see cref="Transaction"/>.
-    /// </summary>
-    [Obsolete("This property will be removed in a future release. The usages are implemented as methods now.")]
-    IQueryable<Transaction> Transactions { get; }
-
     /// <summary>
     /// Creates a new payment.
     /// </summary>
@@ -96,6 +82,12 @@ public interface IStorage
     /// <param name="paymentToken"></param>
     /// <param name="cancellationToken"></param>
     Task<bool> DoesPaymentExistAsync(string paymentToken, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets the largest tracking number of all payments, or <see langword="null"/> when there are no payments.
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    Task<long?> GetLargestTrackingNumberAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets a list of transactions of the given <paramref name="payment"/>.

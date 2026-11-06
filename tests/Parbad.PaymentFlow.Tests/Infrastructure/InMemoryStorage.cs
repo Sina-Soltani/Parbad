@@ -177,6 +177,11 @@ public sealed class InMemoryStorage : IStorage, IPaidPaymentLookup, IPaymentComp
         lock (_sync) return Task.FromResult(_payments.Any(p => p.Token == paymentToken));
     }
 
+    public Task<long?> GetLargestTrackingNumberAsync(CancellationToken cancellationToken = default)
+    {
+        lock (_sync) return Task.FromResult(_payments.Count == 0 ? (long?)null : _payments.Max(p => p.TrackingNumber));
+    }
+
     public Task<List<Transaction>> GetTransactionsAsync(Payment payment, CancellationToken cancellationToken = default)
     {
         lock (_sync) return Task.FromResult(_transactions.Where(t => t.PaymentId == payment.Id).Select(Copy).ToList());

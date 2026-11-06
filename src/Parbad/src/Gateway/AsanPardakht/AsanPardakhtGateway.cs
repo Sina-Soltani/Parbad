@@ -46,23 +46,6 @@ public class AsanPardakhtGateway : GatewayBase<AsanPardakhtGatewayAccount>
         _api = new AsanPardakhtRestApi(httpClientFactory.CreateClient(this), _gatewayOptions);
     }
 
-    /// <summary>
-    /// Initializes an instance of <see cref="AsanPardakhtGateway"/>. The crypto service is not used any more.
-    /// </summary>
-    [Obsolete("The crypto service is not used: since Parbad 3.12 the gateway uses AsanPardakht's REST API. This constructor will be removed in Parbad 4.0.")]
-#pragma warning disable CS0618
-    public AsanPardakhtGateway(
-        IHttpContextAccessor httpContextAccessor,
-        IHttpClientFactory httpClientFactory,
-        IGatewayAccountProvider<AsanPardakhtGatewayAccount> accountProvider,
-        IAsanPardakhtCrypto crypto,
-        IOptions<AsanPardakhtGatewayOptions> gatewayOptions,
-        IOptions<MessagesOptions> messageOptions)
-#pragma warning restore CS0618
-        : this(httpContextAccessor, httpClientFactory, accountProvider, gatewayOptions, messageOptions)
-    {
-    }
-
     /// <inheritdoc />
     public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
     {

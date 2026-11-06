@@ -26,7 +26,7 @@ public class DefaultOnlinePayment : IOnlinePayment
     // CompletePaymentAsync keeps the first result.
     private static readonly KeyedAsyncLock<long> PaymentLocks = new KeyedAsyncLock<long>();
 
-    private readonly IStorageManager _storageManager;
+    private readonly IStorage _storage;
     private readonly IPaymentTokenProvider _tokenProvider;
     private readonly IGatewayProvider _gatewayProvider;
     private readonly ParbadOptions _options;
@@ -37,18 +37,17 @@ public class DefaultOnlinePayment : IOnlinePayment
     /// </summary>
     public DefaultOnlinePayment(
         IServiceProvider services,
-        IStorageManager storageManager,
+        IStorage storage,
         IPaymentTokenProvider tokenProvider,
         IGatewayProvider gatewayProvider,
         IOptions<ParbadOptions> options,
         IParbadLogger<DefaultOnlinePayment> logger)
     {
         Services = services;
-        _storageManager = storageManager;
+        _storage = storage;
         _tokenProvider = tokenProvider;
         _options = options.Value;
         _logger = logger;
-        _storageManager = storageManager;
         _gatewayProvider = gatewayProvider;
     }
 
@@ -62,7 +61,7 @@ public class DefaultOnlinePayment : IOnlinePayment
 
         _logger.LogInformation(LoggingEvents.RequestPayment, "Requesting the invoice {TrackingNumber} is started", invoice.TrackingNumber);
 
-        if (await _storageManager.DoesPaymentExistAsync(invoice.TrackingNumber, cancellationToken).ConfigureAwaitFalse())
+        if (await _storage.DoesPaymentExistAsync(invoice.TrackingNumber, cancellationToken).ConfigureAwaitFalse())
         {
             _logger.LogInformation(LoggingEvents.RequestPayment, _options.Messages.DuplicateTrackingNumber);
 
@@ -85,7 +84,7 @@ public class DefaultOnlinePayment : IOnlinePayment
         }
 
         //  Check the created payment token
-        if (await _storageManager.DoesPaymentExistAsync(paymentToken, cancellationToken).ConfigureAwaitFalse())
+        if (await _storage.DoesPaymentExistAsync(paymentToken, cancellationToken).ConfigureAwaitFalse())
         {
             var message = $"Requesting the invoice {invoice.TrackingNumber} is finished. The payment token \"{paymentToken}\" already exists.";
 
@@ -109,7 +108,7 @@ public class DefaultOnlinePayment : IOnlinePayment
                              GatewayName = gateway.GetRoutingGatewayName()
                          };
 
-        await _storageManager.CreatePaymentAsync(newPayment, cancellationToken).ConfigureAwaitFalse();
+        await _storage.CreatePaymentAsync(newPayment, cancellationToken).ConfigureAwaitFalse();
 
         PaymentRequestResult requestResult;
 
@@ -137,7 +136,7 @@ public class DefaultOnlinePayment : IOnlinePayment
 
         newPayment.GatewayAccountName = requestResult.GatewayAccountName;
 
-        await _storageManager.UpdatePaymentAsync(newPayment, cancellationToken).ConfigureAwaitFalse();
+        await _storage.UpdatePaymentAsync(newPayment, cancellationToken).ConfigureAwaitFalse();
 
         var newTransaction = new Transaction
                              {
@@ -149,7 +148,7 @@ public class DefaultOnlinePayment : IOnlinePayment
                                  PaymentId = newPayment.Id
                              };
 
-        await _storageManager.CreateTransactionAsync(newTransaction, cancellationToken).ConfigureAwaitFalse();
+        await _storage.CreateTransactionAsync(newTransaction, cancellationToken).ConfigureAwaitFalse();
 
         _logger.LogInformation(LoggingEvents.RequestPayment, "Requesting the invoice {TrackingNumber} is finished", invoice.TrackingNumber);
 
@@ -170,7 +169,7 @@ public class DefaultOnlinePayment : IOnlinePayment
             throw new PaymentTokenProviderException("No Token is received.");
         }
 
-        var payment = await _storageManager.GetPaymentByTokenAsync(paymentToken, cancellationToken).ConfigureAwaitFalse();
+        var payment = await _storage.GetPaymentByTokenAsync(paymentToken, cancellationToken).ConfigureAwaitFalse();
 
         if (payment == null)
         {
@@ -189,7 +188,7 @@ public class DefaultOnlinePayment : IOnlinePayment
     {
         _logger.LogInformation(LoggingEvents.FetchPayment, "Fetching from database for invoice number {TrackingNumber} is started", trackingNumber);
 
-        var payment = await _storageManager.GetPaymentByTrackingNumberAsync(trackingNumber, cancellationToken).ConfigureAwaitFalse();
+        var payment = await _storage.GetPaymentByTrackingNumberAsync(trackingNumber, cancellationToken).ConfigureAwaitFalse();
 
         if (payment == null)
         {
@@ -212,7 +211,7 @@ public class DefaultOnlinePayment : IOnlinePayment
 
         using var paymentLock = await PaymentLocks.AcquireAsync(trackingNumber, cancellationToken).ConfigureAwaitFalse();
 
-        var payment = await _storageManager
+        var payment = await _storage
                            .GetPaymentByTrackingNumberAsync(trackingNumber, cancellationToken)
                            .ConfigureAwaitFalse();
 
@@ -245,7 +244,7 @@ public class DefaultOnlinePayment : IOnlinePayment
 
         var gateway = _gatewayProvider.Provide(payment.GatewayName);
 
-        var transactions = await _storageManager.GetTransactionsAsync(payment, cancellationToken).ConfigureAwaitFalse();
+        var transactions = await _storage.GetTransactionsAsync(payment, cancellationToken).ConfigureAwaitFalse();
         var invoiceContext = new InvoiceContext(payment, transactions);
 
         PaymentVerifyResult verifyResult;
@@ -278,7 +277,7 @@ public class DefaultOnlinePayment : IOnlinePayment
         if (!await CompletePaymentAsync(payment, cancellationToken).ConfigureAwaitFalse())
         {
             // Another verification or a cancellation completed the payment first, e.g. on another server.
-            var storedPayment = await _storageManager
+            var storedPayment = await _storage
                                      .GetPaymentByTrackingNumberAsync(trackingNumber, cancellationToken)
                                      .ConfigureAwaitFalse();
 
@@ -310,7 +309,7 @@ public class DefaultOnlinePayment : IOnlinePayment
                               PaymentId = payment.Id
                           };
 
-        await _storageManager.CreateTransactionAsync(transaction, cancellationToken).ConfigureAwaitFalse();
+        await _storage.CreateTransactionAsync(transaction, cancellationToken).ConfigureAwaitFalse();
 
         _logger.LogInformation(LoggingEvents.VerifyPayment, "Verifying the invoice {TrackingNumber} is finished", trackingNumber);
 
@@ -324,7 +323,7 @@ public class DefaultOnlinePayment : IOnlinePayment
 
         using var paymentLock = await PaymentLocks.AcquireAsync(trackingNumber, cancellationToken).ConfigureAwaitFalse();
 
-        var payment = await _storageManager
+        var payment = await _storage
                            .GetPaymentByTrackingNumberAsync(trackingNumber, cancellationToken)
                            .ConfigureAwaitFalse();
 
@@ -380,7 +379,7 @@ public class DefaultOnlinePayment : IOnlinePayment
                                  PaymentId = payment.Id
                              };
 
-        await _storageManager.CreateTransactionAsync(newTransaction, cancellationToken).ConfigureAwaitFalse();
+        await _storage.CreateTransactionAsync(newTransaction, cancellationToken).ConfigureAwaitFalse();
 
         _logger.LogInformation(LoggingEvents.CancelPayment, "Canceling the invoice {TrackingNumber} is finished", trackingNumber);
 
@@ -402,7 +401,7 @@ public class DefaultOnlinePayment : IOnlinePayment
 
         _logger.LogInformation(LoggingEvents.RefundPayment, "Refunding the invoice {TrackingNumber} is started", invoice.TrackingNumber);
 
-        var payment = await _storageManager.GetPaymentByTrackingNumberAsync(invoice.TrackingNumber, cancellationToken).ConfigureAwaitFalse();
+        var payment = await _storage.GetPaymentByTrackingNumberAsync(invoice.TrackingNumber, cancellationToken).ConfigureAwaitFalse();
 
         if (payment == null)
         {
@@ -434,7 +433,7 @@ public class DefaultOnlinePayment : IOnlinePayment
             return PaymentRefundResult.Failed($"{_options.Messages.OnlyPaidPaymentCanBeRefunded} Tracking number: {invoice.TrackingNumber}.");
         }
 
-        var transactions = await _storageManager.GetTransactionsAsync(payment, cancellationToken).ConfigureAwaitFalse();
+        var transactions = await _storage.GetTransactionsAsync(payment, cancellationToken).ConfigureAwaitFalse();
 
         var alreadyRefunded = transactions
                              .Where(transaction => transaction.Type == TransactionType.Refund && transaction.IsSucceed)
@@ -497,7 +496,7 @@ public class DefaultOnlinePayment : IOnlinePayment
                                   PaymentId = payment.Id
                               };
 
-        await _storageManager.CreateTransactionAsync(newtTransaction, cancellationToken).ConfigureAwaitFalse();
+        await _storage.CreateTransactionAsync(newtTransaction, cancellationToken).ConfigureAwaitFalse();
 
         _logger.LogInformation(LoggingEvents.RefundPayment, "Refunding the invoice {TrackingNumber} is finished", invoice.TrackingNumber);
 
@@ -526,7 +525,7 @@ public class DefaultOnlinePayment : IOnlinePayment
         }
         else if (!verifyResult.TransactionCode.IsNullOrEmpty())
         {
-            var lookup = _storageManager as IPaidPaymentLookup ?? Services.GetService<IStorage>() as IPaidPaymentLookup;
+            var lookup = _storage as IPaidPaymentLookup;
 
             if (lookup == null)
             {
@@ -592,7 +591,7 @@ public class DefaultOnlinePayment : IOnlinePayment
     /// <returns>False if the payment was completed by another operation and nothing was stored.</returns>
     private async Task<bool> CompletePaymentAsync(Payment payment, CancellationToken cancellationToken)
     {
-        var completion = _storageManager as IPaymentCompletion ?? Services.GetService<IStorage>() as IPaymentCompletion;
+        var completion = _storage as IPaymentCompletion;
 
         if (completion == null)
         {
@@ -601,7 +600,7 @@ public class DefaultOnlinePayment : IOnlinePayment
                                payment.TrackingNumber,
                                nameof(IPaymentCompletion));
 
-            await _storageManager.UpdatePaymentAsync(payment, cancellationToken).ConfigureAwaitFalse();
+            await _storage.UpdatePaymentAsync(payment, cancellationToken).ConfigureAwaitFalse();
 
             return true;
         }
@@ -633,7 +632,7 @@ public class DefaultOnlinePayment : IOnlinePayment
 
         var gateway = _gatewayProvider.Provide(payment.GatewayName);
 
-        var transactions = await _storageManager.GetTransactionsAsync(payment, cancellationToken).ConfigureAwaitFalse();
+        var transactions = await _storage.GetTransactionsAsync(payment, cancellationToken).ConfigureAwaitFalse();
         var invoiceContext = new InvoiceContext(payment, transactions);
 
         PaymentFetchResult gatewayFetchResult;

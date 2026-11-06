@@ -136,15 +136,11 @@ public abstract class CacheStorageTests
 
         Mutate((await storage.GetPaymentByTrackingNumberAsync(1001))!);
         Mutate((await storage.GetPaymentByTokenAsync(payment.Token))!);
-        Mutate(storage.Payments.Single());
         Mutate((await storage.GetTransactionsAsync(payment)).Single());
-        Mutate(storage.Transactions.Single());
 
         AssertSamePayment(expectedPayment, await storage.GetPaymentByTrackingNumberAsync(1001));
         AssertSamePayment(expectedPayment, await storage.GetPaymentByTokenAsync(payment.Token));
-        AssertSamePayment(expectedPayment, storage.Payments.Single());
         AssertSameTransaction(expectedTransaction, (await storage.GetTransactionsAsync(payment)).Single());
-        AssertSameTransaction(expectedTransaction, storage.Transactions.Single());
 
         static void Mutate(object record)
         {
@@ -178,7 +174,7 @@ public abstract class CacheStorageTests
         var exception = await AssertThrowsInvalidOperationAsync(() => storage.CreatePaymentAsync(duplicate));
 
         StringAssert.Contains(exception.Message, "tracking number 1001");
-        Assert.AreEqual(1, CreateStorage().Payments.Count());
+        Assert.IsFalse(await CreateStorage().DoesPaymentExistAsync(duplicate.Token));
         Assert.IsNotNull(await CreateStorage().GetPaymentByTrackingNumberAsync(1001));
     }
 
@@ -195,7 +191,7 @@ public abstract class CacheStorageTests
         var exception = await AssertThrowsInvalidOperationAsync(() => storage.CreatePaymentAsync(duplicate));
 
         StringAssert.Contains(exception.Message, "token");
-        Assert.AreEqual(1, CreateStorage().Payments.Count());
+        Assert.IsFalse(await CreateStorage().DoesPaymentExistAsync(duplicate.TrackingNumber));
         Assert.IsNotNull(await CreateStorage().GetPaymentByTokenAsync(original.Token));
     }
 
@@ -328,16 +324,20 @@ public abstract class CacheStorageTests
     protected static async Task AssertAllStoredAsync(IStorage storage, IReadOnlyCollection<Payment> payments)
     {
         Assert.AreEqual(payments.Count, payments.Select(payment => payment.Id).Distinct().Count(), "Payment ids are not unique.");
-        Assert.AreEqual(payments.Count, storage.Payments.Count());
+        Assert.AreEqual(payments.Max(payment => payment.TrackingNumber), await storage.GetLargestTrackingNumberAsync());
 
-        var transactionIds = storage.Transactions.Select(transaction => transaction.Id).ToList();
-        Assert.AreEqual(payments.Count, transactionIds.Distinct().Count(), "Transaction ids are not unique, or transactions are missing.");
+        var transactionIds = new List<long>();
 
         foreach (var payment in payments)
         {
             AssertSamePayment(payment, await storage.GetPaymentByTrackingNumberAsync(payment.TrackingNumber));
-            Assert.AreEqual(1, (await storage.GetTransactionsAsync(payment)).Count, $"Payment {payment.TrackingNumber} has no transaction.");
+
+            var transactions = await storage.GetTransactionsAsync(payment);
+            Assert.AreEqual(1, transactions.Count, $"Payment {payment.TrackingNumber} has no transaction.");
+            transactionIds.AddRange(transactions.Select(transaction => transaction.Id));
         }
+
+        Assert.AreEqual(payments.Count, transactionIds.Distinct().Count(), "Transaction ids are not unique.");
     }
 
     protected static Payment NewPayment(long trackingNumber) => new()

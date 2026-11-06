@@ -55,7 +55,7 @@ public class MemoryCacheStorageTests : CacheStorageTests
         await second.DeletePaymentAsync(payment);
 
         Assert.IsFalse(await first.DoesPaymentExistAsync(1001));
-        Assert.AreEqual(0, constructedDirectly.Transactions.Count());
+        Assert.AreEqual(0, (await constructedDirectly.GetTransactionsAsync(payment)).Count);
     }
 
     [TestMethod]
