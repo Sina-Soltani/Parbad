@@ -1,0 +1,34 @@
+<Project>
+
+  <!-- Settings shared by every project. -->
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <NoWarn>$(NoWarn);1701;1702;1591</NoWarn>
+  </PropertyGroup>
+
+  <!--
+    All packages share one version. A prerelease adds a VersionSuffix here (e.g. beta.1), which then applies to
+    every package and to the package dependencies between them.
+  -->
+  <PropertyGroup>
+    <VersionPrefix>4.0.0</VersionPrefix>
+  </PropertyGroup>
+
+  <!-- Package metadata, for every project that is not a test project. -->
+  <PropertyGroup Condition="!$(MSBuildProjectDirectory.Contains('tests'))">
+    <Authors>Sina Soltani</Authors>
+    <Copyright>Copyright © Sina Soltani 2016</Copyright>
+    <PackageProjectUrl>https://github.com/Sina-Soltani/Parbad</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Sina-Soltani/Parbad</RepositoryUrl>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageReleaseNotes>https://github.com/Sina-Soltani/Parbad/releases/tag/v$(VersionPrefix)</PackageReleaseNotes>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+
+    <!-- Each project sets PackageValidationBaselineVersion: the release its public API is compared with. -->
+    <EnablePackageValidation>true</EnablePackageValidation>
+  </PropertyGroup>
+
+</Project>

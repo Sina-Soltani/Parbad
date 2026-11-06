@@ -2,29 +2,13 @@
 
   <PropertyGroup>
     <PackageId>Parbad.Storage.EntityFrameworkCore</PackageId>
-    <VersionPrefix>1.7.0</VersionPrefix>
-    <LangVersion>latest</LangVersion>
+    <PackageValidationBaselineVersion>1.7.0</PackageValidationBaselineVersion>
     <TargetFrameworks>net5;net6;net7;net8.0;net9.0</TargetFrameworks>
     <Nullable>enable</Nullable>  
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
     <Description>Entity Framework Core implementation of Parbad storage.
 More information: https://github.com/Sina-Soltani/Parbad</Description>
-    <PackageProjectUrl>https://github.com/Sina-Soltani/Parbad</PackageProjectUrl>
-    <PackageIcon>icon.png</PackageIcon>
-    <PackageIconUrl>https://raw.githubusercontent.com/Sina-Soltani/Parbad/master/images/Parbad-128x128.png</PackageIconUrl>
-    <RepositoryUrl>https://github.com/Sina-Soltani/Parbad</RepositoryUrl>
-    <Copyright>Copyright © Sina Soltani 2016</Copyright>
     <PackageTags>parbad entityframework efcore</PackageTags>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <Authors>Sina Soltani</Authors>
     <Product>Parbad.Storage.EntityframeworkCore</Product>
-    <PackageReleaseNotes>https://github.com/Sina-Soltani/Parbad/releases/tag/v3.12.0</PackageReleaseNotes>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <NoWarn>1701;1702;1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
