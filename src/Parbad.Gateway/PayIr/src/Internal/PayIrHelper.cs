@@ -32,7 +32,7 @@ internal static class PayIrHelper
         return new PayIrRequestModel
                {
                    Api = api,
-                   Amount = invoice.Amount,
+                   Amount = (long)invoice.Amount,
                    Redirect = invoice.CallbackUrl,
                    NationalCode = additionalData?.NationalCode,
                    Description = additionalData?.Description,

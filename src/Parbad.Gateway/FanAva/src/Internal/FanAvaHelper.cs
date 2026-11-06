@@ -52,7 +52,7 @@ internal static class FanAvaHelper
                                },
                    TransType = transType,
                    ReserveNum = invoice.TrackingNumber.ToString(),
-                   Amount = invoice.Amount,
+                   Amount = (long)invoice.Amount,
                    RedirectUrl = invoice.CallbackUrl,
                    Email = additionalData?.Email,
                    MobileNo = additionalData?.MobileNumber,

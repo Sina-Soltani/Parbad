@@ -33,7 +33,7 @@ internal static class IdPayHelper
         return new IdPayRequestModel
                {
                    OrderId = invoice.TrackingNumber,
-                   Amount = invoice.Amount,
+                   Amount = (long)invoice.Amount,
                    Name = additionalData?.Name,
                    Phone = additionalData?.Phone,
                    Email = additionalData?.Email,

@@ -60,7 +60,7 @@ public class PayPingGateway : GatewayBase<PayPingGatewayAccount>
 
         var body = new CreatePayRequestModel
                    {
-                       Amount = invoice.Amount,
+                       Amount = (long)invoice.Amount,
                        Description = invoice.GetPayPingRequest()?.Description,
                        PayerIdentity = invoice.GetPayPingRequest()?.Mobile,
                        PayerName = invoice.GetPayPingRequest()?.PayerName,
