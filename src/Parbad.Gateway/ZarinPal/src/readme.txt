@@ -20,6 +20,8 @@ Configuration
             {
                 account.MerchantId = "<Your ID>";
                 account.IsSandbox = true | false;
+                // Only for refunds: the access token of the ZarinPal panel. ZarinPal has no sandbox for refunds.
+                account.AuthorizationToken = "<Your access token>";
             });
         });
 })
