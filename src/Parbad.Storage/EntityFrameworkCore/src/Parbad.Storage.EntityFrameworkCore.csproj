@@ -3,7 +3,7 @@
   <PropertyGroup>
     <PackageId>Parbad.Storage.EntityFrameworkCore</PackageId>
     <PackageValidationBaselineVersion>1.7.0</PackageValidationBaselineVersion>
-    <TargetFrameworks>net8.0</TargetFrameworks>
+    <TargetFramework>net8.0</TargetFramework>
     <Description>Entity Framework Core implementation of Parbad storage.
 More information: https://github.com/Sina-Soltani/Parbad</Description>
     <PackageTags>parbad entityframework efcore</PackageTags>
