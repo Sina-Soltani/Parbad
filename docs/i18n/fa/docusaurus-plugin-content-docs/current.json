@@ -1,0 +1,10 @@
+{
+  "version.label": {
+    "message": "4.0",
+    "description": "The label for version current"
+  },
+  "sidebar.docs.category.Gateways": {
+    "message": "درگاه‌ها",
+    "description": "The label for category 'Gateways' in sidebar 'docs'"
+  }
+}

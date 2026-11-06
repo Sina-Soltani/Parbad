@@ -1,0 +1,14 @@
+{
+  "docs": [
+    "intro",
+    "how-to-use-it",
+    "installation",
+    "configuration",
+    "payment",
+    "invoice-builder",
+    "virtual-gateway",
+    "gateways-specific-functions",
+    "developing-a-new-gateway",
+    "samples"
+  ]
+}
