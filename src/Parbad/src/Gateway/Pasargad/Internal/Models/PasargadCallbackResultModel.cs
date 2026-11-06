@@ -41,5 +41,10 @@ internal enum PasargadCallbackResultStatus
     /// <summary>
     /// نامشخص
     /// </summary>
-    Unknown
+    Unknown,
+
+    /// <summary>
+    /// انصراف
+    /// </summary>
+    Cancel
 }
