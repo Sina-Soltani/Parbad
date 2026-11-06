@@ -5,7 +5,7 @@
     <PackageValidationBaselineVersion>2.4.0</PackageValidationBaselineVersion>
     <Product>Parbad.Mvc5</Product>
     <TargetFramework>net472</TargetFramework>
-    <Description>ASP.NET MVC 4 and 5 integration for Parbad project.
+    <Description>ASP.NET MVC 5 integration for Parbad project.
 
 For more information see: https://www.nuget.org/packages/Parbad/</Description>
     <PackageTags>parbad mvc Payment Gateway Bank Iran Shetab IranKish Mellat Melli Sadad Parsian Pasargad Saman Asan-Pardakht پرداخت درگاه بانک ایران شتاب ایران-کیش ملت ملی سداد پارسیان پاسارگاد سامان آسان-پرداخت</PackageTags>
@@ -26,7 +26,6 @@ For more information see: https://www.nuget.org/packages/Parbad/</Description>
 
   <ItemGroup>
     <None Include="icon.png" pack="true" Visible="false" PackagePath="" />
-    <None Include="readme.txt" pack="true" PackagePath="." />
   </ItemGroup>
 
 </Project>
