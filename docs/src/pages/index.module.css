@@ -28,5 +28,7 @@
 .sample {
   max-width: 820px;
   margin: 1rem auto 3rem;
+  /* Code stays left-to-right; rtl:ignore keeps it so in the Persian build, which mirrors all CSS. */
+  /*rtl:ignore*/
   direction: ltr;
 }

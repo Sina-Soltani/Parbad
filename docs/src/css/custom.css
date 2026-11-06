@@ -22,13 +22,23 @@
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
 
-/* Persian pages use Vazirmatn. Code stays left-to-right. */
+/* Persian pages use Vazirmatn. */
 html[lang='fa-IR'] {
   --ifm-font-family-base: 'Vazirmatn', system-ui, sans-serif;
 }
 
-html[lang='fa-IR'] pre,
-html[lang='fa-IR'] code {
+/*
+  Code stays left-to-right on Persian pages. The Persian build mirrors all CSS (left <-> right, ltr <-> rtl);
+  rtl:ignore keeps these rules as they are.
+*/
+/*rtl:begin:ignore*/
+html[lang='fa-IR'] pre {
   direction: ltr;
   text-align: left;
 }
+
+html[lang='fa-IR'] code {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+/*rtl:end:ignore*/
