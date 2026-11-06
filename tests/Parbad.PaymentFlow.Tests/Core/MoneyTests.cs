@@ -2,6 +2,10 @@ using System;
 using System.Globalization;
 using NUnit.Framework;
 
+// These tests check Money's own operators and Equals overloads. The suggested constraints (Is.LessThan,
+// Is.EqualTo, ...) compare with IComparable and NUnit's equality rules, so they would not call them.
+#pragma warning disable NUnit2043, NUnit2010
+
 namespace Parbad.PaymentFlow.Tests.Core;
 
 /// <summary>
@@ -20,15 +24,21 @@ public class MoneyTests
     [Test]
     public void Greater_than_and_or_equal_operators_are_consistent()
     {
-        Assert.That(new Money(5) > new Money(5), Is.False);
-        Assert.That(new Money(5) >= new Money(5), Is.True);
-        Assert.That(new Money(5) <= new Money(5), Is.True);
+        var five = new Money(5);
+        var sameAmount = new Money(5);
+
+        Assert.That(five > sameAmount, Is.False);
+        Assert.That(five >= sameAmount, Is.True);
+        Assert.That(five <= sameAmount, Is.True);
     }
 
     [Test]
     public void Equal_amounts_are_not_less_than_each_other()
     {
-        Assert.That(new Money(5) < new Money(5), Is.False, "Money(5) < Money(5) returned true.");
+        var five = new Money(5);
+        var sameAmount = new Money(5);
+
+        Assert.That(five < sameAmount, Is.False, "Money(5) < Money(5) returned true.");
     }
 
     [Test]
