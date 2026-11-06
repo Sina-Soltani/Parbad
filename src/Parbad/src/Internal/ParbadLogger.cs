@@ -21,7 +21,7 @@ internal class ParbadLogger<TCategoryName> : IParbadLogger<TCategoryName>
         _options = options.Value;
     }
 
-    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
     {
         if (!_options.EnableLogging) return;
 
@@ -33,8 +33,15 @@ internal class ParbadLogger<TCategoryName> : IParbadLogger<TCategoryName>
         return _options.EnableLogging;
     }
 
+#if NETSTANDARD
     public IDisposable BeginScope<TState>(TState state)
     {
         return _logger.BeginScope(state);
     }
+#else
+    public IDisposable? BeginScope<TState>(TState state) where TState : notnull
+    {
+        return _logger.BeginScope(state);
+    }
+#endif
 }

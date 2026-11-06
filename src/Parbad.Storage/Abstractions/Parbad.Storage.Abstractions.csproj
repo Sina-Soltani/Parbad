@@ -5,7 +5,6 @@
     <PackageValidationBaselineVersion>1.4.0</PackageValidationBaselineVersion>
     <Product>Parbad.Storage.Abstractions</Product>
     <TargetFrameworks>netstandard2.0;netstandard2.1;net8.0;net9.0;net10.0</TargetFrameworks>
-    <Nullable>enable</Nullable>
     <Description>Parbad Storage is responsible for saving and loading payments and transactions.
 More information: https://github.com/Sina-Soltani/Parbad</Description>
     <PackageTags>parbad storage</PackageTags>

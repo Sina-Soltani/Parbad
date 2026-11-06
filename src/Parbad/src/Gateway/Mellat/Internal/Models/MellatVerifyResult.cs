@@ -7,5 +7,5 @@ internal class MellatVerifyResult
 {
     public bool IsSucceed { get; set; }
 
-    public IPaymentVerifyResult Result { get; set; }
+    public IPaymentVerifyResult? Result { get; set; }
 }

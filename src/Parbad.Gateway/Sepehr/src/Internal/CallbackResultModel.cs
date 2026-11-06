@@ -9,11 +9,11 @@ internal class CallbackResultModel
 
     public long Rrn { get; set; }
 
-    public string DigitalReceipt { get; set; }
+    public string? DigitalReceipt { get; set; }
 
-    public string CardNumber { get; set; }
+    public string? CardNumber { get; set; }
 
     public bool IsSucceed { get; set; }
 
-    public string Message { get; set; }
+    public string? Message { get; set; }
 }

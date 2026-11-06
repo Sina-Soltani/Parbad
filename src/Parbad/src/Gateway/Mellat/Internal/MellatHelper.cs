@@ -70,9 +70,9 @@ internal static class MellatHelper
 
         var additionalData = invoice.GetMellatAdditionalData();
 
-        if (!string.IsNullOrWhiteSpace(additionalData?.MobileNumber))
+        if (!additionalData?.MobileNumber.IsNullOrWhiteSpace() ?? false)
         {
-            form.Add("MobileNo", additionalData.MobileNumber);
+            form.Add("MobileNo", additionalData!.MobileNumber!);
         }
 
         return PaymentRequestResult.SucceedWithPost(
@@ -106,11 +106,11 @@ internal static class MellatHelper
 
         var isSucceed = resCode.Value == OkResult;
 
-        string message = null;
+        string? message = null;
 
         if (!isSucceed)
         {
-            message = MellatGatewayResultTranslator.Translate(resCode.Value, messagesOptions);
+            message = MellatGatewayResultTranslator.Translate(resCode.Value.ToString(), messagesOptions);
         }
 
         return new MellatCallbackResult
@@ -151,7 +151,7 @@ internal static class MellatHelper
         // and the flow continues with settlement.
         var isSucceed = serviceResult is OkResult or AlreadyVerifiedResult;
 
-        PaymentVerifyResult verifyResult = null;
+        PaymentVerifyResult? verifyResult = null;
 
         if (!isSucceed)
         {

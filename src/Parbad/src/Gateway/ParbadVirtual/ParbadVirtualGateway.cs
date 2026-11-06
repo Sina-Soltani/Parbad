@@ -38,7 +38,7 @@ public class ParbadVirtualGateway : GatewayBase<ParbadVirtualGatewayAccount>
     /// <inheritdoc />
     public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
     {
-        var httpContext = _httpContextAccessor.HttpContext;
+        var httpContext = _httpContextAccessor.GetRequiredHttpContext();
 
         var account = await GetAccountAsync(invoice).ConfigureAwaitFalse();
 
@@ -76,7 +76,7 @@ public class ParbadVirtualGateway : GatewayBase<ParbadVirtualGatewayAccount>
     /// <inheritdoc />
     public override async Task<IPaymentVerifyResult> VerifyAsync(InvoiceContext context, CancellationToken cancellationToken = default)
     {
-        var request = _httpContextAccessor.HttpContext.Request;
+        var request = _httpContextAccessor.GetRequiredHttpContext().Request;
 
         var callbackResult = await GetCallbackResult(cancellationToken);
 
@@ -88,7 +88,7 @@ public class ParbadVirtualGateway : GatewayBase<ParbadVirtualGatewayAccount>
         var transactionCode = await request.TryGetParamAsync("TransactionCode", cancellationToken).ConfigureAwaitFalse();
 
         // The virtual gateway has no bank; its transaction code is its reference.
-        return PaymentVerifyResult.Paid(transactionCode.Value, transactionCode.Value, _messageOptions.Value.PaymentSucceed);
+        return PaymentVerifyResult.Paid(transactionCode.Value, transactionCode.Value.ToString(), _messageOptions.Value.PaymentSucceed);
     }
 
     /// <inheritdoc />
@@ -99,7 +99,7 @@ public class ParbadVirtualGateway : GatewayBase<ParbadVirtualGatewayAccount>
 
     private async Task<(bool IsSucceed, string Message)> GetCallbackResult(CancellationToken cancellationToken)
     {
-        var request = _httpContextAccessor.HttpContext.Request;
+        var request = _httpContextAccessor.GetRequiredHttpContext().Request;
 
         var result = await request.TryGetParamAsync("result", cancellationToken);
 

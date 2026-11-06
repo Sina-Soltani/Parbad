@@ -8,16 +8,16 @@ namespace Parbad.Gateway.ZarinPal.Internal;
 internal class ZarinPalRequestModel
 {
     [JsonProperty("merchant_id")]
-    public string MerchantId { get; set; }
+    public string? MerchantId { get; set; }
 
     [JsonProperty("callback_url")]
-    public string CallbackUrl { get; set; }
+    public string? CallbackUrl { get; set; }
 
-    public string Description { get; set; }
+    public string? Description { get; set; }
 
     public long Amount { get; set; }
 
-    public ZarinPalRequestMetadata Metadata { get; set; }
+    public ZarinPalRequestMetadata Metadata { get; set; } = new();
 }
 
 /// <summary>
@@ -26,11 +26,11 @@ internal class ZarinPalRequestModel
 internal class ZarinPalRequestMetadata
 {
     [JsonProperty("mobile", NullValueHandling = NullValueHandling.Ignore)]
-    public string Mobile { get; set; }
+    public string? Mobile { get; set; }
 
     [JsonProperty("email", NullValueHandling = NullValueHandling.Ignore)]
-    public string Email { get; set; }
+    public string? Email { get; set; }
 
     [JsonProperty("order_id", NullValueHandling = NullValueHandling.Ignore)]
-    public string OrderId { get; set; }
+    public string? OrderId { get; set; }
 }

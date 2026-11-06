@@ -5,9 +5,9 @@ namespace Parbad.Gateway.Sepehr.Internal;
 
 internal class VerificationRollbackResponseModel
 {
-    public string Status { get; set; }
+    public string? Status { get; set; }
 
-    public string ReturnId { get; set; }
+    public string? ReturnId { get; set; }
 
-    public string Message { get; set; }
+    public string? Message { get; set; }
 }

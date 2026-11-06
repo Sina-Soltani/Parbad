@@ -31,16 +31,16 @@ public record PaymentResult : IPaymentResult
     public virtual bool IsSucceed { get; init; }
 
     /// <inheritdoc />
-    public string GatewayName { get; init; }
+    public string GatewayName { get; init; } = null!;
 
     /// <inheritdoc />
-    public string GatewayAccountName { get; init; }
+    public string? GatewayAccountName { get; init; }
 
     /// <inheritdoc />
-    public string GatewayResponseCode { get; init; }
+    public string? GatewayResponseCode { get; init; }
 
     /// <inheritdoc />
-    public string Message { get; init; }
+    public string? Message { get; init; }
 
     /// <inheritdoc />
     public IDictionary<string, object> AdditionalData { get; init; }

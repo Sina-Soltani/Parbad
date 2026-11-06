@@ -5,11 +5,11 @@ namespace Parbad.Gateway.PayIr;
 
 public class PayIrVerifyAdditionalData
 {
-    public string FactorNumber { get; set; }
+    public string? FactorNumber { get; set; }
 
-    public string Mobile { get; set; }
+    public string? Mobile { get; set; }
 
-    public string Description { get; set; }
+    public string? Description { get; set; }
 
-    public string CardNumber { get; set; }
+    public string? CardNumber { get; set; }
 }

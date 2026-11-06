@@ -42,7 +42,7 @@ public class ParbadBuilder : IParbadBuilder
     /// <summary>
     /// Initializes a new instance of the <see cref="IParbadBuilder"/> class with pre-configured services.
     /// </summary>
-    public static IParbadBuilder CreateDefaultBuilder(IServiceCollection services = null)
+    public static IParbadBuilder CreateDefaultBuilder(IServiceCollection? services = null)
     {
         services ??= new ServiceCollection();
 

@@ -17,7 +17,7 @@ public class ZarinPalInvoice
     /// <param name="description">A short description about this invoice which is required by ZarinPal gateway.</param>
     /// <param name="email">Buyer's email.</param>
     /// <param name="mobile">Buyer's mobile.</param>
-    public ZarinPalInvoice(string description, string email = null, string mobile = null)
+    public ZarinPalInvoice(string description, string? email = null, string? mobile = null)
     {
         if (description.IsNullOrEmpty())
         {
@@ -37,10 +37,10 @@ public class ZarinPalInvoice
     /// <summary>
     /// Buyer's email.
     /// </summary>
-    public string Email { get; }
+    public string? Email { get; }
 
     /// <summary>
     /// Buyer's mobile.
     /// </summary>
-    public string Mobile { get; }
+    public string? Mobile { get; }
 }

@@ -5,19 +5,19 @@ namespace Parbad.Gateway.PayIr.Internal;
 
 internal class PayIrRequestModel
 {
-    public string Api { get; set; }
+    public string? Api { get; set; }
 
-    public string Redirect { get; set; }
+    public string? Redirect { get; set; }
 
     public long Amount { get; set; }
 
-    public string Mobile { get; set; }
+    public string? Mobile { get; set; }
 
-    public string FactorNumber { get; set; }
+    public string? FactorNumber { get; set; }
 
-    public string Description { get; set; }
+    public string? Description { get; set; }
 
-    public string ValidCardNumber { get; set; }
+    public string? ValidCardNumber { get; set; }
 
-    public string NationalCode { get; set; }
+    public string? NationalCode { get; set; }
 }

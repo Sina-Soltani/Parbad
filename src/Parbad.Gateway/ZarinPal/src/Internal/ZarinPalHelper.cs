@@ -73,7 +73,7 @@ internal static class ZarinPalHelper
                          GatewayResponseCode = data.Code.ToString()
                      };
 
-        result.DatabaseAdditionalData.Add(AuthorityDatabaseKey, data.Authority);
+        result.DatabaseAdditionalData.Add(AuthorityDatabaseKey, data.Authority ?? string.Empty);
 
         return result;
     }
@@ -85,9 +85,9 @@ internal static class ZarinPalHelper
     {
         var authority = await httpRequest.TryGetParamAsync("Authority", cancellationToken).ConfigureAwaitFalse();
         var status = await httpRequest.TryGetParamAsync("Status", cancellationToken).ConfigureAwaitFalse();
-        string message = null;
+        string? message = null;
 
-        var isSucceed = status.Exists && IsSucceedResult(status.Value);
+        var isSucceed = status.Exists && IsSucceedResult(status.Value.ToString());
 
         if (!isSucceed)
         {
@@ -125,7 +125,7 @@ internal static class ZarinPalHelper
         // the database, so it is this invoice's own payment and it counts as paid.
         if (IsSucceedCode(verificationResult.Code) || verificationResult.Code == NumericAlreadyOkResult)
         {
-            result = PaymentVerifyResult.Paid(verificationResult.RefId, verificationResult.RefId, messagesOptions.PaymentSucceed);
+            result = PaymentVerifyResult.Paid(verificationResult.RefId, verificationResult.RefId ?? string.Empty, messagesOptions.PaymentSucceed);
         }
         else
         {
@@ -182,9 +182,9 @@ internal static class ZarinPalHelper
             throw new InvalidOperationException($"No transaction of type '{TransactionType.Request}' found for the invoice #{context.Payment.TrackingNumber}.");
         }
 
-        var additionalData = JsonConvert.DeserializeObject<IDictionary<string, string>>(transaction.AdditionalData);
+        var additionalData = JsonConvert.DeserializeObject<IDictionary<string, string>>(transaction.AdditionalData ?? "{}") ?? new Dictionary<string, string>();
 
-        string authority = null;
+        string? authority = null;
 
         foreach (var key in additionalData.Keys)
         {
@@ -201,7 +201,7 @@ internal static class ZarinPalHelper
             throw new InvalidOperationException($"Authority not found in the Transaction record of invoice #{context.Payment.TrackingNumber}.");
         }
 
-        return authority;
+        return authority!;
     }
 
     public static string GetApiRequestUrl(bool isSandbox, ZarinPalGatewayOptions gatewayOptions)

@@ -36,11 +36,11 @@ public static class SamanGatewayInvoiceBuilderExtensions
         return builder;
     }
 
-    internal static string GetSamanCellNumber(this Invoice invoice)
+    internal static string? GetSamanCellNumber(this Invoice invoice)
     {
         if (invoice.Properties.TryGetValue(SamanHelper.CellNumberPropertyKey, out var cellNumber))
         {
-            return cellNumber.ToString();
+            return cellNumber?.ToString();
         }
 
         return null;

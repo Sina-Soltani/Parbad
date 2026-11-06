@@ -58,7 +58,7 @@ internal static class IdPayHelper
 
         var result = GatewayResponse.DeserializeJson<IdPayRequestResultModel>(responseMessage, response);
 
-        return PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, result.Link);
+        return PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, result.Link!);
     }
 
     public static async Task<IdPayCallbackResult> CreateCallbackResultAsync(
@@ -73,7 +73,7 @@ internal static class IdPayHelper
         var orderId = await httpRequest.TryGetParamAsync("order_id", cancellationToken).ConfigureAwaitFalse();
         var amount = await httpRequest.TryGetParamAsync("amount", cancellationToken).ConfigureAwaitFalse();
 
-        var (isSucceed, message) = CheckCallback(status.Value, orderId.Value, id.Value, trackId.Value, amount.Value, context, messagesOptions);
+        var (isSucceed, message) = CheckCallback(status.Value.ToString(), orderId.Value.ToString(), id.Value.ToString(), trackId.Value.ToString(), amount.Value.ToString(), context, messagesOptions);
 
         return new IdPayCallbackResult
                {
@@ -145,7 +145,7 @@ internal static class IdPayHelper
         }
     }
 
-    private static (bool IsSucceed, string Message) CheckCallback(
+    private static (bool IsSucceed, string? Message) CheckCallback(
         string status,
         string orderId,
         string id,

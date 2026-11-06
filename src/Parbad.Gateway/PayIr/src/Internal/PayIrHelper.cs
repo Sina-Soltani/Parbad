@@ -56,7 +56,7 @@ internal static class PayIrHelper
         var requestResult = PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, paymentPageUrl);
 
         // Stored so that the callback can be bound to this invoice (see CreateCallbackResultAsync).
-        requestResult.DatabaseAdditionalData.Add(TokenDatabaseKey, result.Token);
+        requestResult.DatabaseAdditionalData.Add(TokenDatabaseKey, result.Token!);
 
         return requestResult;
     }
@@ -71,13 +71,13 @@ internal static class PayIrHelper
         var status = await httpRequest.TryGetParamAsync("Status", cancellationToken).ConfigureAwaitFalse();
 
         var isSucceed = status.Exists && string.Equals(status.Value, OkResult, StringComparison.InvariantCultureIgnoreCase);
-        string message = null;
+        string? message = null;
 
         if (!isSucceed)
         {
             message = $"Error {status.Value}";
         }
-        else if (!IsTokenIssuedForThisInvoice(token.Value, context))
+        else if (!IsTokenIssuedForThisInvoice(token.Value.ToString(), context))
         {
             // The callback carries the token of another invoice (e.g. a cheaper one that was paid).
             isSucceed = false;
@@ -115,7 +115,7 @@ internal static class PayIrHelper
         }
         else if (result.IsSucceed)
         {
-            verifyResult = PaymentVerifyResult.Paid(result.TransId, result.TransId, messagesOptions.PaymentSucceed);
+            verifyResult = PaymentVerifyResult.Paid(result.TransId, result.TransId ?? string.Empty, messagesOptions.PaymentSucceed);
         }
         else
         {
@@ -141,12 +141,12 @@ internal static class PayIrHelper
     /// Checks that the callback's token is the one Pay.ir issued for this invoice. Invoices requested before
     /// the token was stored have nothing to compare with and are accepted as before.
     /// </summary>
-    private static bool IsTokenIssuedForThisInvoice(string callbackToken, InvoiceContext context)
+    private static bool IsTokenIssuedForThisInvoice(string? callbackToken, InvoiceContext context)
     {
         var requestTransaction = context.Transactions?.SingleOrDefault(transaction => transaction.Type == TransactionType.Request);
 
         if (string.IsNullOrEmpty(requestTransaction?.AdditionalData) ||
-            !requestTransaction.ToDictionary().TryGetValue(TokenDatabaseKey, out var issuedToken))
+            !requestTransaction!.ToDictionary().TryGetValue(TokenDatabaseKey, out var issuedToken))
         {
             return true;
         }

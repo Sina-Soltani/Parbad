@@ -9,7 +9,7 @@ public record PaymentRefundResult : PaymentResult, IPaymentRefundResult
 
     public override bool IsSucceed => Status == PaymentRefundResultStatus.Succeed;
 
-    public static PaymentRefundResult Succeed(string message = null, string gatewayResponseCode = null)
+    public static PaymentRefundResult Succeed(string? message = null, string? gatewayResponseCode = null)
     {
         return new PaymentRefundResult
                {
@@ -19,7 +19,7 @@ public record PaymentRefundResult : PaymentResult, IPaymentRefundResult
                };
     }
 
-    public static PaymentRefundResult Failed(string message, string gatewayResponseCode = null)
+    public static PaymentRefundResult Failed(string? message, string? gatewayResponseCode = null)
     {
         return new PaymentRefundResult
                {

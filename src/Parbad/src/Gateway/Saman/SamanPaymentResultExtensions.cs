@@ -8,12 +8,12 @@ public static class SamanPaymentResultExtensions
     /// <summary>
     /// Gets the additional data which is received from Saman Gateway. 
     /// </summary>
-    public static SamanVerificationAdditionalData GetSamanAdditionalData(this IPaymentFetchResult paymentFetchResult) => GetAdditionalData(paymentFetchResult);
+    public static SamanVerificationAdditionalData? GetSamanAdditionalData(this IPaymentFetchResult paymentFetchResult) => GetAdditionalData(paymentFetchResult);
 
     /// <summary>
     /// Gets the additional data which is received from Saman Gateway. 
     /// </summary>
-    public static SamanVerificationAdditionalData GetSamanAdditionalData(this IPaymentVerifyResult paymentVerifyResult) => GetAdditionalData(paymentVerifyResult);
+    public static SamanVerificationAdditionalData? GetSamanAdditionalData(this IPaymentVerifyResult paymentVerifyResult) => GetAdditionalData(paymentVerifyResult);
 
     internal static void AddSamanAdditionalData(this IPaymentFetchResult paymentFetchResult, SamanVerificationAdditionalData additionalData)
     {
@@ -29,7 +29,7 @@ public static class SamanPaymentResultExtensions
         paymentVerifyResult.AdditionalData.Add(SamanHelper.AdditionalVerificationDataKey, additionalData);
     }
 
-    private static SamanVerificationAdditionalData GetAdditionalData(this IPaymentResult paymentResult)
+    private static SamanVerificationAdditionalData? GetAdditionalData(this IPaymentResult paymentResult)
     {
         if (paymentResult == null) throw new ArgumentNullException(nameof(paymentResult));
 

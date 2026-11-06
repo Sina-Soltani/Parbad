@@ -56,8 +56,8 @@ internal static class IranKishHelper
             requestInfo.Amount.ToString().PadLeft(12, '0') +
             (isMultiplex ? "01" : "00") +
             (isMultiplex
-                ? requestInfo.MultiplexParameters.Select(t =>
-                                                             $"{t.Iban.Replace("IR", "2718")}{t.Amount.ToString().PadLeft(12, '0')}")
+                ? requestInfo.MultiplexParameters!.Select(t =>
+                                                             $"{t.Iban!.Replace("IR", "2718")}{t.Amount.ToString().PadLeft(12, '0')}")
                              .Aggregate((a, b) => $"{a}{b}")
                 : string.Empty);
 
@@ -93,7 +93,7 @@ internal static class IranKishHelper
 
         var form = new Dictionary<string, string>
                    {
-                       { "tokenIdentity", result.Result.Token }
+                       { "tokenIdentity", result.Result!.Token! }
                    };
 
         var requestResult = PaymentRequestResult.SucceedWithPost(
@@ -103,7 +103,7 @@ internal static class IranKishHelper
                                                                  form);
 
         // Stored so that the callback can be bound to this invoice (see CreateCallbackResultAsync).
-        requestResult.DatabaseAdditionalData.Add(TokenDatabaseKey, result.Result.Token);
+        requestResult.DatabaseAdditionalData.Add(TokenDatabaseKey, result.Result!.Token!);
 
         return requestResult;
     }
@@ -128,9 +128,9 @@ internal static class IranKishHelper
         var isSucceed = responseCode.Value.Equals(SuccessResponseCode, StringComparison.OrdinalIgnoreCase);
         var message = isSucceed
             ? null
-            : IranKishGatewayResultTranslator.Translate(responseCode.Value, messagesOptions);
+            : IranKishGatewayResultTranslator.Translate(responseCode.Value.ToString(), messagesOptions);
 
-        if (isSucceed && !IsTokenIssuedForThisInvoice(token.Value, context))
+        if (isSucceed && !IsTokenIssuedForThisInvoice(token.Value.ToString(), context))
         {
             // The callback carries the token of another invoice (e.g. a cheaper one that was paid).
             isSucceed = false;
@@ -200,12 +200,12 @@ internal static class IranKishHelper
     /// Checks that the callback's token is the one Iran Kish issued for this invoice. Invoices requested before
     /// the token was stored have nothing to compare with and are accepted as before.
     /// </summary>
-    private static bool IsTokenIssuedForThisInvoice(string callbackToken, InvoiceContext context)
+    private static bool IsTokenIssuedForThisInvoice(string? callbackToken, InvoiceContext context)
     {
         var requestTransaction = context.Transactions?.SingleOrDefault(transaction => transaction.Type == TransactionType.Request);
 
         if (string.IsNullOrEmpty(requestTransaction?.AdditionalData) ||
-            !requestTransaction.ToDictionary().TryGetValue(TokenDatabaseKey, out var issuedToken))
+            !requestTransaction!.ToDictionary().TryGetValue(TokenDatabaseKey, out var issuedToken))
         {
             return true;
         }

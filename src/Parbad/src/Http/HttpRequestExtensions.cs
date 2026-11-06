@@ -36,15 +36,15 @@ public static class HttpRequestExtensions
         return (exists, value);
     }
 
-    public static async Task<(bool Exists, T Value)> TryGetParamAsAsync<T>(this HttpRequest httpRequest, string key, CancellationToken cancellationToken)
+    public static async Task<(bool Exists, T? Value)> TryGetParamAsAsync<T>(this HttpRequest httpRequest, string key, CancellationToken cancellationToken)
     {
         var result = await TryGetParamAsync(httpRequest, key, cancellationToken).ConfigureAwaitFalse();
 
-        T value = default;
+        T? value = default;
 
         if (result.Exists)
         {
-            value = (T)Convert.ChangeType((string)result.Value, typeof(T), CultureInfo.InvariantCulture);
+            value = (T?)Convert.ChangeType((string?)result.Value, typeof(T), CultureInfo.InvariantCulture);
         }
 
         return (result.Exists, value);

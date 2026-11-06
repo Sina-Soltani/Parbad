@@ -21,14 +21,14 @@ public class GatewayAccountCollection<TAccount> : IGatewayAccountCollection<TAcc
         _accounts = new List<TAccount>();
     }
 
-    public virtual TAccount Get(string name)
+    public virtual TAccount? Get(string name)
     {
         if (name == null) throw new ArgumentNullException(nameof(name));
 
         return _accounts.SingleOrDefault(item => item.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
     }
 
-    public virtual TAccount GetDefaultAccount() => _accounts.FirstOrDefault();
+    public virtual TAccount? GetDefaultAccount() => _accounts.FirstOrDefault();
 
     public virtual IEnumerator<TAccount> GetEnumerator() => _accounts.GetEnumerator();
 

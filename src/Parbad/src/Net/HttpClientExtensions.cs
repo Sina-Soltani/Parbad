@@ -34,7 +34,7 @@ public static class HttpClientExtensions
     public static Task<HttpResponseMessage> PostJsonAsync(this HttpClient httpClient,
                                                           string requestUri,
                                                           object data,
-                                                          JsonSerializerSettings serializerSettings = null,
+                                                          JsonSerializerSettings? serializerSettings = null,
                                                           CancellationToken cancellationToken = default)
     {
         if (httpClient == null) throw new ArgumentNullException(nameof(httpClient));
@@ -49,7 +49,7 @@ public static class HttpClientExtensions
     public static async Task<TResult> PostJsonAsync<TResult>(this HttpClient httpClient,
                                                              string requestUri,
                                                              object data,
-                                                             JsonSerializerSettings serializerSettings = null,
+                                                             JsonSerializerSettings? serializerSettings = null,
                                                              CancellationToken cancellationToken = default)
     {
         var responseMessage = await httpClient.PostJsonAsync(requestUri, data, serializerSettings, cancellationToken).ConfigureAwaitFalse();

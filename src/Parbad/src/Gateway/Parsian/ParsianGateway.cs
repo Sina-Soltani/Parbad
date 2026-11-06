@@ -1,6 +1,7 @@
 // Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
+using Parbad.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Parbad.Abstraction;
@@ -54,7 +55,7 @@ public class ParsianGateway : GatewayBase<ParsianGatewayAccount>
 
         var response = await responseMessage.ReadSoapAsync().ConfigureAwaitFalse();
 
-        return ParsianHelper.CreateRequestResult(response, _httpContextAccessor.HttpContext, account, _gatewayOptions, _messageOptions);
+        return ParsianHelper.CreateRequestResult(response, _httpContextAccessor.GetRequiredHttpContext(), account, _gatewayOptions, _messageOptions);
     }
 
     /// <inheritdoc />
@@ -63,7 +64,7 @@ public class ParsianGateway : GatewayBase<ParsianGatewayAccount>
         if (context == null) throw new ArgumentNullException(nameof(context));
 
         var callbackResult = await ParsianHelper
-                                  .CreateCallbackResultAsync(_httpContextAccessor.HttpContext.Request, context, _messageOptions, cancellationToken)
+                                  .CreateCallbackResultAsync(_httpContextAccessor.GetRequiredHttpContext().Request, context, _messageOptions, cancellationToken)
                                   .ConfigureAwaitFalse();
 
         return callbackResult.IsSucceed
@@ -77,7 +78,7 @@ public class ParsianGateway : GatewayBase<ParsianGatewayAccount>
         if (context == null) throw new ArgumentNullException(nameof(context));
 
         var callbackResult = await ParsianHelper
-                                  .CreateCallbackResultAsync(_httpContextAccessor.HttpContext.Request, context, _messageOptions, cancellationToken)
+                                  .CreateCallbackResultAsync(_httpContextAccessor.GetRequiredHttpContext().Request, context, _messageOptions, cancellationToken)
                                   .ConfigureAwaitFalse();
 
         if (!callbackResult.IsSucceed)

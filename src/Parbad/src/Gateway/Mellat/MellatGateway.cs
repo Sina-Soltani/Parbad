@@ -1,6 +1,7 @@
 // Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
+using Parbad.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Parbad.Abstraction;
@@ -57,7 +58,7 @@ public class MellatGateway : GatewayBase<MellatGatewayAccount>
         return MellatHelper.CreateRequestResult(
                                                 response,
                                                 invoice,
-                                                _httpContextAccessor.HttpContext,
+                                                _httpContextAccessor.GetRequiredHttpContext(),
                                                 _gatewayOptions,
                                                 _messagesOptions.Value,
                                                 account);
@@ -69,7 +70,7 @@ public class MellatGateway : GatewayBase<MellatGatewayAccount>
         if (context == null) throw new ArgumentNullException(nameof(context));
 
         var callbackResult = await MellatHelper
-                                  .CrateCallbackResultAsync(_httpContextAccessor.HttpContext.Request, _messagesOptions.Value, cancellationToken)
+                                  .CrateCallbackResultAsync(_httpContextAccessor.GetRequiredHttpContext().Request, _messagesOptions.Value, cancellationToken)
                                   .ConfigureAwaitFalse();
 
         if (callbackResult.IsSucceed)
@@ -86,7 +87,7 @@ public class MellatGateway : GatewayBase<MellatGatewayAccount>
         if (context == null) throw new ArgumentNullException(nameof(context));
 
         var callbackResult = await MellatHelper
-                                  .CrateCallbackResultAsync(_httpContextAccessor.HttpContext.Request, _messagesOptions.Value, cancellationToken)
+                                  .CrateCallbackResultAsync(_httpContextAccessor.GetRequiredHttpContext().Request, _messagesOptions.Value, cancellationToken)
                                   .ConfigureAwaitFalse();
 
         if (!callbackResult.IsSucceed)
@@ -108,7 +109,7 @@ public class MellatGateway : GatewayBase<MellatGatewayAccount>
 
         if (!verifyResult.IsSucceed)
         {
-            return verifyResult.Result;
+            return verifyResult.Result!;
         }
 
         data = MellatHelper.CreateSettleData(context, callbackResult, account);

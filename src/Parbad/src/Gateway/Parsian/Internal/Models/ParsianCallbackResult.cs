@@ -7,12 +7,12 @@ internal class ParsianCallbackResult
 {
     public bool IsSucceed { get; set; }
 
-    public string Token { get; set; }
+    public string? Token { get; set; }
 
     /// <summary>
     /// Equals to TransactionCode in Parbad system.
     /// </summary>
-    public string RRN { get; set; }
+    public string? RRN { get; set; }
 
-    public string Message { get; set; }
+    public string? Message { get; set; }
 }

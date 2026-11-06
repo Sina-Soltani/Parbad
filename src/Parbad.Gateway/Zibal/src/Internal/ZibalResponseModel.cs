@@ -9,7 +9,7 @@ internal class ZibalResponseModel
 
     public int Result { get; set; }
 
-    public string Message { get; set; }
+    public string? Message { get; set; }
 
     public string? PayLink { get; set; }
 }

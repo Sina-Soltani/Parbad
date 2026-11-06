@@ -5,9 +5,9 @@ namespace Parbad.Gateway.PayIr.Internal;
 
 internal class PayIrCallbackResult
 {
-    public string Token { get; set; }
+    public string? Token { get; set; }
 
     public bool IsSucceed { get; set; }
 
-    public string Message { get; set; }
+    public string? Message { get; set; }
 }

@@ -7,7 +7,7 @@ internal class YekPayResponseModel
 {
     public int Code { get; set; }
 
-    public string Description { get; set; }
+    public string? Description { get; set; }
 
-    public string Authority { get; set; }
+    public string? Authority { get; set; }
 }

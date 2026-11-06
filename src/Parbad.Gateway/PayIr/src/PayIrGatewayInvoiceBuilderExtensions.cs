@@ -34,7 +34,7 @@ public static class PayIrGatewayInvoiceBuilderExtensions
         return builder.AddOrUpdateProperty(PayIrHelper.RequestAdditionalDataKey, data);
     }
 
-    internal static PayIrRequestAdditionalData GetPayIrAdditionalData(this Invoice invoice)
+    internal static PayIrRequestAdditionalData? GetPayIrAdditionalData(this Invoice invoice)
     {
         if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 

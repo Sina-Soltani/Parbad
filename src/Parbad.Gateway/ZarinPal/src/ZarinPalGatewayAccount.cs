@@ -10,12 +10,12 @@ namespace Parbad.Gateway.ZarinPal;
 /// </summary>
 public class ZarinPalGatewayAccount : GatewayAccount
 {
-    public string MerchantId { get; set; }
+    public string MerchantId { get; set; } = null!;
 
     /// <summary>
     /// It's needed for refunding a payment.
     /// </summary>
-    public string AuthorizationToken { get; set; }
+    public string AuthorizationToken { get; set; } = null!;
 
     public bool IsSandbox { get; set; }
 }

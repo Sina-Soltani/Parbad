@@ -5,16 +5,16 @@ namespace Parbad.Gateway.Pasargad.Api.Models;
 
 public class PasargadPurchaseResponseModel
 {
-    public string ResultMsg { get; set; }
+    public string? ResultMsg { get; set; }
 
     public int ResultCode { get; set; }
 
-    public PasargadPurchaseDataResponseModel Data { get; set; }
+    public PasargadPurchaseDataResponseModel? Data { get; set; }
 }
 
 public class PasargadPurchaseDataResponseModel
 {
-    public string UrlId { get; set; }
+    public string? UrlId { get; set; }
 
-    public string Url { get; set; }
+    public string? Url { get; set; }
 }

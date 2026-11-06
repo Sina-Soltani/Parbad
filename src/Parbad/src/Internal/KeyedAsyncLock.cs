@@ -12,7 +12,7 @@ namespace Parbad.Internal;
 /// An async lock per key. Entries exist only while someone holds or waits for the key, so the lock does not
 /// grow with the number of keys ever used.
 /// </summary>
-internal sealed class KeyedAsyncLock<TKey>
+internal sealed class KeyedAsyncLock<TKey> where TKey : notnull
 {
     private readonly Dictionary<TKey, Entry> _entries = new Dictionary<TKey, Entry>();
 
@@ -21,7 +21,7 @@ internal sealed class KeyedAsyncLock<TKey>
     /// </summary>
     public async Task<IDisposable> AcquireAsync(TKey key, CancellationToken cancellationToken)
     {
-        Entry entry;
+        Entry? entry;
 
         lock (_entries)
         {
@@ -72,7 +72,7 @@ internal sealed class KeyedAsyncLock<TKey>
     {
         private readonly KeyedAsyncLock<TKey> _owner;
         private readonly TKey _key;
-        private Entry _entry;
+        private Entry? _entry;
 
         public Releaser(KeyedAsyncLock<TKey> owner, TKey key, Entry entry)
         {

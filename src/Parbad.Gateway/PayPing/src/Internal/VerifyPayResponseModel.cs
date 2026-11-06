@@ -15,18 +15,18 @@ internal class VerifyPayResponseModel
     public long? Amount { get; set; }
 
     [JsonProperty("clientRefId")]
-    public string ClientRefId { get; set; }
+    public string? ClientRefId { get; set; }
 
     [JsonProperty("paymentRefId")]
     public long? PaymentRefId { get; set; }
 
     /// <summary>The payment code.</summary>
     [JsonProperty("code")]
-    public string Code { get; set; }
+    public string? Code { get; set; }
 
     [JsonProperty("cardNumber")]
-    public string CardNumber { get; set; }
+    public string? CardNumber { get; set; }
 
     [JsonProperty("cardHashPan")]
-    public string CardHashPan { get; set; }
+    public string? CardHashPan { get; set; }
 }

@@ -7,9 +7,9 @@ internal class FanAvaCallbackResultModel
 {
     public bool IsSucceed { get; set; }
         
-    public string InvoiceNumber { get; set; }
+    public string? InvoiceNumber { get; set; }
         
-    public string Message { get; set; }
+    public string? Message { get; set; }
         
-    public FanAvaCheckRequestModel CallbackCheckData { get; set; }
+    public FanAvaCheckRequestModel? CallbackCheckData { get; set; }
 }

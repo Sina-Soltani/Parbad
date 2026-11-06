@@ -12,7 +12,7 @@ public record PaymentRequestResult : PaymentResult, IPaymentRequestResult
     public PaymentRequestResultStatus Status { get; init; }
 
     /// <inheritdoc />
-    public IGatewayTransporter GatewayTransporter { get; init; }
+    public IGatewayTransporter GatewayTransporter { get; init; } = new NullGatewayTransporter();
 
     public override bool IsSucceed => Status == PaymentRequestResultStatus.Succeed;
 
@@ -70,17 +70,17 @@ public record PaymentRequestResult : PaymentResult, IPaymentRequestResult
     /// <summary>
     /// Creates an instance of <see cref="PaymentRequestResult"/> which indicates a failure result.
     /// </summary>
-    public static PaymentRequestResult Failed(string message) => Failed(message, null);
+    public static PaymentRequestResult Failed(string? message) => Failed(message, null);
 
     /// <summary>
     /// Creates an instance of <see cref="PaymentRequestResult"/> which indicates a failure result.
     /// </summary>
-    public static PaymentRequestResult Failed(string message, string gatewayAccountName) => Failed(message, gatewayAccountName, null);
+    public static PaymentRequestResult Failed(string? message, string? gatewayAccountName) => Failed(message, gatewayAccountName, null);
 
     /// <summary>
     /// Creates an instance of <see cref="PaymentRequestResult"/> which indicates a failure result.
     /// </summary>
-    public static PaymentRequestResult Failed(string message, string gatewayAccountName, string gatewayResponseCode)
+    public static PaymentRequestResult Failed(string? message, string? gatewayAccountName, string? gatewayResponseCode)
     {
         return new PaymentRequestResult
                {

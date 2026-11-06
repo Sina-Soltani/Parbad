@@ -13,7 +13,7 @@ public class NullGatewayTransporter : IGatewayTransporter
         Descriptor = null;
     }
 
-    public GatewayTransporterDescriptor Descriptor { get; }
+    public GatewayTransporterDescriptor? Descriptor { get; }
 
     public Task TransportAsync(CancellationToken cancellationToken = default)
     {

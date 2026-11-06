@@ -34,7 +34,7 @@ public static class ParsianGatewayInvoiceBuilderExtensions
         return builder;
     }
 
-    internal static ParsianGatewayAdditionalDataRequest GetParsianAdditionalData(this Invoice invoice)
+    internal static ParsianGatewayAdditionalDataRequest? GetParsianAdditionalData(this Invoice invoice)
     {
         if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 

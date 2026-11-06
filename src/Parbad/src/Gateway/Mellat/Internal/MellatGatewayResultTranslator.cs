@@ -7,7 +7,7 @@ namespace Parbad.Gateway.Mellat.Internal;
 
 internal static class MellatGatewayResultTranslator
 {
-    public static string Translate(string result, MessagesOptions options)
+    public static string Translate(string? result, MessagesOptions options)
     {
         return result switch
         {

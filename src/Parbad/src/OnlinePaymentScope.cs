@@ -21,7 +21,7 @@ namespace Parbad;
 public sealed class OnlinePaymentScope : IDisposable
 {
     private readonly IServiceScope _scope;
-    private IOnlinePayment _onlinePayment;
+    private IOnlinePayment? _onlinePayment;
 
     internal OnlinePaymentScope(IServiceScope scope)
     {

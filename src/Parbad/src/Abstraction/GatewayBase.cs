@@ -43,7 +43,7 @@ public abstract class GatewayBase<TAccount> : IGateway where TAccount : GatewayA
 
         var accounts = await AccountProvider.LoadAccountsAsync();
 
-        TAccount account;
+        TAccount? account;
 
         if (accountName.IsNullOrEmpty())
         {
@@ -72,7 +72,7 @@ public abstract class GatewayBase<TAccount> : IGateway where TAccount : GatewayA
 
         var accounts = await AccountProvider.LoadAccountsAsync();
 
-        var account = accounts.Get(payment.GatewayAccountName);
+        var account = payment.GatewayAccountName == null ? accounts.GetDefaultAccount() : accounts.Get(payment.GatewayAccountName);
 
         if (account == null) throw new Exception($"The account \"{payment.GatewayAccountName}\" of type {typeof(TAccount).Name} does not exist.");
 

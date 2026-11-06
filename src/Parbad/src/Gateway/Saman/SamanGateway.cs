@@ -1,6 +1,7 @@
 // Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
+using Parbad.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Parbad.Abstraction;
@@ -54,7 +55,7 @@ public class SamanGateway : GatewayBase<SamanGatewayAccount>
 
         return SamanHelper.CreatePaymentRequestResult(responseModel,
                                                       account,
-                                                      _httpContextAccessor.HttpContext,
+                                                      _httpContextAccessor.GetRequiredHttpContext(),
                                                       _gatewayOptions,
                                                       _messageOptions);
     }
@@ -64,7 +65,7 @@ public class SamanGateway : GatewayBase<SamanGatewayAccount>
     {
         if (context == null) throw new ArgumentNullException(nameof(context));
 
-        var callbackResultResponse = await SamanHelper.BindCallbackResponse(_httpContextAccessor.HttpContext.Request, cancellationToken);
+        var callbackResultResponse = await SamanHelper.BindCallbackResponse(_httpContextAccessor.GetRequiredHttpContext().Request, cancellationToken);
 
         var account = await GetAccountAsync(context.Payment);
 
@@ -76,7 +77,7 @@ public class SamanGateway : GatewayBase<SamanGatewayAccount>
     {
         if (context == null) throw new ArgumentNullException(nameof(context));
 
-        var callbackResponse = await SamanHelper.BindCallbackResponse(_httpContextAccessor.HttpContext.Request, cancellationToken);
+        var callbackResponse = await SamanHelper.BindCallbackResponse(_httpContextAccessor.GetRequiredHttpContext().Request, cancellationToken);
 
         var account = await GetAccountAsync(context.Payment);
 

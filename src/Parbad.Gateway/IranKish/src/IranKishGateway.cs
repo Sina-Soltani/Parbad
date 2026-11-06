@@ -1,6 +1,7 @@
 // Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
+using Parbad.Http;
 using System;
 using System.Net.Http;
 using System.Threading;
@@ -53,7 +54,7 @@ public class IranKishGateway : GatewayBase<IranKishGatewayAccount>
                           .PostJsonAsync<IranKishTokenResult>(_gatewayOptions.ApiTokenUrl, data, cancellationToken: cancellationToken)
                           .ConfigureAwaitFalse();
 
-        return IranKishHelper.CreateRequestResult(result, _httpContextAccessor.HttpContext, account, _gatewayOptions, _messageOptions.Value);
+        return IranKishHelper.CreateRequestResult(result, _httpContextAccessor.GetRequiredHttpContext(), account, _gatewayOptions, _messageOptions.Value);
     }
 
     /// <inheritdoc />
@@ -65,7 +66,7 @@ public class IranKishGateway : GatewayBase<IranKishGatewayAccount>
 
         var callbackResult = await IranKishHelper.CreateCallbackResultAsync(
                                                                             context,
-                                                                            _httpContextAccessor.HttpContext.Request,
+                                                                            _httpContextAccessor.GetRequiredHttpContext().Request,
                                                                             _messageOptions.Value,
                                                                             cancellationToken);
 
@@ -86,7 +87,7 @@ public class IranKishGateway : GatewayBase<IranKishGatewayAccount>
 
         var callbackResult = await IranKishHelper.CreateCallbackResultAsync(
                                                                             context,
-                                                                            _httpContextAccessor.HttpContext.Request,
+                                                                            _httpContextAccessor.GetRequiredHttpContext().Request,
                                                                             _messageOptions.Value,
                                                                             cancellationToken);
 

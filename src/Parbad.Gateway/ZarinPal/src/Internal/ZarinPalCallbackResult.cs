@@ -7,9 +7,9 @@ internal class ZarinPalCallbackResult
 {
     public bool IsSucceed { get; set; }
 
-    public string Authority { get; set; }
+    public string? Authority { get; set; }
 
-    public string Message { get; set; }
+    public string? Message { get; set; }
 
-    public string Status { get; set; }
+    public string? Status { get; set; }
 }

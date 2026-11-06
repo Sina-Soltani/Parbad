@@ -7,5 +7,5 @@ namespace Parbad.Gateway.YekPay;
 
 public class YekPayGatewayAccount : GatewayAccount
 {
-    public string MerchantId { get; set; }
+    public string MerchantId { get; set; } = null!;
 }

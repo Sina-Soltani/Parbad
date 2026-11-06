@@ -9,7 +9,7 @@ public class PasargadGatewayOptions
     /// According to Pasargad gateway, the BaseUrl is different for each merchant.
     /// Get the BaseUrl from Pasargad gateway and set the value here.
     /// </summary>
-    public string ApiBaseUrl { get; set; }
+    public string ApiBaseUrl { get; set; } = null!;
 
     public string ApiGetTokenUrl { get; set; } = "Token/GetToken";
 

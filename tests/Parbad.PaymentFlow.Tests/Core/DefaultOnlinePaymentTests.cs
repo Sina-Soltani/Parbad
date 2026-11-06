@@ -52,7 +52,7 @@ public class DefaultOnlinePaymentTests
         var result = await RequestAsync();
 
         Assert.IsTrue(result.IsSucceed, result.Message);
-        Assert.AreEqual(FakeGateway.PaymentPageUrl, result.GatewayTransporter.Descriptor.Url);
+        Assert.AreEqual(FakeGateway.PaymentPageUrl, result.GatewayTransporter.Descriptor?.Url);
 
         var payment = await _host.GetPaymentAsync(TrackingNumber);
         Assert.AreEqual(Amount, payment.Amount);

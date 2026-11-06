@@ -4,7 +4,6 @@
     <PackageId>Parbad.Storage.Cache</PackageId>
     <PackageValidationBaselineVersion>1.6.0</PackageValidationBaselineVersion>
     <TargetFrameworks>netstandard2.0;netstandard2.1;net8.0;net9.0;net10.0</TargetFrameworks>
-    <Nullable>enable</Nullable>
     <Description>Memory cache and distributed cache implementation of Parbad storage.
 More information: https://github.com/Sina-Soltani/Parbad</Description>
     <PackageTags>parbad cache memorycache distributedcache</PackageTags>

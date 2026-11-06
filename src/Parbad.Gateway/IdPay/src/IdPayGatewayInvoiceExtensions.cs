@@ -9,7 +9,7 @@ namespace Parbad.Gateway.IdPay;
 
 public static class IdPayGatewayInvoiceExtensions
 {
-    internal static IdPayRequestAdditionalData GetIdPayAdditionalData(this Invoice invoice)
+    internal static IdPayRequestAdditionalData? GetIdPayAdditionalData(this Invoice invoice)
     {
         if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 

@@ -8,7 +8,7 @@ namespace Parbad.Gateway.IranKish.Tests;
 [TestClass]
 public class IranKishCommonTests
 {
-    private IInvoiceBuilder _invoiceBuilder;
+    private IInvoiceBuilder _invoiceBuilder = null!;
 
     [TestInitialize]
     public void Initialize()

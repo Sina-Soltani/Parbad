@@ -45,7 +45,7 @@ public static class GatewayResponse
     {
         if (responseMessage == null) throw new ArgumentNullException(nameof(responseMessage));
 
-        TResult result;
+        TResult? result;
 
         try
         {
@@ -70,11 +70,11 @@ public static class GatewayResponse
     {
         if (responseMessage == null) throw new ArgumentNullException(nameof(responseMessage));
 
-        var body = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
+        var body = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse() ?? string.Empty;
 
         try
         {
-            JToken.Parse(body ?? string.Empty);
+            JToken.Parse(body);
         }
         catch (JsonException)
         {

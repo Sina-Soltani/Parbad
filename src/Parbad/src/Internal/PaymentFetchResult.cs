@@ -5,7 +5,7 @@ namespace Parbad.Internal;
 
 public record PaymentFetchResult : PaymentResult, IPaymentFetchResult
 {
-    public string TransactionCode { get; init; }
+    public string? TransactionCode { get; init; }
         
     public PaymentFetchResultStatus Status { get; init; }
 
@@ -13,7 +13,7 @@ public record PaymentFetchResult : PaymentResult, IPaymentFetchResult
 
     public override bool IsSucceed => Status == PaymentFetchResultStatus.ReadyForVerifying;
 
-    public static PaymentFetchResult Failed(string message)
+    public static PaymentFetchResult Failed(string? message)
     {
         return new PaymentFetchResult
                {

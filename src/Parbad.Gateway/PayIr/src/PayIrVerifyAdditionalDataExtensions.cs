@@ -9,7 +9,7 @@ public static class PayIrVerifyAdditionalDataExtensions
 {
     private const string AdditionalDataKey = "PayIrVerificationAdditionalData";
 
-    public static PayIrVerifyAdditionalData GetPayIrAdditionalData(this IPaymentVerifyResult result)
+    public static PayIrVerifyAdditionalData? GetPayIrAdditionalData(this IPaymentVerifyResult result)
     {
         if (result == null) throw new ArgumentNullException(nameof(result));
 

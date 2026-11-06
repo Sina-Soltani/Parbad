@@ -60,7 +60,7 @@ public class DistributedCacheStorage : CacheStorage
 
         var cached = buffer == null
             ? null
-            : ObjectSerializer.DeserializeObject<CacheStorageCollection>(buffer).Payments.SingleOrDefault(payment => payment.Id == paymentId);
+            : ObjectSerializer.DeserializeObject<CacheStorageCollection>(buffer)?.Payments.SingleOrDefault(payment => payment.Id == paymentId);
 
         if (cached != null)
         {
@@ -111,6 +111,6 @@ public class DistributedCacheStorage : CacheStorage
 
         return buffer == null
             ? new CacheStorageCollection()
-            : ObjectSerializer.DeserializeObject<CacheStorageCollection>(buffer);
+            : ObjectSerializer.DeserializeObject<CacheStorageCollection>(buffer) ?? new CacheStorageCollection();
     }
 }

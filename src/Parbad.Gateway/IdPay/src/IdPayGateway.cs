@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
+using Parbad.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -61,7 +62,7 @@ public class IdPayGateway : GatewayBase<IdPayGatewayAccount>
                                    .PostJsonAsync(_gatewayOptions.ApiRequestUrl, data, DefaultSerializerSettings, cancellationToken)
                                    .ConfigureAwaitFalse();
 
-        return await IdPayHelper.CreateRequestResult(responseMessage, _httpContextAccessor.HttpContext, account);
+        return await IdPayHelper.CreateRequestResult(responseMessage, _httpContextAccessor.GetRequiredHttpContext(), account);
     }
 
     /// <inheritdoc />
@@ -71,7 +72,7 @@ public class IdPayGateway : GatewayBase<IdPayGatewayAccount>
 
         var callbackResult = await IdPayHelper.CreateCallbackResultAsync(
                                                                          context,
-                                                                         _httpContextAccessor.HttpContext.Request,
+                                                                         _httpContextAccessor.GetRequiredHttpContext().Request,
                                                                          _messagesOptions,
                                                                          cancellationToken)
                                               .ConfigureAwaitFalse();
@@ -91,7 +92,7 @@ public class IdPayGateway : GatewayBase<IdPayGatewayAccount>
 
         var callbackResult = await IdPayHelper.CreateCallbackResultAsync(
                                                                          context,
-                                                                         _httpContextAccessor.HttpContext.Request,
+                                                                         _httpContextAccessor.GetRequiredHttpContext().Request,
                                                                          _messagesOptions,
                                                                          cancellationToken)
                                               .ConfigureAwaitFalse();

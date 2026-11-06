@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
+using Parbad.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -65,7 +66,7 @@ public class YekPayGateway : GatewayBase<YekPayGatewayAccount>
                                    .PostJsonAsync(_gatewayOptions.ApiRequestUrl, data, DefaultSerializerSettings, cancellationToken)
                                    .ConfigureAwaitFalse();
 
-        return await YekPayHelper.CreateRequestResult(responseMessage, _httpContextAccessor.HttpContext, account, _gatewayOptions, _options.Messages);
+        return await YekPayHelper.CreateRequestResult(responseMessage, _httpContextAccessor.GetRequiredHttpContext(), account, _gatewayOptions, _options.Messages);
     }
 
     /// <inheritdoc />

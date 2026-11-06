@@ -19,11 +19,11 @@ public interface IGatewayAccountCollection<TAccount> : ICollection<TAccount>
     /// Gets an account with the given <paramref name="name"/>.
     /// </summary>
     /// <param name="name">Name of account.</param>
-    TAccount Get(string name);
+    TAccount? Get(string name);
 
     /// <summary>
     /// Gets the first account.
     /// </summary>
     /// <returns></returns>
-    TAccount GetDefaultAccount();
+    TAccount? GetDefaultAccount();
 }

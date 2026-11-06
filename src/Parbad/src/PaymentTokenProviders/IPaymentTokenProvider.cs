@@ -24,5 +24,5 @@ public interface IPaymentTokenProvider
     /// <summary>
     /// Retrieves the token.
     /// </summary>
-    Task<string> RetrieveTokenAsync(CancellationToken cancellationToken = default);
+    Task<string?> RetrieveTokenAsync(CancellationToken cancellationToken = default);
 }

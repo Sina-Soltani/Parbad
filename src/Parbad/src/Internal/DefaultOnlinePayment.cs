@@ -180,7 +180,7 @@ public class DefaultOnlinePayment : IOnlinePayment
             throw new PaymentTokenProviderException("No Token is received.");
         }
 
-        var payment = await _storage.GetPaymentByTokenAsync(paymentToken, cancellationToken).ConfigureAwaitFalse();
+        var payment = await _storage.GetPaymentByTokenAsync(paymentToken!, cancellationToken).ConfigureAwaitFalse();
 
         if (payment == null)
         {
@@ -311,7 +311,7 @@ public class DefaultOnlinePayment : IOnlinePayment
             // Another verification or a cancellation completed the payment first, e.g. on another server.
             var storedPayment = await _storage
                                      .GetPaymentByTrackingNumberAsync(trackingNumber, cancellationToken)
-                                     .ConfigureAwaitFalse();
+                                     .ConfigureAwaitFalse() ?? throw new InvoiceNotFoundException(trackingNumber);
 
             _logger.LogWarning(LoggingEvents.VerifyPayment,
                                "Verifying the invoice {TrackingNumber}: another operation completed the payment first (paid: {StoredIsPaid}). This verification's result ({Status}) is not stored",
@@ -349,7 +349,7 @@ public class DefaultOnlinePayment : IOnlinePayment
     }
 
     /// <inheritdoc />
-    public virtual async Task<IPaymentCancelResult> CancelAsync(long trackingNumber, string cancellationReason = null, CancellationToken cancellationToken = default)
+    public virtual async Task<IPaymentCancelResult> CancelAsync(long trackingNumber, string? cancellationReason = null, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation(LoggingEvents.CancelPayment, "Canceling the invoice {TrackingNumber} is started", trackingNumber);
 
@@ -563,14 +563,14 @@ public class DefaultOnlinePayment : IOnlinePayment
     /// bank reference can settle only one payment. An "already verified" answer that the gateway could not tie to this
     /// invoice is accepted only after the last check.
     /// </summary>
-    private async Task<(PaymentVerifyResultStatus Status, string Message)> DecideAsync(Payment payment,
+    private async Task<(PaymentVerifyResultStatus Status, string? Message)> DecideAsync(Payment payment,
                                                                                       IPaymentVerifyResult gatewayResult,
-                                                                                      string bankReference,
+                                                                                      string? bankReference,
                                                                                       CancellationToken cancellationToken)
     {
         if (!gatewayResult.IsSucceed && !gatewayResult.IsAlreadyVerifiedAtBank) return (gatewayResult.Status, gatewayResult.Message);
 
-        string failure = null;
+        string? failure = null;
 
         if (gatewayResult.BankReportedAmount.HasValue && gatewayResult.BankReportedAmount.Value.Value != payment.Amount)
         {

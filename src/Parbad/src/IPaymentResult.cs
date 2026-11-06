@@ -33,17 +33,17 @@ public interface IPaymentResult
     /// <summary>
     /// Name of the gateway account.
     /// </summary>
-    string GatewayAccountName { get; }
+    string? GatewayAccountName { get; }
 
     /// <summary>
     /// Gets the original response code (also known as Status Code) that recevied from the gateway.
     /// </summary>
-    string GatewayResponseCode { get; }
+    string? GatewayResponseCode { get; }
 
     /// <summary>
     /// A short message about the operation.
     /// </summary>
-    string Message { get; }
+    string? Message { get; }
 
     /// <summary>
     /// Includes some additional data.

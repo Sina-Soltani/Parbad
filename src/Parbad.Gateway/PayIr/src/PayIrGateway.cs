@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
+using Parbad.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -61,7 +62,7 @@ public class PayIrGateway : GatewayBase<PayIrGatewayAccount>
 
         var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwaitFalse();
 
-        return PayIrHelper.CreateRequestResult(responseMessage, response, _httpContextAccessor.HttpContext, account, _gatewayOptions);
+        return PayIrHelper.CreateRequestResult(responseMessage, response, _httpContextAccessor.GetRequiredHttpContext(), account, _gatewayOptions);
     }
 
     /// <inheritdoc />
@@ -69,7 +70,7 @@ public class PayIrGateway : GatewayBase<PayIrGatewayAccount>
     {
         if (context == null) throw new ArgumentNullException(nameof(context));
 
-        var callbackResult = await PayIrHelper.CreateCallbackResultAsync(_httpContextAccessor.HttpContext.Request, context, _messagesOptions, cancellationToken).ConfigureAwaitFalse();
+        var callbackResult = await PayIrHelper.CreateCallbackResultAsync(_httpContextAccessor.GetRequiredHttpContext().Request, context, _messagesOptions, cancellationToken).ConfigureAwaitFalse();
 
         if (callbackResult.IsSucceed)
         {
@@ -84,7 +85,7 @@ public class PayIrGateway : GatewayBase<PayIrGatewayAccount>
     {
         if (context == null) throw new ArgumentNullException(nameof(context));
 
-        var callbackResult = await PayIrHelper.CreateCallbackResultAsync(_httpContextAccessor.HttpContext.Request, context, _messagesOptions, cancellationToken).ConfigureAwaitFalse();
+        var callbackResult = await PayIrHelper.CreateCallbackResultAsync(_httpContextAccessor.GetRequiredHttpContext().Request, context, _messagesOptions, cancellationToken).ConfigureAwaitFalse();
 
         if (!callbackResult.IsSucceed)
         {

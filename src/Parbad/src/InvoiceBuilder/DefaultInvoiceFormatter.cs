@@ -13,8 +13,8 @@ namespace Parbad.InvoiceBuilder;
 /// </summary>
 public class DefaultInvoiceFormatter : IInvoiceFormatter
 {
-    private readonly Action<Invoice> _formatInvoice;
-    private readonly Func<Invoice, Task> _formatInvoiceAsync;
+    private readonly Action<Invoice>? _formatInvoice;
+    private readonly Func<Invoice, Task>? _formatInvoiceAsync;
 
     /// <summary>
     /// Initializes an instance of <see cref="DefaultInvoiceFormatter"/>.
@@ -48,6 +48,6 @@ public class DefaultInvoiceFormatter : IInvoiceFormatter
             return Task.CompletedTask;
         }
 
-        return _formatInvoiceAsync(invoice);
+        return _formatInvoiceAsync!(invoice);
     }
 }

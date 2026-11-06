@@ -44,6 +44,6 @@ public static class ZarinPalGatewayInvoiceBuilderExtensions
     /// <param name="email">Buyer's email.</param>
     /// <param name="mobile">Buyer's mobile.</param>
     /// <exception cref="ArgumentNullException"></exception>
-    public static IInvoiceBuilder SetZarinPalData(this IInvoiceBuilder builder, string description, string email = null, string mobile = null)
+    public static IInvoiceBuilder SetZarinPalData(this IInvoiceBuilder builder, string description, string? email = null, string? mobile = null)
         => SetZarinPalData(builder, new ZarinPalInvoice(description, email, mobile));
 }
