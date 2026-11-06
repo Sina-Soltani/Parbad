@@ -12,7 +12,7 @@ For more information see: https://www.nuget.org/packages/Parbad/</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNet.Mvc" Version="4.0.20505" />
+    <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.3.0" />
   </ItemGroup>
 
   <ItemGroup>
