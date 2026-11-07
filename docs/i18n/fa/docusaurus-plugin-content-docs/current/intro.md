@@ -2,6 +2,7 @@
 sidebar_position: 1
 title: معرفی
 slug: /intro
+source_hash: 4487b5285732
 ---
 
 # پَرباد

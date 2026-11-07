@@ -1,6 +1,7 @@
 ---
 sidebar_position: 3
 title: پیکربندی
+source_hash: 7a6a1ba7f59c
 ---
 
 # پیکربندی

@@ -1,6 +1,7 @@
 ---
 sidebar_position: 4
 title: ذخیره‌سازی
+source_hash: 99cd0587b853
 ---
 
 # ذخیره‌سازی

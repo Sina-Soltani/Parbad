@@ -32,5 +32,19 @@ npm start -- --locale fa  # Persian: http://localhost:3000/Parbad/fa/
 | `src/pages/` | The home page |
 | `static/img/` | Images |
 
+## Translations
+
+Each Persian page records, in its front matter (`source_hash`), the English page it was translated from. Before every
+start and build, `scripts/translations.mjs` warns about each Persian page whose English page has changed since, for
+example after a gateway's README was edited. Update the Persian page, then record that it is up to date:
+
+```bash
+npm run translations:stamp -- i18n/fa/docusaurus-plugin-content-docs/current/gateways/zibal.generated.md
+```
+
+`npm run translations:check` runs the check on its own.
+
+## Versions
+
 Before the pages are changed for the next major version, `npm run docusaurus docs:version 4.0` freezes the current
 pages as version 4.0.

@@ -1,6 +1,7 @@
 ---
 sidebar_position: 2
 title: شروع کار
+source_hash: 00451f9f5961
 ---
 
 # شروع کار

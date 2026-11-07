@@ -1,6 +1,7 @@
 ---
 sidebar_position: 10
 title: مهاجرت از نسخه 3.x
+source_hash: 0b5b6a0b05d7
 ---
 
 # مهاجرت از نسخه 3.x به 4.0
