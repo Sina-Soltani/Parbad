@@ -17,7 +17,7 @@ Create an [issue](https://github.com/Sina-Soltani/Parbad/issues/new/choose) and 
   - Branch name pattern: `[feature|bug]/[issue number]_[name]`
   - Examples: `feature/70_AddingSomething`, `bug/80_FixingSomething`
 - **Do** write summary for codes (Interfaces, Classes, Methods, Properties, etc.) that are `public`, when you think that their usages are hard to understand. If your english is not so much good, don't worry, I will write suggestions for you during the code review.
-- **Do** let people know how your feature works by writing a nice and understandable Wiki guidline. It's really kind from you and it will be added in [Wiki](https://github.com/Sina-Soltani/Parbad/wiki) page.
+- **Do** let people know how your feature works by documenting it in the documentation site, in the [docs](docs) folder of this repository.
 
 ### Don't:
 - **Don't** use 3rd party libraries which are not popular.

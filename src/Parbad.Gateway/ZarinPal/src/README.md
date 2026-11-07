@@ -55,4 +55,4 @@ var refundResult = await onlinePayment.RefundCompletelyAsync(trackingNumber);
 ## More information
 
 * [GitHub](https://github.com/Sina-Soltani/Parbad)
-* [Documentation](https://github.com/Sina-Soltani/Parbad/wiki)
+* [Documentation](https://sina-soltani.github.io/Parbad/docs/gateways/zarinpal)

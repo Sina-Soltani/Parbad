@@ -109,5 +109,5 @@ if (invoice.Status == PaymentFetchResultStatus.ReadyForVerifying)
 ## More information
 
 * [GitHub](https://github.com/Sina-Soltani/Parbad)
-* [Documentation](https://github.com/Sina-Soltani/Parbad/wiki)
+* [Documentation](https://sina-soltani.github.io/Parbad/)
 * [Samples](https://github.com/Sina-Soltani/Parbad.Samples)

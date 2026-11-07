@@ -38,4 +38,4 @@ storage.UseDistributedCache(options => options.CacheKey = "shop.parbad");
 ## More information
 
 * [GitHub](https://github.com/Sina-Soltani/Parbad)
-* [Documentation](https://github.com/Sina-Soltani/Parbad/wiki)
+* [Documentation](https://sina-soltani.github.io/Parbad/docs/storage#memory-cache-and-distributed-cache)

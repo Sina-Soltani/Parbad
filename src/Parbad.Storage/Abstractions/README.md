@@ -29,4 +29,4 @@ The XML documentation of `IStorage` describes every member.
 ## More information
 
 * [GitHub](https://github.com/Sina-Soltani/Parbad)
-* [Documentation](https://github.com/Sina-Soltani/Parbad/wiki)
+* [Documentation](https://sina-soltani.github.io/Parbad/docs/storage#your-own-storage)

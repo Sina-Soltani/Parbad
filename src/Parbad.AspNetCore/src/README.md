@@ -43,6 +43,6 @@ app.UseParbadVirtualGatewayWhenDeveloping();
 
 ## More information
 
-* [Configuration](https://github.com/Sina-Soltani/Parbad/wiki/Configuration)
+* [Configuration](https://sina-soltani.github.io/Parbad/docs/configuration)
 * [GitHub](https://github.com/Sina-Soltani/Parbad)
-* [Documentation](https://github.com/Sina-Soltani/Parbad/wiki)
+* [Documentation](https://sina-soltani.github.io/Parbad/)
