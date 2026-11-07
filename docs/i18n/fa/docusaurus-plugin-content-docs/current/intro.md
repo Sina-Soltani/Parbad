@@ -2,7 +2,7 @@
 sidebar_position: 1
 title: معرفی
 slug: /intro
-source_hash: 4487b5285732
+source_hash: 46daf78aa91d
 ---
 
 # پَرباد
@@ -32,7 +32,7 @@ source_hash: 4487b5285732
 * پشتیبانی از ASP.NET Core، ASP.NET MVC 5 و WebForms
 * ذخیره اطلاعات در پایگاه داده خودتان با EF Core، در کش، یا با پیاده‌سازی خودتان
 
-## درگاه‌ها
+## درگاه‌ها {#gateways}
 
 | درگاه | پکیج |
 |---|---|
@@ -47,4 +47,4 @@ source_hash: 4487b5285732
 | زیبال | [Parbad.Gateway.Zibal](https://www.nuget.org/packages/Parbad.Gateway.Zibal/) |
 | فن‌آوا | [Parbad.Gateway.FanAva](https://www.nuget.org/packages/Parbad.Gateway.FanAva/) |
 
-مرحله بعد: [شروع کار](./getting-started.md).
+مرحله بعد: [شروع کار](./getting-started).

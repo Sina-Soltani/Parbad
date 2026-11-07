@@ -1,7 +1,7 @@
 ---
 sidebar_position: 2
 title: شروع کار
-source_hash: 00451f9f5961
+source_hash: 166d127d7f2d
 ---
 
 # شروع کار
@@ -16,7 +16,7 @@ dotnet add package Parbad.AspNetCore
 dotnet add package Parbad.Storage.EntityFrameworkCore
 ```
 
-اگر درگاه شما در پکیج اصلی نیست، پکیج آن درگاه را هم نصب کنید؛ فهرست را در [درگاه‌ها](./intro.md#درگاهها) ببینید.
+اگر درگاه شما در پکیج اصلی نیست، پکیج آن درگاه را هم نصب کنید؛ فهرست را در [درگاه‌ها](./intro#gateways) ببینید.
 
 ## ۲. پیکربندی پرباد
 

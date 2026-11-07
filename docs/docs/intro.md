@@ -46,4 +46,4 @@ or the same payment is verified on two servers at the same time.
 | Zibal | [Parbad.Gateway.Zibal](https://www.nuget.org/packages/Parbad.Gateway.Zibal/) |
 | FanAva | [Parbad.Gateway.FanAva](https://www.nuget.org/packages/Parbad.Gateway.FanAva/) |
 
-Next: [Getting started](./getting-started.md).
+Next: [Getting started](./getting-started).

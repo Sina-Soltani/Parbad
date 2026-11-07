@@ -15,7 +15,7 @@ dotnet add package Parbad.AspNetCore
 dotnet add package Parbad.Storage.EntityFrameworkCore
 ```
 
-Add a gateway package too if your gateway is not in the main package; see [Gateways](./intro.md#gateways).
+Add a gateway package too if your gateway is not in the main package; see [Gateways](./intro#gateways).
 
 ## 2. Configure Parbad
 
@@ -43,7 +43,7 @@ builder.Services.AddParbad()
        .ConfigureStorage(storage => storage.UseEfCore<ShopDbContext>());
 ```
 
-`UseEfCore<ShopDbContext>()` keeps Parbad's tables in your own database; see [Storage](./storage.md) for the
+`UseEfCore<ShopDbContext>()` keeps Parbad's tables in your own database; see [Storage](./storage) for the
 `DbContext` setup.
 
 ## 3. Request a payment

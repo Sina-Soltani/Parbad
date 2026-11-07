@@ -30,7 +30,7 @@ var parbad = ParbadBuilder.CreateDefaultBuilder()
 containerBuilder.Populate(parbad.Services);
 ```
 
-### بدون تزریق وابستگی
+### بدون تزریق وابستگی {#without-dependency-injection}
 
 پرباد را یک بار در شروع برنامه بسازید:
 
@@ -72,7 +72,7 @@ using (var scope = StaticOnlinePayment.CreateScope())
 })
 ```
 
-### چند حساب برای یک درگاه
+### چند حساب برای یک درگاه {#several-accounts-for-one-gateway}
 
 به هر حساب یک نام بدهید و برای هر فاکتور با `UseAccount("...")` حساب را انتخاب کنید:
 
@@ -135,7 +135,7 @@ gateways
 | ASP.NET MVC 5 | `Parbad.Mvc5` | `.ConfigureHttpContext(builder => builder.UseOwinFromCurrentHttpContext())` |
 | ASP.NET WebForms | `Parbad.Owin` | `.ConfigureHttpContext(builder => builder.UseOwinFromCurrentHttpContext())` |
 
-## تنظیمات
+## تنظیمات {#options}
 
 ```csharp
 .ConfigureOptions(options =>
@@ -161,7 +161,7 @@ gateways
 * `NonceFactory`: اگر از nonce در Content-Security-Policy استفاده می‌کنید، nonce درخواست جاری را برمی‌گرداند. پرباد آن
   را در صفحه‌هایی که مشتری را به بانک می‌فرستند و در درگاه مجازی به کار می‌برد.
 
-### شماره پیگیری
+### شماره پیگیری {#tracking-numbers}
 
 `UseAutoIncrementTrackingNumber()` و `UseAutoRandomTrackingNumber()` به هر فاکتور یک شماره پیگیری می‌دهند. تنظیمات
 آن‌ها:

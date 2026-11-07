@@ -20,6 +20,11 @@ const config: Config = {
 
   onBrokenLinks: 'throw',
 
+  markdown: {
+    // `## Heading {#anchor}`: the translated pages keep the English anchors, so links work in every language.
+    mdx1Compat: {headingIds: true},
+  },
+
   i18n: {
     defaultLocale: 'en',
     locales: ['en', 'fa'],
