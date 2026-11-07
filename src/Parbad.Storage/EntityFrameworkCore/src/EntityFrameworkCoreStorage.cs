@@ -6,8 +6,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using Parbad.Storage.Abstractions;
 using Parbad.Storage.Abstractions.Models;
-using Parbad.Storage.EntityFrameworkCore.Configuration;
-using Parbad.Storage.EntityFrameworkCore.Context;
+using Parbad.Storage.EntityFrameworkCore.Domain;
 using Parbad.Storage.EntityFrameworkCore.Internal;
 using System;
 using System.Collections.Generic;
@@ -18,45 +17,41 @@ using System.Threading.Tasks;
 namespace Parbad.Storage.EntityFrameworkCore;
 
 /// <summary>
-/// EntityFramework Core implementation of <see cref="IStorage"/>.
+/// EntityFramework Core implementation of <see cref="IStorage"/>, on any <see cref="DbContext"/> whose model contains
+/// Parbad's entities (<c>modelBuilder.UseParbad()</c>).
+/// <para>
+/// Every operation works on a new, short-lived context from <see cref="IDbContextFactory{TContext}"/>. Parbad's
+/// <c>SaveChanges</c> therefore only saves Parbad's own entities, never changes that the application has pending on
+/// its own context instance, and it does not take part in a transaction the application opened there.
+/// </para>
 /// </summary>
-public class EntityFrameworkCoreStorage : IStorage, IPaidPaymentLookup, IPaymentCompletion
+/// <typeparam name="TContext">The context that contains Parbad's entities.</typeparam>
+public class EntityFrameworkCoreStorage<TContext> : IStorage where TContext : DbContext
 {
+    private readonly IDbContextFactory<TContext> _contextFactory;
+    private volatile bool _modelChecked;
+
     /// <summary>
-    /// Initializes an instance of <see cref="EntityFrameworkCoreStorage"/>.
+    /// Initializes an instance of <see cref="EntityFrameworkCoreStorage{TContext}"/>.
     /// </summary>
-    /// <param name="context"></param>
-    public EntityFrameworkCoreStorage(ParbadDataContext context)
+    public EntityFrameworkCoreStorage(IDbContextFactory<TContext> contextFactory)
     {
-        Context = context;
+        _contextFactory = contextFactory ?? throw new ArgumentNullException(nameof(contextFactory));
     }
-
-    /// <inheritdoc />
-    [Obsolete("This property will be removed in a future release. The usages are implemented as methods now.")]
-    public virtual IQueryable<Payment> Payments => Context.Payments.Select(Mapper.ToPaymentModel());
-
-    /// <inheritdoc />
-    [Obsolete("This property will be removed in a future release. The usages are implemented as methods now.")]
-    public virtual IQueryable<Transaction> Transactions => Context.Transactions.Select(Mapper.ToTransactionModel());
-
-    /// <summary>
-    /// Gets Parbad DbContext.
-    /// </summary>
-    protected ParbadDataContext Context { get; }
 
     /// <inheritdoc />
     public virtual async Task CreatePaymentAsync(Payment payment, CancellationToken cancellationToken = default)
     {
         if (payment == null) throw new ArgumentNullException(nameof(payment));
 
+        await using var context = await CreateContextAsync(cancellationToken);
+
         var entity = payment.ToPaymentEntity();
         entity.CreatedOn = DateTime.UtcNow;
 
-        Context.Payments.Add(entity);
+        context.Set<PaymentEntity>().Add(entity);
 
-        await Context.SaveChangesAsync(cancellationToken);
-
-        Context.Entry(entity).State = EntityState.Detached;
+        await context.SaveChangesAsync(cancellationToken);
 
         payment.Id = entity.Id;
     }
@@ -66,19 +61,16 @@ public class EntityFrameworkCoreStorage : IStorage, IPaidPaymentLookup, IPayment
     {
         if (payment == null) throw new ArgumentNullException(nameof(payment));
 
-        var record = await Context
-                          .Payments
-                          .AsNoTracking()
-                          .SingleOrDefaultAsync(model => model.Id == payment.Id, cancellationToken);
+        await using var context = await CreateContextAsync(cancellationToken);
+
+        var record = await context.Set<PaymentEntity>().SingleOrDefaultAsync(model => model.Id == payment.Id, cancellationToken);
 
         if (record == null) throw new InvalidOperationException($"No payment records found in database with id {payment.Id}");
 
         Mapper.ToPaymentEntity(payment, record);
         record.UpdatedOn = DateTime.UtcNow;
 
-        Context.Payments.Update(record);
-
-        await Context.SaveChangesAsync(cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
     }
 
     /// <inheritdoc />
@@ -86,16 +78,15 @@ public class EntityFrameworkCoreStorage : IStorage, IPaidPaymentLookup, IPayment
     {
         if (payment == null) throw new ArgumentNullException(nameof(payment));
 
-        var record = await Context
-                          .Payments
-                          .AsNoTracking()
-                          .SingleOrDefaultAsync(model => model.Id == payment.Id, cancellationToken);
+        await using var context = await CreateContextAsync(cancellationToken);
+
+        var record = await context.Set<PaymentEntity>().SingleOrDefaultAsync(model => model.Id == payment.Id, cancellationToken);
 
         if (record == null) throw new InvalidOperationException($"No payment records found in database with id {payment.Id}");
 
-        Context.Payments.Remove(record);
+        context.Set<PaymentEntity>().Remove(record);
 
-        await Context.SaveChangesAsync(cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
     }
 
     /// <inheritdoc />
@@ -103,12 +94,14 @@ public class EntityFrameworkCoreStorage : IStorage, IPaidPaymentLookup, IPayment
     {
         if (transaction == null) throw new ArgumentNullException(nameof(transaction));
 
+        await using var context = await CreateContextAsync(cancellationToken);
+
         var entity = transaction.ToTransactionEntity();
         entity.CreatedOn = DateTime.UtcNow;
 
-        Context.Transactions.Add(entity);
+        context.Set<TransactionEntity>().Add(entity);
 
-        await Context.SaveChangesAsync(cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
 
         transaction.Id = entity.Id;
     }
@@ -118,18 +111,16 @@ public class EntityFrameworkCoreStorage : IStorage, IPaidPaymentLookup, IPayment
     {
         if (transaction == null) throw new ArgumentNullException(nameof(transaction));
 
-        var record = await Context
-                          .Transactions
-                          .SingleOrDefaultAsync(model => model.Id == transaction.Id, cancellationToken);
+        await using var context = await CreateContextAsync(cancellationToken);
+
+        var record = await context.Set<TransactionEntity>().SingleOrDefaultAsync(model => model.Id == transaction.Id, cancellationToken);
 
         if (record == null) throw new InvalidOperationException($"No transaction records found in database with id {transaction.Id}");
 
         Mapper.ToTransactionEntity(transaction, record);
         record.UpdatedOn = DateTime.UtcNow;
 
-        Context.Transactions.Update(record);
-
-        await Context.SaveChangesAsync(cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
     }
 
     /// <inheritdoc />
@@ -137,21 +128,23 @@ public class EntityFrameworkCoreStorage : IStorage, IPaidPaymentLookup, IPayment
     {
         if (transaction == null) throw new ArgumentNullException(nameof(transaction));
 
-        var record = await Context
-                          .Transactions
-                          .SingleOrDefaultAsync(model => model.Id == transaction.Id, cancellationToken);
+        await using var context = await CreateContextAsync(cancellationToken);
+
+        var record = await context.Set<TransactionEntity>().SingleOrDefaultAsync(model => model.Id == transaction.Id, cancellationToken);
 
         if (record == null) throw new InvalidOperationException($"No transaction records found in database with id {transaction.Id}");
 
-        Context.Transactions.Remove(record);
+        context.Set<TransactionEntity>().Remove(record);
 
-        await Context.SaveChangesAsync(cancellationToken);
+        await context.SaveChangesAsync(cancellationToken);
     }
 
     /// <inheritdoc />
     public virtual async Task<Payment?> GetPaymentByTrackingNumberAsync(long trackingNumber, CancellationToken cancellationToken = default)
     {
-        var paymentEntity = await Context.Payments
+        await using var context = await CreateContextAsync(cancellationToken);
+
+        var paymentEntity = await context.Set<PaymentEntity>()
                                          .AsNoTracking()
                                          .SingleOrDefaultAsync(payment => payment.TrackingNumber == trackingNumber, cancellationToken);
 
@@ -161,7 +154,9 @@ public class EntityFrameworkCoreStorage : IStorage, IPaidPaymentLookup, IPayment
     /// <inheritdoc />
     public virtual async Task<Payment?> GetPaymentByTokenAsync(string paymentToken, CancellationToken cancellationToken = default)
     {
-        var paymentEntity = await Context.Payments
+        await using var context = await CreateContextAsync(cancellationToken);
+
+        var paymentEntity = await context.Set<PaymentEntity>()
                                          .AsNoTracking()
                                          .SingleOrDefaultAsync(payment => payment.Token == paymentToken, cancellationToken);
 
@@ -169,17 +164,21 @@ public class EntityFrameworkCoreStorage : IStorage, IPaidPaymentLookup, IPayment
     }
 
     /// <inheritdoc />
-    public virtual async Task<Payment?> FindPaidPaymentByTransactionCodeAsync(string gatewayName,
-                                                                              string transactionCode,
-                                                                              long exceptTrackingNumber,
-                                                                              CancellationToken cancellationToken = default)
+    public virtual async Task<Payment?> FindPaidPaymentByBankReferenceAsync(string gatewayName,
+                                                                            string bankReference,
+                                                                            long exceptTrackingNumber,
+                                                                            CancellationToken cancellationToken = default)
     {
-        var paymentEntity = await Context.Payments
+        await using var context = await CreateContextAsync(cancellationToken);
+
+        // Payments stored before Parbad 4.0 have no bank reference; their transaction code is compared instead.
+        var paymentEntity = await context.Set<PaymentEntity>()
                                          .AsNoTracking()
                                          .FirstOrDefaultAsync(payment => payment.IsPaid &&
                                                                          payment.TrackingNumber != exceptTrackingNumber &&
-                                                                         payment.TransactionCode == transactionCode &&
-                                                                         payment.GatewayName == gatewayName,
+                                                                         payment.GatewayName == gatewayName &&
+                                                                         (payment.BankReference == bankReference ||
+                                                                          (payment.BankReference == null && payment.TransactionCode == bankReference)),
                                                               cancellationToken);
 
         return paymentEntity?.ToPaymentModel();
@@ -187,96 +186,171 @@ public class EntityFrameworkCoreStorage : IStorage, IPaidPaymentLookup, IPayment
 
     /// <inheritdoc />
     public virtual async Task<bool> TryCompletePaymentAsync(long paymentId,
-                                                            bool isPaid,
+                                                            PaymentStatus status,
                                                             string? transactionCode,
+                                                            string? bankReference,
                                                             CancellationToken cancellationToken = default)
     {
-        if (!Context.Database.IsRelational())
+        if (status is not (PaymentStatus.Paid or PaymentStatus.Failed or PaymentStatus.Cancelled))
         {
-            return await TryCompletePaymentWithoutSqlAsync(paymentId, isPaid, transactionCode, cancellationToken);
+            throw new ArgumentOutOfRangeException(nameof(status), status, "A payment is completed as paid, failed or cancelled.");
         }
 
-        // One conditional UPDATE, so two concurrent completions cannot both succeed, without a schema change.
-        var sql = Context.GetService<ISqlGenerationHelper>();
-        var options = Context.EntityFrameworkCoreOptions;
-        var schema = string.IsNullOrWhiteSpace(options.PaymentTableOptions.Schema) ? options.DefaultSchema : options.PaymentTableOptions.Schema;
+        var isPaid = status == PaymentStatus.Paid;
 
-        string Column(string name) => sql.DelimitIdentifier(name);
+        await using var context = await CreateContextAsync(cancellationToken);
 
-        // {5} is false. A paid result may replace an unpaid one; any other result needs an open payment.
-        var condition = isPaid
-            ? $"{Column(PaymentColumnNames.IsPaid)} = {{5}}"
-            : $"{Column(PaymentColumnNames.IsCompleted)} = {{5}} AND {Column(PaymentColumnNames.IsPaid)} = {{5}}";
+        var payments = context.Set<PaymentEntity>();
 
-        var command = $"UPDATE {sql.DelimitIdentifier(options.PaymentTableOptions.Name, schema)} " +
-                      $"SET {Column(PaymentColumnNames.IsCompleted)} = {{0}}, {Column(PaymentColumnNames.IsPaid)} = {{1}}, " +
-                      $"{Column(PaymentColumnNames.TransactionCode)} = {(transactionCode == null ? "NULL" : "{2}")}, {Column(PaymentColumnNames.UpdatedOn)} = {{3}} " +
-                      $"WHERE {Column(PaymentColumnNames.Id)} = {{4}} AND {condition}";
+        // A paid result may replace an unpaid one; any other result needs an open payment.
+        var completable = isPaid
+            ? payments.Where(payment => payment.Id == paymentId && !payment.IsPaid)
+            : payments.Where(payment => payment.Id == paymentId && !payment.IsCompleted && !payment.IsPaid);
 
-        // A null parameter has no type mapping on every provider, so a missing transaction code is written as NULL.
-        var parameters = new object[] { true, isPaid, transactionCode ?? string.Empty, DateTime.UtcNow, paymentId, false };
+        bool updated;
 
-        var updatedRows = await Context.Database.ExecuteSqlRawAsync(command, parameters, cancellationToken);
+        if (context.Database.IsRelational())
+        {
+            updated = await TryCompleteWithSqlAsync(context, paymentId, status, transactionCode, bankReference, cancellationToken) > 0;
+        }
+        else
+        {
+            // Providers without SQL (e.g. InMemory): the same rule, but not one atomic step.
+            var record = await completable.SingleOrDefaultAsync(cancellationToken);
 
-        if (updatedRows == 0 && !await Context.Payments.AnyAsync(payment => payment.Id == paymentId, cancellationToken))
+            if (record != null)
+            {
+                record.Status = status;
+                record.IsCompleted = true;
+                record.IsPaid = isPaid;
+                record.TransactionCode = transactionCode;
+                record.BankReference = bankReference;
+                record.UpdatedOn = DateTime.UtcNow;
+
+                await context.SaveChangesAsync(cancellationToken);
+            }
+
+            updated = record != null;
+        }
+
+        if (!updated && !await payments.AnyAsync(payment => payment.Id == paymentId, cancellationToken))
         {
             throw new InvalidOperationException($"No payment records found in database with id {paymentId}");
         }
 
-        return updatedRows > 0;
+        return updated;
     }
 
     /// <summary>
-    /// The same rule as <see cref="TryCompletePaymentAsync"/> for providers without SQL (e.g. InMemory), where it
-    /// cannot be one atomic step.
+    /// One conditional UPDATE, so two concurrent completions cannot both succeed. The table and column names come from
+    /// the model, so they follow the application's <c>UseParbad(...)</c> options.
+    /// <para>
+    /// Plain SQL instead of <c>ExecuteUpdateAsync</c>: its binary signature differs between EF Core 8, 9 and 10, and
+    /// this package is built against EF Core 8 but runs with whichever EF Core the application uses.
+    /// </para>
     /// </summary>
-    private async Task<bool> TryCompletePaymentWithoutSqlAsync(long paymentId,
-                                                               bool isPaid,
-                                                               string? transactionCode,
-                                                               CancellationToken cancellationToken)
+    private static Task<int> TryCompleteWithSqlAsync(TContext context,
+                                                     long paymentId,
+                                                     PaymentStatus status,
+                                                     string? transactionCode,
+                                                     string? bankReference,
+                                                     CancellationToken cancellationToken)
     {
-        var record = await Context.Payments.SingleOrDefaultAsync(payment => payment.Id == paymentId, cancellationToken);
+        var sql = context.GetService<ISqlGenerationHelper>();
+        var entityType = context.Model.FindEntityType(typeof(PaymentEntity))!;
+        var table = sql.DelimitIdentifier(entityType.GetTableName()!, entityType.GetSchema());
 
-        if (record == null) throw new InvalidOperationException($"No payment records found in database with id {paymentId}");
+        string Column(string propertyName) => sql.DelimitIdentifier(entityType.FindProperty(propertyName)!.GetColumnName()!);
 
-        try
+        var id = Column(nameof(PaymentEntity.Id));
+        var isCompletedColumn = Column(nameof(PaymentEntity.IsCompleted));
+        var isPaidColumn = Column(nameof(PaymentEntity.IsPaid));
+        var transactionCodeColumn = Column(nameof(PaymentEntity.TransactionCode));
+        var bankReferenceColumn = Column(nameof(PaymentEntity.BankReference));
+        var statusColumn = Column(nameof(PaymentEntity.Status));
+        var isPaid = status == PaymentStatus.Paid;
+        var updatedOn = Column(nameof(PaymentEntity.UpdatedOn));
+
+        // {5} is false. A paid result may replace an unpaid one; any other result needs an open payment. The condition
+        // uses is_completed/is_paid, which payments stored before Parbad 4.0 have too.
+        var condition = isPaid
+            ? $"{isPaidColumn} = {{5}}"
+            : $"{isCompletedColumn} = {{5}} AND {isPaidColumn} = {{5}}";
+
+        var command = $"UPDATE {table} " +
+                      $"SET {statusColumn} = {{6}}, {isCompletedColumn} = {{0}}, {isPaidColumn} = {{1}}, " +
+                      $"{transactionCodeColumn} = {(transactionCode == null ? "NULL" : "{2}")}, " +
+                      $"{bankReferenceColumn} = {(bankReference == null ? "NULL" : "{7}")}, {updatedOn} = {{3}} " +
+                      $"WHERE {id} = {{4}} AND {condition}";
+
+        // A null parameter has no type mapping on every provider, so missing values are written as NULL.
+        var parameters = new object[]
+                         {
+                             true, isPaid, transactionCode ?? string.Empty, DateTime.UtcNow, paymentId, false, (byte)status, bankReference ?? string.Empty
+                         };
+
+        return context.Database.ExecuteSqlRawAsync(command, parameters, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public virtual async Task<bool> DoesPaymentExistAsync(long trackingNumber, CancellationToken cancellationToken = default)
+    {
+        await using var context = await CreateContextAsync(cancellationToken);
+
+        return await context.Set<PaymentEntity>().AnyAsync(payment => payment.TrackingNumber == trackingNumber, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public virtual async Task<bool> DoesPaymentExistAsync(string paymentToken, CancellationToken cancellationToken = default)
+    {
+        await using var context = await CreateContextAsync(cancellationToken);
+
+        return await context.Set<PaymentEntity>().AnyAsync(payment => payment.Token == paymentToken, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public virtual async Task<long?> GetLargestTrackingNumberAsync(CancellationToken cancellationToken = default)
+    {
+        await using var context = await CreateContextAsync(cancellationToken);
+
+        return await context.Set<PaymentEntity>().MaxAsync(payment => (long?)payment.TrackingNumber, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public virtual async Task<List<Transaction>> GetTransactionsAsync(Payment payment, CancellationToken cancellationToken = default)
+    {
+        if (payment == null) throw new ArgumentNullException(nameof(payment));
+
+        await using var context = await CreateContextAsync(cancellationToken);
+
+        return await context.Set<TransactionEntity>()
+                            .Where(transaction => transaction.PaymentId == payment.Id)
+                            .AsNoTracking()
+                            .Select(Mapper.ToTransactionModel())
+                            .ToListAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// Creates the context for one operation. The caller disposes it.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">The model of <typeparamref name="TContext"/> has no Parbad entities.</exception>
+    protected virtual async Task<TContext> CreateContextAsync(CancellationToken cancellationToken)
+    {
+        var context = await _contextFactory.CreateDbContextAsync(cancellationToken);
+
+        if (!_modelChecked)
         {
-            if (record.IsPaid || (record.IsCompleted && !isPaid)) return false;
+            if (context.Model.FindEntityType(typeof(PaymentEntity)) == null)
+            {
+                await context.DisposeAsync();
 
-            record.IsCompleted = true;
-            record.IsPaid = isPaid;
-            record.TransactionCode = transactionCode;
-            record.UpdatedOn = DateTime.UtcNow;
+                throw new InvalidOperationException($"The model of {typeof(TContext).Name} does not contain Parbad's entities. " +
+                                                    $"Call modelBuilder.UseParbad() in {typeof(TContext).Name}.OnModelCreating.");
+            }
 
-            await Context.SaveChangesAsync(cancellationToken);
-
-            return true;
+            _modelChecked = true;
         }
-        finally
-        {
-            Context.Entry(record).State = EntityState.Detached;
-        }
-    }
 
-    /// <inheritdoc />
-    public virtual Task<bool> DoesPaymentExistAsync(long trackingNumber, CancellationToken cancellationToken = default)
-    {
-        return Context.Payments.AnyAsync(payment => payment.TrackingNumber == trackingNumber, cancellationToken);
-    }
-
-    /// <inheritdoc />
-    public virtual Task<bool> DoesPaymentExistAsync(string paymentToken, CancellationToken cancellationToken = default)
-    {
-        return Context.Payments.AnyAsync(payment => payment.Token == paymentToken, cancellationToken);
-    }
-
-    /// <inheritdoc />
-    public virtual Task<List<Transaction>> GetTransactionsAsync(Payment payment, CancellationToken cancellationToken = default)
-    {
-        return Context.Transactions
-                      .Where(transaction => transaction.PaymentId == payment.Id)
-                      .AsNoTracking()
-                      .Select(Mapper.ToTransactionModel())
-                      .ToListAsync(cancellationToken);
+        return context;
     }
 }

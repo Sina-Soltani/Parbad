@@ -64,7 +64,7 @@ public readonly struct CallbackUrl : IComparable<CallbackUrl>, IEquatable<Callba
         return string.Equals(Url, other.Url, StringComparison.OrdinalIgnoreCase);
     }
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (ReferenceEquals(null, obj)) return false;
 

@@ -1,0 +1,50 @@
+<Project>
+
+  <!-- Settings shared by every project. -->
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <NoWarn>$(NoWarn);1701;1702;1591</NoWarn>
+  </PropertyGroup>
+
+  <!--
+    All packages share one version. A prerelease adds a VersionSuffix here (e.g. beta.1), which then applies to
+    every package and to the package dependencies between them.
+  -->
+  <PropertyGroup>
+    <VersionPrefix>4.0.0</VersionPrefix>
+  </PropertyGroup>
+
+  <!-- Package metadata, for every project that is not a test project (test projects are named *.Tests or *.Tests.*). -->
+  <PropertyGroup Condition="!$(MSBuildProjectName.Contains('.Tests'))">
+    <Authors>Sina Soltani</Authors>
+    <Copyright>Copyright © Sina Soltani 2016</Copyright>
+    <PackageProjectUrl>https://github.com/Sina-Soltani/Parbad</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Sina-Soltani/Parbad</RepositoryUrl>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageReleaseNotes>https://github.com/Sina-Soltani/Parbad/releases/tag/v$(VersionPrefix)</PackageReleaseNotes>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+
+    <!-- Each project sets PackageValidationBaselineVersion: the release its public API is compared with. -->
+    <EnablePackageValidation>true</EnablePackageValidation>
+  </PropertyGroup>
+
+  <!-- Every package has a README.md next to its project file; nuget.org shows it on the package page. -->
+  <ItemGroup Condition="!$(MSBuildProjectName.Contains('.Tests'))">
+    <None Include="README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+  <!-- Test projects: NUnit creates a new instance of the test class for each test, so tests never share state through fields. -->
+  <ItemGroup Condition="'$(IsTestProject)' == 'true'">
+    <AssemblyAttribute Include="NUnit.Framework.FixtureLifeCycleAttribute">
+      <_Parameter1>NUnit.Framework.LifeCycle.InstancePerTestCase</_Parameter1>
+      <_Parameter1_IsLiteral>true</_Parameter1_IsLiteral>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+</Project>

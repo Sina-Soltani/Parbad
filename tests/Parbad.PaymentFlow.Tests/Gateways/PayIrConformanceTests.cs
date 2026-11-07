@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Net;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Parbad.Builder;
 using Parbad.Gateway.PayIr;
 using Parbad.GatewayBuilders;
@@ -13,7 +13,7 @@ namespace Parbad.PaymentFlow.Tests.Gateways;
 /// <summary>
 /// Pay.ir: pg/send → redirect → GET callback (token, status) → pg/verify.
 /// </summary>
-[TestClass]
+[TestFixture]
 public class PayIrConformanceTests : GatewayConformanceTests
 {
     private const string ApiKey = "payir-api-key";

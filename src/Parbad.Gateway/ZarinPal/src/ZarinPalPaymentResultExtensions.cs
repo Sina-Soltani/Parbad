@@ -12,7 +12,7 @@ public static class ZarinPalPaymentResultExtensions
     /// <summary>
     /// Gets the original verification result that was received from the ZarinPal gateway.
     /// </summary>
-    public static ZarinPalOriginalVerificationResult GetZarinPalOriginalVerificationResult(this IPaymentVerifyResult result)
+    public static ZarinPalOriginalVerificationResult? GetZarinPalOriginalVerificationResult(this IPaymentVerifyResult result)
     {
         if (result.AdditionalData.TryGetValue(ZarinPalOriginalVerificationResultKey, out var value))
         {

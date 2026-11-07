@@ -7,11 +7,11 @@ using Parbad.Storage.Abstractions.Models;
 using Parbad.Storage.Cache.MemoryCache;
 using Parbad.TrackingNumberProviders;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Parbad.Tests;
 
-[TestClass]
+[TestFixture]
 public class AutoIncrementTrackingNumberTests
 {
     private IStorage _storage;
@@ -19,7 +19,7 @@ public class AutoIncrementTrackingNumberTests
     private AutoIncrementTrackingNumber _instance;
     private Invoice _invoice;
 
-    [TestInitialize]
+    [SetUp]
     public void Setup()
     {
         var services = new ServiceCollection()
@@ -37,15 +37,15 @@ public class AutoIncrementTrackingNumberTests
         _invoice = new Invoice();
     }
 
-    [TestCleanup]
+    [TearDown]
     public async Task TrackingNumber_Must_Be_A_Positive_Number()
     {
         await _instance.FormatAsync(_invoice);
 
-        Assert.IsTrue(_invoice.TrackingNumber > 0);
+        Assert.That(_invoice.TrackingNumber > 0, Is.True);
     }
 
-    [TestMethod]
+    [Test]
     public async Task NewTrackingNumber_Must_Be_Greater_Than_Latest_Number()
     {
         var expectedNumber = AutoIncrementTrackingNumberOptions.DefaultMinimumNumber + 1;
@@ -57,10 +57,10 @@ public class AutoIncrementTrackingNumberTests
 
         await _instance.FormatAsync(_invoice);
 
-        Assert.AreEqual(expectedNumber, _invoice.TrackingNumber);
+        Assert.That(_invoice.TrackingNumber, Is.EqualTo(expectedNumber));
     }
 
-    [TestMethod]
+    [Test]
     public async Task TrackingNumber_Must_Be_Equal_With_MinimumNumber()
     {
         const long expectedMinimumNumber = 5;
@@ -69,10 +69,10 @@ public class AutoIncrementTrackingNumberTests
 
         await _instance.FormatAsync(_invoice);
 
-        Assert.AreEqual(expectedMinimumNumber, _invoice.TrackingNumber);
+        Assert.That(_invoice.TrackingNumber, Is.EqualTo(expectedMinimumNumber));
     }
 
-    [TestMethod]
+    [Test]
     public async Task TrackingNumber_Must_Increment_Correctly()
     {
         const long expectedNumber = 3;
@@ -87,6 +87,6 @@ public class AutoIncrementTrackingNumberTests
 
         await _instance.FormatAsync(_invoice);
 
-        Assert.AreEqual(expectedNumber, _invoice.TrackingNumber);
+        Assert.That(_invoice.TrackingNumber, Is.EqualTo(expectedNumber));
     }
 }

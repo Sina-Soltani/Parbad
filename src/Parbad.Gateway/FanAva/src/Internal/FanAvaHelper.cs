@@ -52,7 +52,7 @@ internal static class FanAvaHelper
                                },
                    TransType = transType,
                    ReserveNum = invoice.TrackingNumber.ToString(),
-                   Amount = invoice.Amount,
+                   Amount = (long)invoice.Amount,
                    RedirectUrl = invoice.CallbackUrl,
                    Email = additionalData?.Email,
                    MobileNo = additionalData?.MobileNumber,
@@ -84,14 +84,14 @@ internal static class FanAvaHelper
 
         var paymentPageUrl = QueryHelper.AddQueryString(gatewayOptions.PaymentPageUrl, new Dictionary<string, string>
                                                                                        {
-                                                                                           {"token", result.Token},
+                                                                                           {"token", result.Token!},
                                                                                            {"lang", "fa"}
                                                                                        });
 
         var requestResult = PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, paymentPageUrl);
 
         // Stored so that the callback can be bound to this invoice (see CreateCallbackResult).
-        requestResult.DatabaseAdditionalData.Add(TokenDatabaseKey, result.Token);
+        requestResult.DatabaseAdditionalData.Add(TokenDatabaseKey, result.Token!);
 
         return requestResult;
     }
@@ -173,7 +173,7 @@ internal static class FanAvaHelper
     {
         return new FanAvaVerifyRequestModel
                {
-                   WSContext = callbackResult.CallbackCheckData.WSContext,
+                   WSContext = callbackResult.CallbackCheckData!.WSContext,
                    Token = callbackResult.CallbackCheckData.Token,
                    Amount = (long)context.Payment.Amount,
                    InvoiceNumber = callbackResult.InvoiceNumber
@@ -189,11 +189,11 @@ internal static class FanAvaHelper
             return PaymentVerifyResult.Failed(messagesOptions.PaymentFailed, verifyResult?.Result);
         }
 
-        var result = PaymentVerifyResult.Succeed(callbackResult.InvoiceNumber, messagesOptions.PaymentSucceed, verifyResult.Result);
+        var result = PaymentVerifyResult.Paid(callbackResult.InvoiceNumber, callbackResult.InvoiceNumber ?? string.Empty, messagesOptions.PaymentSucceed, verifyResult.Result);
 
         // A refund may run long after the callback (e.g. from an admin action), so it reads them from here.
-        result.DatabaseAdditionalData.Add(TokenDatabaseKey, callbackResult.CallbackCheckData.Token);
-        result.DatabaseAdditionalData.Add(RefNumDatabaseKey, callbackResult.InvoiceNumber);
+        result.DatabaseAdditionalData.Add(TokenDatabaseKey, callbackResult.CallbackCheckData!.Token!);
+        result.DatabaseAdditionalData.Add(RefNumDatabaseKey, callbackResult.InvoiceNumber ?? string.Empty);
 
         return result;
     }
@@ -202,7 +202,7 @@ internal static class FanAvaHelper
     /// Creates the refund request from the data stored by <see cref="CreateVerifyResult"/>, or returns null if
     /// the payment has no successful verification with that data.
     /// </summary>
-    internal static FanAvaVerifyRequestModel CreateRefundRequest(InvoiceContext context, FanAvaGatewayAccount account)
+    internal static FanAvaVerifyRequestModel? CreateRefundRequest(InvoiceContext context, FanAvaGatewayAccount account)
     {
         var verifyTransaction = context.Transactions?.LastOrDefault(transaction => transaction.Type == TransactionType.Verify && transaction.IsSucceed);
 
@@ -211,7 +211,7 @@ internal static class FanAvaHelper
             return null;
         }
 
-        var additionalData = verifyTransaction.ToDictionary();
+        var additionalData = verifyTransaction!.ToDictionary();
 
         if (additionalData == null ||
             !additionalData.TryGetValue(TokenDatabaseKey, out var token) ||
@@ -245,19 +245,19 @@ internal static class FanAvaHelper
         return PaymentRefundResult.Succeed(gatewayResponseCode: refundResult.Result);
     }
 
-    private static bool IsSucceedResult(string result) =>
+    private static bool IsSucceedResult(string? result) =>
         string.Equals(result, SucceedResult, StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
     /// Checks that the callback's token is the one FanAva issued for this invoice. Invoices requested before
     /// the token was stored have nothing to compare with and are accepted as before.
     /// </summary>
-    private static bool IsTokenIssuedForThisInvoice(string callbackToken, InvoiceContext context)
+    private static bool IsTokenIssuedForThisInvoice(string? callbackToken, InvoiceContext context)
     {
         var requestTransaction = context.Transactions?.SingleOrDefault(transaction => transaction.Type == TransactionType.Request);
 
         if (string.IsNullOrEmpty(requestTransaction?.AdditionalData) ||
-            !requestTransaction.ToDictionary().TryGetValue(TokenDatabaseKey, out var issuedToken))
+            !requestTransaction!.ToDictionary().TryGetValue(TokenDatabaseKey, out var issuedToken))
         {
             return true;
         }

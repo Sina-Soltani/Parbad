@@ -12,10 +12,11 @@ public static class AdditionalDataConverter
 {
     public static IDictionary<string, string> ToDictionary(this Transaction transaction)
     {
-        return JsonConvert.DeserializeObject<IDictionary<string, string>>(transaction.AdditionalData);
+        return (transaction.AdditionalData == null ? null : JsonConvert.DeserializeObject<IDictionary<string, string>>(transaction.AdditionalData))
+               ?? new Dictionary<string, string>();
     }
 
-    internal static string ToJson(PaymentResult paymentResult)
+    internal static string ToJson(IPaymentResult paymentResult)
     {
         if (paymentResult == null) throw new ArgumentNullException(nameof(paymentResult));
 

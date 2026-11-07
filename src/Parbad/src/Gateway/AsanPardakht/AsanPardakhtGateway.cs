@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
+using Parbad.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Parbad.Abstraction;
@@ -46,23 +47,6 @@ public class AsanPardakhtGateway : GatewayBase<AsanPardakhtGatewayAccount>
         _api = new AsanPardakhtRestApi(httpClientFactory.CreateClient(this), _gatewayOptions);
     }
 
-    /// <summary>
-    /// Initializes an instance of <see cref="AsanPardakhtGateway"/>. The crypto service is not used any more.
-    /// </summary>
-    [Obsolete("The crypto service is not used: since Parbad 3.12 the gateway uses AsanPardakht's REST API. This constructor will be removed in Parbad 4.0.")]
-#pragma warning disable CS0618
-    public AsanPardakhtGateway(
-        IHttpContextAccessor httpContextAccessor,
-        IHttpClientFactory httpClientFactory,
-        IGatewayAccountProvider<AsanPardakhtGatewayAccount> accountProvider,
-        IAsanPardakhtCrypto crypto,
-        IOptions<AsanPardakhtGatewayOptions> gatewayOptions,
-        IOptions<MessagesOptions> messageOptions)
-#pragma warning restore CS0618
-        : this(httpContextAccessor, httpClientFactory, accountProvider, gatewayOptions, messageOptions)
-    {
-    }
-
     /// <inheritdoc />
     public override async Task<IPaymentRequestResult> RequestAsync(Invoice invoice, CancellationToken cancellationToken = default)
     {
@@ -83,7 +67,7 @@ public class AsanPardakhtGateway : GatewayBase<AsanPardakhtGatewayAccount>
 
         var response = await _api.GetTokenAsync(account, request, cancellationToken).ConfigureAwaitFalse();
 
-        return AsanPardakhtHelper.CreateRequestResult(response, account, _httpContextAccessor.HttpContext, _gatewayOptions, _messageOptions);
+        return AsanPardakhtHelper.CreateRequestResult(response, account, _httpContextAccessor.GetRequiredHttpContext(), _gatewayOptions, _messageOptions);
     }
 
     /// <inheritdoc />
@@ -106,10 +90,7 @@ public class AsanPardakhtGateway : GatewayBase<AsanPardakhtGatewayAccount>
 
         if (transaction.IsSucceed) return PaymentFetchResult.ReadyForVerifying();
 
-        var failed = PaymentFetchResult.Failed(transaction.Message);
-        failed.GatewayResponseCode = response.Code;
-
-        return failed;
+        return PaymentFetchResult.Failed(transaction.Message) with { GatewayResponseCode = response.Code };
     }
 
     /// <inheritdoc />
@@ -134,7 +115,7 @@ public class AsanPardakhtGateway : GatewayBase<AsanPardakhtGatewayAccount>
             return PaymentVerifyResult.Failed(transaction.Message, response.Code);
         }
 
-        var payGateTranId = long.Parse(transaction.Result.PayGateTranId, NumberStyles.Integer, CultureInfo.InvariantCulture);
+        var payGateTranId = long.Parse(transaction.Result!.PayGateTranId!, NumberStyles.Integer, CultureInfo.InvariantCulture);
 
         // The transaction comes from TranResult for this invoice, so an "already verified" or "already settled"
         // answer (e.g. after a lost response) is about this invoice's own payment.
@@ -153,7 +134,7 @@ public class AsanPardakhtGateway : GatewayBase<AsanPardakhtGatewayAccount>
         {
             // The payment is verified, so the money is captured. When settlement fails, AsanPardakht has Shaparak
             // settle it 12 hours after the transaction (guide v1.6, p.12), so the payment is still paid.
-            result.GatewayResponseCode = settlement.Code;
+            result = result with { GatewayResponseCode = settlement.Code };
             result.DatabaseAdditionalData.Add(AsanPardakhtHelper.SettlementResultDatabaseKey,
                                               AsanPardakhtResultTranslator.Translate(AsanPardakhtOperation.Settlement, settlement, _messageOptions));
         }

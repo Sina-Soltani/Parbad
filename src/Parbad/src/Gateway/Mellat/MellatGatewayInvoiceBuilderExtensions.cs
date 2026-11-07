@@ -41,7 +41,7 @@ public static class MellatGatewayInvoiceBuilderExtensions
         if (accounts == null) throw new ArgumentNullException(nameof(accounts));
         if (!accounts.Any()) throw new ArgumentException("Accounts cannot be an empty collection.", nameof(accounts));
 
-        List<MellatCumulativeDynamicAccount> allAccounts = null;
+        List<MellatCumulativeDynamicAccount>? allAccounts = null;
 
         builder.ChangeProperties(properties =>
                                  {
@@ -75,7 +75,7 @@ public static class MellatGatewayInvoiceBuilderExtensions
         return builder;
     }
 
-    internal static MellatGatewayAdditionalDataRequest GetMellatAdditionalData(this Invoice invoice)
+    internal static MellatGatewayAdditionalDataRequest? GetMellatAdditionalData(this Invoice invoice)
     {
         if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 

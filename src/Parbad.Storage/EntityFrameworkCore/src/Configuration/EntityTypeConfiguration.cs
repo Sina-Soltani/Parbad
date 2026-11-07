@@ -16,24 +16,24 @@ public abstract class EntityTypeConfiguration<TEntity> : IEntityTypeConfiguratio
     /// <summary>
     /// Initializes an instance of <see cref="EntityTypeConfiguration{TEntity}"/>.
     /// </summary>
-    protected EntityTypeConfiguration(EntityFrameworkCoreOptions efCoreOptions)
+    protected EntityTypeConfiguration(ParbadModelOptions modelOptions)
     {
-        EntityFrameworkCoreOptions = efCoreOptions;
+        ModelOptions = modelOptions;
     }
 
     /// <summary>
-    /// Contains the options for configuring the EntityFrameworkCore for Parbad storage.
+    /// The tables of Parbad's entities.
     /// </summary>
-    public EntityFrameworkCoreOptions EntityFrameworkCoreOptions { get; }
+    public ParbadModelOptions ModelOptions { get; }
 
     /// <inheritdoc />
     public void Configure(EntityTypeBuilder<TEntity> builder)
     {
-        Configure(builder, EntityFrameworkCoreOptions);
+        Configure(builder, ModelOptions);
     }
 
     /// <summary>
     /// Configures the entity.
     /// </summary>
-    public abstract void Configure(EntityTypeBuilder<TEntity> builder, EntityFrameworkCoreOptions tableOptions);
+    public abstract void Configure(EntityTypeBuilder<TEntity> builder, ParbadModelOptions modelOptions);
 }

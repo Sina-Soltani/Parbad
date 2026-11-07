@@ -16,20 +16,20 @@ public class PaymentConfiguration : EntityTypeConfiguration<PaymentEntity>
     /// <summary>
     /// Initializes an instance of <see cref="PaymentConfiguration"/>.
     /// </summary>
-    public PaymentConfiguration(EntityFrameworkCoreOptions efCoreOptions) : base(efCoreOptions)
+    public PaymentConfiguration(ParbadModelOptions modelOptions) : base(modelOptions)
     {
     }
 
     /// <inheritdoc />
-    public override void Configure(EntityTypeBuilder<PaymentEntity> builder, EntityFrameworkCoreOptions efCoreOptions)
+    public override void Configure(EntityTypeBuilder<PaymentEntity> builder, ParbadModelOptions modelOptions)
     {
-        builder.ToTable(efCoreOptions.PaymentTableOptions, efCoreOptions.DefaultSchema);
+        builder.ToTable(modelOptions.PaymentTableOptions, modelOptions.DefaultSchema);
 
         builder
            .HasKey(entity => entity.Id)
            .HasName("payment_id");
         builder.Property(entity => entity.Id)
-               .HasColumnName(PaymentColumnNames.Id)
+               .HasColumnName("payment_id")
                .ValueGeneratedOnAdd();
 
         builder.Property(entity => entity.TrackingNumber)
@@ -48,7 +48,7 @@ public class PaymentConfiguration : EntityTypeConfiguration<PaymentEntity>
                .IsRequired(required: true);
 
         builder.Property(entity => entity.TransactionCode)
-               .HasColumnName(PaymentColumnNames.TransactionCode)
+               .HasColumnName("transaction_code")
                .IsRequired(required: false);
 
         builder.Property(entity => entity.GatewayName)
@@ -56,12 +56,29 @@ public class PaymentConfiguration : EntityTypeConfiguration<PaymentEntity>
                .HasMaxLength(20)
                .IsRequired(required: true);
 
+        builder.Property(entity => entity.BankReference)
+               .HasColumnName("bank_reference")
+               .HasMaxLength(200)
+               .IsRequired(required: false);
+
+        // One bank reference settles only one payment of a gateway.
+        builder.HasIndex(entity => new { entity.GatewayName, entity.BankReference }).IsUnique(unique: true);
+
+        builder.Property(entity => entity.Status)
+               .HasColumnName("status")
+               .IsRequired(required: true);
+
+        builder.Property(entity => entity.RefundedAmount)
+               .HasColumnName("refunded_amount")
+               .HasColumnType("decimal(18,2)")
+               .IsRequired(required: true);
+
         builder.Property(entity => entity.IsCompleted)
-               .HasColumnName(PaymentColumnNames.IsCompleted)
+               .HasColumnName("is_completed")
                .IsRequired(required: true);
 
         builder.Property(entity => entity.IsPaid)
-               .HasColumnName(PaymentColumnNames.IsPaid)
+               .HasColumnName("is_paid")
                .IsRequired(required: true);
 
         builder.Property(entity => entity.GatewayAccountName)
@@ -73,7 +90,7 @@ public class PaymentConfiguration : EntityTypeConfiguration<PaymentEntity>
                .IsRequired(required: true);
 
         builder.Property(entity => entity.UpdatedOn)
-               .HasColumnName(PaymentColumnNames.UpdatedOn)
+               .HasColumnName("updated_on")
                .IsRequired(required: false);
 
         builder

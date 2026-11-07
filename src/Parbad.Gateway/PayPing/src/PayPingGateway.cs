@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
+using Parbad.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Parbad.Abstraction;
@@ -60,7 +61,7 @@ public class PayPingGateway : GatewayBase<PayPingGatewayAccount>
 
         var body = new CreatePayRequestModel
                    {
-                       Amount = invoice.Amount,
+                       Amount = (long)invoice.Amount,
                        Description = invoice.GetPayPingRequest()?.Description,
                        PayerIdentity = invoice.GetPayPingRequest()?.Mobile,
                        PayerName = invoice.GetPayPingRequest()?.PayerName,
@@ -86,10 +87,10 @@ public class PayPingGateway : GatewayBase<PayPingGatewayAccount>
 
         var url = _pingGatewayOptions.PaymentPageUrl.ToggleStringAtEnd("/", shouldHave: true) + Uri.EscapeDataString(createPayResult.PaymentCode);
 
-        var result = PaymentRequestResult.SucceedWithRedirect(account.Name, _httpContextAccessor.HttpContext, url);
+        var result = PaymentRequestResult.SucceedWithRedirect(account.Name, _httpContextAccessor.GetRequiredHttpContext(), url);
 
         // The callback and the verification must use the payment code PayPing issued for this invoice.
-        result.DatabaseAdditionalData.Add(PayPingGatewayHelper.PaymentCodeKey, createPayResult.PaymentCode);
+        result.DatabaseAdditionalData.Add(PayPingGatewayHelper.PaymentCodeKey, createPayResult.PaymentCode!);
 
         return result;
     }
@@ -100,7 +101,7 @@ public class PayPingGateway : GatewayBase<PayPingGatewayAccount>
         if (context == null) throw new ArgumentNullException(nameof(context));
 
         var callbackResult = await PayPingGatewayHelper.GetCallbackResult(
-                                                                          _httpContextAccessor.HttpContext.Request,
+                                                                          _httpContextAccessor.GetRequiredHttpContext().Request,
                                                                           context,
                                                                           _options.Messages,
                                                                           cancellationToken);
@@ -121,7 +122,7 @@ public class PayPingGateway : GatewayBase<PayPingGatewayAccount>
         var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 
         var callbackResult = await PayPingGatewayHelper.GetCallbackResult(
-                                                                          _httpContextAccessor.HttpContext.Request,
+                                                                          _httpContextAccessor.GetRequiredHttpContext().Request,
                                                                           context,
                                                                           _options.Messages,
                                                                           cancellationToken);
@@ -171,12 +172,10 @@ public class PayPingGateway : GatewayBase<PayPingGatewayAccount>
                 result = PaymentVerifyResult.Failed(problem.Message);
             }
 
-            result.GatewayResponseCode = problem.Code?.ToString(CultureInfo.InvariantCulture);
+            result = result with { GatewayResponseCode = problem.Code?.ToString(CultureInfo.InvariantCulture) };
         }
 
-        result.GatewayAccountName = account.Name;
-
-        return result;
+        return result with { GatewayAccountName = account.Name };
     }
 
     /// <inheritdoc />

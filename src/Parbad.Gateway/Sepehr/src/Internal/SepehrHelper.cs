@@ -28,7 +28,7 @@ internal static class SepehrHelper
         return new TokenRequestModel
                {
                    InvoiceId = invoice.TrackingNumber.ToString(),
-                   Amount = invoice.Amount,
+                   Amount = (long)invoice.Amount,
                    CallbackUrl = invoice.CallbackUrl,
                    TerminalId = account.TerminalId
                };
@@ -115,7 +115,7 @@ internal static class SepehrHelper
             }
             else if (responseCode != 0)
             {
-                message = respMsgParam.Exists ? (string)respMsgParam.Value : messages.PaymentFailed;
+                message = respMsgParam.Exists ? respMsgParam.Value.ToString() : messages.PaymentFailed;
 
                 isSucceed = false;
             }
@@ -149,7 +149,7 @@ internal static class SepehrHelper
                 }
                 else
                 {
-                    traceNumber = long.Parse(traceNumberParam.Value, CultureInfo.InvariantCulture);
+                    traceNumber = long.Parse(traceNumberParam.Value.ToString(), CultureInfo.InvariantCulture);
                 }
 
                 if (!rrnParam.Exists)
@@ -159,7 +159,7 @@ internal static class SepehrHelper
                 }
                 else
                 {
-                    rrn = long.Parse(rrnParam.Value, CultureInfo.InvariantCulture);
+                    rrn = long.Parse(rrnParam.Value.ToString(), CultureInfo.InvariantCulture);
                 }
 
                 if (!digitalReceiptParam.Exists)
@@ -212,6 +212,7 @@ internal static class SepehrHelper
 
         PaymentVerifyResultStatus status;
         string message;
+        var isAlreadyVerifiedAtBank = false;
 
         switch (result.Status.ToLowerInvariant())
         {
@@ -244,7 +245,10 @@ internal static class SepehrHelper
                 break;
 
             case "duplicate":
-                status = PaymentVerifyResultStatus.AlreadyVerified;
+                // Verified before (e.g. the first response was lost). The digital receipt comes from the browser, so
+                // Parbad records the payment as paid only if the receipt has not settled another payment.
+                status = PaymentVerifyResultStatus.Failed;
+                isAlreadyVerifiedAtBank = true;
                 message = !result.Message.IsNullOrWhiteSpace() ? result.Message : messagesOptions.PaymentIsAlreadyProcessedBefore;
                 break;
 
@@ -258,7 +262,10 @@ internal static class SepehrHelper
                                  {
                                      Status = status,
                                      Message = message,
-                                     TransactionCode = callbackResult.Rrn.ToString()
+                                     // The RRN is shown to the customer; the bank verifies the digital receipt.
+                                     TransactionCode = callbackResult.Rrn.ToString(),
+                                     BankReference = callbackResult.DigitalReceipt,
+                                     IsAlreadyVerifiedAtBank = isAlreadyVerifiedAtBank
                                  };
 
         var verificationAdditionalData = new SepehrGatewayVerificationAdditionalData
@@ -284,7 +291,7 @@ internal static class SepehrHelper
             throw new Exception("No verification record found in transactions.");
         }
 
-        var additionalData = JsonConvert.DeserializeObject<IDictionary<string, string>>(verificationRecord.AdditionalData);
+        var additionalData = JsonConvert.DeserializeObject<IDictionary<string, string>>(verificationRecord.AdditionalData ?? "{}");
 
         if (additionalData == null || !additionalData.ContainsKey(VerificationAdditionalDataKey))
         {

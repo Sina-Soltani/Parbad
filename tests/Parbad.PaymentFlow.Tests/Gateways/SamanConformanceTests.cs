@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Globalization;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Parbad.Builder;
 using Parbad.Gateway.Saman;
 using Parbad.GatewayBuilders;
@@ -13,7 +13,7 @@ namespace Parbad.PaymentFlow.Tests.Gateways;
 /// <summary>
 /// Saman (SEP) token API: token request → POST to the payment page → POST callback → VerifyTransaction / ReverseTransaction.
 /// </summary>
-[TestClass]
+[TestFixture]
 public class SamanConformanceTests : GatewayConformanceTests
 {
     private const string TerminalId = "12345678";

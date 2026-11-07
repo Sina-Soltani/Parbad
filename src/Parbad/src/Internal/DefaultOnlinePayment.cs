@@ -11,6 +11,7 @@ using Parbad.PaymentTokenProviders;
 using Parbad.Storage.Abstractions;
 using Parbad.Storage.Abstractions.Models;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -26,7 +27,7 @@ public class DefaultOnlinePayment : IOnlinePayment
     // CompletePaymentAsync keeps the first result.
     private static readonly KeyedAsyncLock<long> PaymentLocks = new KeyedAsyncLock<long>();
 
-    private readonly IStorageManager _storageManager;
+    private readonly IStorage _storage;
     private readonly IPaymentTokenProvider _tokenProvider;
     private readonly IGatewayProvider _gatewayProvider;
     private readonly ParbadOptions _options;
@@ -37,18 +38,17 @@ public class DefaultOnlinePayment : IOnlinePayment
     /// </summary>
     public DefaultOnlinePayment(
         IServiceProvider services,
-        IStorageManager storageManager,
+        IStorage storage,
         IPaymentTokenProvider tokenProvider,
         IGatewayProvider gatewayProvider,
         IOptions<ParbadOptions> options,
         IParbadLogger<DefaultOnlinePayment> logger)
     {
         Services = services;
-        _storageManager = storageManager;
+        _storage = storage;
         _tokenProvider = tokenProvider;
         _options = options.Value;
         _logger = logger;
-        _storageManager = storageManager;
         _gatewayProvider = gatewayProvider;
     }
 
@@ -62,7 +62,7 @@ public class DefaultOnlinePayment : IOnlinePayment
 
         _logger.LogInformation(LoggingEvents.RequestPayment, "Requesting the invoice {TrackingNumber} is started", invoice.TrackingNumber);
 
-        if (await _storageManager.DoesPaymentExistAsync(invoice.TrackingNumber, cancellationToken).ConfigureAwaitFalse())
+        if (await _storage.DoesPaymentExistAsync(invoice.TrackingNumber, cancellationToken).ConfigureAwaitFalse())
         {
             _logger.LogInformation(LoggingEvents.RequestPayment, _options.Messages.DuplicateTrackingNumber);
 
@@ -85,7 +85,7 @@ public class DefaultOnlinePayment : IOnlinePayment
         }
 
         //  Check the created payment token
-        if (await _storageManager.DoesPaymentExistAsync(paymentToken, cancellationToken).ConfigureAwaitFalse())
+        if (await _storage.DoesPaymentExistAsync(paymentToken, cancellationToken).ConfigureAwaitFalse())
         {
             var message = $"Requesting the invoice {invoice.TrackingNumber} is finished. The payment token \"{paymentToken}\" already exists.";
 
@@ -103,41 +103,51 @@ public class DefaultOnlinePayment : IOnlinePayment
                          {
                              TrackingNumber = invoice.TrackingNumber,
                              Amount = invoice.Amount,
-                             IsCompleted = false,
-                             IsPaid = false,
+                             Status = PaymentStatus.Requested,
                              Token = paymentToken,
                              GatewayName = gateway.GetRoutingGatewayName()
                          };
 
-        await _storageManager.CreatePaymentAsync(newPayment, cancellationToken).ConfigureAwaitFalse();
+        await _storage.CreatePaymentAsync(newPayment, cancellationToken).ConfigureAwaitFalse();
 
-        PaymentRequestResult requestResult;
+        IPaymentRequestResult gatewayResult;
 
         try
         {
-            requestResult = await gateway
+            gatewayResult = await gateway
                                  .RequestAsync(invoice, cancellationToken)
-                                 .ConfigureAwaitFalse() as PaymentRequestResult;
+                                 .ConfigureAwaitFalse();
 
-            if (requestResult == null) throw new Exception($"Requesting the invoice {invoice.TrackingNumber} is finished. The gateway {gateway.GetCompleteGatewayName()} returns null instead of a result.");
+            if (gatewayResult == null) throw new Exception($"Requesting the invoice {invoice.TrackingNumber} is finished. The gateway {gateway.GetCompleteGatewayName()} returns null instead of a result.");
         }
         catch (Exception exception)
         {
             _logger.LogError(exception, exception.Message);
 
-            newPayment.IsCompleted = true;
-            newPayment.IsPaid = false;
-
-            requestResult = PaymentRequestResult.Failed(exception.Message);
+            gatewayResult = PaymentRequestResult.Failed(exception.Message);
         }
 
-        requestResult.TrackingNumber = invoice.TrackingNumber;
-        requestResult.Amount = invoice.Amount;
-        requestResult.GatewayName = gateway.GetRoutingGatewayName();
+        // Parbad's own result, so a gateway may return any implementation of the interface.
+        var requestResult = new PaymentRequestResult
+                            {
+                                TrackingNumber = invoice.TrackingNumber,
+                                Amount = invoice.Amount,
+                                GatewayName = gateway.GetRoutingGatewayName(),
+                                GatewayAccountName = gatewayResult.GatewayAccountName,
+                                Status = gatewayResult.Status,
+                                GatewayTransporter = gatewayResult.GatewayTransporter ?? new NullGatewayTransporter(),
+                                GatewayResponseCode = gatewayResult.GatewayResponseCode,
+                                Message = gatewayResult.Message,
+                                AdditionalData = gatewayResult.AdditionalData ?? new Dictionary<string, object>(),
+                                DatabaseAdditionalData = gatewayResult.DatabaseAdditionalData ?? new Dictionary<string, string>()
+                            };
+
+        // A rejected request is final: the user never reaches the bank, so there is nothing to verify.
+        if (!requestResult.IsSucceed) newPayment.Status = PaymentStatus.Failed;
 
         newPayment.GatewayAccountName = requestResult.GatewayAccountName;
 
-        await _storageManager.UpdatePaymentAsync(newPayment, cancellationToken).ConfigureAwaitFalse();
+        await _storage.UpdatePaymentAsync(newPayment, cancellationToken).ConfigureAwaitFalse();
 
         var newTransaction = new Transaction
                              {
@@ -149,7 +159,7 @@ public class DefaultOnlinePayment : IOnlinePayment
                                  PaymentId = newPayment.Id
                              };
 
-        await _storageManager.CreateTransactionAsync(newTransaction, cancellationToken).ConfigureAwaitFalse();
+        await _storage.CreateTransactionAsync(newTransaction, cancellationToken).ConfigureAwaitFalse();
 
         _logger.LogInformation(LoggingEvents.RequestPayment, "Requesting the invoice {TrackingNumber} is finished", invoice.TrackingNumber);
 
@@ -170,7 +180,7 @@ public class DefaultOnlinePayment : IOnlinePayment
             throw new PaymentTokenProviderException("No Token is received.");
         }
 
-        var payment = await _storageManager.GetPaymentByTokenAsync(paymentToken, cancellationToken).ConfigureAwaitFalse();
+        var payment = await _storage.GetPaymentByTokenAsync(paymentToken!, cancellationToken).ConfigureAwaitFalse();
 
         if (payment == null)
         {
@@ -189,7 +199,7 @@ public class DefaultOnlinePayment : IOnlinePayment
     {
         _logger.LogInformation(LoggingEvents.FetchPayment, "Fetching from database for invoice number {TrackingNumber} is started", trackingNumber);
 
-        var payment = await _storageManager.GetPaymentByTrackingNumberAsync(trackingNumber, cancellationToken).ConfigureAwaitFalse();
+        var payment = await _storage.GetPaymentByTrackingNumberAsync(trackingNumber, cancellationToken).ConfigureAwaitFalse();
 
         if (payment == null)
         {
@@ -212,7 +222,7 @@ public class DefaultOnlinePayment : IOnlinePayment
 
         using var paymentLock = await PaymentLocks.AcquireAsync(trackingNumber, cancellationToken).ConfigureAwaitFalse();
 
-        var payment = await _storageManager
+        var payment = await _storage
                            .GetPaymentByTrackingNumberAsync(trackingNumber, cancellationToken)
                            .ConfigureAwaitFalse();
 
@@ -245,16 +255,16 @@ public class DefaultOnlinePayment : IOnlinePayment
 
         var gateway = _gatewayProvider.Provide(payment.GatewayName);
 
-        var transactions = await _storageManager.GetTransactionsAsync(payment, cancellationToken).ConfigureAwaitFalse();
+        var transactions = await _storage.GetTransactionsAsync(payment, cancellationToken).ConfigureAwaitFalse();
         var invoiceContext = new InvoiceContext(payment, transactions);
 
-        PaymentVerifyResult verifyResult;
+        IPaymentVerifyResult gatewayResult;
 
         try
         {
-            verifyResult = await gateway
-                                .VerifyAsync(invoiceContext, cancellationToken)
-                                .ConfigureAwaitFalse() as PaymentVerifyResult;
+            gatewayResult = await gateway
+                                 .VerifyAsync(invoiceContext, cancellationToken)
+                                 .ConfigureAwaitFalse();
         }
         catch (Exception exception)
         {
@@ -262,25 +272,46 @@ public class DefaultOnlinePayment : IOnlinePayment
             throw;
         }
 
-        if (verifyResult == null) throw new Exception($"The {gateway.GetCompleteGatewayName()} returns null instead of a result.");
+        if (gatewayResult == null) throw new Exception($"The {gateway.GetCompleteGatewayName()} returns null instead of a result.");
 
-        verifyResult.TrackingNumber = payment.TrackingNumber;
-        verifyResult.Amount = payment.Amount;
-        verifyResult.GatewayName = payment.GatewayName;
-        verifyResult.GatewayAccountName = payment.GatewayAccountName;
+        // The gateway reports what the bank verified; a gateway that does not name the bank reference is taken to
+        // have verified its transaction code.
+        var reportedBankReference = gatewayResult.BankReference.IsNullOrEmpty() ? gatewayResult.TransactionCode : gatewayResult.BankReference;
 
-        await EnforceVerificationRulesAsync(payment, verifyResult, cancellationToken).ConfigureAwaitFalse();
+        var (resultStatus, resultMessage) = await DecideAsync(payment, gatewayResult, reportedBankReference, cancellationToken).ConfigureAwaitFalse();
 
-        payment.IsCompleted = true;
-        payment.IsPaid = verifyResult.IsSucceed;
-        payment.TransactionCode = verifyResult.TransactionCode;
+        // Parbad's own result, so a gateway may return any implementation of the interface.
+        var verifyResult = new PaymentVerifyResult
+                           {
+                               TrackingNumber = payment.TrackingNumber,
+                               Amount = payment.Amount,
+                               GatewayName = payment.GatewayName,
+                               GatewayAccountName = payment.GatewayAccountName,
+                               Status = resultStatus,
+                               Message = resultMessage,
+                               TransactionCode = gatewayResult.TransactionCode,
+                               BankReference = reportedBankReference,
+                               BankReportedAmount = gatewayResult.BankReportedAmount,
+                               BankReportedOrderId = gatewayResult.BankReportedOrderId,
+                               IsAlreadyVerifiedAtBank = gatewayResult.IsAlreadyVerifiedAtBank,
+                               GatewayResponseCode = gatewayResult.GatewayResponseCode,
+                               AdditionalData = gatewayResult.AdditionalData ?? new Dictionary<string, object>(),
+                               DatabaseAdditionalData = gatewayResult.DatabaseAdditionalData ?? new Dictionary<string, string>()
+                           };
 
-        if (!await CompletePaymentAsync(payment, cancellationToken).ConfigureAwaitFalse())
+        var status = verifyResult.IsSucceed ? PaymentStatus.Paid : PaymentStatus.Failed;
+
+        // Only a paid payment claims its bank reference: one bank reference settles only one payment.
+        var bankReference = verifyResult.IsSucceed && !reportedBankReference.IsNullOrEmpty() ? reportedBankReference : null;
+
+        if (!await _storage
+                  .TryCompletePaymentAsync(payment.Id, status, verifyResult.TransactionCode, bankReference, cancellationToken)
+                  .ConfigureAwaitFalse())
         {
             // Another verification or a cancellation completed the payment first, e.g. on another server.
-            var storedPayment = await _storageManager
+            var storedPayment = await _storage
                                      .GetPaymentByTrackingNumberAsync(trackingNumber, cancellationToken)
-                                     .ConfigureAwaitFalse();
+                                     .ConfigureAwaitFalse() ?? throw new InvoiceNotFoundException(trackingNumber);
 
             _logger.LogWarning(LoggingEvents.VerifyPayment,
                                "Verifying the invoice {TrackingNumber}: another operation completed the payment first (paid: {StoredIsPaid}). This verification's result ({Status}) is not stored",
@@ -310,7 +341,7 @@ public class DefaultOnlinePayment : IOnlinePayment
                               PaymentId = payment.Id
                           };
 
-        await _storageManager.CreateTransactionAsync(transaction, cancellationToken).ConfigureAwaitFalse();
+        await _storage.CreateTransactionAsync(transaction, cancellationToken).ConfigureAwaitFalse();
 
         _logger.LogInformation(LoggingEvents.VerifyPayment, "Verifying the invoice {TrackingNumber} is finished", trackingNumber);
 
@@ -318,13 +349,13 @@ public class DefaultOnlinePayment : IOnlinePayment
     }
 
     /// <inheritdoc />
-    public virtual async Task<IPaymentCancelResult> CancelAsync(long trackingNumber, string cancellationReason = null, CancellationToken cancellationToken = default)
+    public virtual async Task<IPaymentCancelResult> CancelAsync(long trackingNumber, string? cancellationReason = null, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation(LoggingEvents.CancelPayment, "Canceling the invoice {TrackingNumber} is started", trackingNumber);
 
         using var paymentLock = await PaymentLocks.AcquireAsync(trackingNumber, cancellationToken).ConfigureAwaitFalse();
 
-        var payment = await _storageManager
+        var payment = await _storage
                            .GetPaymentByTrackingNumberAsync(trackingNumber, cancellationToken)
                            .ConfigureAwaitFalse();
 
@@ -354,10 +385,9 @@ public class DefaultOnlinePayment : IOnlinePayment
 
         _logger.LogInformation(LoggingEvents.CancelPayment, message);
 
-        payment.IsCompleted = true;
-        payment.IsPaid = false;
-
-        if (!await CompletePaymentAsync(payment, cancellationToken).ConfigureAwaitFalse())
+        if (!await _storage
+                  .TryCompletePaymentAsync(payment.Id, PaymentStatus.Cancelled, payment.TransactionCode, bankReference: null, cancellationToken)
+                  .ConfigureAwaitFalse())
         {
             // A verification completed the payment first, e.g. on another server.
             return new PaymentCancelResult
@@ -380,7 +410,7 @@ public class DefaultOnlinePayment : IOnlinePayment
                                  PaymentId = payment.Id
                              };
 
-        await _storageManager.CreateTransactionAsync(newTransaction, cancellationToken).ConfigureAwaitFalse();
+        await _storage.CreateTransactionAsync(newTransaction, cancellationToken).ConfigureAwaitFalse();
 
         _logger.LogInformation(LoggingEvents.CancelPayment, "Canceling the invoice {TrackingNumber} is finished", trackingNumber);
 
@@ -402,7 +432,11 @@ public class DefaultOnlinePayment : IOnlinePayment
 
         _logger.LogInformation(LoggingEvents.RefundPayment, "Refunding the invoice {TrackingNumber} is started", invoice.TrackingNumber);
 
-        var payment = await _storageManager.GetPaymentByTrackingNumberAsync(invoice.TrackingNumber, cancellationToken).ConfigureAwaitFalse();
+        // Refunds of one payment run one at a time within this process, so two of them cannot both pass the check of
+        // the remaining amount.
+        using var paymentLock = await PaymentLocks.AcquireAsync(invoice.TrackingNumber, cancellationToken).ConfigureAwaitFalse();
+
+        var payment = await _storage.GetPaymentByTrackingNumberAsync(invoice.TrackingNumber, cancellationToken).ConfigureAwaitFalse();
 
         if (payment == null)
         {
@@ -434,11 +468,13 @@ public class DefaultOnlinePayment : IOnlinePayment
             return PaymentRefundResult.Failed($"{_options.Messages.OnlyPaidPaymentCanBeRefunded} Tracking number: {invoice.TrackingNumber}.");
         }
 
-        var transactions = await _storageManager.GetTransactionsAsync(payment, cancellationToken).ConfigureAwaitFalse();
+        var transactions = await _storage.GetTransactionsAsync(payment, cancellationToken).ConfigureAwaitFalse();
 
-        var alreadyRefunded = transactions
-                             .Where(transaction => transaction.Type == TransactionType.Refund && transaction.IsSucceed)
-                             .Sum(transaction => transaction.Amount);
+        // The refund transactions also count, for payments refunded before Parbad 4.0 kept RefundedAmount.
+        var alreadyRefunded = Math.Max(payment.RefundedAmount,
+                                       transactions
+                                          .Where(transaction => transaction.Type == TransactionType.Refund && transaction.IsSucceed)
+                                          .Sum(transaction => transaction.Amount));
 
         var remainingAmount = payment.Amount - alreadyRefunded;
 
@@ -466,13 +502,13 @@ public class DefaultOnlinePayment : IOnlinePayment
 
         var verifyContext = new InvoiceContext(payment, transactions);
 
-        PaymentRefundResult refundResult;
+        IPaymentRefundResult gatewayResult;
 
         try
         {
-            refundResult = await gateway
-                                .RefundAsync(verifyContext, amountToRefund, cancellationToken)
-                                .ConfigureAwaitFalse() as PaymentRefundResult;
+            gatewayResult = await gateway
+                                 .RefundAsync(verifyContext, amountToRefund, cancellationToken)
+                                 .ConfigureAwaitFalse();
         }
         catch (Exception exception)
         {
@@ -480,12 +516,21 @@ public class DefaultOnlinePayment : IOnlinePayment
             throw;
         }
 
-        if (refundResult == null) throw new Exception($"Gateway {gateway.GetCompleteGatewayName()} returns null instead of a result.");
+        if (gatewayResult == null) throw new Exception($"Gateway {gateway.GetCompleteGatewayName()} returns null instead of a result.");
 
-        refundResult.TrackingNumber = payment.TrackingNumber;
-        refundResult.Amount = amountToRefund;
-        refundResult.GatewayName = payment.GatewayName;
-        refundResult.GatewayAccountName = payment.GatewayAccountName;
+        // Parbad's own result, so a gateway may return any implementation of the interface.
+        var refundResult = new PaymentRefundResult
+                           {
+                               TrackingNumber = payment.TrackingNumber,
+                               Amount = amountToRefund,
+                               GatewayName = payment.GatewayName,
+                               GatewayAccountName = payment.GatewayAccountName,
+                               Status = gatewayResult.Status,
+                               Message = gatewayResult.Message,
+                               GatewayResponseCode = gatewayResult.GatewayResponseCode,
+                               AdditionalData = gatewayResult.AdditionalData ?? new Dictionary<string, object>(),
+                               DatabaseAdditionalData = gatewayResult.DatabaseAdditionalData ?? new Dictionary<string, string>()
+                           };
 
         var newtTransaction = new Transaction
                               {
@@ -497,7 +542,15 @@ public class DefaultOnlinePayment : IOnlinePayment
                                   PaymentId = payment.Id
                               };
 
-        await _storageManager.CreateTransactionAsync(newtTransaction, cancellationToken).ConfigureAwaitFalse();
+        await _storage.CreateTransactionAsync(newtTransaction, cancellationToken).ConfigureAwaitFalse();
+
+        if (refundResult.IsSucceed)
+        {
+            payment.RefundedAmount = alreadyRefunded + amountToRefund;
+            payment.Status = payment.RefundedAmount >= payment.Amount ? PaymentStatus.Refunded : PaymentStatus.PartiallyRefunded;
+
+            await _storage.UpdatePaymentAsync(payment, cancellationToken).ConfigureAwaitFalse();
+        }
 
         _logger.LogInformation(LoggingEvents.RefundPayment, "Refunding the invoice {TrackingNumber} is finished", invoice.TrackingNumber);
 
@@ -505,61 +558,50 @@ public class DefaultOnlinePayment : IOnlinePayment
     }
 
     /// <summary>
-    /// Checks that every gateway gets for free, so a gateway cannot forget them: the bank-reported amount and
-    /// order id must match the invoice, and one bank transaction can settle only one payment. An "already
-    /// verified" answer that the gateway could not tie to this invoice is accepted only after the last check.
+    /// Decides the result of a verification from what the gateway reported, with checks that every gateway gets for
+    /// free, so a gateway cannot forget them: the bank-reported amount and order id must match the invoice, and one
+    /// bank reference can settle only one payment. An "already verified" answer that the gateway could not tie to this
+    /// invoice is accepted only after the last check.
     /// </summary>
-    private async Task EnforceVerificationRulesAsync(Payment payment, PaymentVerifyResult verifyResult, CancellationToken cancellationToken)
+    private async Task<(PaymentVerifyResultStatus Status, string? Message)> DecideAsync(Payment payment,
+                                                                                      IPaymentVerifyResult gatewayResult,
+                                                                                      string? bankReference,
+                                                                                      CancellationToken cancellationToken)
     {
-        if (!verifyResult.IsSucceed && !verifyResult.IsAlreadyVerifiedAtBank) return;
+        if (!gatewayResult.IsSucceed && !gatewayResult.IsAlreadyVerifiedAtBank) return (gatewayResult.Status, gatewayResult.Message);
 
-        string failure = null;
+        string? failure = null;
 
-        if (verifyResult.BankReportedAmount.HasValue && verifyResult.BankReportedAmount.Value.Value != payment.Amount)
+        if (gatewayResult.BankReportedAmount.HasValue && gatewayResult.BankReportedAmount.Value.Value != payment.Amount)
         {
             failure = _options.Messages.BankReportedDifferentAmount;
         }
-        else if (verifyResult.BankReportedOrderId != null &&
-                 verifyResult.BankReportedOrderId != payment.TrackingNumber.ToString(CultureInfo.InvariantCulture))
+        else if (gatewayResult.BankReportedOrderId != null &&
+                 gatewayResult.BankReportedOrderId != payment.TrackingNumber.ToString(CultureInfo.InvariantCulture))
         {
             failure = _options.Messages.BankReportedDifferentInvoice;
         }
-        else if (!verifyResult.TransactionCode.IsNullOrEmpty())
+        else if (!bankReference.IsNullOrEmpty())
         {
-            var lookup = _storageManager as IPaidPaymentLookup ?? Services.GetService<IStorage>() as IPaidPaymentLookup;
+            var otherPayment = await _storage
+                                    .FindPaidPaymentByBankReferenceAsync(payment.GatewayName,
+                                                                         bankReference,
+                                                                         payment.TrackingNumber,
+                                                                         cancellationToken)
+                                    .ConfigureAwaitFalse();
 
-            if (lookup == null)
+            if (otherPayment != null)
             {
                 _logger.LogWarning(LoggingEvents.VerifyPayment,
-                                   "Verifying the invoice {TrackingNumber}: the storage does not implement {Lookup}, so it is not checked whether the transaction code {TransactionCode} already settled another payment",
+                                   "Verifying the invoice {TrackingNumber}: the bank reference {BankReference} already settled the invoice {OtherTrackingNumber}",
                                    payment.TrackingNumber,
-                                   nameof(IPaidPaymentLookup),
-                                   verifyResult.TransactionCode);
+                                   bankReference,
+                                   otherPayment.TrackingNumber);
 
-                if (verifyResult.IsAlreadyVerifiedAtBank) failure = _options.Messages.AlreadyVerifiedPaymentCannotBeConfirmed;
-            }
-            else
-            {
-                var otherPayment = await lookup
-                                        .FindPaidPaymentByTransactionCodeAsync(payment.GatewayName,
-                                                                               verifyResult.TransactionCode,
-                                                                               payment.TrackingNumber,
-                                                                               cancellationToken)
-                                        .ConfigureAwaitFalse();
-
-                if (otherPayment != null)
-                {
-                    _logger.LogWarning(LoggingEvents.VerifyPayment,
-                                       "Verifying the invoice {TrackingNumber}: the transaction code {TransactionCode} already settled the invoice {OtherTrackingNumber}",
-                                       payment.TrackingNumber,
-                                       verifyResult.TransactionCode,
-                                       otherPayment.TrackingNumber);
-
-                    failure = _options.Messages.TransactionCodeAlreadyUsed;
-                }
+                failure = _options.Messages.TransactionCodeAlreadyUsed;
             }
         }
-        else if (verifyResult.IsAlreadyVerifiedAtBank)
+        else if (gatewayResult.IsAlreadyVerifiedAtBank)
         {
             failure = _options.Messages.AlreadyVerifiedPaymentCannotBeConfirmed;
         }
@@ -571,78 +613,43 @@ public class DefaultOnlinePayment : IOnlinePayment
                                payment.TrackingNumber,
                                failure);
 
-            verifyResult.Status = PaymentVerifyResultStatus.Failed;
-            verifyResult.Message = failure;
-
-            return;
+            return (PaymentVerifyResultStatus.Failed, failure);
         }
 
-        if (verifyResult.IsAlreadyVerifiedAtBank)
-        {
-            verifyResult.Status = PaymentVerifyResultStatus.Succeed;
-            verifyResult.Message = _options.Messages.PaymentSucceed;
-        }
-    }
-
-    /// <summary>
-    /// Stores the completion of <paramref name="payment"/> (<see cref="Payment.IsCompleted"/>, <see cref="Payment.IsPaid"/>
-    /// and <see cref="Payment.TransactionCode"/>) unless another operation completed it first in a way that must be
-    /// kept: a paid payment is never changed, and an unpaid result never replaces another result.
-    /// </summary>
-    /// <returns>False if the payment was completed by another operation and nothing was stored.</returns>
-    private async Task<bool> CompletePaymentAsync(Payment payment, CancellationToken cancellationToken)
-    {
-        var completion = _storageManager as IPaymentCompletion ?? Services.GetService<IStorage>() as IPaymentCompletion;
-
-        if (completion == null)
-        {
-            _logger.LogWarning(LoggingEvents.VerifyPayment,
-                               "Completing the invoice {TrackingNumber}: the storage does not implement {Completion}, so a concurrent operation on another server could overwrite this result",
-                               payment.TrackingNumber,
-                               nameof(IPaymentCompletion));
-
-            await _storageManager.UpdatePaymentAsync(payment, cancellationToken).ConfigureAwaitFalse();
-
-            return true;
-        }
-
-        return await completion
-                    .TryCompletePaymentAsync(payment.Id, payment.IsPaid, payment.TransactionCode, cancellationToken)
-                    .ConfigureAwaitFalse();
+        return gatewayResult.IsAlreadyVerifiedAtBank
+            ? (PaymentVerifyResultStatus.Succeed, _options.Messages.PaymentSucceed)
+            : (gatewayResult.Status, gatewayResult.Message);
     }
 
     private async Task<IPaymentFetchResult> FetchAsync(Payment payment, CancellationToken cancellationToken)
     {
-        var fetchResult = new PaymentFetchResult
-                          {
-                              TrackingNumber = payment.TrackingNumber,
-                              Amount = payment.Amount,
-                              GatewayName = payment.GatewayName,
-                              GatewayAccountName = payment.GatewayAccountName,
-                              IsAlreadyVerified = payment.IsPaid
-                          };
-
         if (payment.IsCompleted)
         {
-            fetchResult.Status = PaymentFetchResultStatus.AlreadyProcessed;
-            fetchResult.Message = _options.Messages.PaymentIsAlreadyProcessedBefore;
-            fetchResult.TransactionCode = payment.TransactionCode;
-
-            return fetchResult;
+            return new PaymentFetchResult
+                   {
+                       TrackingNumber = payment.TrackingNumber,
+                       Amount = payment.Amount,
+                       GatewayName = payment.GatewayName,
+                       GatewayAccountName = payment.GatewayAccountName,
+                       IsAlreadyVerified = payment.IsPaid,
+                       Status = PaymentFetchResultStatus.AlreadyProcessed,
+                       Message = _options.Messages.PaymentIsAlreadyProcessedBefore,
+                       TransactionCode = payment.TransactionCode
+                   };
         }
 
         var gateway = _gatewayProvider.Provide(payment.GatewayName);
 
-        var transactions = await _storageManager.GetTransactionsAsync(payment, cancellationToken).ConfigureAwaitFalse();
+        var transactions = await _storage.GetTransactionsAsync(payment, cancellationToken).ConfigureAwaitFalse();
         var invoiceContext = new InvoiceContext(payment, transactions);
 
-        PaymentFetchResult gatewayFetchResult;
+        IPaymentFetchResult gatewayFetchResult;
 
         try
         {
             gatewayFetchResult = await gateway
                                       .FetchAsync(invoiceContext, cancellationToken)
-                                      .ConfigureAwaitFalse() as PaymentFetchResult;
+                                      .ConfigureAwaitFalse();
         }
         catch (Exception exception)
         {
@@ -657,17 +664,18 @@ public class DefaultOnlinePayment : IOnlinePayment
 
         _logger.LogInformation(LoggingEvents.FetchPayment, "Fetching is finished");
 
-        fetchResult.Status = gatewayFetchResult.Status;
-
-        string message = null;
-        if (gatewayFetchResult.Status != PaymentFetchResultStatus.ReadyForVerifying)
-        {
-            message = gatewayFetchResult.Message ?? _options.Messages.PaymentFailed;
-        }
-        fetchResult.Message = message;
-
-        fetchResult.GatewayResponseCode = gatewayFetchResult.GatewayResponseCode;
-
-        return fetchResult;
+        return new PaymentFetchResult
+               {
+                   TrackingNumber = payment.TrackingNumber,
+                   Amount = payment.Amount,
+                   GatewayName = payment.GatewayName,
+                   GatewayAccountName = payment.GatewayAccountName,
+                   IsAlreadyVerified = payment.IsPaid,
+                   Status = gatewayFetchResult.Status,
+                   Message = gatewayFetchResult.Status == PaymentFetchResultStatus.ReadyForVerifying
+                       ? null
+                       : gatewayFetchResult.Message ?? _options.Messages.PaymentFailed,
+                   GatewayResponseCode = gatewayFetchResult.GatewayResponseCode
+               };
     }
 }

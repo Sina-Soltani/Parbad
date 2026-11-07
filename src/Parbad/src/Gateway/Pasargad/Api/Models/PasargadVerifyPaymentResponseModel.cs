@@ -5,9 +5,9 @@ namespace Parbad.Gateway.Pasargad.Api.Models;
 
 public class PasargadVerifyPaymentResponseModel
 {
-    public string ResultMsg { get; set; }
+    public string? ResultMsg { get; set; }
 
     public int ResultCode { get; set; }
 
-    public string Data { get; set; }
+    public string? Data { get; set; }
 }

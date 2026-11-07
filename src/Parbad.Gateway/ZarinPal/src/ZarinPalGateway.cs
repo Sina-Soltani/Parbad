@@ -1,8 +1,11 @@
 ﻿// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
+using Parbad.Http;
 using System;
+using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,6 +13,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using Parbad.Abstraction;
 using Parbad.Exceptions;
@@ -68,7 +72,7 @@ public class ZarinPalGateway : GatewayBase<ZarinPalGatewayAccount>
             return PaymentRequestResult.Failed(response.ErrorMessage, account.Name, response.ErrorCode?.ToString());
         }
 
-        var result = ZarinPalHelper.CreateRequestResult(response.Data, _httpContextAccessor.HttpContext, account, _gatewayOptions, _messagesOptions);
+        var result = ZarinPalHelper.CreateRequestResult(response.Data!, _httpContextAccessor.GetRequiredHttpContext(), account, _gatewayOptions, _messagesOptions);
 
         return result;
     }
@@ -77,7 +81,7 @@ public class ZarinPalGateway : GatewayBase<ZarinPalGatewayAccount>
     {
         if (context == null) throw new ArgumentNullException(nameof(context));
 
-        var callbackResult = await ZarinPalHelper.CreateCallbackResultAsync(_httpContextAccessor.HttpContext.Request,
+        var callbackResult = await ZarinPalHelper.CreateCallbackResultAsync(_httpContextAccessor.GetRequiredHttpContext().Request,
                                                                             _messagesOptions,
                                                                             cancellationToken);
 
@@ -92,9 +96,7 @@ public class ZarinPalGateway : GatewayBase<ZarinPalGatewayAccount>
             result = PaymentFetchResult.Failed(callbackResult.Message);
         }
 
-        result.GatewayResponseCode = callbackResult.Status;
-
-        return result;
+        return result with { GatewayResponseCode = callbackResult.Status };
     }
 
     /// <inheritdoc />
@@ -102,7 +104,7 @@ public class ZarinPalGateway : GatewayBase<ZarinPalGatewayAccount>
     {
         if (context == null) throw new ArgumentNullException(nameof(context));
 
-        var callbackResult = await ZarinPalHelper.CreateCallbackResultAsync(_httpContextAccessor.HttpContext.Request,
+        var callbackResult = await ZarinPalHelper.CreateCallbackResultAsync(_httpContextAccessor.GetRequiredHttpContext().Request,
                                                                             _messagesOptions,
                                                                             cancellationToken);
 
@@ -132,7 +134,7 @@ public class ZarinPalGateway : GatewayBase<ZarinPalGatewayAccount>
                    };
         }
 
-        var result = ZarinPalHelper.CreateVerifyResult(response.Data, account, _messagesOptions);
+        var result = ZarinPalHelper.CreateVerifyResult(response.Data!, account, _messagesOptions);
 
         return result;
     }
@@ -142,39 +144,108 @@ public class ZarinPalGateway : GatewayBase<ZarinPalGatewayAccount>
     {
         if (context == null) throw new ArgumentNullException(nameof(context));
 
-        // The refund request Parbad sends to ZarinPal has no amount: it always refunds the whole payment.
-        if (amount.Value != context.Payment.Amount)
+        var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
+
+        if (account.IsSandbox)
         {
-            return PaymentRefundResult.Failed(_messagesOptions.PartialRefundNotSupported);
+            return RefundFailed(account, "ZarinPal has no sandbox for refunds.");
         }
 
-        var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
+        if (account.AuthorizationToken.IsNullOrWhiteSpace())
+        {
+            return RefundFailed(account, "A ZarinPal refund needs the account's AuthorizationToken: the access token of the ZarinPal panel.");
+        }
+
+        // The verify response's ref_id, which is the payment's transaction code.
+        var referenceId = context.Payment.TransactionCode;
+
+        if (referenceId.IsNullOrEmpty())
+        {
+            return RefundFailed(account, "The payment has no ZarinPal reference (ref_id) to refund.");
+        }
 
         var authority = ZarinPalHelper.GetAuthorityFromAdditionalData(context);
 
-        var refundModel = ZarinPalHelper.CreateRefundModel(authority, account);
+        // 1. The terminal of the account: Terminals.key is the merchant id.
+        var terminals = await SendGraphQlAsync(account, ZarinPalGraphQl.TerminalsQuery, null, cancellationToken);
 
-        var apiUrl = ZarinPalHelper.GetApiRefundUrl(account.IsSandbox, _gatewayOptions);
+        if (terminals.Error != null) return RefundFailed(account, terminals.Error);
 
-        var responseMessage = await PostAsJson(_httpClient, apiUrl, refundModel);
+        var terminalId = (terminals.Data!["Terminals"] as JArray)?
+                         .OfType<JObject>()
+                         .FirstOrDefault(terminal => string.Equals((string?)terminal["key"], account.MerchantId, StringComparison.OrdinalIgnoreCase))?["id"]?
+                         .ToString();
 
-        var response = await ReadAsync<ZarinPalRefundResultModelData>(responseMessage);
-
-        if (response.IsError)
+        if (terminalId == null)
         {
-            return new PaymentRefundResult
-                   {
-                       Status = PaymentRefundResultStatus.Failed,
-                       GatewayAccountName = account.Name,
-                       GatewayResponseCode = response.ErrorCode?.ToString(),
-                       Message = response.ErrorMessage
-                   };
+            return RefundFailed(account, "The access token has no ZarinPal terminal with the account's merchant id.");
         }
 
-        var result = ZarinPalHelper.CreateRefundResult(response.Data, account, _messagesOptions);
+        // 2. The payment ("session") with this ref_id, and this invoice's authority.
+        var sessions = await SendGraphQlAsync(account,
+                                              ZarinPalGraphQl.SessionsQuery,
+                                              new { terminal_id = terminalId, reference_id = referenceId },
+                                              cancellationToken);
 
-        return result;
+        if (sessions.Error != null) return RefundFailed(account, sessions.Error);
+
+        var sessionId = (sessions.Data!["Session"] as JArray)?
+                        .OfType<JObject>()
+                        .FirstOrDefault(session => session["authority"] == null || (string?)session["authority"] == authority)?["id"]?
+                        .ToString();
+
+        if (sessionId == null)
+        {
+            return RefundFailed(account, $"ZarinPal has no payment with the reference {referenceId} and this invoice's authority.");
+        }
+
+        // 3. The refund. Its amount may be a part of the payment.
+        var refund = await SendGraphQlAsync(account,
+                                            ZarinPalGraphQl.AddRefundMutation,
+                                            new
+                                            {
+                                                session_id = sessionId,
+                                                amount = (long)amount,
+                                                description = $"Refund of invoice {context.Payment.TrackingNumber}",
+                                                method = _gatewayOptions.RefundMethod == ZarinPalRefundMethod.Card ? "CARD" : "PAYA",
+                                                reason = ToGraphQlName(_gatewayOptions.RefundReason)
+                                            },
+                                            cancellationToken);
+
+        if (refund.Error != null) return RefundFailed(account, refund.Error);
+
+        var refundStatus = (string?)refund.Data!["resource"]?["timeline"]?["refund_status"];
+
+        if (string.Equals(refundStatus, "FAILED", StringComparison.OrdinalIgnoreCase))
+        {
+            return RefundFailed(account, _messagesOptions.PaymentFailed, refundStatus);
+        }
+
+        // PENDING: ZarinPal accepted the refund and pays it in the chosen method's cycle.
+        return new PaymentRefundResult
+               {
+                   Status = PaymentRefundResultStatus.Succeed,
+                   GatewayAccountName = account.Name,
+                   GatewayResponseCode = refundStatus,
+                   Message = string.Equals(refundStatus, "PENDING", StringComparison.OrdinalIgnoreCase)
+                       ? "ZarinPal accepted the refund; it is paid to the customer in the next settlement."
+                       : _messagesOptions.PaymentSucceed
+               };
     }
+
+    private Task<GraphQlResponse> SendGraphQlAsync(ZarinPalGatewayAccount account, string query, object? variables, CancellationToken cancellationToken) =>
+        ZarinPalGraphQl.SendAsync(_httpClient, _gatewayOptions.ApiGraphQlUrl, account.AuthorizationToken!, query, variables, cancellationToken);
+
+    private static PaymentRefundResult RefundFailed(ZarinPalGatewayAccount account, string message, string? gatewayResponseCode = null) =>
+        PaymentRefundResult.Failed(message, gatewayResponseCode) with { GatewayAccountName = account.Name };
+
+    private static string ToGraphQlName(ZarinPalRefundReason reason) => reason switch
+    {
+        ZarinPalRefundReason.DuplicateTransaction => "DUPLICATE_TRANSACTION",
+        ZarinPalRefundReason.SuspiciousTransaction => "SUSPICIOUS_TRANSACTION",
+        ZarinPalRefundReason.Other => "OTHER",
+        _ => "CUSTOMER_REQUEST"
+    };
 
     private static Task<HttpResponseMessage> PostAsJson(HttpClient httpClient, string url, object model)
     {
@@ -184,7 +255,15 @@ public class ZarinPalGateway : GatewayBase<ZarinPalGatewayAccount>
                                                    ContractResolver = new CamelCasePropertyNamesContractResolver()
                                                });
 
-        return httpClient.PostAsync(url, new StringContent(json, Encoding.UTF8, "application/json"));
+        var request = new HttpRequestMessage(HttpMethod.Post, url)
+                      {
+                          Content = new StringContent(json, Encoding.UTF8, "application/json")
+                      };
+
+        // Required by ZarinPal's documentation.
+        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+        return httpClient.SendAsync(request);
     }
 
     private async Task<ZarinPalResponse<TData>> ReadAsync<TData>(HttpResponseMessage responseMessage) where TData : class

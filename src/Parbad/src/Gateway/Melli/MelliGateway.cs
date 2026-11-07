@@ -1,6 +1,7 @@
 // Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
+using Parbad.Http;
 using System;
 using System.Net.Http;
 using System.Threading;
@@ -68,7 +69,7 @@ public class MelliGateway : GatewayBase<MelliGatewayAccount>
 
         var result = await PostJsonAsync<MelliApiRequestResult>(_gatewayOptions.ApiRequestUrl, data, cancellationToken).ConfigureAwaitFalse();
 
-        return MelliHelper.CreateRequestResult(result, _httpContextAccessor.HttpContext, account, _gatewayOptions, _messageOptions.Value);
+        return MelliHelper.CreateRequestResult(result, _httpContextAccessor.GetRequiredHttpContext(), account, _gatewayOptions, _messageOptions.Value);
     }
 
     /// <inheritdoc />
@@ -80,7 +81,7 @@ public class MelliGateway : GatewayBase<MelliGatewayAccount>
 
         var callbackResult = await MelliHelper.CreateCallbackResultAsync(
                                                                          context,
-                                                                         _httpContextAccessor.HttpContext.Request,
+                                                                         _httpContextAccessor.GetRequiredHttpContext().Request,
                                                                          account,
                                                                          _crypto,
                                                                          _messageOptions.Value,
@@ -103,7 +104,7 @@ public class MelliGateway : GatewayBase<MelliGatewayAccount>
 
         var callbackResult = await MelliHelper.CreateCallbackResultAsync(
                                                                          context,
-                                                                         _httpContextAccessor.HttpContext.Request,
+                                                                         _httpContextAccessor.GetRequiredHttpContext().Request,
                                                                          account,
                                                                          _crypto,
                                                                          _messageOptions.Value,
@@ -114,7 +115,7 @@ public class MelliGateway : GatewayBase<MelliGatewayAccount>
             return PaymentVerifyResult.Failed(callbackResult.Message);
         }
 
-        var result = await PostJsonAsync<MelliApiVerifyResult>(_gatewayOptions.ApiVerificationUrl, callbackResult.JsonDataToVerify, cancellationToken).ConfigureAwaitFalse();
+        var result = await PostJsonAsync<MelliApiVerifyResult>(_gatewayOptions.ApiVerificationUrl, callbackResult.JsonDataToVerify!, cancellationToken).ConfigureAwaitFalse();
 
         return MelliHelper.CreateVerifyResult(result, context, _messageOptions.Value);
     }

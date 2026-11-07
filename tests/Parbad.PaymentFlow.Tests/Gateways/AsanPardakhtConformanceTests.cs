@@ -5,7 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Parbad.Builder;
 using Parbad.Gateway.AsanPardakht;
 using Parbad.GatewayBuilders;
@@ -20,7 +20,7 @@ namespace Parbad.PaymentFlow.Tests.Gateways;
 /// the merchant to look → TranResult by the merchant's own invoice id → Verify → Settlement. Every call carries the
 /// usr/pwd headers; nothing is encrypted.
 /// </summary>
-[TestClass]
+[TestFixture]
 public class AsanPardakhtConformanceTests : GatewayConformanceTests
 {
     private const long MerchantConfigurationId = 4321;
@@ -144,18 +144,18 @@ public class AsanPardakhtConformanceTests : GatewayConformanceTests
     /// The REST API needs no encryption: the credentials go only into the usr/pwd headers, never into a
     /// body or a URL.
     /// </summary>
-    [TestMethod]
+    [Test]
     public async Task Credentials_are_sent_only_in_the_authentication_headers()
     {
         await PaidInvoiceIsVerifiedAsync();
 
-        Assert.AreEqual(0, _requestsWithoutHeaders.Count, $"Calls without the usr/pwd headers: {string.Join(", ", _requestsWithoutHeaders)}");
+        Assert.That(_requestsWithoutHeaders.Count, Is.EqualTo(0), $"Calls without the usr/pwd headers: {string.Join(", ", _requestsWithoutHeaders)}");
     }
 
     /// <summary>
     /// TranResult is looked up by the invoice id, and the RefId stored at request time must match what the bank reports.
     /// </summary>
-    [TestMethod]
+    [Test]
     public async Task Payment_reported_with_another_RefId_is_not_verified()
     {
         var transaction = await PayAsync(InvoiceTrackingNumber, InvoiceAmount);
@@ -165,15 +165,15 @@ public class AsanPardakhtConformanceTests : GatewayConformanceTests
         var outcome = await FetchAndVerifyAsync();
 
         outcome.AssertNoUnexpectedException();
-        Assert.IsFalse((await Host.GetPaymentAsync(InvoiceTrackingNumber)).IsPaid, outcome.Describe());
-        Assert.IsFalse(transaction.Verified, "The bank was asked to verify a payment whose RefId does not match the request.");
+        Assert.That((await Host.GetPaymentAsync(InvoiceTrackingNumber)).IsPaid, Is.False, outcome.Describe());
+        Assert.That(transaction.Verified, Is.False, "The bank was asked to verify a payment whose RefId does not match the request.");
     }
 
     /// <summary>
     /// After a successful Verify the money is captured; a failed settlement is done by Shaparak 12 hours later
     /// (guide v1.6, p.12), so the payment is paid.
     /// </summary>
-    [TestMethod]
+    [Test]
     public async Task Payment_is_recorded_as_paid_when_only_the_settlement_fails()
     {
         var transaction = await PayAsync(InvoiceTrackingNumber, InvoiceAmount);
@@ -183,8 +183,8 @@ public class AsanPardakhtConformanceTests : GatewayConformanceTests
         var outcome = await FetchAndVerifyAsync();
 
         outcome.AssertNoUnexpectedException();
-        Assert.IsTrue(transaction.Verified, "Test setup: the bank should have verified the payment.");
-        Assert.IsTrue((await Host.GetPaymentAsync(InvoiceTrackingNumber)).IsPaid, outcome.Describe());
+        Assert.That(transaction.Verified, Is.True, "Test setup: the bank should have verified the payment.");
+        Assert.That((await Host.GetPaymentAsync(InvoiceTrackingNumber)).IsPaid, Is.True, outcome.Describe());
     }
 
     private void Record(BankCall call)

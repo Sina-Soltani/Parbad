@@ -9,14 +9,14 @@ using RichardSzalay.MockHttp;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Parbad.Tests.Gateway.Melli;
 
-[TestClass]
+[TestFixture]
 public class MelliGatewayTests
 {
-    [TestMethod]
+    [Test]
     public async Task Requesting_And_Verifying_Work()
     {
         const long expectedTrackingNumber = 1;
@@ -91,8 +91,8 @@ public class MelliGatewayTests
                                                                                                   {
                                                                                                       var uri = new Uri(result.GatewayTransporter.Descriptor.Url);
                                                                                                       var queries = QueryHelpers.ParseQuery(uri.Query);
-                                                                                                      Assert.IsTrue(queries.ContainsKey("token"));
-                                                                                                      Assert.AreEqual("test", (string)queries["token"]);
+                                                                                                      Assert.That(queries.ContainsKey("token"), Is.True);
+                                                                                                      Assert.That((string)queries["token"], Is.EqualTo("test"));
                                                                                                   }),
                                                   result => GatewayOnResultHelper.OnFetchResult(result, expectedTrackingNumber, expectedAmount, MelliGateway.Name),
                                                   result => GatewayOnResultHelper.OnVerifyResult(result, expectedTrackingNumber, expectedAmount, MelliGateway.Name));

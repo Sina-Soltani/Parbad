@@ -16,9 +16,9 @@ public class TransactionEntity
 
     public bool IsSucceed { get; set; }
 
-    public string Message { get; set; }
+    public string? Message { get; set; }
 
-    public string AdditionalData { get; set; }
+    public string? AdditionalData { get; set; }
 
     public long PaymentId { get; set; }
 
@@ -26,5 +26,5 @@ public class TransactionEntity
 
     public DateTime? UpdatedOn { get; set; }
 
-    public PaymentEntity Payment { get; set; }
+    public PaymentEntity Payment { get; set; } = null!;
 }

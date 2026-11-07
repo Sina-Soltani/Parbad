@@ -5,9 +5,9 @@ namespace Parbad.Gateway.IdPay.Internal;
 
 internal class IdPayCallbackResult
 {
-    public string Id { get; set; }
+    public string? Id { get; set; }
 
     public bool IsSucceed { get; set; }
 
-    public string Message { get; set; }
+    public string? Message { get; set; }
 }

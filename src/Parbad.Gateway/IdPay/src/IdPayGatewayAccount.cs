@@ -7,7 +7,7 @@ namespace Parbad.Gateway.IdPay;
 
 public class IdPayGatewayAccount : GatewayAccount
 {
-    public string Api { get; set; }
+    public string Api { get; set; } = null!;
 
     public bool IsTestAccount { get; set; }
 }

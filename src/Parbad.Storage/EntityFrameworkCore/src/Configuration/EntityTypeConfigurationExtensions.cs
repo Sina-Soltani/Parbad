@@ -10,7 +10,7 @@ namespace Parbad.Storage.EntityFrameworkCore.Configuration;
 
 internal static class EntityTypeConfigurationExtensions
 {
-    public static EntityTypeBuilder ToTable(this EntityTypeBuilder entityTypeBuilder, TableOptions options, string defaultSchema)
+    public static EntityTypeBuilder ToTable(this EntityTypeBuilder entityTypeBuilder, TableOptions options, string? defaultSchema)
     {
         if (options == null) throw new ArgumentNullException(nameof(options));
 

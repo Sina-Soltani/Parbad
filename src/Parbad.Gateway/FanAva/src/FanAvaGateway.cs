@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
+using Parbad.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -57,7 +58,7 @@ public class FanAvaGateway : GatewayBase<FanAvaGatewayAccount>
 
         var responseMessage = await _httpClient.PostJsonAsync(_gatewayOptions.ApiTokenGenerationUrl, data, jsonSettings, cancellationToken);
 
-        return await FanAvaHelper.CreateRequestResult(responseMessage, _httpContextAccessor.HttpContext, account, _gatewayOptions);
+        return await FanAvaHelper.CreateRequestResult(responseMessage, _httpContextAccessor.GetRequiredHttpContext(), account, _gatewayOptions);
     }
 
     /// <inheritdoc />
@@ -68,7 +69,7 @@ public class FanAvaGateway : GatewayBase<FanAvaGatewayAccount>
         var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 
         var callbackResult = await FanAvaHelper.CreateCallbackResult(
-                                                                     _httpContextAccessor.HttpContext.Request,
+                                                                     _httpContextAccessor.GetRequiredHttpContext().Request,
                                                                      context,
                                                                      _messageOptions,
                                                                      account,
@@ -91,7 +92,7 @@ public class FanAvaGateway : GatewayBase<FanAvaGatewayAccount>
         var account = await GetAccountAsync(context.Payment).ConfigureAwaitFalse();
 
         var callbackResult = await FanAvaHelper.CreateCallbackResult(
-                                                                     _httpContextAccessor.HttpContext.Request,
+                                                                     _httpContextAccessor.GetRequiredHttpContext().Request,
                                                                      context,
                                                                      _messageOptions,
                                                                      account,
@@ -105,7 +106,7 @@ public class FanAvaGateway : GatewayBase<FanAvaGatewayAccount>
 
         var responseMessage = await _httpClient.PostJsonAsync(
                                                               _gatewayOptions.ApiCheckPaymentUrl,
-                                                              callbackResult.CallbackCheckData,
+                                                              callbackResult.CallbackCheckData!,
                                                               cancellationToken)
                                                .ConfigureAwaitFalse();
 
@@ -117,7 +118,7 @@ public class FanAvaGateway : GatewayBase<FanAvaGatewayAccount>
 
         if (!checkResult.IsSucceed)
         {
-            return checkResult.VerifyResult;
+            return checkResult.VerifyResult!;
         }
 
         var data = FanAvaHelper.CreateVerifyRequest(context, callbackResult);

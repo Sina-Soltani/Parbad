@@ -1,0 +1,70 @@
+name: Docs
+
+# Builds the documentation site (docs/) for every pull request that changes it, so broken links and outdated
+# translations show up before merging, and publishes it to GitHub Pages from master.
+
+on:
+  pull_request:
+    paths:
+      - 'docs/**'
+      - 'src/Parbad.Gateway/*/src/README.md'
+      - '.github/workflows/docs.yml'
+  push:
+    branches: [ master ]
+    paths:
+      - 'docs/**'
+      - 'src/Parbad.Gateway/*/src/README.md'
+      - '.github/workflows/docs.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docs-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build:
+    name: Build the site
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: docs
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: docs/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      # Also generates the gateway pages from the package READMEs and reports outdated translations.
+      - name: Build
+        run: npm run build
+
+      - uses: actions/upload-pages-artifact@v3
+        if: github.event_name != 'pull_request'
+        with:
+          path: docs/build
+
+  deploy:
+    name: Publish to GitHub Pages
+    needs: build
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

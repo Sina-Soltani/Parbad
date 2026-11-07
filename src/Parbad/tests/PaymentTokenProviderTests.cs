@@ -9,11 +9,11 @@ using Parbad.Tests.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Parbad.Tests;
 
-[TestClass]
+[TestFixture]
 public class PaymentTokenProviderTests
 {
     private IHttpContextAccessor _httpContextAccessor;
@@ -21,7 +21,7 @@ public class PaymentTokenProviderTests
     private IPaymentTokenProvider _provider;
     private Invoice _invoice;
 
-    [TestInitialize]
+    [SetUp]
     public void Setup()
     {
         _invoice = new Invoice { CallbackUrl = CallbackUrl.Parse("http://www.mysite.com") };
@@ -33,23 +33,23 @@ public class PaymentTokenProviderTests
         _provider = new GuidQueryStringPaymentTokenProvider(_httpContextAccessor, _options);
     }
 
-    [TestMethod]
+    [Test]
     public async Task Token_Must_Not_Be_Null()
     {
         var token = await _provider.ProvideTokenAsync(_invoice);
 
-        Assert.IsNotNull(token);
+        Assert.That(token, Is.Not.Null);
     }
 
-    [TestMethod]
+    [Test]
     public async Task Token_Must_Be_Guid()
     {
         var token = await _provider.ProvideTokenAsync(_invoice);
 
-        Assert.IsTrue(Guid.TryParse(token, out _));
+        Assert.That(Guid.TryParse(token, out _), Is.True);
     }
 
-    [TestMethod]
+    [Test]
     public async Task CallbackUrl_Must_Have_Default_TokenName()
     {
         await _provider.ProvideTokenAsync(_invoice);
@@ -58,10 +58,10 @@ public class PaymentTokenProviderTests
 
         var query = QueryHelpers.ParseQuery(uri.Query);
 
-        Assert.IsTrue(query.ContainsKey(QueryStringPaymentTokenOptions.DefaultQueryName));
+        Assert.That(query.ContainsKey(QueryStringPaymentTokenOptions.DefaultQueryName), Is.True);
     }
 
-    [TestMethod]
+    [Test]
     public async Task CallbackUrl_Must_Have_TokenName_From_Options()
     {
         const string expectedQueryName = "test";
@@ -74,10 +74,10 @@ public class PaymentTokenProviderTests
 
         var query = QueryHelpers.ParseQuery(uri.Query);
 
-        Assert.IsTrue(query.ContainsKey(expectedQueryName));
+        Assert.That(query.ContainsKey(expectedQueryName), Is.True);
     }
 
-    [TestMethod]
+    [Test]
     public async Task CallbackUrl_Must_Have_Correct_TokenValue()
     {
         var token = await _provider.ProvideTokenAsync(_invoice);
@@ -86,29 +86,29 @@ public class PaymentTokenProviderTests
 
         var query = QueryHelpers.ParseQuery(uri.Query);
 
-        Assert.IsTrue(query.ContainsKey(QueryStringPaymentTokenOptions.DefaultQueryName));
+        Assert.That(query.ContainsKey(QueryStringPaymentTokenOptions.DefaultQueryName), Is.True);
 
-        Assert.AreEqual(token, (string)query[QueryStringPaymentTokenOptions.DefaultQueryName]);
+        Assert.That((string)query[QueryStringPaymentTokenOptions.DefaultQueryName], Is.EqualTo(token));
     }
 
-    [TestMethod]
+    [Test]
     public async Task Must_Provide_Unique_Tokens()
     {
         var token1 = await _provider.ProvideTokenAsync(_invoice);
         var token2 = await _provider.ProvideTokenAsync(_invoice);
 
-        Assert.AreNotEqual(token2, token1);
+        Assert.That(token1, Is.Not.EqualTo(token2));
     }
 
-    [TestMethod]
+    [Test]
     public async Task Must_Return_Null_When_No_Token_Exists()
     {
         var token = await _provider.RetrieveTokenAsync();
 
-        Assert.IsNull(token);
+        Assert.That(token, Is.Null);
     }
 
-    [TestMethod]
+    [Test]
     public async Task Must_Return_The_Token_From_QueryString()
     {
         const string expectedToken = "test";
@@ -120,11 +120,11 @@ public class PaymentTokenProviderTests
 
         var token = await _provider.RetrieveTokenAsync();
 
-        Assert.IsNotNull(token);
-        Assert.AreEqual(expectedToken, token);
+        Assert.That(token, Is.Not.Null);
+        Assert.That(token, Is.EqualTo(expectedToken));
     }
 
-    [TestMethod]
+    [Test]
     public async Task Must_Return_The_Token_From_QueryString_With_CustomQueryName()
     {
         const string expectedToken = "test";
@@ -139,7 +139,7 @@ public class PaymentTokenProviderTests
 
         var token = await _provider.RetrieveTokenAsync();
 
-        Assert.IsNotNull(token);
-        Assert.AreEqual(expectedToken, token);
+        Assert.That(token, Is.Not.Null);
+        Assert.That(token, Is.EqualTo(expectedToken));
     }
 }

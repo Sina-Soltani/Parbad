@@ -5,16 +5,16 @@ using Parbad.Internal;
 using Parbad.InvoiceBuilder;
 using System;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Parbad.Tests.Gateway.Saman;
 
-[TestClass]
+[TestFixture]
 public class SamanCommonTests
 {
     private IInvoiceBuilder _invoiceBuilder;
 
-    [TestInitialize]
+    [SetUp]
     public void Setup()
     {
         var mockServiceProvider = new Mock<IServiceProvider>();
@@ -22,15 +22,15 @@ public class SamanCommonTests
         _invoiceBuilder = new DefaultInvoiceBuilder(mockServiceProvider.Object);
     }
 
-    [TestMethod]
+    [Test]
     public async Task Invoice_Must_Have_Correct_GatewayName()
     {
         _invoiceBuilder.UseSaman();
 
         var invoice = await _invoiceBuilder.BuildAsync();
 
-        Assert.IsNotNull(invoice);
-        Assert.IsNotNull(invoice.GatewayName);
-        Assert.IsTrue(invoice.GatewayName.Equals("saman", StringComparison.OrdinalIgnoreCase));
+        Assert.That(invoice, Is.Not.Null);
+        Assert.That(invoice.GatewayName, Is.Not.Null);
+        Assert.That(invoice.GatewayName.Equals("saman", StringComparison.OrdinalIgnoreCase), Is.True);
     }
 }

@@ -28,7 +28,7 @@ public static class IranKishGatewayInvoiceBuilderExtensions
 
         if (!string.IsNullOrWhiteSpace(data.MobileNumberOrEmail))
         {
-            builder.AddOrUpdateProperty(IranKishHelper.CmsPreservationIdKey, data.MobileNumberOrEmail);
+            builder.AddOrUpdateProperty(IranKishHelper.CmsPreservationIdKey, data.MobileNumberOrEmail!);
         }
 
         return builder;

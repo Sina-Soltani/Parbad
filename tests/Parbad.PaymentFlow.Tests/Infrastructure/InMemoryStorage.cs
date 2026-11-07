@@ -13,7 +13,7 @@ namespace Parbad.PaymentFlow.Tests.Infrastructure;
 /// It enforces unique tracking numbers and tokens, so the tests observe Parbad's own behaviour and are
 /// not affected by the cache storages.
 /// </summary>
-public sealed class InMemoryStorage : IStorage, IPaidPaymentLookup, IPaymentCompletion
+public sealed class InMemoryStorage : IStorage
 {
     private readonly object _sync = new();
     private readonly List<Payment> _payments = new();
@@ -80,7 +80,11 @@ public sealed class InMemoryStorage : IStorage, IPaidPaymentLookup, IPaymentComp
         return Task.CompletedTask;
     }
 
-    public Task<bool> TryCompletePaymentAsync(long paymentId, bool isPaid, string? transactionCode, CancellationToken cancellationToken = default)
+    public Task<bool> TryCompletePaymentAsync(long paymentId,
+                                              PaymentStatus status,
+                                              string? transactionCode,
+                                              string? bankReference,
+                                              CancellationToken cancellationToken = default)
     {
         lock (_sync)
         {
@@ -92,11 +96,11 @@ public sealed class InMemoryStorage : IStorage, IPaidPaymentLookup, IPaymentComp
 
             var record = _payments.SingleOrDefault(p => p.Id == paymentId) ?? throw new InvalidOperationException($"No payment with id {paymentId}.");
 
-            if (record.IsPaid || (record.IsCompleted && !isPaid)) return Task.FromResult(false);
+            if (record.IsPaid || (record.IsCompleted && status != PaymentStatus.Paid)) return Task.FromResult(false);
 
-            record.IsCompleted = true;
-            record.IsPaid = isPaid;
+            record.Status = status;
             record.TransactionCode = transactionCode;
+            record.BankReference = bankReference;
 
             return Task.FromResult(true);
         }
@@ -151,8 +155,8 @@ public sealed class InMemoryStorage : IStorage, IPaidPaymentLookup, IPaymentComp
         lock (_sync) return Task.FromResult(_payments.Where(p => p.Token == paymentToken).Select(Copy).SingleOrDefault());
     }
 
-    public Task<Payment?> FindPaidPaymentByTransactionCodeAsync(string gatewayName,
-                                                               string transactionCode,
+    public Task<Payment?> FindPaidPaymentByBankReferenceAsync(string gatewayName,
+                                                             string bankReference,
                                                                long exceptTrackingNumber,
                                                                CancellationToken cancellationToken = default)
     {
@@ -160,7 +164,8 @@ public sealed class InMemoryStorage : IStorage, IPaidPaymentLookup, IPaymentComp
         {
             return Task.FromResult(_payments.Where(p => p.IsPaid &&
                                                         p.TrackingNumber != exceptTrackingNumber &&
-                                                        p.TransactionCode == transactionCode &&
+                                                        (p.BankReference == bankReference ||
+                                                         (p.BankReference == null && p.TransactionCode == bankReference)) &&
                                                         string.Equals(p.GatewayName, gatewayName, StringComparison.OrdinalIgnoreCase))
                                             .Select(Copy)
                                             .FirstOrDefault());
@@ -177,6 +182,11 @@ public sealed class InMemoryStorage : IStorage, IPaidPaymentLookup, IPaymentComp
         lock (_sync) return Task.FromResult(_payments.Any(p => p.Token == paymentToken));
     }
 
+    public Task<long?> GetLargestTrackingNumberAsync(CancellationToken cancellationToken = default)
+    {
+        lock (_sync) return Task.FromResult(_payments.Count == 0 ? (long?)null : _payments.Max(p => p.TrackingNumber));
+    }
+
     public Task<List<Transaction>> GetTransactionsAsync(Payment payment, CancellationToken cancellationToken = default)
     {
         lock (_sync) return Task.FromResult(_transactions.Where(t => t.PaymentId == payment.Id).Select(Copy).ToList());
@@ -191,8 +201,9 @@ public sealed class InMemoryStorage : IStorage, IPaidPaymentLookup, IPaymentComp
         TransactionCode = payment.TransactionCode,
         GatewayName = payment.GatewayName,
         GatewayAccountName = payment.GatewayAccountName,
-        IsCompleted = payment.IsCompleted,
-        IsPaid = payment.IsPaid
+        BankReference = payment.BankReference,
+        Status = payment.Status,
+        RefundedAmount = payment.RefundedAmount
     };
 
     private static Transaction Copy(Transaction transaction) => new()

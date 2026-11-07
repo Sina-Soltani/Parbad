@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Parbad.Abstraction;
 using Parbad.Builder;
 using Parbad.InvoiceBuilder;
@@ -21,16 +21,15 @@ namespace Parbad.PaymentFlow.Tests.Core;
 /// The storages used here throw from the obsolete <see cref="IStorage.Payments"/>, so every test also proves
 /// that the formatter no longer loads all stored payments.
 /// </summary>
-[TestClass]
+[TestFixture]
 public class AutoRandomTrackingNumberTests
 {
     private const int MaxAttempts = 10;
 
-    [TestMethod]
-    [DataRow(long.MaxValue - 1000)]
-    [DataRow(long.MaxValue / 2)] // About half of the random samples are rejected for this range.
-    [DataRow(long.MaxValue)]
-    [DataRow(1000L)] // The default minimum.
+    [TestCase(long.MaxValue - 1000)]
+    [TestCase(long.MaxValue / 2)] // About half of the random samples are rejected for this range.
+    [TestCase(long.MaxValue)]
+    [TestCase(1000L)] // The default minimum.
     public async Task Generated_numbers_are_at_least_the_minimum_value(long minimumValue)
     {
         var formatter = CreateFormatter(new CheckingStorage(), minimumValue);
@@ -41,13 +40,12 @@ public class AutoRandomTrackingNumberTests
 
             await formatter.FormatAsync(invoice);
 
-            Assert.IsTrue(invoice.TrackingNumber >= minimumValue, $"{invoice.TrackingNumber} is below the minimum {minimumValue}.");
+            Assert.That(invoice.TrackingNumber >= minimumValue, Is.True, $"{invoice.TrackingNumber} is below the minimum {minimumValue}.");
         }
     }
 
-    [TestMethod]
-    [DataRow(-1L)]
-    [DataRow(long.MinValue)]
+    [TestCase(-1L)]
+    [TestCase(long.MinValue)]
     public async Task Generated_numbers_are_not_negative_when_the_minimum_is_negative(long minimumValue)
     {
         var formatter = CreateFormatter(new CheckingStorage(), minimumValue);
@@ -58,11 +56,11 @@ public class AutoRandomTrackingNumberTests
 
             await formatter.FormatAsync(invoice);
 
-            Assert.IsTrue(invoice.TrackingNumber >= 0, $"{invoice.TrackingNumber} is negative.");
+            Assert.That(invoice.TrackingNumber >= 0, Is.True, $"{invoice.TrackingNumber} is negative.");
         }
     }
 
-    [TestMethod]
+    [Test]
     public async Task Generated_numbers_are_random()
     {
         var formatter = CreateFormatter(new CheckingStorage(), AutoRandomTrackingNumberOptions.DefaultMinimumNumber);
@@ -78,10 +76,10 @@ public class AutoRandomTrackingNumberTests
             numbers.Add(invoice.TrackingNumber);
         }
 
-        Assert.AreEqual(100, numbers.Count, "Two of 100 random 63-bit numbers are equal.");
+        Assert.That(numbers.Count, Is.EqualTo(100), "Two of 100 random 63-bit numbers are equal.");
     }
 
-    [TestMethod]
+    [Test]
     public async Task Numbers_that_already_exist_are_skipped()
     {
         const int existingCount = 3;
@@ -91,38 +89,38 @@ public class AutoRandomTrackingNumberTests
 
         await formatter.FormatAsync(invoice);
 
-        Assert.AreEqual(existingCount + 1, storage.CheckedNumbers.Count);
-        Assert.AreEqual(storage.CheckedNumbers.Last(), invoice.TrackingNumber);
-        CollectionAssert.DoesNotContain(storage.CheckedNumbers.Take(existingCount).ToList(), invoice.TrackingNumber);
+        Assert.That(storage.CheckedNumbers.Count, Is.EqualTo(existingCount + 1));
+        Assert.That(invoice.TrackingNumber, Is.EqualTo(storage.CheckedNumbers.Last()));
+        Assert.That(storage.CheckedNumbers.Take(existingCount).ToList(), Has.No.Member(invoice.TrackingNumber));
     }
 
-    [TestMethod]
+    [Test]
     public async Task A_clear_exception_is_thrown_when_no_unused_number_is_found()
     {
         var storage = new CheckingStorage { Exists = (_, _) => true };
         var formatter = CreateFormatter(storage, long.MaxValue - 5);
 
-        var exception = await ThrowsAsync<InvalidOperationException>(() => formatter.FormatAsync(new Invoice()));
+        var exception = await Assert.CatchAsync<InvalidOperationException>(() => formatter.FormatAsync(new Invoice()));
 
-        Assert.AreEqual(MaxAttempts, storage.CheckedNumbers.Count);
-        StringAssert.Contains(exception.Message, "No unused tracking number was found");
-        StringAssert.Contains(exception.Message, nameof(AutoRandomTrackingNumberOptions.MinimumValue));
+        Assert.That(storage.CheckedNumbers.Count, Is.EqualTo(MaxAttempts));
+        Assert.That(exception.Message, Does.Contain("No unused tracking number was found"));
+        Assert.That(exception.Message, Does.Contain(nameof(AutoRandomTrackingNumberOptions.MinimumValue)));
     }
 
-    [TestMethod]
+    [Test]
     public async Task A_cancelled_token_throws_instead_of_returning_a_number()
     {
         var storage = new CheckingStorage();
         var formatter = CreateFormatter(storage, AutoRandomTrackingNumberOptions.DefaultMinimumNumber);
         var invoice = new Invoice();
 
-        await ThrowsAsync<OperationCanceledException>(() => formatter.FormatAsync(invoice, new CancellationToken(canceled: true)));
+        await Assert.CatchAsync<OperationCanceledException>(() => formatter.FormatAsync(invoice, new CancellationToken(canceled: true)));
 
-        Assert.AreEqual(0, storage.CheckedNumbers.Count);
-        Assert.AreEqual(0, invoice.TrackingNumber);
+        Assert.That(storage.CheckedNumbers.Count, Is.EqualTo(0));
+        Assert.That(invoice.TrackingNumber, Is.EqualTo(0));
     }
 
-    [TestMethod]
+    [Test]
     public async Task Cancellation_between_attempts_throws_instead_of_returning_a_number()
     {
         using var cancellation = new CancellationTokenSource();
@@ -137,13 +135,13 @@ public class AutoRandomTrackingNumberTests
         var formatter = CreateFormatter(storage, AutoRandomTrackingNumberOptions.DefaultMinimumNumber);
         var invoice = new Invoice();
 
-        await ThrowsAsync<OperationCanceledException>(() => formatter.FormatAsync(invoice, cancellation.Token));
+        await Assert.CatchAsync<OperationCanceledException>(() => formatter.FormatAsync(invoice, cancellation.Token));
 
-        Assert.AreEqual(1, storage.CheckedNumbers.Count);
-        Assert.AreEqual(0, invoice.TrackingNumber);
+        Assert.That(storage.CheckedNumbers.Count, Is.EqualTo(1));
+        Assert.That(invoice.TrackingNumber, Is.EqualTo(0));
     }
 
-    [TestMethod]
+    [Test]
     public async Task Requesting_with_UseAutoRandomTrackingNumber_stores_payments_with_random_numbers()
     {
         const long minimumValue = long.MaxValue - 1_000_000;
@@ -174,39 +172,24 @@ public class AutoRandomTrackingNumberTests
                                                                           .SetCallbackUrl("https://shop.test/payment/callback")
                                                                           .SetGateway(FakeGateway.Name));
 
-            Assert.IsTrue(result.IsSucceed, result.Message);
-            Assert.IsTrue(result.TrackingNumber >= minimumValue, $"{result.TrackingNumber} is below the minimum {minimumValue}.");
+            Assert.That(result.IsSucceed, Is.True, result.Message);
+            Assert.That(result.TrackingNumber >= minimumValue, Is.True, $"{result.TrackingNumber} is below the minimum {minimumValue}.");
 
             var payment = await host.GetPaymentAsync(result.TrackingNumber);
-            Assert.AreEqual(FakeGateway.Name, payment.GatewayName);
+            Assert.That(payment.GatewayName, Is.EqualTo(FakeGateway.Name));
 
             trackingNumbers.Add(result.TrackingNumber);
         }
 
-        Assert.AreEqual(trackingNumbers.Count, trackingNumbers.Distinct().Count());
+        Assert.That(trackingNumbers.Distinct().Count(), Is.EqualTo(trackingNumbers.Count));
     }
 
     private static AutoRandomTrackingNumber CreateFormatter(IStorage storage, long minimumValue) =>
         new(storage, Microsoft.Extensions.Options.Options.Create(new AutoRandomTrackingNumberOptions { MinimumValue = minimumValue }));
 
-    private static async Task<TException> ThrowsAsync<TException>(Func<Task> action) where TException : Exception
-    {
-        try
-        {
-            await action();
-        }
-        catch (TException exception)
-        {
-            return exception;
-        }
-
-        Assert.Fail($"Expected {typeof(TException).Name}.");
-        throw new InvalidOperationException("Unreachable.");
-    }
-
     /// <summary>
-    /// Delegates to another storage, records the tracking numbers checked with
-    /// <see cref="DoesPaymentExistAsync(long, CancellationToken)"/> and throws from the obsolete queryables.
+    /// Delegates to another storage and records the tracking numbers checked with
+    /// <see cref="DoesPaymentExistAsync(long, CancellationToken)"/>.
     /// </summary>
     private sealed class CheckingStorage : IStorage
     {
@@ -233,10 +216,6 @@ public class AutoRandomTrackingNumberTests
             }
         }
 
-        public IQueryable<Payment> Payments => throw new AssertFailedException("IStorage.Payments must not be used.");
-
-        public IQueryable<Transaction> Transactions => throw new AssertFailedException("IStorage.Transactions must not be used.");
-
         public async Task<bool> DoesPaymentExistAsync(long trackingNumber, CancellationToken cancellationToken = default)
         {
             int call;
@@ -252,6 +231,15 @@ public class AutoRandomTrackingNumberTests
 
         public Task<bool> DoesPaymentExistAsync(string paymentToken, CancellationToken cancellationToken = default) =>
             _inner.DoesPaymentExistAsync(paymentToken, cancellationToken);
+
+        public Task<long?> GetLargestTrackingNumberAsync(CancellationToken cancellationToken = default) =>
+            _inner.GetLargestTrackingNumberAsync(cancellationToken);
+
+        public Task<Payment?> FindPaidPaymentByBankReferenceAsync(string gatewayName, string bankReference, long exceptTrackingNumber, CancellationToken cancellationToken = default) =>
+            _inner.FindPaidPaymentByBankReferenceAsync(gatewayName, bankReference, exceptTrackingNumber, cancellationToken);
+
+        public Task<bool> TryCompletePaymentAsync(long paymentId, PaymentStatus status, string? transactionCode, string? bankReference, CancellationToken cancellationToken = default) =>
+            _inner.TryCompletePaymentAsync(paymentId, status, transactionCode, bankReference, cancellationToken);
 
         public Task CreatePaymentAsync(Payment payment, CancellationToken cancellationToken = default) =>
             _inner.CreatePaymentAsync(payment, cancellationToken);

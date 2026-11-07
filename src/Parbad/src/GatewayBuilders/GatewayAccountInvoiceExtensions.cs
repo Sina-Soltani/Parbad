@@ -34,12 +34,12 @@ public static class GatewayAccountInvoiceExtensions
     /// Gets the account name if specified.
     /// </summary>
     /// <param name="invoice"></param>
-    public static string GetAccountName(this Invoice invoice)
+    public static string? GetAccountName(this Invoice invoice)
     {
         if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 
         if (!invoice.Properties.ContainsKey(GatewayAccountKeyName)) return null;
 
-        return (string)invoice.Properties[GatewayAccountKeyName];
+        return (string?)invoice.Properties[GatewayAccountKeyName];
     }
 }

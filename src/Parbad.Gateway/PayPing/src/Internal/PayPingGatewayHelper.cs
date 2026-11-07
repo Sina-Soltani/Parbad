@@ -56,7 +56,7 @@ internal static class PayPingGatewayHelper
         var data = callback.Data;
         var message = "";
         long paymentRefId = 0;
-        string paymentCode = null;
+        string? paymentCode = null;
 
         if (data == null)
         {
@@ -126,13 +126,13 @@ internal static class PayPingGatewayHelper
 
         var paymentRefId = responseModel.PaymentRefId ?? callbackResult.PaymentRefId;
 
-        var result = PaymentVerifyResult.Succeed(paymentRefId.ToString(CultureInfo.InvariantCulture), messagesOptions.PaymentSucceed);
+        var reference = paymentRefId.ToString(CultureInfo.InvariantCulture);
 
-        if (responseModel.Amount != null) result.BankReportedAmount = responseModel.Amount.Value;
-
-        if (!string.IsNullOrEmpty(responseModel.ClientRefId)) result.BankReportedOrderId = responseModel.ClientRefId;
-
-        return result;
+        return PaymentVerifyResult.Paid(reference, reference, messagesOptions.PaymentSucceed) with
+               {
+                   BankReportedAmount = responseModel.Amount,
+                   BankReportedOrderId = string.IsNullOrEmpty(responseModel.ClientRefId) ? null : responseModel.ClientRefId
+               };
     }
 
     /// <summary>
@@ -167,13 +167,13 @@ internal static class PayPingGatewayHelper
                };
     }
 
-    public static VerifyPayResponseModel TryParseVerifyResponse(string json)
+    public static VerifyPayResponseModel? TryParseVerifyResponse(string? json)
     {
         if (string.IsNullOrWhiteSpace(json)) return null;
 
         try
         {
-            return JsonConvert.DeserializeObject<VerifyPayResponseModel>(json);
+            return JsonConvert.DeserializeObject<VerifyPayResponseModel>(json!);
         }
         catch (JsonException)
         {
@@ -181,17 +181,17 @@ internal static class PayPingGatewayHelper
         }
     }
 
-    private static string GetStoredPaymentCode(InvoiceContext context)
+    private static string? GetStoredPaymentCode(InvoiceContext context)
     {
         var transaction = context.Transactions.FirstOrDefault(item => item.Type == TransactionType.Request);
 
         if (string.IsNullOrEmpty(transaction?.AdditionalData)) return null;
 
-        IDictionary<string, string> additionalData;
+        IDictionary<string, string>? additionalData;
 
         try
         {
-            additionalData = JsonConvert.DeserializeObject<IDictionary<string, string>>(transaction.AdditionalData);
+            additionalData = JsonConvert.DeserializeObject<IDictionary<string, string>>(transaction!.AdditionalData!);
         }
         catch (JsonException)
         {
@@ -241,9 +241,9 @@ internal static class PayPingGatewayHelper
 
             callback = new PayPingCallback
                        {
-                           Status = status.Exists ? (string)status.Value : null,
-                           ErrorCode = errorCode.Exists ? (string)errorCode.Value : null,
-                           Data = data.Exists ? Parse(data.Value) as JObject : null
+                           Status = status.Exists ? status.Value.ToString() : null,
+                           ErrorCode = errorCode.Exists ? errorCode.Value.ToString() : null,
+                           Data = data.Exists ? Parse(data.Value.ToString()) as JObject : null
                        };
         }
 
@@ -253,7 +253,7 @@ internal static class PayPingGatewayHelper
     }
 
     /// <summary>Parses JSON, keeping dates as strings; returns null for anything that is not JSON.</summary>
-    private static JToken Parse(string json)
+    private static JToken? Parse(string? json)
     {
         if (string.IsNullOrWhiteSpace(json)) return null;
 
@@ -269,18 +269,18 @@ internal static class PayPingGatewayHelper
         }
     }
 
-    private static string ToString(JToken token) =>
+    private static string? ToString(JToken? token) =>
         token == null || token.Type == JTokenType.Null ? null :
         token is JValue value ? Convert.ToString(value.Value, CultureInfo.InvariantCulture) :
         token.ToString(Formatting.None);
 
     private class PayPingCallback
     {
-        public string Status { get; set; }
+        public string? Status { get; set; }
 
-        public string ErrorCode { get; set; }
+        public string? ErrorCode { get; set; }
 
-        public JObject Data { get; set; }
+        public JObject? Data { get; set; }
     }
 }
 
@@ -288,8 +288,8 @@ internal class PayPingProblem
 {
     public int? Code { get; set; }
 
-    public string Message { get; set; }
+    public string? Message { get; set; }
 
     /// <summary>metaData.message: for "already verified", the verified transaction as a JSON string.</summary>
-    public string Details { get; set; }
+    public string? Details { get; set; }
 }

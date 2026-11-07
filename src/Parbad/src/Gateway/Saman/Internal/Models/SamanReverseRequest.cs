@@ -5,7 +5,7 @@ namespace Parbad.Gateway.Saman.Internal.Models;
 
 internal class SamanReverseRequest
 {
-    public string TerminalNumber { get; set; }
+    public string? TerminalNumber { get; set; }
     
-    public string RefNum { get; set; }
+    public string? RefNum { get; set; }
 }

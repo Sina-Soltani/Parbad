@@ -14,21 +14,39 @@ public class Payment
 
     public decimal Amount { get; set; }
 
-    public string Token { get; set; }
-
-    public string TransactionCode { get; set; }
-
-    public string GatewayName { get; set; }
-
-    public string GatewayAccountName { get; set; }
+    public string Token { get; set; } = null!;
 
     /// <summary>
-    /// Determines if this payment is completed, regardless of whether it is successful or not.
+    /// The transaction code shown to the customer (e.g. the RRN or the bank's tracking code).
     /// </summary>
-    public bool IsCompleted { get; set; }
+    public string? TransactionCode { get; set; }
 
     /// <summary>
-    /// Determines whether this payment is successful or not.
+    /// The reference the bank verified for this payment. Within a gateway, one bank reference settles only one payment.
     /// </summary>
-    public bool IsPaid { get; set; }
+    public string? BankReference { get; set; }
+
+    public string GatewayName { get; set; } = null!;
+
+    public string? GatewayAccountName { get; set; }
+
+    /// <summary>
+    /// The state of the payment.
+    /// </summary>
+    public PaymentStatus Status { get; set; }
+
+    /// <summary>
+    /// The amount refunded so far.
+    /// </summary>
+    public decimal RefundedAmount { get; set; }
+
+    /// <summary>
+    /// Whether the payment is completed, regardless of whether it is paid or not (derived from <see cref="Status"/>).
+    /// </summary>
+    public bool IsCompleted => Status != PaymentStatus.Requested;
+
+    /// <summary>
+    /// Whether the bank confirmed the payment, including payments refunded later (derived from <see cref="Status"/>).
+    /// </summary>
+    public bool IsPaid => Status is PaymentStatus.Paid or PaymentStatus.PartiallyRefunded or PaymentStatus.Refunded;
 }

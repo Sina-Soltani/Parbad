@@ -12,7 +12,7 @@ internal class MelliGatewayCrypto : IMelliGatewayCrypto
         {
             var dataBytes = Encoding.UTF8.GetBytes(data);
 
-            var symmetric = SymmetricAlgorithm.Create("TripleDes");
+            var symmetric = TripleDES.Create();
             symmetric.Mode = CipherMode.ECB;
             symmetric.Padding = PaddingMode.PKCS7;
 

@@ -35,7 +35,7 @@ internal static class SamanHelper
                     {
                         Action = "token",
                         TerminalId = account.TerminalId,
-                        Amount = invoice.Amount,
+                        Amount = (long)invoice.Amount,
                         ResNum = invoice.TrackingNumber.ToString(),
                         RedirectUrl = invoice.CallbackUrl,
                         CellNumber = invoice.GetSamanCellNumber()
@@ -59,7 +59,7 @@ internal static class SamanHelper
         {
             var form = new Dictionary<string, string>
                        {
-                           { "Token", tokenResponse.Token },
+                           { "Token", tokenResponse.Token ?? string.Empty },
                            { "GetMethod", "false" }
                        };
 
@@ -170,15 +170,17 @@ internal static class SamanHelper
                      {
                          Status = isSuccess ? PaymentVerifyResultStatus.Succeed : PaymentVerifyResultStatus.Failed,
                          TransactionCode = detail?.Rrn,
+                         // The bank verifies the RefNum.
+                         BankReference = callbackResponse.RefNum,
                          GatewayResponseCode = verificationResponse.ResultCode.ToString(CultureInfo.InvariantCulture),
                          Message = message,
                          // The RefNum comes from the browser and the answer has no order id, so the gateway cannot tell
                          // whether an "already verified" transaction is this invoice's. Parbad accepts it only when the
-                         // RRN has not settled another payment.
+                         // RefNum has not settled another payment.
                          IsAlreadyVerifiedAtBank = isThisTransaction && verificationResponse.ResultCode == VerificationAlreadyVerifiedCode
                      };
 
-        result.DatabaseAdditionalData.Add(RefNumKey, callbackResponse.RefNum);
+        result.DatabaseAdditionalData.Add(RefNumKey, callbackResponse.RefNum ?? string.Empty);
 
         result.AddSamanAdditionalData(MapToAdditionalData(callbackResponse));
 
@@ -190,7 +192,7 @@ internal static class SamanHelper
         var verificationTransaction = context.Transactions.LastOrDefault(transaction => transaction.Type == TransactionType.Verify && transaction.IsSucceed);
 
         if (string.IsNullOrEmpty(verificationTransaction?.AdditionalData) ||
-            !verificationTransaction.ToDictionary().ContainsKey(RefNumKey))
+            !verificationTransaction!.ToDictionary().ContainsKey(RefNumKey))
         {
             throw new
                 InvalidOperationException($"No Transaction of type Verification or additional data found for reversing the invoice {context.Payment.TrackingNumber}.");
@@ -199,7 +201,7 @@ internal static class SamanHelper
         return new()
                {
                    TerminalNumber = account.TerminalId,
-                   RefNum = verificationTransaction.ToDictionary()[RefNumKey]
+                   RefNum = verificationTransaction!.ToDictionary()[RefNumKey]
                };
     }
 

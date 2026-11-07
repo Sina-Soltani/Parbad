@@ -1,0 +1,44 @@
+/* Parbad's purple, from its logo. */
+:root {
+  --ifm-color-primary: #6a2c70;
+  --ifm-color-primary-dark: #5f2865;
+  --ifm-color-primary-darker: #5a265f;
+  --ifm-color-primary-darkest: #4a1f4e;
+  --ifm-color-primary-light: #75307b;
+  --ifm-color-primary-lighter: #7a3281;
+  --ifm-color-primary-lightest: #8a3992;
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: #c792cc;
+  --ifm-color-primary-dark: #bd7dc3;
+  --ifm-color-primary-darker: #b873bf;
+  --ifm-color-primary-darkest: #a456ac;
+  --ifm-color-primary-light: #d1a7d5;
+  --ifm-color-primary-lighter: #d6b1d9;
+  --ifm-color-primary-lightest: #e5cfe7;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}
+
+/* Persian pages use Vazirmatn. */
+html[lang='fa-IR'] {
+  --ifm-font-family-base: 'Vazirmatn', system-ui, sans-serif;
+}
+
+/*
+  Code stays left-to-right on Persian pages. The Persian build mirrors all CSS (left <-> right, ltr <-> rtl);
+  rtl:ignore keeps these rules as they are.
+*/
+/*rtl:begin:ignore*/
+html[lang='fa-IR'] pre {
+  direction: ltr;
+  text-align: left;
+}
+
+html[lang='fa-IR'] code {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+/*rtl:end:ignore*/

@@ -8,7 +8,7 @@ internal class PasargadCallbackResultModel
     /// <summary>
     /// شماره فاکتوری که در مرحله ثبت خرید، شارژ یا پرداخت قبض توسط پذیرنده ارسال شده است
     /// </summary>
-    public string InvoiceId { get; set; }
+    public string? InvoiceId { get; set; }
 
     /// <summary>
     /// وضعیت پرداخت
@@ -18,12 +18,12 @@ internal class PasargadCallbackResultModel
     /// <summary>
     /// شماره ارجاع شاپرکی
     /// </summary>
-    public string ReferenceNumber { get; set; }
+    public string? ReferenceNumber { get; set; }
 
     /// <summary>
     /// کد پیگیری
     /// </summary>
-    public string TrackId { get; set; }
+    public string? TrackId { get; set; }
 }
 
 internal enum PasargadCallbackResultStatus

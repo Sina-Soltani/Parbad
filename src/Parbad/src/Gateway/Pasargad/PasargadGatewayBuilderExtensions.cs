@@ -39,7 +39,7 @@ public static class PasargadGatewayBuilderExtensions
     /// <exception cref="ArgumentNullException"></exception>
     public static IGatewayConfigurationBuilder<PasargadGateway> WithHttpClient<TGatewayApi>(this IGatewayConfigurationBuilder<PasargadGateway> builder,
                                                                                             Action<IServiceProvider, HttpClient> configureHttpClient,
-                                                                                            Action<IHttpClientBuilder> configureHttpClientBuilder = null)
+                                                                                            Action<IHttpClientBuilder>? configureHttpClientBuilder = null)
         where TGatewayApi : class, IPasargadApi
     {
         if (builder == null) throw new ArgumentNullException(nameof(builder));

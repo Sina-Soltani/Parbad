@@ -3,17 +3,17 @@ using Parbad.Internal;
 using Parbad.InvoiceBuilder;
 using System;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Parbad.Tests;
 
-[TestClass]
+[TestFixture]
 public class InvoiceBuilderTests
 {
     private ServiceProvider _services;
     private IInvoiceBuilder _builder;
 
-    [TestInitialize]
+    [SetUp]
     public void Setup()
     {
         _services = new ServiceCollection()
@@ -22,21 +22,21 @@ public class InvoiceBuilderTests
         _builder = new DefaultInvoiceBuilder(_services);
     }
 
-    [TestCleanup]
+    [TearDown]
     public async Task Cleanup()
     {
         await _services.DisposeAsync();
     }
 
-    [TestMethod]
+    [Test]
     public async Task Build_Must_Return_An_Invoice()
     {
         var invoice = await _builder.BuildAsync();
 
-        Assert.IsNotNull(invoice);
+        Assert.That(invoice, Is.Not.Null);
     }
 
-    [TestMethod]
+    [Test]
     public async Task Invoice_Must_Have_The_Expected_TrackingNumber()
     {
         const long expectedValue = 1000;
@@ -45,10 +45,10 @@ public class InvoiceBuilderTests
 
         var invoice = await _builder.BuildAsync();
 
-        Assert.AreEqual(expectedValue, invoice.TrackingNumber);
+        Assert.That(invoice.TrackingNumber, Is.EqualTo(expectedValue));
     }
 
-    [TestMethod]
+    [Test]
     public async Task Invoice_Must_Have_The_Expected_Amount()
     {
         const decimal expectedValue = 1000;
@@ -57,10 +57,10 @@ public class InvoiceBuilderTests
 
         var invoice = await _builder.BuildAsync();
 
-        Assert.AreEqual(expectedValue, (decimal)invoice.Amount);
+        Assert.That((decimal)invoice.Amount, Is.EqualTo(expectedValue));
     }
 
-    [TestMethod]
+    [Test]
     public async Task Invoice_Must_Have_The_Expected_CallbackUrl()
     {
         const string expectedValue = "http://test.com";
@@ -69,10 +69,10 @@ public class InvoiceBuilderTests
 
         var invoice = await _builder.BuildAsync();
 
-        Assert.AreEqual(expectedValue, (string)invoice.CallbackUrl);
+        Assert.That((string)invoice.CallbackUrl, Is.EqualTo(expectedValue));
     }
 
-    [TestMethod]
+    [Test]
     public async Task Invoice_Must_Have_The_Expected_GatewayName()
     {
         const string expectedValue = "Gateway";
@@ -81,10 +81,10 @@ public class InvoiceBuilderTests
 
         var invoice = await _builder.BuildAsync();
 
-        Assert.AreEqual(expectedValue, invoice.GatewayName);
+        Assert.That(invoice.GatewayName, Is.EqualTo(expectedValue));
     }
 
-    [TestMethod]
+    [Test]
     public async Task Invoice_Must_Have_The_Expected_AdditionalData()
     {
         const string expectedKey = "key";
@@ -94,12 +94,12 @@ public class InvoiceBuilderTests
 
         var invoice = await _builder.BuildAsync();
 
-        Assert.IsNotNull(invoice.Properties);
-        Assert.IsTrue(invoice.Properties.ContainsKey(expectedKey));
-        Assert.AreEqual(expectedValue, invoice.Properties[expectedKey]);
+        Assert.That(invoice.Properties, Is.Not.Null);
+        Assert.That(invoice.Properties.ContainsKey(expectedKey), Is.True);
+        Assert.That(invoice.Properties[expectedKey], Is.EqualTo(expectedValue));
     }
 
-    [TestMethod]
+    [Test]
     public async Task Invoice_Must_Throw_Exception_When_Duplicate_AdditionalKey_Is_Added()
     {
         const string key = "key";
@@ -108,10 +108,10 @@ public class InvoiceBuilderTests
         _builder.AddProperty(key, "");
 
         // Without await, the assertion's task was discarded and the test could never fail.
-        await Assert.ThrowsExceptionAsync<ArgumentException>(() => _builder.BuildAsync());
+        await Assert.ThrowsAsync<ArgumentException>(() => _builder.BuildAsync());
     }
 
-    [TestMethod]
+    [Test]
     public async Task Invoice_Must_Have_The_Updated_AdditionalData_Value()
     {
         const string expectedKey = "key";
@@ -122,12 +122,12 @@ public class InvoiceBuilderTests
 
         var invoice = await _builder.BuildAsync();
 
-        Assert.IsNotNull(invoice.Properties);
-        Assert.IsTrue(invoice.Properties.ContainsKey(expectedKey));
-        Assert.AreEqual(expectedValue, invoice.Properties[expectedKey]);
+        Assert.That(invoice.Properties, Is.Not.Null);
+        Assert.That(invoice.Properties.ContainsKey(expectedKey), Is.True);
+        Assert.That(invoice.Properties[expectedKey], Is.EqualTo(expectedValue));
     }
 
-    [TestMethod]
+    [Test]
     public async Task Invoice_Formatter_Must_Apply_Value_Correctly()
     {
         const long expectedTrackingNumber = 1000;
@@ -145,9 +145,9 @@ public class InvoiceBuilderTests
 
         var invoice = await _builder.BuildAsync();
 
-        Assert.AreEqual(expectedTrackingNumber, invoice.TrackingNumber);
-        Assert.AreEqual(expectedAmount, (decimal)invoice.Amount);
-        Assert.AreEqual(expectedCallbackUrl, (string)invoice.CallbackUrl);
-        Assert.AreEqual(expectedGateway, invoice.GatewayName);
+        Assert.That(invoice.TrackingNumber, Is.EqualTo(expectedTrackingNumber));
+        Assert.That((decimal)invoice.Amount, Is.EqualTo(expectedAmount));
+        Assert.That((string)invoice.CallbackUrl, Is.EqualTo(expectedCallbackUrl));
+        Assert.That(invoice.GatewayName, Is.EqualTo(expectedGateway));
     }
 }

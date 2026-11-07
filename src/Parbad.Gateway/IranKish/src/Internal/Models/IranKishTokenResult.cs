@@ -5,24 +5,24 @@ namespace Parbad.Gateway.IranKish.Internal.Models;
 
 internal class IranKishTokenResult
 {
-    public string ResponseCode { get; set; }
+    public string? ResponseCode { get; set; }
 
-    public object Description { get; set; }
+    public object? Description { get; set; }
 
     public bool Status { get; set; }
 
-    public IranKishTokenResultInfo Result { get; set; }
+    public IranKishTokenResultInfo? Result { get; set; }
 }
 
 internal class IranKishTokenResultInfo
 {
-    public string Token { get; set; }
+    public string? Token { get; set; }
 
     public int InitiateTimeStamp { get; set; }
 
     public int ExpiryTimeStamp { get; set; }
 
-    public string TransactionType { get; set; }
+    public string? TransactionType { get; set; }
 
-    public IranKishBillInfo BillInfo { get; set; }
+    public IranKishBillInfo? BillInfo { get; set; }
 }

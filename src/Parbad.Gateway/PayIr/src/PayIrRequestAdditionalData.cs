@@ -5,13 +5,13 @@ namespace Parbad.Gateway.PayIr;
 
 public class PayIrRequestAdditionalData
 {
-    public string Mobile { get; set; }
+    public string? Mobile { get; set; }
 
-    public string FactorNumber { get; set; }
+    public string? FactorNumber { get; set; }
 
-    public string Description { get; set; }
+    public string? Description { get; set; }
 
-    public string ValidCardNumber { get; set; }
+    public string? ValidCardNumber { get; set; }
 
-    public string NationalCode { get; set; }
+    public string? NationalCode { get; set; }
 }

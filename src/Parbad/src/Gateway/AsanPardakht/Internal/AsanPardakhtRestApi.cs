@@ -57,7 +57,7 @@ internal sealed class AsanPardakhtRestApi
     private async Task<AsanPardakhtResponse> SendAsync(HttpMethod method,
                                                        string path,
                                                        AsanPardakhtGatewayAccount account,
-                                                       object body,
+                                                       object? body,
                                                        CancellationToken cancellationToken)
     {
         using var request = new HttpRequestMessage(method, _options.ApiBaseUrl.TrimEnd('/') + "/" + path);
@@ -116,7 +116,7 @@ internal sealed class AsanPardakhtResponse
         {
             try
             {
-                return JToken.Parse(text).Value<string>();
+                return JToken.Parse(text).Value<string>() ?? string.Empty;
             }
             catch (JsonException)
             {

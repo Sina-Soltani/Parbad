@@ -8,16 +8,29 @@ namespace Parbad.Gateway.ZarinPal.Internal;
 internal class ZarinPalRequestModel
 {
     [JsonProperty("merchant_id")]
-    public string MerchantId { get; set; }
+    public string? MerchantId { get; set; }
 
     [JsonProperty("callback_url")]
-    public string CallbackUrl { get; set; }
+    public string? CallbackUrl { get; set; }
 
-    public string Description { get; set; }
+    public string? Description { get; set; }
 
     public long Amount { get; set; }
 
-    public string Mobile { get; set; }
+    public ZarinPalRequestMetadata Metadata { get; set; } = new();
+}
 
-    public string Email { get; set; }
+/// <summary>
+/// The optional details of a request; ZarinPal shows them in its panel. Empty values are not sent.
+/// </summary>
+internal class ZarinPalRequestMetadata
+{
+    [JsonProperty("mobile", NullValueHandling = NullValueHandling.Ignore)]
+    public string? Mobile { get; set; }
+
+    [JsonProperty("email", NullValueHandling = NullValueHandling.Ignore)]
+    public string? Email { get; set; }
+
+    [JsonProperty("order_id", NullValueHandling = NullValueHandling.Ignore)]
+    public string? OrderId { get; set; }
 }

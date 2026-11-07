@@ -3,6 +3,7 @@
 
 using Parbad.Internal;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using System.Xml;
@@ -72,7 +73,7 @@ public static class XmlHelper
         return contents;
     }
 
-    public static bool TryDeserialize<T>(Stream stream, out T obj)
+    public static bool TryDeserialize<T>(Stream stream, [MaybeNullWhen(false)] out T obj)
     {
         try
         {
@@ -80,24 +81,24 @@ public static class XmlHelper
 
             using (var xmlReader = XmlReader.Create(stream))
             {
-                obj = (T)xmlSerializer.Deserialize(xmlReader);
+                obj = (T)xmlSerializer.Deserialize(xmlReader)!;
                 return true;
             }
         }
         catch
         {
-            obj = default(T);
+            obj = default!;
             return false;
         }
     }
 
-    public static string EncodeXmlValue(string value)
+    public static string EncodeXmlValue(string? value)
     {
         if (value.IsNullOrEmpty())
         {
-            return value;
+            return string.Empty;
         }
 
-        return new XElement("t", value).LastNode.ToString();
+        return new XElement("t", value).LastNode!.ToString();
     }
 }

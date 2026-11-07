@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Parbad.Builder;
 using Parbad.Gateway.ParbadVirtual;
 using Parbad.GatewayBuilders;
@@ -16,7 +16,7 @@ namespace Parbad.PaymentFlow.Tests.Gateways;
 /// The Virtual Gateway: a payment page served by the merchant's own application. There is no bank, and it
 /// approves any payment by design, so the bank-side scenarios do not apply.
 /// </summary>
-[TestClass]
+[TestFixture]
 public class ParbadVirtualConformanceTests : GatewayConformanceTests
 {
     private const string NoBank = "the Virtual Gateway has no bank and approves payments by design.";

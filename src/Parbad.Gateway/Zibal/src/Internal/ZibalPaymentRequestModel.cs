@@ -8,19 +8,19 @@ namespace Parbad.Gateway.Zibal.Internal;
 
 internal class ZibalPaymentRequestModel
 {
-    public string Merchant { get; set; }
+    public string? Merchant { get; set; }
 
     public long Amount { get; set; }
 
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-    public string Mobile { get; set; }
+    public string? Mobile { get; set; }
 
-    public string OrderId { get; set; }
+    public string? OrderId { get; set; }
 
-    public string CallbackUrl { get; set; }
+    public string? CallbackUrl { get; set; }
 
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-    public string Description { get; set; }
+    public string? Description { get; set; }
 
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     public int? FeeMode { get; set; }
@@ -29,5 +29,5 @@ internal class ZibalPaymentRequestModel
     public bool? Sms { get; set; }
 
     [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-    public List<string> AllowedCards { get; set; }
+    public List<string>? AllowedCards { get; set; }
 }

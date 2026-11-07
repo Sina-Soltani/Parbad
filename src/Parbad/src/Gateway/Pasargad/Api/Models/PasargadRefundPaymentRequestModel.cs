@@ -8,10 +8,10 @@ public class PasargadRefundPaymentRequestModel
     /// <summary>
     /// شماره فاکتور که توسط پذیرنده هنگام ثبت درخواست خرید فرستاده شده
     /// </summary>
-    public string Invoice { get; set; }
+    public string? Invoice { get; set; }
 
     /// <summary>
     /// توکن خرید که در جواب ثبت درخواست خرید دریافت شده است
     /// </summary>
-    public string UrlId { get; set; }
+    public string? UrlId { get; set; }
 }

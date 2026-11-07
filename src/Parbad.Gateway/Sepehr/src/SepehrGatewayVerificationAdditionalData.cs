@@ -12,7 +12,7 @@ public class SepehrGatewayVerificationAdditionalData
 
     public long Rrn { get; set; }
 
-    public string DigitalReceipt { get; set; }
+    public string? DigitalReceipt { get; set; }
 
-    public string CardNumber { get; set; }
+    public string? CardNumber { get; set; }
 }

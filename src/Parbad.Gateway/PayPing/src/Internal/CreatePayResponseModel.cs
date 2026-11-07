@@ -9,8 +9,8 @@ namespace Parbad.Gateway.PayPing.Internal;
 internal class CreatePayResponseModel
 {
     [JsonProperty("paymentCode")]
-    public string PaymentCode { get; set; }
+    public string? PaymentCode { get; set; }
 
     [JsonProperty("url")]
-    public string Url { get; set; }
+    public string? Url { get; set; }
 }

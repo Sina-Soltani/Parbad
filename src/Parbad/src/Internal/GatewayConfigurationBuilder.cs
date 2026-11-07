@@ -53,7 +53,7 @@ internal class GatewayConfigurationBuilder<TGateway> : IGatewayConfigurationBuil
 
     /// <inheritdoc />
     public IGatewayConfigurationBuilder<TGateway> WithHttpClient<TGatewayApi, TGatewayApiImplementation>(Action<IServiceProvider, HttpClient> configureHttpClient,
-                                                                                                         Action<IHttpClientBuilder> configureHttpClientBuilder = null)
+                                                                                                         Action<IHttpClientBuilder>? configureHttpClientBuilder = null)
         where TGatewayApi : class
         where TGatewayApiImplementation : class, TGatewayApi
     {

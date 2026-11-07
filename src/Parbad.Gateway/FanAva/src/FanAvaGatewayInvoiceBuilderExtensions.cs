@@ -26,11 +26,11 @@ public static class FanAvaGatewayInvoiceBuilderExtensions
     public static IInvoiceBuilder SetFanAvaAdditionalData(
         this IInvoiceBuilder builder,
         FanAvaGatewayAdditionalDataRequestType type = FanAvaGatewayAdditionalDataRequestType.Goods,
-        string mobileNumber = null,
-        string email = null,
-        string goodsReferenceId = null,
-        string merchantGoodReferenceId = null,
-        IEnumerable<FanAvaGatewayApportionmentAccount> apportionmentAccountList = null)
+        string? mobileNumber = null,
+        string? email = null,
+        string? goodsReferenceId = null,
+        string? merchantGoodReferenceId = null,
+        IEnumerable<FanAvaGatewayApportionmentAccount>? apportionmentAccountList = null)
     {
         return SetFanAvaAdditionalData(builder, new FanAvaGatewayAdditionalDataRequest
                                                 {
@@ -58,7 +58,7 @@ public static class FanAvaGatewayInvoiceBuilderExtensions
         return builder;
     }
 
-    internal static FanAvaGatewayAdditionalDataRequest GetFanAvaAdditionalData(this Invoice invoice)
+    internal static FanAvaGatewayAdditionalDataRequest? GetFanAvaAdditionalData(this Invoice invoice)
     {
         if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 

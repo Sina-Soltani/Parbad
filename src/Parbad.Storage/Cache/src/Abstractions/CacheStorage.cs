@@ -15,35 +15,11 @@ namespace Parbad.Storage.Cache.Abstractions;
 /// <summary>
 /// Abstract cache implementation of Parbad storage.
 /// </summary>
-public abstract class CacheStorage : IStorage, IPaidPaymentLookup, IPaymentCompletion
+public abstract class CacheStorage : IStorage
 {
     // The storages are transient and all instances that use the same cache share one collection,
     // so the lock must belong to the collection, not to the storage instance.
     private static readonly ConditionalWeakTable<ICacheStorageCollection, object> CollectionLocks = new();
-
-    /// <inheritdoc />
-    public virtual IQueryable<Payment> Payments
-    {
-        get
-        {
-            lock (SyncRoot)
-            {
-                return Collection.Payments.Select(ClonePayment).ToList().AsQueryable();
-            }
-        }
-    }
-
-    /// <inheritdoc />
-    public virtual IQueryable<Transaction> Transactions
-    {
-        get
-        {
-            lock (SyncRoot)
-            {
-                return Collection.Transactions.Select(CloneTransaction).ToList().AsQueryable();
-            }
-        }
-    }
 
     /// <summary>
     /// A collection for holding the data.
@@ -200,8 +176,8 @@ public abstract class CacheStorage : IStorage, IPaidPaymentLookup, IPaymentCompl
     }
 
     /// <inheritdoc />
-    public virtual Task<Payment?> FindPaidPaymentByTransactionCodeAsync(string gatewayName,
-                                                                        string transactionCode,
+    public virtual Task<Payment?> FindPaidPaymentByBankReferenceAsync(string gatewayName,
+                                                                      string bankReference,
                                                                         long exceptTrackingNumber,
                                                                         CancellationToken cancellationToken = default)
     {
@@ -209,10 +185,12 @@ public abstract class CacheStorage : IStorage, IPaidPaymentLookup, IPaymentCompl
 
         lock (SyncRoot)
         {
+            // Payments stored before Parbad 4.0 have no bank reference; their transaction code is compared instead.
             var record = Collection.Payments.FirstOrDefault(payment => payment.IsPaid &&
                                                                        payment.TrackingNumber != exceptTrackingNumber &&
-                                                                       payment.TransactionCode == transactionCode &&
-                                                                       string.Equals(payment.GatewayName, gatewayName, StringComparison.OrdinalIgnoreCase));
+                                                                       string.Equals(payment.GatewayName, gatewayName, StringComparison.OrdinalIgnoreCase) &&
+                                                                       (payment.BankReference == bankReference ||
+                                                                        (payment.BankReference == null && payment.TransactionCode == bankReference)));
 
             return Task.FromResult<Payment?>(record == null ? null : ClonePayment(record));
         }
@@ -220,10 +198,16 @@ public abstract class CacheStorage : IStorage, IPaidPaymentLookup, IPaymentCompl
 
     /// <inheritdoc />
     public virtual async Task<bool> TryCompletePaymentAsync(long paymentId,
-                                                            bool isPaid,
+                                                            PaymentStatus status,
                                                             string? transactionCode,
+                                                            string? bankReference,
                                                             CancellationToken cancellationToken = default)
     {
+        if (status is not (PaymentStatus.Paid or PaymentStatus.Failed or PaymentStatus.Cancelled))
+        {
+            throw new ArgumentOutOfRangeException(nameof(status), status, "A payment is completed as paid, failed or cancelled.");
+        }
+
         cancellationToken.ThrowIfCancellationRequested();
 
         lock (SyncRoot)
@@ -232,11 +216,12 @@ public abstract class CacheStorage : IStorage, IPaidPaymentLookup, IPaymentCompl
 
             if (record == null) throw new InvalidOperationException($"No payment records found in database with id {paymentId}");
 
-            if (record.IsPaid || (record.IsCompleted && !isPaid)) return false;
+            // A paid payment is never changed; a failed or cancelled one only becomes paid.
+            if (record.IsPaid || (record.IsCompleted && status != PaymentStatus.Paid)) return false;
 
-            record.IsCompleted = true;
-            record.IsPaid = isPaid;
+            record.Status = status;
             record.TransactionCode = transactionCode;
+            record.BankReference = bankReference;
         }
 
         await SaveChangesAsync(cancellationToken).ConfigureAwait(false);
@@ -267,6 +252,17 @@ public abstract class CacheStorage : IStorage, IPaidPaymentLookup, IPaymentCompl
             var exists = Collection.Payments.Any(payment => payment.Token == paymentToken);
 
             return Task.FromResult(exists);
+        }
+    }
+
+    /// <inheritdoc />
+    public virtual Task<long?> GetLargestTrackingNumberAsync(CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        lock (SyncRoot)
+        {
+            return Task.FromResult(Collection.Payments.Count == 0 ? (long?)null : Collection.Payments.Max(payment => payment.TrackingNumber));
         }
     }
 
@@ -364,8 +360,9 @@ public abstract class CacheStorage : IStorage, IPaidPaymentLookup, IPaymentCompl
         target.TransactionCode = source.TransactionCode;
         target.GatewayName = source.GatewayName;
         target.GatewayAccountName = source.GatewayAccountName;
-        target.IsCompleted = source.IsCompleted;
-        target.IsPaid = source.IsPaid;
+        target.BankReference = source.BankReference;
+        target.Status = source.Status;
+        target.RefundedAmount = source.RefundedAmount;
     }
 
     private static Transaction CloneTransaction(Transaction transaction)

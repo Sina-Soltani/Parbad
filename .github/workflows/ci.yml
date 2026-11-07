@@ -36,21 +36,22 @@ jobs:
 
       - uses: actions/setup-dotnet@v4
         with:
-          # The SDK builds every target framework; the .NET 9 runtime runs the tests.
+          # The SDK builds every target framework; the runtimes run the tests (the EF Core storage on .NET 8, 9 and 10).
           dotnet-version: |
+            8.0.x
             9.0.x
             10.0.x
 
       - name: Restore
         run: dotnet restore Parbad.sln
 
-      # Fails when a shipped package depends on a package with a known vulnerability, including the transitive
-      # dependencies of the netstandard and net462 builds.
+      # Fails when any project, shipped package or test, depends on a package with a known vulnerability, including
+      # transitive dependencies and those of the netstandard and net472 builds.
       - name: Check for vulnerable packages
         shell: pwsh
         run: |
           $vulnerable = $false
-          Get-ChildItem src -Recurse -Filter *.csproj | Where-Object { $_.FullName -notmatch '[\\/](tests|bin|obj)[\\/]' } | ForEach-Object {
+          Get-ChildItem src, tests -Recurse -Filter *.csproj | Where-Object { $_.FullName -notmatch '[\\/](bin|obj)[\\/]' } | ForEach-Object {
             $output = dotnet list $_.FullName package --vulnerable --include-transitive 2>&1 | Out-String
             if ($output -match 'has the following vulnerable packages') { Write-Host $output; $vulnerable = $true }
           }

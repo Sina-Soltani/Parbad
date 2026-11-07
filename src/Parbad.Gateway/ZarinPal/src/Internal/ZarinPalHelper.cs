@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -40,11 +41,15 @@ internal static class ZarinPalHelper
         return new()
                {
                    MerchantId = account.MerchantId,
-                   Amount = invoice.Amount,
+                   Amount = (long)invoice.Amount,
                    CallbackUrl = invoice.CallbackUrl,
                    Description = zarinPalInvoice.Description,
-                   Email = zarinPalInvoice.Email,
-                   Mobile = zarinPalInvoice.Mobile
+                   Metadata = new ZarinPalRequestMetadata
+                              {
+                                  Mobile = string.IsNullOrWhiteSpace(zarinPalInvoice.Mobile) ? null : zarinPalInvoice.Mobile,
+                                  Email = string.IsNullOrWhiteSpace(zarinPalInvoice.Email) ? null : zarinPalInvoice.Email,
+                                  OrderId = invoice.TrackingNumber.ToString(CultureInfo.InvariantCulture)
+                              }
                };
     }
 
@@ -63,10 +68,12 @@ internal static class ZarinPalHelper
 
         var paymentPageUrl = GetPaymentPageUrl(account.IsSandbox, gatewayOptions) + data.Authority;
 
-        var result = PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, paymentPageUrl);
+        var result = PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, paymentPageUrl) with
+                     {
+                         GatewayResponseCode = data.Code.ToString()
+                     };
 
-        result.GatewayResponseCode = data.Code.ToString();
-        result.DatabaseAdditionalData.Add(AuthorityDatabaseKey, data.Authority);
+        result.DatabaseAdditionalData.Add(AuthorityDatabaseKey, data.Authority ?? string.Empty);
 
         return result;
     }
@@ -78,9 +85,9 @@ internal static class ZarinPalHelper
     {
         var authority = await httpRequest.TryGetParamAsync("Authority", cancellationToken).ConfigureAwaitFalse();
         var status = await httpRequest.TryGetParamAsync("Status", cancellationToken).ConfigureAwaitFalse();
-        string message = null;
+        string? message = null;
 
-        var isSucceed = status.Exists && IsSucceedResult(status.Value);
+        var isSucceed = status.Exists && IsSucceedResult(status.Value.ToString());
 
         if (!isSucceed)
         {
@@ -103,7 +110,7 @@ internal static class ZarinPalHelper
         return new()
                {
                    MerchantId = account.MerchantId,
-                   Amount = amount,
+                   Amount = (long)amount,
                    Authority = authority
                };
     }
@@ -118,7 +125,7 @@ internal static class ZarinPalHelper
         // the database, so it is this invoice's own payment and it counts as paid.
         if (IsSucceedCode(verificationResult.Code) || verificationResult.Code == NumericAlreadyOkResult)
         {
-            result = PaymentVerifyResult.Succeed(verificationResult.RefId, messagesOptions.PaymentSucceed);
+            result = PaymentVerifyResult.Paid(verificationResult.RefId, verificationResult.RefId ?? string.Empty, messagesOptions.PaymentSucceed);
         }
         else
         {
@@ -131,45 +138,18 @@ internal static class ZarinPalHelper
                      };
         }
 
-        result.GatewayAccountName = account.Name;
-        result.GatewayResponseCode = verificationResult.Code.ToString();
+        result = result with
+                 {
+                     GatewayAccountName = account.Name,
+                     GatewayResponseCode = verificationResult.Code.ToString()
+                 };
+
         result.SetZarinPalOriginalVerificationResult(verificationResult);
 
         return result;
     }
 
-    public static ZarinPalRefundModel CreateRefundModel(string authority, ZarinPalGatewayAccount account)
-    {
-        return new()
-               {
-                   MerchantId = account.MerchantId,
-                   Authority = authority
-               };
-    }
 
-    public static PaymentRefundResult CreateRefundResult(ZarinPalRefundResultModelData data, ZarinPalGatewayAccount account, MessagesOptions messagesOptions)
-    {
-        var result = new PaymentRefundResult
-                     {
-                         GatewayResponseCode = data.Code.ToString(),
-                         GatewayAccountName = account.Name
-                     };
-
-        if (IsSucceedCode(data.Code))
-        {
-            result.Status = PaymentRefundResultStatus.Succeed;
-
-            result.Message = messagesOptions.PaymentSucceed;
-        }
-        else
-        {
-            result.Status = data.Code == NumericAlreadyOkResult ? PaymentRefundResultStatus.AlreadyRefunded : PaymentRefundResultStatus.Failed;
-
-            result.Message = ZarinPalCodeTranslator.Translate(data.Code, messagesOptions);
-        }
-
-        return result;
-    }
 
     public static string GetAuthorityFromAdditionalData(InvoiceContext context)
     {
@@ -180,9 +160,9 @@ internal static class ZarinPalHelper
             throw new InvalidOperationException($"No transaction of type '{TransactionType.Request}' found for the invoice #{context.Payment.TrackingNumber}.");
         }
 
-        var additionalData = JsonConvert.DeserializeObject<IDictionary<string, string>>(transaction.AdditionalData);
+        var additionalData = JsonConvert.DeserializeObject<IDictionary<string, string>>(transaction.AdditionalData ?? "{}") ?? new Dictionary<string, string>();
 
-        string authority = null;
+        string? authority = null;
 
         foreach (var key in additionalData.Keys)
         {
@@ -199,7 +179,7 @@ internal static class ZarinPalHelper
             throw new InvalidOperationException($"Authority not found in the Transaction record of invoice #{context.Payment.TrackingNumber}.");
         }
 
-        return authority;
+        return authority!;
     }
 
     public static string GetApiRequestUrl(bool isSandbox, ZarinPalGatewayOptions gatewayOptions)
@@ -216,12 +196,6 @@ internal static class ZarinPalHelper
             : gatewayOptions.ApiVerificationUrl;
     }
 
-    public static string GetApiRefundUrl(bool isSandbox, ZarinPalGatewayOptions gatewayOptions)
-    {
-        return isSandbox
-            ? gatewayOptions.SandboxApiRefundUrl
-            : gatewayOptions.ApiRefundUrl;
-    }
 
     private static string GetPaymentPageUrl(bool isSandbox, ZarinPalGatewayOptions gatewayOptions)
     {

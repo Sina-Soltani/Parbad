@@ -1,6 +1,7 @@
 // Copyright (c) Parbad. All rights reserved.
 // Licensed under the GNU GENERAL PUBLIC License, Version 3.0. See License.txt in the project root for license information.
 
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -36,7 +37,7 @@ public class DefaultGatewayTransporter : IGatewayTransporter
     {
         if (Descriptor.Type == GatewayTransporterDescriptor.TransportType.Post)
         {
-            string nonce = null;
+            string? nonce = null;
             var parbadOptions = _httpContext.RequestServices.GetRequiredService<IOptions<ParbadOptions>>();
 
             HttpResponseUtilities.AddNecessaryContents(_httpContext, "text/html");
@@ -46,7 +47,7 @@ public class DefaultGatewayTransporter : IGatewayTransporter
                 nonce = parbadOptions.Value.NonceFactory(_httpContext);
             }
 
-            var form = HtmlFormBuilder.CreateForm(Descriptor.Url, Descriptor.Form, nonce);
+            var form = HtmlFormBuilder.CreateForm(Descriptor.Url, Descriptor.Form ?? Array.Empty<KeyValuePair<string, string>>(), nonce);
 
             var buffer = Encoding.UTF8.GetBytes(form);
 

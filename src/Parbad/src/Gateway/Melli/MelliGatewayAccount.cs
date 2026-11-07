@@ -10,9 +10,9 @@ namespace Parbad.Gateway.Melli;
 /// </summary>
 public class MelliGatewayAccount : GatewayAccount
 {
-    public string TerminalId { get; set; }
+    public string TerminalId { get; set; } = null!;
 
-    public string MerchantId { get; set; }
+    public string MerchantId { get; set; } = null!;
 
-    public string TerminalKey { get; set; }
+    public string TerminalKey { get; set; } = null!;
 }

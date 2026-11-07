@@ -10,14 +10,17 @@ namespace Parbad;
 /// An amount of money.
 /// <para>
 /// Parbad never converts the amount. It is sent to the gateway exactly as given, as a whole number
-/// (<see cref="Int64"/>; a fraction is dropped). Set it in the unit the gateway expects: most Iranian gateways
-/// expect Iranian rials (IRR), but some payment providers work in tomans. Check the gateway's documentation.
+/// (<see cref="Int64"/>). Set it in the unit the gateway expects: most Iranian gateways expect Iranian rials (IRR),
+/// but some payment providers work in tomans. Check the gateway's documentation.
+/// </para>
+/// <para>
+/// Converting to <see cref="long"/> is explicit and throws <see cref="InvalidOperationException"/> when the amount
+/// has a fraction, so no part of an amount is dropped silently. Equality compares the exact values.
 /// </para>
 /// <para>Examples:
-/// <para>decimal a = new Money(1000)</para>
-/// <para>long a = new Money(1000)</para>
-/// <para>Money m = 1000.55m</para>
-/// <para>Money m = 1000</para>
+/// <para>Money m = 1000;</para>
+/// <para>decimal d = m;</para>
+/// <para>long l = (long)m;</para>
 /// </para>
 /// </summary>
 public readonly struct Money : IComparable<Money>, IEquatable<Money>, IEquatable<decimal>, IEquatable<long>
@@ -41,16 +44,16 @@ public readonly struct Money : IComparable<Money>, IEquatable<Money>, IEquatable
         return new Money(Value + amount);
     }
 
-    public bool Equals(Money? other) => false;
+    public bool Equals(Money? other) => other.HasValue && Equals(other.Value);
     public bool Equals(Money other) => Value == other.Value;
 
-    public bool Equals(long? other) => false;
-    public bool Equals(long other) => (long)Value == other;
+    public bool Equals(long? other) => other.HasValue && Equals(other.Value);
+    public bool Equals(long other) => Value == other;
 
-    public bool Equals(decimal? other) => false;
+    public bool Equals(decimal? other) => other.HasValue && Equals(other.Value);
     public bool Equals(decimal other) => Value == other;
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         var equals =
             (obj is Money other && Equals(other)) ||
@@ -90,29 +93,33 @@ public readonly struct Money : IComparable<Money>, IEquatable<Money>, IEquatable
 
     public static Money Parse(long amount) => new Money(amount);
 
-    /// <exception cref="Exception"></exception>
+    /// <summary>
+    /// Parses an amount written with the invariant culture (e.g. "1000" or "1000.5"), whatever the server's culture.
+    /// </summary>
+    /// <exception cref="FormatException"><paramref name="amount"/> is not a number.</exception>
     public static Money Parse(string amount)
     {
-        if (!decimal.TryParse(amount, out var testValue))
+        if (!TryParse(amount, out var money))
         {
-            throw new Exception($"Cannot parse {amount} to Money.");
+            throw new FormatException($"Cannot parse '{amount}' to Money.");
         }
 
-        return testValue;
+        return money;
     }
 
+    /// <summary>
+    /// Parses an amount written with the invariant culture (e.g. "1000" or "1000.5"), whatever the server's culture.
+    /// </summary>
     public static bool TryParse(string value, out Money money)
     {
-        try
+        if (decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var amount))
         {
-            money = Parse(value);
+            money = new Money(amount);
             return true;
         }
-        catch
-        {
-            money = default;
-            return false;
-        }
+
+        money = default;
+        return false;
     }
 
     public static implicit operator decimal(Money money)
@@ -120,9 +127,19 @@ public readonly struct Money : IComparable<Money>, IEquatable<Money>, IEquatable
         return money.Value;
     }
 
-    public static implicit operator long(Money money)
+    /// <summary>
+    /// Converts the amount to a whole number.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">The amount has a fraction.</exception>
+    /// <exception cref="OverflowException">The amount does not fit into a <see cref="long"/>.</exception>
+    public static explicit operator long(Money money)
     {
-        return (long)money.Value;
+        if (decimal.Truncate(money.Value) != money.Value)
+        {
+            throw new InvalidOperationException($"The amount {money} has a fraction and cannot be converted to a whole number.");
+        }
+
+        return decimal.ToInt64(money.Value);
     }
 
     public static implicit operator Money(decimal amount) => Parse(amount);

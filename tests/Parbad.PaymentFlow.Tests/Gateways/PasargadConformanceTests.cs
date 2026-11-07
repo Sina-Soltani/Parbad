@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Parbad.Builder;
 using Parbad.Gateway.Pasargad;
 using Parbad.GatewayBuilders;
@@ -16,7 +16,7 @@ namespace Parbad.PaymentFlow.Tests.Gateways;
 /// Pasargad REST API: Token/GetToken → Api/Payment/purchase (bearer) → redirect → callback →
 /// Api/Payment/Verify-Payment; refunds use Api/Payment/Reverse-Transactions.
 /// </summary>
-[TestClass]
+[TestFixture]
 public class PasargadConformanceTests : GatewayConformanceTests
 {
     private const string ApiBase = BankUrl + "/pasargad/";
@@ -133,7 +133,7 @@ public class PasargadConformanceTests : GatewayConformanceTests
     /// Open question: Parbad declares the verify response's "data" as a string, while the
     /// bank is believed to return an object. Confirm the real shape against the Pasargad sandbox.
     /// </summary>
-    [TestMethod]
+    [Test]
     public Task Verify_accepts_a_response_whose_data_is_an_object() =>
         KnownIssue.ReproducesAsync("the shape of Pasargad's verify data (unverified)", () =>
             UnderCultureAsync(CultureInfo.InvariantCulture.Name, () =>

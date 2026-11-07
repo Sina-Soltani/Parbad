@@ -22,7 +22,7 @@ public class ParbadOptions
     /// A factory to represent Nonce. The value will be used in inline-scripts and CSS links
     /// to support CSP (Content-Security-Policy). If your application doesn't include any CSP, you can leave this property null. 
     /// </summary>
-    public Func<HttpContext, string> NonceFactory { get; set; }
+    public Func<HttpContext, string>? NonceFactory { get; set; }
 
     /// <summary>
     /// The timeout of each HTTP call Parbad makes to a gateway. The default value is 30 seconds, instead of the

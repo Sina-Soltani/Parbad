@@ -7,7 +7,7 @@ namespace Parbad.Internal;
 
 internal static class HttpResponseUtilities
 {
-    public static void AddNecessaryContents(HttpContext httpContext, string contentType = null)
+    public static void AddNecessaryContents(HttpContext httpContext, string? contentType = null)
     {
         var response = httpContext.Response;
 

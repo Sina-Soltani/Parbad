@@ -34,7 +34,7 @@ internal static class ZibalHelper
         return new ZibalPaymentRequestModel
                {
                    Merchant = GetMerchant(account),
-                   Amount = invoice.Amount,
+                   Amount = (long)invoice.Amount,
                    Mobile = requestAdditionalData?.MobileNumber,
                    OrderId = invoice.TrackingNumber.ToString(),
                    CallbackUrl = invoice.CallbackUrl,
@@ -70,7 +70,7 @@ internal static class ZibalHelper
             ? GetPaymentPageUrl(gatewayOptions.PaymentPageUrl, response.TrackId)
             : response.PayLink;
 
-        var result = PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, paymentPageUrl);
+        var result = PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, paymentPageUrl!);
 
         result.DatabaseAdditionalData.Add(TrackIdAdditionalDataKey, response.TrackId.ToString());
 
@@ -136,21 +136,19 @@ internal static class ZibalHelper
         // the database, so it is this invoice's own payment and it counts as paid.
         if (response.Result == PaymentAlreadyVerifiedCode)
         {
-            var alreadyVerified = PaymentVerifyResult.Succeed(response.RefNumber?.ToString() ?? trackId, messagesOptions.PaymentSucceed);
-            alreadyVerified.GatewayResponseCode = response.Result.ToString();
-
-            return alreadyVerified;
+            return PaymentVerifyResult.Paid(response.RefNumber?.ToString() ?? trackId,
+                                            trackId ?? response.RefNumber?.ToString() ?? string.Empty,
+                                            messagesOptions.PaymentSucceed,
+                                            response.Result.ToString());
         }
 
         if (response.Result != SuccessCode)
         {
-            var verifyResult = PaymentVerifyResult.Failed(response.Message);
-            verifyResult.GatewayResponseCode = response.Result.ToString();
-
-            return verifyResult;
+            return PaymentVerifyResult.Failed(response.Message, response.Result.ToString());
         }
 
-        return PaymentVerifyResult.Succeed(response.RefNumber.ToString(), messagesOptions.PaymentSucceed);
+        // The bank verifies the trackId stored for this invoice; the reference number is shown to the customer.
+        return PaymentVerifyResult.Paid(response.RefNumber.ToString(), trackId ?? response.RefNumber.ToString() ?? string.Empty, messagesOptions.PaymentSucceed);
     }
 
     private static string GetPaymentPageUrl(string paymentUrl, long trackId)
@@ -168,7 +166,7 @@ internal static class ZibalHelper
 
         if (transactionRecord == null) throw new Exception("Cannot find any transaction with the type \"Request\"");
 
-        var additionalData = JsonConvert.DeserializeObject<IDictionary<string, string>>(transactionRecord.AdditionalData);
+        var additionalData = JsonConvert.DeserializeObject<IDictionary<string, string>>(transactionRecord.AdditionalData ?? "{}") ?? new Dictionary<string, string>();
 
         if (!additionalData.TryGetValue(TrackIdAdditionalDataKey, out var id))
         {

@@ -10,7 +10,7 @@ internal class ZarinPalVerificationModel
     public long Amount { set; get; }
 
     [JsonProperty("merchant_id")]
-    public string MerchantId { set; get; }
+    public string? MerchantId { set; get; }
 
-    public string Authority { set; get; }
+    public string? Authority { set; get; }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Newtonsoft.Json.Linq;
 using Parbad.Builder;
 using Parbad.Gateway.IranKish;
@@ -18,7 +18,7 @@ namespace Parbad.PaymentFlow.Tests.Gateways;
 /// Iran Kish (IKC API v3): tokenization/make with an RSA/AES authentication envelope → POST to the payment
 /// page → POST callback → confirmation/purchase.
 /// </summary>
-[TestClass]
+[TestFixture]
 public class IranKishConformanceTests : GatewayConformanceTests
 {
     private const string TerminalId = "08000001";
@@ -26,6 +26,9 @@ public class IranKishConformanceTests : GatewayConformanceTests
     private const string PassPhrase = "0123456789ABCDEF0123456789ABCDEF";
 
     private static readonly RSA BankKey = RSA.Create(2048);
+
+    [OneTimeTearDown]
+    public static void DisposeBankKey() => BankKey.Dispose();
 
     protected override string GatewayName => IranKishGateway.Name;
 

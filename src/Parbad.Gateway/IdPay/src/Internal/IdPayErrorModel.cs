@@ -8,10 +8,10 @@ namespace Parbad.Gateway.IdPay.Internal;
 internal class IdPayErrorModel
 {
     [JsonProperty("error_code")]
-    public string ErrorCode { get; set; }
+    public string? ErrorCode { get; set; }
 
     [JsonProperty("error_message")]
-    public string ErrorMessage { get; set; }
+    public string? ErrorMessage { get; set; }
 
     public override string ToString()
     {

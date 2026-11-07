@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
 using System.Net.Http;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using Parbad.Builder;
 using Parbad.Gateway.IdPay;
 using Parbad.GatewayBuilders;
@@ -15,7 +15,7 @@ namespace Parbad.PaymentFlow.Tests.Gateways;
 /// <summary>
 /// IDPay v1.1: payment (X-API-KEY) → redirect → POST callback → payment/verify.
 /// </summary>
-[TestClass]
+[TestFixture]
 public class IdPayConformanceTests : GatewayConformanceTests
 {
     private const string ApiKey = "idpay-api-key";

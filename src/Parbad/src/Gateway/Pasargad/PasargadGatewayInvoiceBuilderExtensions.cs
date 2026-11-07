@@ -34,7 +34,7 @@ public static class PasargadGatewayInvoiceBuilderExtensions
         return builder.AddOrUpdateProperty(RequestAdditionalDataKey, additionalData);
     }
 
-    internal static PasargadRequestAdditionalData GetPasargadRequestAdditionalData(this Invoice invoice)
+    internal static PasargadRequestAdditionalData? GetPasargadRequestAdditionalData(this Invoice invoice)
     {
         if (invoice == null) throw new ArgumentNullException(nameof(invoice));
 

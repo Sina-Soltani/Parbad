@@ -22,14 +22,20 @@ public sealed class FakeGatewayBehaviour
 
     public Exception? RequestException { get; set; }
 
+    /// <summary>Builds the request result from the account name. By default the request succeeds with a redirect.</summary>
+    public Func<string, PaymentRequestResult>? RequestResult { get; set; }
+
+    /// <summary>Builds the refund result. By default the refund succeeds.</summary>
+    public Func<PaymentRefundResult> RefundResult { get; set; } = () => PaymentRefundResult.Succeed("Refunded.");
+
     public Exception? VerifyException { get; set; }
 
     /// <summary>Awaited inside every verify call; used to make concurrent verifications overlap.</summary>
     public Func<Task> BeforeVerify { get; set; } = () => Task.CompletedTask;
 
     /// <summary>Builds the verify result from the invoice. By default the payment succeeds with <see cref="FakeGateway.TransactionCode"/>.</summary>
-    public Func<InvoiceContext, PaymentVerifyResult> VerifyResult { get; set; } =
-        _ => PaymentVerifyResult.Succeed(FakeGateway.TransactionCode, "Paid.");
+    public Func<InvoiceContext, IPaymentVerifyResult> VerifyResult { get; set; } =
+        _ => PaymentVerifyResult.Paid(FakeGateway.TransactionCode, FakeGateway.TransactionCode, "Paid.");
 
     public int VerifyCalls => _verifyCalls;
 
@@ -67,6 +73,8 @@ public class FakeGateway : GatewayBase<FakeGatewayAccount>
 
         var account = await GetAccountAsync(invoice);
 
+        if (_behaviour.RequestResult != null) return _behaviour.RequestResult(account.Name);
+
         return PaymentRequestResult.SucceedWithRedirect(account.Name, _httpContextAccessor.HttpContext!, PaymentPageUrl);
     }
 
@@ -86,8 +94,10 @@ public class FakeGateway : GatewayBase<FakeGatewayAccount>
 
     public override Task<IPaymentRefundResult> RefundAsync(InvoiceContext context, Money amount, CancellationToken cancellationToken = default)
     {
-        _behaviour.RefundedAmounts.Enqueue(amount);
+        var result = _behaviour.RefundResult();
 
-        return Task.FromResult<IPaymentRefundResult>(PaymentRefundResult.Succeed("Refunded."));
+        if (result.IsSucceed) _behaviour.RefundedAmounts.Enqueue(amount);
+
+        return Task.FromResult<IPaymentRefundResult>(result);
     }
 }

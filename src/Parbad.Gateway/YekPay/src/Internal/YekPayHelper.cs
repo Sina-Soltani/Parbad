@@ -71,7 +71,7 @@ internal static class YekPayHelper
         var paymentPageUrl = gatewayOptions.PaymentPageUrl + response.Authority;
 
         var result = PaymentRequestResult.SucceedWithRedirect(account.Name, httpContext, paymentPageUrl);
-        result.DatabaseAdditionalData.Add(AuthorityAdditionalDataKey, response.Authority);
+        result.DatabaseAdditionalData.Add(AuthorityAdditionalDataKey, response.Authority!);
 
         return result;
     }
@@ -84,7 +84,7 @@ internal static class YekPayHelper
 
         if (transactionRecord == null) throw new Exception("Cannot find any transaction with the type \"Request\"");
 
-        var additionalData = JsonConvert.DeserializeObject<IDictionary<string, string>>(transactionRecord.AdditionalData);
+        var additionalData = JsonConvert.DeserializeObject<IDictionary<string, string>>(transactionRecord.AdditionalData ?? "{}") ?? new Dictionary<string, string>();
 
         if (!additionalData.ContainsKey(AuthorityAdditionalDataKey))
         {
@@ -114,6 +114,6 @@ internal static class YekPayHelper
             return PaymentVerifyResult.Failed(failureMessage);
         }
 
-        return PaymentVerifyResult.Succeed(response.Reference, optionsMessages.PaymentSucceed);
+        return PaymentVerifyResult.Paid(response.Reference, response.Reference ?? string.Empty, optionsMessages.PaymentSucceed);
     }
 }

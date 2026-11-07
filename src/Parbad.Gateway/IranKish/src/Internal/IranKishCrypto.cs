@@ -31,7 +31,7 @@ internal class IranKishCrypto
 
         var encrypted = EncryptStringToBytes_Aes(dataBytes, aes.Key, aes.IV);
 
-        var hsaHash = new SHA256CryptoServiceProvider().ComputeHash(encrypted);
+        var hsaHash = SHA256.Create().ComputeHash(encrypted);
 
         var aesData = CombineArrays(keyAes, hsaHash);
 
@@ -69,7 +69,7 @@ internal class IranKishCrypto
 
     private static byte[] EncryptStringToBytes_Aes(byte[] plainText, byte[] key, byte[] iv)
     {
-        using var aesAlg = new AesCryptoServiceProvider();
+        using var aesAlg = Aes.Create();
 
         aesAlg.KeySize = 128;
         aesAlg.Key = key;
@@ -102,7 +102,7 @@ internal class IranKishCrypto
 
         // Declare the string used to hold
         // the decrypted text.
-        string plaintext = null;
+        string? plaintext = null;
 
         // Create an Aes object
         // with the specified key and IV.
