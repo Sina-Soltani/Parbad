@@ -37,6 +37,6 @@ app.UseParbadVirtualGateway(parbad.Services);
 
 ## More information
 
-* [Configuration](https://github.com/Sina-Soltani/Parbad/wiki/Configuration#aspnet-mvc--aspnet-webforms)
+* [Configuration](https://sina-soltani.github.io/Parbad/docs/configuration#web-application-integration)
 * [GitHub](https://github.com/Sina-Soltani/Parbad)
-* [Documentation](https://github.com/Sina-Soltani/Parbad/wiki)
+* [Documentation](https://sina-soltani.github.io/Parbad/)

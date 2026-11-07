@@ -39,12 +39,15 @@ Parbad is a free and open-source integrated online payment library which helps d
 
 # Tutorials
 
-* [How to use it?](https://github.com/Sina-Soltani/Parbad/wiki/How-to-use-it%3F)
-* [Installation](https://github.com/Sina-Soltani/Parbad/wiki/Installation)
-* [Configuration](https://github.com/Sina-Soltani/Parbad/wiki/Configuration)
-* [Payment](https://github.com/Sina-Soltani/Parbad/wiki/Payment)
-* [Virtual Gateway](https://github.com/Sina-Soltani/Parbad/wiki/Virtual-Gateway)
-* [Developing a new Gateway](https://github.com/Sina-Soltani/Parbad/wiki/Developing-a-new-Gateway)
+The documentation, in English and Persian, is at **[sina-soltani.github.io/Parbad](https://sina-soltani.github.io/Parbad/)**:
+
+* [Getting started](https://sina-soltani.github.io/Parbad/docs/getting-started)
+* [Configuration](https://sina-soltani.github.io/Parbad/docs/configuration)
+* [Payment](https://sina-soltani.github.io/Parbad/docs/payment)
+* [Gateways](https://sina-soltani.github.io/Parbad/docs/gateways)
+* [Virtual Gateway](https://sina-soltani.github.io/Parbad/docs/virtual-gateway)
+* [Developing a gateway](https://sina-soltani.github.io/Parbad/docs/developing-a-gateway)
+* [Migrating from 3.x to 4.0](https://sina-soltani.github.io/Parbad/docs/migrating-to-4)
 * Samples
   * [Project Samples](https://github.com/Sina-Soltani/Parbad.Samples)
   * [Docker Demo](https://hub.docker.com/r/ssoltani/parbad.samples.aspnetcore)
